@@ -1,0 +1,71 @@
+﻿<Window x:Class="CncWallStation.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:CncWallStation"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:vm="CncWallStationWPF.ViewModels"
+    mc:Ignorable="d"
+
+    Title="CNC工站管理系统" Height="600" Width="1200">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <!-- 侧边导航宽度 -->
+            <ColumnDefinition Width="*"/>
+            <!-- 内容区宽度 -->
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧：HandyControl侧边菜单 -->
+        <hc:SideMenu Grid.Column="0" Background="{DynamicResource SecondaryRegionBrush}" Margin="0,30,0,0">
+            <hc:SideMenu.Items>
+                <!-- 首页 -->
+                <hc:SideMenuItem 
+                Header="BIM数据渲染" 
+                
+                Command="{Binding NavigateCommand}"
+                CommandParameter="BimDataRenderPage"/>
+
+                <!-- 设备监控 -->
+                <hc:SideMenuItem 
+                Header="设备监控" 
+                
+                Command="{Binding NavigateCommand}"
+                CommandParameter="ControllerPage"/>
+
+                <!-- 生产报表 -->
+                <hc:SideMenuItem 
+                Header="生产报表" 
+                
+                Command="{Binding NavigateCommand}"
+                CommandParameter="ReportPage"/>
+
+                <!-- 系统设置 -->
+                <hc:SideMenuItem 
+                Header="系统设置" 
+                
+                Command="{Binding NavigateCommand}"
+                CommandParameter="SettingPage"/>
+            </hc:SideMenu.Items>
+        </hc:SideMenu>
+
+        <!-- 右侧：页面容器（Frame） -->
+        <Grid Grid.Column="1" Margin="10">
+            <Frame 
+            x:Name="MainFrame" 
+            NavigationUIVisibility="Hidden"
+            Background="{DynamicResource PrimaryRegionBrush}"/>
+        </Grid>
+    </Grid>
+</Window>

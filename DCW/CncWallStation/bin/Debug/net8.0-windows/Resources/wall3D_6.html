@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>AAC 墙体 3D — 竖立 · 完整功能版</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0f0f1a; font-family:'Segoe UI',sans-serif; overflow:hidden; }
+    canvas { display:block; }
+
+    #info-panel {
+      position:fixed; top:20px; left:20px;
+      background:rgba(15,15,40,0.88); backdrop-filter:blur(14px);
+      border:1px solid rgba(97,218,251,0.28); border-radius:14px;
+      padding:18px 22px; color:#fff; min-width:240px; z-index:100;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    }
+    #info-panel h2 {
+      font-size:12px; font-weight:700; color:#61dafb;
+      margin-bottom:12px; padding-bottom:8px;
+      border-bottom:1px solid rgba(97,218,251,0.2);
+      letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .info-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; font-size:12px; }
+    .info-label { color:#8888aa; }
+    .info-value { color:#fff; font-weight:600; background:rgba(97,218,251,0.1); padding:2px 8px; border-radius:5px; font-size:11px; }
+
+    #legend {
+      position:fixed; top:20px; right:20px;
+      background:rgba(15,15,40,0.88); backdrop-filter:blur(14px);
+      border:1px solid rgba(97,218,251,0.28); border-radius:14px;
+      padding:18px 22px; color:#fff; min-width:200px; z-index:100;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+    }
+    #legend h2 {
+      font-size:12px; font-weight:700; color:#61dafb;
+      margin-bottom:12px; padding-bottom:8px;
+      border-bottom:1px solid rgba(97,218,251,0.2);
+      letter-spacing:1.5px; text-transform:uppercase;
+    }
+    .legend-item { display:flex; align-items:center; margin-bottom:8px; font-size:12px; color:#ccccdd; }
+    .legend-dot { width:13px; height:13px; border-radius:3px; margin-right:10px; flex-shrink:0; border:1px solid rgba(255,255,255,0.15); }
+
+    #layer-panel {
+      position:fixed; top:20px; left:50%; transform:translateX(-50%);
+      background:rgba(15,15,40,0.88); backdrop-filter:blur(14px);
+      border:1px solid rgba(97,218,251,0.28); border-radius:14px;
+      padding:11px 20px; z-index:100;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      display:flex; gap:12px; align-items:center;
+    }
+    #layer-panel > span { font-size:12px; color:#61dafb; font-weight:700; letter-spacing:1px; margin-right:4px; }
+    .layer-btn {
+      padding:5px 14px; border-radius:20px;
+      border:1px solid rgba(97,218,251,0.35);
+      background:rgba(97,218,251,0.07); color:#aaa;
+      font-size:12px; cursor:pointer; transition:all 0.2s; user-select:none;
+    }
+    .layer-btn.active { background:rgba(97,218,251,0.28); border-color:#61dafb; color:#61dafb; font-weight:600; }
+    .layer-btn:hover  { background:rgba(97,218,251,0.16); color:#fff; }
+
+    #measure-tooltip {
+      position:fixed; background:rgba(8,8,28,0.96); backdrop-filter:blur(8px);
+      border:1px solid #61dafb; border-radius:10px; padding:10px 15px;
+      color:#fff; pointer-events:none; z-index:300; display:none;
+      min-width:180px; box-shadow:0 4px 20px rgba(97,218,251,0.25);
+    }
+    .tip-title { color:#61dafb; font-weight:700; font-size:10px; letter-spacing:1.5px; margin-bottom:7px; text-transform:uppercase; }
+    .tip-row   { display:flex; justify-content:space-between; gap:14px; margin-bottom:4px; font-size:12px; }
+    .tip-key   { color:#9999bb; }
+    .tip-val   { color:#fff; font-weight:600; font-size:11px; }
+
+    #brick-tooltip {
+      position:fixed; background:rgba(8,8,28,0.96); backdrop-filter:blur(8px);
+      border:1px solid #f5a623; border-radius:10px; padding:10px 15px;
+      color:#fff; pointer-events:none; z-index:300; display:none;
+      min-width:200px; box-shadow:0 4px 20px rgba(245,166,35,0.25);
+    }
+    .btip-title { color:#f5a623; font-weight:700; font-size:10px; letter-spacing:1.5px; margin-bottom:7px; text-transform:uppercase; }
+    .btip-row   { display:flex; justify-content:space-between; gap:14px; margin-bottom:4px; font-size:12px; }
+    .btip-key   { color:#ccaa66; }
+    .btip-val   { color:#fff; font-weight:600; font-size:11px; }
+
+    #hint-bar {
+      position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+      background:rgba(15,15,40,0.88); backdrop-filter:blur(14px);
+      border:1px solid rgba(97,218,251,0.2); border-radius:30px;
+      padding:8px 26px; display:flex; gap:20px;
+      color:#777799; font-size:11px; z-index:100; white-space:nowrap;
+    }
+    .hint-item b { color:#ddd; margin-right:3px; }
+
+    #loading {
+      position:fixed; inset:0; background:#0f0f1a;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      z-index:999; color:#61dafb; font-size:14px; gap:16px;
+    }
+    .spinner {
+      width:50px; height:50px;
+      border:4px solid rgba(97,218,251,0.12); border-top-color:#61dafb;
+      border-radius:50%; animation:spin 0.85s linear infinite;
+    }
+    #load-status { font-size:12px; color:#666688; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    #error-box {
+      display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      background:rgba(35,8,8,0.97); border:1px solid #ff4444; border-radius:14px;
+      padding:28px 36px; color:#ff9999; z-index:9999; text-align:center;
+      max-width:460px; line-height:1.8;
+    }
+    #error-box h3 { color:#ff4444; margin-bottom:10px; font-size:16px; }
+
+    #axis-legend {
+      position:fixed; bottom:70px; left:20px;
+      background:rgba(15,15,40,0.82); backdrop-filter:blur(10px);
+      border:1px solid rgba(97,218,251,0.2); border-radius:10px;
+      padding:10px 16px; font-size:11px; color:#aaa; z-index:100; line-height:1.8;
+    }
+    #axis-legend span { font-weight:700; margin-right:6px; }
+    .ax { color:#ff5555; } .ay { color:#55ff88; } .az { color:#5588ff; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <span>正在加载 Three.js…</span>
+  <span id="load-status">请稍候</span>
+</div>
+<div id="error-box">
+  <h3>⚠️ 加载失败</h3>
+  <p id="error-msg"></p>
+</div>
+
+<!-- 信息面板 -->
+<div id="info-panel">
+  <h2>📐 墙体参数</h2>
+  <div class="info-row"><span class="info-label">数据来源</span><span class="info-value">aacWallElevation</span></div>
+  <div class="info-row">
+    <span class="info-label"><span style="color:#ff5555">■</span> X 轴（宽度）</span>
+    <span class="info-value" id="val-x">—</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label"><span style="color:#55ff88">■</span> Y 轴（高度）</span>
+    <span class="info-value" id="val-y">—</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label"><span style="color:#5588ff">■</span> Z 轴（厚度）</span>
+    <span class="info-value" id="val-z">—</span>
+  </div>
+  <div class="info-row"><span class="info-label">砖块分片</span><span class="info-value" id="val-slices">—</span></div>
+  <div class="info-row"><span class="info-label">轮廓顶点</span><span class="info-value" id="val-verts">—</span></div>
+</div>
+
+<!-- 图层开关 -->
+<div id="layer-panel">
+  <span>图层</span>
+  <div class="layer-btn active" id="btn-wall"   onclick="toggleLayer('wall',this)">🧱 墙体</div>
+  <div class="layer-btn active" id="btn-slices" onclick="toggleLayer('slices',this)">🪨 砖块</div>
+  <div class="layer-btn active" id="btn-joints" onclick="toggleLayer('joints',this)">📏 接缝</div>
+  <div class="layer-btn active" id="btn-dim"    onclick="toggleLayer('dim',this)">📐 标注</div>
+</div>
+
+<!-- 图例 -->
+<div id="legend">
+  <h2>🎨 图例</h2>
+  <div class="legend-item"><div class="legend-dot" style="background:#c8a87a;opacity:.5;"></div>AAC 整体墙体</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#e8c97a;"></div>砖块 · 列 0</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d4a856;"></div>砖块 · 列 1</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#bf8c3c;"></div>砖块 · 列 2</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff6060; height:3px; border-radius:2px;"></div>竖向胶缝</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffd700;"></div>尺寸标注</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#00ffcc;"></div>悬停高亮边</div>
+</div>
+
+<!-- 坐标轴说明 -->
+<div id="axis-legend">
+  <div><span class="ax">■ X</span>宽度方向 · 1400 mm</div>
+  <div><span class="ay">■ Y</span>高度方向 · 2695 mm（竖立）</div>
+  <div><span class="az">■ Z</span>厚度方向 · 298 mm</div>
+</div>
+
+<!-- 测量浮窗 -->
+<div id="measure-tooltip">
+  <div class="tip-title">📏 边缘测量</div>
+  <div class="tip-row"><span class="tip-key">类型</span><span class="tip-val" id="tip-type">—</span></div>
+  <div class="tip-row"><span class="tip-key">长度</span><span class="tip-val" id="tip-len">—</span></div>
+  <div class="tip-row"><span class="tip-key">起点</span><span class="tip-val" id="tip-a">—</span></div>
+  <div class="tip-row"><span class="tip-key">终点</span><span class="tip-val" id="tip-b">—</span></div>
+</div>
+
+<!-- 砖块浮窗 -->
+<div id="brick-tooltip">
+  <div class="btip-title">🪨 砖块信息</div>
+  <div class="btip-row"><span class="btip-key">列号</span><span class="btip-val" id="bt-col">—</span></div>
+  <div class="btip-row"><span class="btip-key">宽度 (X)</span><span class="btip-val" id="bt-w">—</span></div>
+  <div class="btip-row"><span class="btip-key">高度 (Y)</span><span class="btip-val" id="bt-h">—</span></div>
+  <div class="btip-row"><span class="btip-key">厚度 (Z)</span><span class="btip-val" id="bt-t">—</span></div>
+  <div class="btip-row"><span class="btip-key">胶缝</span><span class="btip-val" id="bt-glue">—</span></div>
+</div>
+
+<!-- 底部提示 -->
+<div id="hint-bar">
+  <span class="hint-item"><b>左键</b>旋转</span>
+  <span class="hint-item"><b>右键</b>平移</span>
+  <span class="hint-item"><b>滚轮</b>缩放</span>
+  <span class="hint-item"><b>双击</b>复位</span>
+  <span class="hint-item"><b>悬停墙边</b>测量</span>
+  <span class="hint-item"><b>悬停砖块</b>信息</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+    function showError(msg) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-box').style.display = 'block';
+        document.getElementById('error-msg').textContent = msg;
+    }
+    function setStatus(s) { document.getElementById('load-status').textContent = s; }
+
+    window.addEventListener('load', function () {
+        setStatus('检测依赖…');
+        if (typeof THREE === 'undefined') { showError('Three.js 加载失败，请检查网络后刷新。'); return; }
+        if (typeof THREE.OrbitControls === 'undefined') { showError('OrbitControls 加载失败，请检查网络后刷新。'); return; }
+        setStatus('构建场景…');
+        requestAnimationFrame(function () { requestAnimationFrame(initScene); });
+    });
+
+    function initScene() {
+
+        /* ── 1. 数据 ── */
+        var D = {
+            wallContour: [
+                { x: 0, y: 0 }, { x: 0, y: 2695 },
+                { x: 1400, y: 2695 }, { x: 1400, y: 0 }
+            ],
+            thickness: 298,
+            slices: [
+                {
+                    contour: [{ x: 0, y: 0 }, { x: 0, y: 2695 }, { x: 466.7, y: 2695 }, { x: 466.7, y: 0 }],
+                    col: 0, gluePn: null, glueSegs: null, pn: '10001'
+                },
+                {
+                    contour: [{ x: 466.7, y: 0 }, { x: 466.7, y: 2695 }, { x: 933.3, y: 2695 }, { x: 933.3, y: 0 }],
+                    col: 1, gluePn: '10021',
+                    glueSegs: [{ s: { x: 466.7, y: 0 }, e: { x: 466.7, y: 2695 } }],
+                    pn: '10001'
+                },
+                {
+                    contour: [{ x: 933.3, y: 0 }, { x: 933.3, y: 2695 }, { x: 1400, y: 2695 }, { x: 1400, y: 0 }],
+                    col: 2, gluePn: '10021',
+                    glueSegs: [{ s: { x: 933.3, y: 0 }, e: { x: 933.3, y: 2695 } }],
+                    pn: '10001'
+                }
+            ]
+        };
+
+        /* ── 2. 尺寸 ── */
+        var W = 1400;
+        var H = 2695;
+        var TH = D.thickness; // 298
+
+        var cx = W / 2;
+        var cy = H / 2;
+        var cz = TH / 2;
+
+        document.getElementById('val-x').textContent = W + ' mm';
+        document.getElementById('val-y').textContent = H + ' mm';
+        document.getElementById('val-z').textContent = TH + ' mm';
+        document.getElementById('val-slices').textContent = D.slices.length + ' 块';
+        document.getElementById('val-verts').textContent = D.wallContour.length + ' 个';
+
+        /* ── 3. 渲染器 ── */
+        var renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.08;
+        document.body.appendChild(renderer.domElement);
+
+        /* ── 4. 场景 ── */
+        var scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d0d1c);
+        scene.fog = new THREE.Fog(0x0d0d1c, 16000, 30000);
+
+        /* ── 5. 相机 ── */
+        var camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 1, 60000);
+        camera.position.set(cx + 1400, cy + 400, TH + 4500);
+
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(cx, cy, cz);
+        controls.minDistance = 200;
+        controls.maxDistance = 22000;
+        controls.update();
+
+        var defaultPos = camera.position.clone();
+        var defaultTarget = controls.target.clone();
+        renderer.domElement.addEventListener('dblclick', function () {
+            camera.position.copy(defaultPos);
+            controls.target.copy(defaultTarget);
+            controls.update();
+        });
+
+        /* ── 6. 灯光 ── */
+        scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+
+        var sun = new THREE.DirectionalLight(0xfff8ee, 1.1);
+        sun.position.set(cx + 2200, H + 1500, TH + 2800);
+        sun.castShadow = true;
+        sun.shadow.mapSize.set(2048, 2048);
+        sun.shadow.camera.near = 100;
+        sun.shadow.camera.far = 18000;
+        sun.shadow.camera.left = -2000;
+        sun.shadow.camera.right = 2000;
+        sun.shadow.camera.top = 4000;
+        sun.shadow.camera.bottom = -500;
+        sun.shadow.bias = -0.0003;
+        scene.add(sun);
+
+        var rim = new THREE.DirectionalLight(0x6688bb, 0.28);
+        rim.position.set(-1800, cy, -2000);
+        scene.add(rim);
+
+        /* ── 7. 图层组 ── */
+        var layers = {
+            wall: new THREE.Group(),
+            slices: new THREE.Group(),
+            joints: new THREE.Group(),
+            dim: new THREE.Group()
+        };
+        for (var k in layers) scene.add(layers[k]);
+
+        window.toggleLayer = function (name, btn) {
+            layers[name].visible = !layers[name].visible;
+            btn.classList.toggle('active', layers[name].visible);
+        };
+
+        /* ── 8. 工具函数 ── */
+
+        /* ✅ 修复1：bevelEnabled:false — 彻底去除斜切，消除三角色块异常 */
+        function makeShape(pts) {
+            var s = new THREE.Shape();
+            for (var i = 0; i < pts.length; i++) {
+                if (i === 0) s.moveTo(pts[i].x, pts[i].y);
+                else s.lineTo(pts[i].x, pts[i].y);
+            }
+            s.closePath();
+            return s;
+        }
+
+        function extrude(shape, depth, mat) {
+            var geo = new THREE.ExtrudeGeometry(shape, {
+                depth: depth,
+                bevelEnabled: false   /* ✅ 关闭bevel，消除底角三角色块 */
+            });
+            /* ✅ 修复2：ExtrudeGeometry 有2个材质组(face=0, side=1)
+               传入单一材质数组 [faceMat, sideMat] 精确对应 */
+            var m = new THREE.Mesh(geo, mat);
+            m.castShadow = true;
+            m.receiveShadow = true;
+            return m;
+        }
+
+        function addLine(pts, mat, grp) {
+            var geo = new THREE.BufferGeometry().setFromPoints(pts);
+            var ln = new THREE.Line(geo, mat);
+            if (mat.isLineDashedMaterial) ln.computeLineDistances();
+            grp.add(ln);
+        }
+
+        function v3(x, y, z) { return new THREE.Vector3(x, y, z); }
+
+        /* ── 9. 整体墙体（半透明衬底） ── */
+        var wFaceMat = new THREE.MeshStandardMaterial({
+            color: 0xc8a87a, roughness: 0.82, metalness: 0.01,
+            transparent: true, opacity: 0.12, side: THREE.DoubleSide
+        });
+        var wSideMat = new THREE.MeshStandardMaterial({
+            color: 0xaa8855, roughness: 0.85, metalness: 0.01,
+            transparent: true, opacity: 0.12
+        });
+        /* 墙体整体：[faceMat, sideMat] */
+        var wallMesh = extrude(makeShape(D.wallContour), TH, [wFaceMat, wSideMat]);
+        wallMesh.name = 'wallBody';
+        layers.wall.add(wallMesh);
+
+        /* 外框描边 */
+        var outMat = new THREE.LineBasicMaterial({ color: 0x99bbdd, transparent: true, opacity: 0.35 });
+        [0, TH].forEach(function (z) {
+            var pts = D.wallContour.map(function (p) { return v3(p.x, p.y, z); });
+            pts.push(pts[0].clone());
+            addLine(pts, outMat, layers.wall);
+        });
+        D.wallContour.forEach(function (p) {
+            addLine([v3(p.x, p.y, 0), v3(p.x, p.y, TH)], outMat, layers.wall);
+        });
+
+        /* ── 10. 砖块 ── */
+        /*
+         * ✅ 修复3：砖块厚度 = TH（与墙体完全一致），position.z = 0
+         *    不再内缩(INSET=0)，砖面与墙面齐平
+         *    用 polygonOffset 解决 Z-fighting（砖块在墙体前方）
+         */
+        var BRICK_COLORS = [
+            { face: 0xe8c97a, side: 0xd0b060 },
+            { face: 0xd4a856, side: 0xbc9040 },
+            { face: 0xbf8c3c, side: 0xa87428 }
+        ];
+
+        var brickMeshes = [];
+
+        D.slices.forEach(function (sl, idx) {
+            var clr = BRICK_COLORS[sl.col % BRICK_COLORS.length];
+
+            /* ✅ polygonOffset 防止与墙体 Z-fighting */
+            var fMat = new THREE.MeshStandardMaterial({
+                color: clr.face, roughness: 0.75, metalness: 0.03,
+                polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+            });
+            var sMat = new THREE.MeshStandardMaterial({
+                color: clr.side, roughness: 0.80, metalness: 0.03,
+                polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+            });
+
+            /* ✅ 砖块厚度 = TH，position.z = 0（与墙体完全对齐） */
+            var mesh = extrude(makeShape(sl.contour), TH, [fMat, sMat]);
+            mesh.position.z = 0;
+            mesh.name = 'slice_' + idx;
+
+            var oxs = sl.contour.map(function (p) { return p.x; });
+            var oys = sl.contour.map(function (p) { return p.y; });
+            mesh.userData = {
+                col: sl.col,
+                gluePn: sl.gluePn,
+                hasGlue: sl.gluePn !== null,
+                brickW: Math.max.apply(null, oxs) - Math.min.apply(null, oxs),
+                brickH: Math.max.apply(null, oys) - Math.min.apply(null, oys),
+                brickT: TH
+            };
+            layers.slices.add(mesh);
+            brickMeshes.push(mesh);
+        });
+
+        /* ── 11. 接缝线 ── */
+        var jMat = new THREE.LineBasicMaterial({ color: 0xff6060 });
+        var jFaint = new THREE.LineBasicMaterial({ color: 0xff6060, transparent: true, opacity: 0.4 });
+        var bBoxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
+
+        D.slices.forEach(function (sl) {
+            /* 砖块前后面描边 */
+            [0, TH].forEach(function (z) {
+                var pts = sl.contour.map(function (p) { return v3(p.x, p.y, z); });
+                pts.push(pts[0].clone());
+                addLine(pts, bBoxMat, layers.joints);
+            });
+            /* 胶缝线 */
+            if (!sl.glueSegs) return;
+            sl.glueSegs.forEach(function (seg) {
+                var fp = [v3(seg.s.x, seg.s.y, 0), v3(seg.e.x, seg.e.y, 0)];
+                var bp = [v3(seg.s.x, seg.s.y, TH), v3(seg.e.x, seg.e.y, TH)];
+                addLine(fp, jMat, layers.joints);
+                addLine(bp, jMat, layers.joints);
+                addLine([fp[0], bp[0]], jFaint, layers.joints);
+                addLine([fp[1], bp[1]], jFaint, layers.joints);
+            });
+        });
+
+        /* ── 12. 尺寸标注 ── */
+        var dimMat = new THREE.LineBasicMaterial({ color: 0xffd700 });
+        var dashMat = new THREE.LineDashedMaterial({ color: 0xffd700, dashSize: 14, gapSize: 8 });
+        var TICK = 32, OFFX = 160, OFFY = 160, OFFZ = 180;
+
+        function dimSeg(p1, p2, tick, axis, grp) {
+            addLine([p1, p2], dimMat, grp);
+            var t = tick;
+            if (axis === 'x') {
+                addLine([v3(p1.x, p1.y - t, p1.z), v3(p1.x, p1.y + t, p1.z)], dimMat, grp);
+                addLine([v3(p2.x, p2.y - t, p2.z), v3(p2.x, p2.y + t, p2.z)], dimMat, grp);
+            } else if (axis === 'y') {
+                addLine([v3(p1.x - t, p1.y, p1.z), v3(p1.x + t, p1.y, p1.z)], dimMat, grp);
+                addLine([v3(p2.x - t, p2.y, p2.z), v3(p2.x + t, p2.y, p2.z)], dimMat, grp);
+            } else {
+                addLine([v3(p1.x, p1.y - t, p1.z), v3(p1.x, p1.y + t, p1.z)], dimMat, grp);
+                addLine([v3(p2.x, p2.y - t, p2.z), v3(p2.x, p2.y + t, p2.z)], dimMat, grp);
+            }
+        }
+
+        /* 宽度（底部 X 方向 1400mm） */
+        dimSeg(v3(0, -OFFY, 0), v3(W, -OFFY, 0), TICK, 'x', layers.dim);
+        addLine([v3(0, 0, 0), v3(0, -OFFY, 0)], dashMat, layers.dim);
+        addLine([v3(W, 0, 0), v3(W, -OFFY, 0)], dashMat, layers.dim);
+
+        /* 高度（左侧 Y 方向 2695mm） */
+        dimSeg(v3(-OFFX, 0, 0), v3(-OFFX, H, 0), TICK, 'y', layers.dim);
+        addLine([v3(0, 0, 0), v3(-OFFX, 0, 0)], dashMat, layers.dim);
+        addLine([v3(0, H, 0), v3(-OFFX, H, 0)], dashMat, layers.dim);
+
+        /* 厚度（右下 Z 方向 298mm） */
+        dimSeg(v3(W + OFFZ, -OFFY, 0), v3(W + OFFZ, -OFFY, TH), TICK, 'z', layers.dim);
+        addLine([v3(W, 0, 0), v3(W + OFFZ, -OFFY, 0)], dashMat, layers.dim);
+        addLine([v3(W, 0, TH), v3(W + OFFZ, -OFFY, TH)], dashMat, layers.dim);
+
+        /* 各砖块宽度（底部分段标注） */
+        D.slices.forEach(function (sl) {
+            var oxs = sl.contour.map(function (p) { return p.x; });
+            var xMin = Math.min.apply(null, oxs);
+            var xMax = Math.max.apply(null, oxs);
+            var yOff = -OFFY - 75 - sl.col * 52;
+            dimSeg(v3(xMin, yOff, 0), v3(xMax, yOff, 0), 22, 'x', layers.dim);
+            addLine([v3(xMin, 0, 0), v3(xMin, yOff, 0)], dashMat, layers.dim);
+            addLine([v3(xMax, 0, 0), v3(xMax, yOff, 0)], dashMat, layers.dim);
+        });
+
+        /* ── 13. 地面 & 网格 ── */
+        var gnd = new THREE.Mesh(
+            new THREE.PlaneGeometry(16000, 16000),
+            new THREE.MeshStandardMaterial({ color: 0x181828, roughness: 1.0 })
+        );
+        gnd.rotation.x = -Math.PI / 2;
+        gnd.position.set(cx, -3, cz);
+        gnd.receiveShadow = true;
+        scene.add(gnd);
+
+        var grid = new THREE.GridHelper(14000, 70, 0x222244, 0x1a1a33);
+        grid.position.set(cx, -2, cz);
+        scene.add(grid);
+
+        var axes = new THREE.AxesHelper(360);
+        axes.position.set(-200, -200, 0);
+        scene.add(axes);
+
+        /* ── 14. 高亮线 ── */
+        var hlMat = new THREE.LineBasicMaterial({ color: 0x00ffcc });
+        var hlGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+        var hlLine = new THREE.Line(hlGeo, hlMat);
+        hlLine.visible = false;
+        scene.add(hlLine);
+
+        /* ── 15. 12条边缘 ── */
+        var CR = [
+            { x: 0, y: 0, z: 0 }, { x: W, y: 0, z: 0 }, { x: W, y: H, z: 0 }, { x: 0, y: H, z: 0 },
+            { x: 0, y: 0, z: TH }, { x: W, y: 0, z: TH }, { x: W, y: H, z: TH }, { x: 0, y: H, z: TH }
+        ];
+        function mkE(a, b, type) {
+            var A = v3(CR[a].x, CR[a].y, CR[a].z);
+            var B = v3(CR[b].x, CR[b].y, CR[b].z);
+            return { A: A, B: B, type: type, len: A.distanceTo(B) };
+        }
+        var EDGES = [
+            mkE(0, 1, '宽度边 X=' + W + 'mm'), mkE(1, 2, '高度边 Y=' + H + 'mm'),
+            mkE(2, 3, '宽度边 X=' + W + 'mm'), mkE(3, 0, '高度边 Y=' + H + 'mm'),
+            mkE(4, 5, '宽度边 X=' + W + 'mm'), mkE(5, 6, '高度边 Y=' + H + 'mm'),
+            mkE(6, 7, '宽度边 X=' + W + 'mm'), mkE(7, 4, '高度边 Y=' + H + 'mm'),
+            mkE(0, 4, '厚度边 Z=' + TH + 'mm'), mkE(1, 5, '厚度边 Z=' + TH + 'mm'),
+            mkE(2, 6, '厚度边 Z=' + TH + 'mm'), mkE(3, 7, '厚度边 Z=' + TH + 'mm')
+        ];
+
+        /* ── 16. 砖块高亮 ── */
+        var hovBrick = null;
+        function hlBrick(mesh) {
+            if (hovBrick === mesh) return;
+            clearHL();
+            hovBrick = mesh;
+            (Array.isArray(mesh.material) ? mesh.material : [mesh.material])
+                .forEach(function (m) { if (m.emissive) m.emissive.set(0x442200); });
+        }
+        function clearHL() {
+            if (!hovBrick) return;
+            (Array.isArray(hovBrick.material) ? hovBrick.material : [hovBrick.material])
+                .forEach(function (m) { if (m.emissive) m.emissive.set(0x000000); });
+            hovBrick = null;
+        }
+
+        /* ── 17. 鼠标交互 ── */
+        var ray = new THREE.Raycaster();
+        var mouse = new THREE.Vector2();
+        var tipM = document.getElementById('measure-tooltip');
+        var tipB = document.getElementById('brick-tooltip');
+        var PICK = 28;
+        var fmt = function (v) { return (+v).toFixed(1); };
+
+        function toScr(p3) {
+            var p = p3.clone().project(camera);
+            return { x: (p.x + 1) / 2 * window.innerWidth, y: -(p.y - 1) / 2 * window.innerHeight };
+        }
+        function sDist(px, py, ax, ay, bx, by) {
+            var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+            if (l2 === 0) return Math.hypot(px - ax, py - ay);
+            var t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2));
+            return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+        }
+        function placeEl(el, mx, my, dy) {
+            var tw = el.offsetWidth || 190, th = el.offsetHeight || 120;
+            var tx = mx + 18, ty = my + 18 + (dy || 0);
+            if (tx + tw > window.innerWidth) tx = mx - tw - 12;
+            if (ty + th > window.innerHeight) ty = my - th - 12;
+            el.style.left = tx + 'px'; el.style.top = ty + 'px';
+        }
+
+        window.addEventListener('mousemove', function (e) {
+            var mx = e.clientX, my = e.clientY;
+
+            /* 边缘测量 */
+            var best = null, bd = 1e9;
+            EDGES.forEach(function (ed) {
+                var sA = toScr(ed.A), sB = toScr(ed.B);
+                var d = sDist(mx, my, sA.x, sA.y, sB.x, sB.y);
+                if (d < bd) { bd = d; best = ed; }
+            });
+            if (best && bd < PICK) {
+                var pos = hlLine.geometry.attributes.position;
+                pos.setXYZ(0, best.A.x, best.A.y, best.A.z);
+                pos.setXYZ(1, best.B.x, best.B.y, best.B.z);
+                pos.needsUpdate = true; hlLine.visible = true;
+                document.getElementById('tip-type').textContent = best.type;
+                document.getElementById('tip-len').textContent = fmt(best.len) + ' mm';
+                document.getElementById('tip-a').textContent = '(' + fmt(best.A.x) + ', ' + fmt(best.A.y) + ', ' + fmt(best.A.z) + ')';
+                document.getElementById('tip-b').textContent = '(' + fmt(best.B.x) + ', ' + fmt(best.B.y) + ', ' + fmt(best.B.z) + ')';
+                tipM.style.display = 'block'; placeEl(tipM, mx, my, 0);
+            } else {
+                hlLine.visible = false; tipM.style.display = 'none';
+            }
+
+            /* 砖块 Raycast */
+            mouse.set((mx / window.innerWidth) * 2 - 1, -(my / window.innerHeight) * 2 + 1);
+            ray.setFromCamera(mouse, camera);
+            var hits = ray.intersectObjects(brickMeshes, false);
+            if (hits.length > 0) {
+                var ud = hits[0].object.userData;
+                hlBrick(hits[0].object);
+                document.getElementById('bt-col').textContent = '第 ' + ud.col + ' 列';
+                document.getElementById('bt-w').textContent = fmt(ud.brickW) + ' mm';
+                document.getElementById('bt-h').textContent = fmt(ud.brickH) + ' mm';
+                document.getElementById('bt-t').textContent = fmt(ud.brickT) + ' mm';
+                document.getElementById('bt-glue').textContent = ud.hasGlue ? '✅ 有 (pn:' + ud.gluePn + ')' : '❌ 无';
+                tipB.style.display = 'block';
+                placeEl(tipB, mx, my, tipM.style.display === 'block' ? 138 : 0);
+            } else {
+                clearHL(); tipB.style.display = 'none';
+            }
+        });
+
+        renderer.domElement.addEventListener('mouseleave', function () {
+            hlLine.visible = false;
+            tipM.style.display = 'none'; tipB.style.display = 'none';
+            clearHL();
+        });
+
+        /* ── 18. 渲染循环 ── */
+        document.getElementById('loading').style.display = 'none';
+
+        (function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        })();
+
+        window.addEventListener('resize', function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    } // end initScene
+
+
+
+
+< !-- ===== WPF WebView2 消息桥接（追加到 wall3D_6.html 末尾 script 区） ===== -->
+        <script>
+  // 重置摄像机函数（供 WPF 通过 ExecuteScript 调用）
+            function resetCamera() {
+    if (typeof controls !== 'undefined' && typeof camera !== 'undefined') {
+                camera.position.set(800, 600, 1200);
+            camera.lookAt(700, 600, 0);
+            controls.reset();
+    }
+  }
+
+            // 向 WPF 发送墙体状态（可选扩展）
+            function notifyWPF(type, data) {
+    if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(type + ':' + data);
+    }
+  }
+
+            // 页面加载完成后通知 WPF
+            window.addEventListener('load', function () {
+                notifyWPF('status', '✅ Three.js 场景初始化完成');
+            notifyWPF('wallInfo', 'X宽: 1400 mm  |  Y高: 2695 mm  |  Z厚: 298 mm');
+  });
+</script>
+</body>
+</html>
