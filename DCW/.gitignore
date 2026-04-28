@@ -1,0 +1,113 @@
+# .gitignore for Visual Studio / .NET 8 projects
+# Place at repository root to avoid committing build artifacts, IDE files and OS junk
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+**/bin/
+**/obj/
+
+# Publish output
+publish/
+**/publish/
+artifacts/
+
+# NuGet
+*.nupkg
+.packages/
+**/packages/
+.nuget/
+.nuget/packages/
+
+# Rider/IntelliJ
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# Test results
+TestResults/
+*.trx
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+
+# User-specific files
+*.pidb
+*.userprefs
+*.userosscache
+
+# Dotnet CLI
+project.lock.json
+project.fragment.lock.json
+
+# Entity Framework
+*.db
+*.db-journal
+
+# JetBrains Rider caches
+.idea/
+*.sln.iml
+
+# Node / frontend
+node_modules/
+.pnp/
+.pnp.js
+
+# Package managers
+bower_components/
+jspm_packages/
+
+# Coverage and profiling
+coverage/
+*.lcov
+*.coverage
+*.coveragexml
+
+# Docker
+**/Dockerfile*
+**/docker-compose*.yml
+
+# Ignore publishable single-file executables and self-contained build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Keep common lockfiles (you may want to commit these). If you use them, remove from ignore
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Keep source files and resources tracked (do not ignore):
+# - project source under project folders
+# - Resources (e.g. CncWallStation/Resources/*)
+
+# End of .gitignore
