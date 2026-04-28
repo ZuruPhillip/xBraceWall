@@ -25,7 +25,7 @@ namespace CncWallStation.ViewModels
             set => SetProperty(ref _statusMessage, value);
         }
 
-        private string _wallInfo = "X宽: 1400 mm  |  Y高: 2695 mm  |  Z厚: 298 mm";
+        private string _wallInfo = "";
         public string WallInfo
         {
             get => _wallInfo;
@@ -139,7 +139,7 @@ namespace CncWallStation.ViewModels
             }
 
             IsLoading = true;
-            StatusMessage = "🔄 正在加载 Three.js 3D 墙体渲染...";
+            StatusMessage = "🔄 正在加载墙体3D模型渲染...";
 
             // 触发 View 中注入的导航委托
             NavigateToHtml?.Invoke();
@@ -205,7 +205,7 @@ namespace CncWallStation.ViewModels
         private void ExecuteExport()
         {
             MessageBox.Show(
-                "可在 Three.js 场景中使用 renderer.domElement.toDataURL() 导出 PNG 截图。\n" +
+                "可在墙体3D模型中使用 renderer.domElement.toDataURL() 导出 PNG 截图。\n" +
                 "当前版本为演示，完整导出功能可在此扩展。",
                 "导出提示",
                 MessageBoxButton.OK,
@@ -220,7 +220,7 @@ namespace CncWallStation.ViewModels
         public void OnRenderLoaded()
         {
             IsLoading = false;
-            StatusMessage = "✅ Three.js AAC 墙体渲染加载完成";
+            StatusMessage = "✅AAC墙体3D渲染模型加载完成";
         }
 
         public void OnRenderFailed(string error)

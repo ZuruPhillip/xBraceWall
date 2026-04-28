@@ -21,7 +21,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="160"/>
             <!-- 侧边导航宽度 -->
             <ColumnDefinition Width="*"/>
             <!-- 内容区宽度 -->

@@ -6,7 +6,7 @@
       xmlns:vm="clr-namespace:CncWallStation.ViewModels" 
       xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="1200"
       Title="BIM 3D 墙体渲染">
 
     <Page.Resources>
@@ -102,7 +102,7 @@
                                    FontSize="18"
                                    FontWeight="Bold"
                                    Foreground="White"/>
-                        <TextBlock Text="AAC 墙体三维可视化 · Three.js"
+                        <TextBlock Text="AAC 墙体三维可视化"
                                    FontSize="11"
                                    Foreground="#94A3B8"/>
                     </StackPanel>
@@ -135,7 +135,7 @@
                 <Button Content="🚀 加载渲染"
                         Style="{StaticResource ToolbarButtonStyle}"
                         Command="{Binding LoadRenderCommand}"
-                        ToolTip="加载 Three.js AAC 墙体 3D 渲染页面"/>
+                        ToolTip="加载AAC墙体3D渲染页面"/>
 
                 <Separator Width="1" Height="24"
                            Background="#334155" Margin="6,0"/>
@@ -196,23 +196,15 @@
                                Foreground="White"
                                HorizontalAlignment="Center"/>
 
-                    <TextBlock Text="基于 Three.js 的 BIM 数据可视化"
+                    <TextBlock Text="BIM 数据可视化"
                                FontSize="15"
                                Foreground="#64748B"
                                HorizontalAlignment="Center"
                                Margin="0,8,0,0"/>
 
-                    <TextBlock HorizontalAlignment="Center"
-                               Margin="0,24,0,0">
-                        <Run Text="■ X 轴（宽度）" Foreground="#60A5FA"/>
-                        <Run Text="1400 mm" Foreground="White" FontWeight="SemiBold"/>
-                        <Run Text="  ■ Y 轴（高度）" Foreground="#34D399"/>
-                        <Run Text="2695 mm" Foreground="White" FontWeight="SemiBold"/>
-                        <Run Text="  ■ Z 轴（厚度）" Foreground="#FBBF24"/>
-                        <Run Text="298 mm" Foreground="White" FontWeight="SemiBold"/>
-                    </TextBlock>
+                    
 
-                    <TextBlock Text="点击上方 🚀 加载渲染 按钮以启动 Three.js 3D 场景"
+                    <TextBlock Text="点击上方 🚀 加载渲染 按钮以启动3D场景"
                                FontSize="14"
                                Foreground="#475569"
                                HorizontalAlignment="Center"
