@@ -1,50 +1,60 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace CncWallStation.ViewModels
 {
     public class MainViewModel
     {
-        private Frame _mainFrame;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<MainViewModel> _logger;
 
-        public MainViewModel(Frame mainFrame)
+        private Frame? _mainFrame;
+
+        // 页面映射表
+        private readonly Dictionary<string, Type> _pageMap = new()
         {
-            _mainFrame = mainFrame;
-            _mainFrame.Navigate(new Uri("Views/ControllerPage.xaml", UriKind.Relative));
-            // 初始化导航命令
+            { "ControllerPage", typeof(Views.ControllerPage) },
+            { "BimDataRenderPage", typeof(Views.BimDataRenderPage) }
+        };
+
+        public MainViewModel(
+            IServiceProvider serviceProvider,
+            ILogger<MainViewModel> logger)
+        {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+
             NavigateCommand = new RelayCommand<string>(NavigateToPage);
+        }
+
+        public void SetFrame(Frame frame)
+        {
+            _mainFrame = frame;
         }
 
         public ICommand NavigateCommand { get; }
 
         private void NavigateToPage(string pageName)
         {
-            if (_mainFrame == null) return;
-
-            // 根据页面名称导航到对应页面
-            switch (pageName)
+            if (_mainFrame == null)
             {
-                case "BimDataRenderPage":
-                _mainFrame.Navigate(new Uri("Views/BimDataRenderPage.xaml", UriKind.Relative));
-                break;
-                case "ControllerPage":
-                _mainFrame.Navigate(new Uri("Views/ControllerPage.xaml", UriKind.Relative));
-                break;
-                //case "ReportPage":
-                //_mainFrame.Navigate(new Uri("Pages/ReportPage.xaml", UriKind.Relative));
-                //break;
-                //case "SettingPage":
-                //_mainFrame.Navigate(new Uri("Pages/SettingPage.xaml", UriKind.Relative));
-                //break;
-                default:
-                throw new ArgumentException($"未找到页面: {pageName}");
+                _logger.LogWarning("MainFrame 未初始化");
+                return;
             }
+
+            if (!_pageMap.TryGetValue(pageName, out var pageType))
+            {
+                _logger.LogError("未找到页面: {PageName}", pageName);
+                return;
+            }
+
+            var page = _serviceProvider.GetRequiredService(pageType);
+            _mainFrame.Navigate(page);
+
+            _logger.LogInformation("导航到页面: {PageName}", pageName);
         }
     }
 }

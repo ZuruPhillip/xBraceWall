@@ -9,10 +9,10 @@ namespace CncWallStation.Views
     public partial class ControllerPage : Page
     {
         private readonly ControllerPageViewModel _viewModel;
-        public ControllerPage()
+        public ControllerPage(ControllerPageViewModel viewModel)
         {
             InitializeComponent();
-            _viewModel = new ControllerPageViewModel();
+            _viewModel = viewModel;
             DataContext = _viewModel;
         }
     }
