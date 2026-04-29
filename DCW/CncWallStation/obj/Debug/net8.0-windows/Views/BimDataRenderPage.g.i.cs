@@ -70,7 +70,7 @@ namespace CncWallStation.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/CncWallStation;V1.0.0.0;component/views/bimdatarenderpage.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CncWallStation;component/views/bimdatarenderpage.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\BimDataRenderPage.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -5,55 +5,27 @@
 *.user
 *.suo
 
+# Visual Studio folder (anywhere in repo)
+**/.vs/
+
 # CNC Station
-
 DCW/CncWallStation/bin/
-.vs/
 DCW/CncWallStation/obj/
-.hidden/
 
-# 忽略 WebView2 运行时缓存和调试日志
-DCW/CncWallStation/bin/Debug/net8.0-windows/CncWallStation.exe.WebView2/
-DCW/CncWallStation/bin/Debug/net8.0-windows/*.log
-DCW/CncWallStation/bin/Debug/net8.0-windows/*.pdb
-DCW/CncWallStation/bin/Debug/net8.0-windows/*.dll
-DCW/CncWallStation/bin/Debug/net8.0-windows/*.exe
-DCW/CncWallStation/bin/Debug/net8.0-windows/**/*.log
-DCW/CncWallStation/bin/Debug/net8.0-windows/**/*.pdb
-DCW/CncWallStation/bin/Debug/net8.0-windows/**/*.dll
-DCW/CncWallStation/bin/Debug/net8.0-windows/**/*.exe
-
-# Copilot/IDE 索引和缓存
-DCW/.vs/
-DCW/.vs/**
-DCW/.vs/DCW.slnx/DesignTimeBuild/
-DCW/.vs/DCW.slnx/FileContentIndex/
-DCW/.vs/DCW.slnx/v18/
-DCW/.vs/DCW/CopilotIndices/
-
-# 生成的中间文件
-DCW/CncWallStation/obj/
-DCW/CncWallStation/obj/**
-DCW/CncWallStation/obj/Debug/
-DCW/CncWallStation/obj/Debug/net8.0-windows/
-DCW/CncWallStation/obj/Debug/net8.0-windows/**
-DCW/CncWallStation/obj/project.assets.json
-DCW/CncWallStation/obj/project.nuget.cache
-
-# 新增未跟踪的项目文件（如不想提交）
+# BimWallData (新项目)
 DCW/BimWallData/
-
 
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-[Nn]et8.0-windows/
 x64/
 x86/
 bld/
 [Bb]in/
 [Oo]bj/
 [Rr]ef/
-#[Ll]og/
+
+# Hidden folders
+.hidden/
