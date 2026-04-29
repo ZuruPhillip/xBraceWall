@@ -6,14 +6,14 @@
 *.suo
 
 # Visual Studio folder (anywhere in repo)
-**/.vs/
+.vs/
+**/bin/
+**/obj/
 
 # CNC Station
-DCW/CncWallStation/bin/
-DCW/CncWallStation/obj/
+CncWallStation/bin/
+CncWallStation/obj/
 
-# BimWallData (新项目)
-DCW/BimWallData/
 
 # Build results
 [Dd]ebug/
