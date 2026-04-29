@@ -1,4 +1,5 @@
-﻿using CncWallStation.Views;
+﻿using CncWallStation.ViewModels;
+using CncWallStation.Views;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,9 +22,8 @@ namespace CncWallStation
         {
             InitializeComponent();
             // 导航到 BimDataRenderPage 作为主页面
-            MainFrame.Navigate(new BimDataRenderPage());
             // 将 MainFrame 传递给 MainViewModel
-            //DataContext = new MainViewModel(MainFrame);
+            DataContext = new MainViewModel(MainFrame);
         }
     }
 }

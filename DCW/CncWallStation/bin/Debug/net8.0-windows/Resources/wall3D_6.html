@@ -125,7 +125,7 @@
 
 <div id="loading">
   <div class="spinner"></div>
-  <span>正在加载 Three.js…</span>
+  <span>正在加载墙体3D模型…</span>
   <span id="load-status">请稍候</span>
 </div>
 <div id="error-box">
@@ -671,10 +671,6 @@
     } // end initScene
 
 
-
-
-< !-- ===== WPF WebView2 消息桥接（追加到 wall3D_6.html 末尾 script 区） ===== -->
-        <script>
   // 重置摄像机函数（供 WPF 通过 ExecuteScript 调用）
             function resetCamera() {
     if (typeof controls !== 'undefined' && typeof camera !== 'undefined') {
@@ -693,8 +689,7 @@
 
             // 页面加载完成后通知 WPF
             window.addEventListener('load', function () {
-                notifyWPF('status', '✅ Three.js 场景初始化完成');
-            notifyWPF('wallInfo', 'X宽: 1400 mm  |  Y高: 2695 mm  |  Z厚: 298 mm');
+                notifyWPF('status', '✅ 墙体3D模型初始化完成');
   });
 </script>
 </body>
