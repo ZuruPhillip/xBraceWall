@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="BimWallData/BimWallData.csproj" />
   <Project Path="CncWallStation/CncWallStation.csproj" />
+  <Project Path="infrastructure/Infrastructure.csproj" Id="c874aa46-1c7d-4505-b62e-5cb494b3f45d" />
 </Solution>
