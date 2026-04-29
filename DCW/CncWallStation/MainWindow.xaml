@@ -37,9 +37,9 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="BimDataRenderPage"/>
 
-                <!-- 设备监控 -->
+                <!-- 控制页面 -->
                 <hc:SideMenuItem 
-                Header="设备监控" 
+                Header="控制页面" 
                 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ControllerPage"/>

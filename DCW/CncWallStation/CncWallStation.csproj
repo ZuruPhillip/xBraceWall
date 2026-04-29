@@ -25,4 +25,8 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\BimWallData\BimWallData.csproj" />
+	  <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
 </Project>

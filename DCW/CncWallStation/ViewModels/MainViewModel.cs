@@ -16,7 +16,7 @@ namespace CncWallStation.ViewModels
         public MainViewModel(Frame mainFrame)
         {
             _mainFrame = mainFrame;
-            _mainFrame.Navigate(new Uri("Views/BimDataRenderPage.xaml", UriKind.Relative));
+            _mainFrame.Navigate(new Uri("Views/ControllerPage.xaml", UriKind.Relative));
             // 初始化导航命令
             NavigateCommand = new RelayCommand<string>(NavigateToPage);
         }
@@ -33,9 +33,9 @@ namespace CncWallStation.ViewModels
                 case "BimDataRenderPage":
                 _mainFrame.Navigate(new Uri("Views/BimDataRenderPage.xaml", UriKind.Relative));
                 break;
-                //case "ControllerPage":
-                //_mainFrame.Navigate(new Uri("Pages/ControllerPage.xaml", UriKind.Relative));
-                //break;
+                case "ControllerPage":
+                _mainFrame.Navigate(new Uri("Views/ControllerPage.xaml", UriKind.Relative));
+                break;
                 //case "ReportPage":
                 //_mainFrame.Navigate(new Uri("Pages/ReportPage.xaml", UriKind.Relative));
                 //break;
