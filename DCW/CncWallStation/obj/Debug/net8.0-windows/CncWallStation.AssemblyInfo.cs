@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CncWallStation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3b686006c3ab56cf19edc2b129f367e243f11a4c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fe0a120c74dac6158a7d4c4983b065e175501586")]
 [assembly: System.Reflection.AssemblyProductAttribute("CncWallStation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CncWallStation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

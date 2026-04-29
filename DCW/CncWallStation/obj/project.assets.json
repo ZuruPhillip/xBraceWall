@@ -5361,11 +5361,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\CncWallStation.csproj",
+      "projectUniqueName": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\CncWallStation.csproj",
       "projectName": "CncWallStation",
-      "projectPath": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\CncWallStation.csproj",
+      "projectPath": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\CncWallStation.csproj",
       "packagesPath": "C:\\Users\\Phillip.Fang.ZURU\\.nuget\\packages\\",
-      "outputPath": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\obj\\",
+      "outputPath": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Application\\Install\\VisualStudio\\Shared\\NuGetPackages"

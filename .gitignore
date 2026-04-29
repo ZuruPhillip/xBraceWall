@@ -1,0 +1,10 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/DCW/.vs/DCW/CopilotIndices/18.4.114.215/CodeChunks.db
+/DCW/.vs/DCW/CopilotIndices/18.4.114.215/SemanticSymbols.db
+/DCW/CncWallStation/bin/Debug/net8.0-windows/CncWallStation.exe.WebView2/EBWebView/Default/Sync Data/LevelDB/LOG
+/DCW/CncWallStation/bin/Debug/net8.0-windows/CncWallStation.exe.WebView2/EBWebView/Default/Sync Data/LevelDB/LOG.old
+/DCW/CncWallStation/bin/Debug/net8.0-windows/CncWallStation.exe.WebView2/EBWebView/Default/Site Characteristics Database/LOG
+/DCW/CncWallStation/bin/Debug/net8.0-windows/CncWallStation.exe.WebView2/EBWebView/Default/Site Characteristics Database/LOG.old

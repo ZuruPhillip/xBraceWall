@@ -1,42 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\",
+  "WorkspaceRootPath": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\resources\\wall3d_6.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\resources\\wall3d_6.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewall\\dcw\\cncwallstation\\views\\bimdatarenderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\views\\bimdatarenderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\viewmodels\\bimdatarenderviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\viewmodels\\bimdatarenderviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewall\\dcw\\cncwallstation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\cncwallstation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\cncwallstation.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewall\\dcw\\cncwallstation\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{92374BD6-7E82-A7C0-097C-096D1B90F7CB}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\views\\bimdatarenderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\views\\bimdatarenderpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\views\\bimdatarenderpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\views\\bimdatarenderpage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|c:\\works\\workspace\\projects\\xbracewallwpf\\dcw\\cncwallstation\\commands\\relaycommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D1F9D6EF-1D20-4C7D-A8B8-6FBFFE5833CF}|CncWallStation\\CncWallStation.csproj|solutionrelative:cncwallstation\\commands\\relaycommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Bookmark",
@@ -74,75 +54,36 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "wall3D_6.html",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Resources\\wall3D_6.html",
-              "RelativeDocumentMoniker": "CncWallStation\\Resources\\wall3D_6.html",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Resources\\wall3D_6.html",
-              "RelativeToolTip": "CncWallStation\\Resources\\wall3D_6.html",
-              "ViewState": "AgIAAJQCAAAAAAAAAAAgwKECAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-04-28T06:29:46.041Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "RelayCommand.cs",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Commands\\RelayCommand.cs",
-              "RelativeDocumentMoniker": "CncWallStation\\Commands\\RelayCommand.cs",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Commands\\RelayCommand.cs",
-              "RelativeToolTip": "CncWallStation\\Commands\\RelayCommand.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAQwBgAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T05:59:21.245Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "BimDataRenderPage.xaml.cs",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml.cs",
-              "RelativeDocumentMoniker": "CncWallStation\\Views\\BimDataRenderPage.xaml.cs",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml.cs",
-              "RelativeToolTip": "CncWallStation\\Views\\BimDataRenderPage.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T05:46:27.294Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAAAYAAAAAAAAAAABYwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-04-29T01:41:39.434Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "BimDataRenderPage.xaml",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml",
+              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml",
               "RelativeDocumentMoniker": "CncWallStation\\Views\\BimDataRenderPage.xaml",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml",
+              "ToolTip": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\Views\\BimDataRenderPage.xaml",
               "RelativeToolTip": "CncWallStation\\Views\\BimDataRenderPage.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-28T04:17:38.915Z",
+              "WhenOpened": "2026-04-28T07:04:36.913Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "BimDataRenderViewModel.cs",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\ViewModels\\BimDataRenderViewModel.cs",
-              "RelativeDocumentMoniker": "CncWallStation\\ViewModels\\BimDataRenderViewModel.cs",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\ViewModels\\BimDataRenderViewModel.cs",
-              "RelativeToolTip": "CncWallStation\\ViewModels\\BimDataRenderViewModel.cs",
-              "ViewState": "AgIAAFAAAAAAAAAAAAAYwKEAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T04:16:58.483Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "App.xaml",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\App.xaml",
+              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\App.xaml",
               "RelativeDocumentMoniker": "CncWallStation\\App.xaml",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\App.xaml",
+              "ToolTip": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\App.xaml",
               "RelativeToolTip": "CncWallStation\\App.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2026-04-28T03:53:31.913Z",
@@ -150,41 +91,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CncWallStation",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\CncWallStation.csproj",
-              "RelativeDocumentMoniker": "CncWallStation\\CncWallStation.csproj",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\CncWallStation.csproj",
-              "RelativeToolTip": "CncWallStation\\CncWallStation.csproj",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAiwBwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-28T03:52:09.543Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "MainWindow.xaml",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\MainWindow.xaml",
-              "RelativeDocumentMoniker": "CncWallStation\\MainWindow.xaml",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\MainWindow.xaml",
-              "RelativeToolTip": "CncWallStation\\MainWindow.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-28T03:08:24.281Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "CncWallStation\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\MainWindow.xaml.cs",
               "RelativeToolTip": "CncWallStation\\MainWindow.xaml.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAADwvxkAAAA5AAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAawBkAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-28T03:08:21.858Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-28T03:08:21.858Z"
             }
           ]
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "hKcNBD/GRR8=",
+  "dgSpecHash": "a4wVncSzuhs=",
   "success": true,
-  "projectFilePath": "C:\\Works\\workspace\\projects\\xbraceWallWpf\\DCW\\CncWallStation\\CncWallStation.csproj",
+  "projectFilePath": "C:\\Works\\workspace\\projects\\xBraceWall\\DCW\\CncWallStation\\CncWallStation.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Phillip.Fang.ZURU\\.nuget\\packages\\abp\\9.1.3\\abp.9.1.3.nupkg.sha512",
     "C:\\Users\\Phillip.Fang.ZURU\\.nuget\\packages\\abp.automapper\\9.1.3\\abp.automapper.9.1.3.nupkg.sha512",
