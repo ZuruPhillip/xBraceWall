@@ -1,4 +1,5 @@
 ﻿using CncWallStation.Features;
+using CncWallStation.Features.MepSlots;
 using CncWallStation.Transforms;
 using Infrastructure.Maths;
 using System.Text;
@@ -179,6 +180,16 @@ namespace CncWallStation.MomWallData
             Features.Add(new Pocket(id, side, center, width, height,
                                     depth, cornerRadius));
             return this;
+        }
+
+        /// <summary>
+        /// 添加电线管道线槽（链式调用，返回 MepSlot 供继续配置路径）
+        /// </summary>
+        public MepSlot AddMepSlot(string id, MachineSide side, float width)
+        {
+            var slot = new MepSlot(id, side, width);
+            Features.Add(slot);
+            return slot;
         }
 
         /// <summary>按 ID 移除特征</summary>

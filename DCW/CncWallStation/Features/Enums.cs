@@ -6,6 +6,7 @@
         Groove,      // 切槽
         Hole,        // 圆形开孔
         Pocket,      // 矩形挖坑
+        MepSlot,     // 电线管道线槽
         PolygonCut   // 多边形切割（扩展用）
     }
 

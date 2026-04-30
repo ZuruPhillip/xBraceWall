@@ -50,21 +50,48 @@ namespace CncWallStation.ViewModels
                            new Vec2(100, 50), new Vec2(150, 50),
                            width: 18f, depth: 10f);
 
-                //.AddHole("H-001", MachineSide.Top,
-                //         center: new Vec2(30, 150), radius: 4f,
-                //         depth: 18f, throughHole: true)
+            //.AddHole("H-001", MachineSide.Top,
+            //         center: new Vec2(30, 150), radius: 4f,
+            //         depth: 18f, throughHole: true)
 
-                //.AddHole("H-002", MachineSide.Top,
-                //         center: new Vec2(120, 150), radius: 4f,
-                //         depth: 18f, throughHole: true)
+            //.AddHole("H-002", MachineSide.Top,
+            //         center: new Vec2(120, 150), radius: 4f,
+            //         depth: 18f, throughHole: true)
 
-                //.AddPocket("P-001", MachineSide.Bottom,
-                //           center: new Vec2(75, 50), width: 30f,
-                //           height: 10f, depth: 5f, cornerRadius: 2f)
+            //.AddPocket("P-001", MachineSide.Bottom,
+            //           center: new Vec2(75, 50), width: 30f,
+            //           height: 10f, depth: 5f, cornerRadius: 2f)
 
-                //.AddHole("H-003", MachineSide.Front,
-                //         center: new Vec2(75, 0), radius: 5f,
-                //         depth: 10f);
+            //.AddHole("H-003", MachineSide.Front,
+            //         center: new Vec2(75, 0), radius: 5f,
+            //         depth: 10f);
+
+            // ── 添加 MepSlot（链式构造路径）──────────────────────────
+
+            // ① L 形线槽（水平段 + 垂直段，深度均一）
+            wall.AddMepSlot("MS-001", MachineSide.Top, width: 20f)
+                .AddLine(new Vec2(50, 50), new Vec2(300, 50), depth: 12f)
+                .LineTo(new Vec2(300, 300), depth: 12f);
+
+            // ② S 形线槽（直线 + 圆弧 + 直线，深度渐变）
+            wall.AddMepSlot("MS-002", MachineSide.Top, width: 15f)
+                .AddLine(new Vec2(350, 50), new Vec2(400, 50), depth: 8f)
+                .AddArc(center: new Vec2(400, 100),
+                         radius: 50f,
+                         startAngleDeg: 270f,
+                         endAngleDeg: 90f,
+                         depth: 10f,
+                         isClockwise: false)
+                .LineTo(new Vec2(350, 200), depth: 12f);
+
+            // ③ 三点圆弧线槽
+            wall.AddMepSlot("MS-003", MachineSide.Front, width: 25f)
+                .AddArcByThreePoints(
+                    p1: new Vec2(100, 0),
+                    pMid: new Vec2(200, 30),
+                    p3: new Vec2(300, 0),
+                    depth: 15f)
+                .LineTo(new Vec2(500, 0), depth: 15f);
 
             // ══════════════════════════════════════════
             // ③ 初始状态
