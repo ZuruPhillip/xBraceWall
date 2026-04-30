@@ -1,10 +1,5 @@
 ﻿using CncWallStation.Transforms;
 using Infrastructure.Maths;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CncWallStation.Features
 {

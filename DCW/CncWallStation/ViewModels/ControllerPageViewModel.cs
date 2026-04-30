@@ -26,24 +26,15 @@ namespace CncWallStation.ViewModels
         {
             // ══════════════════════════════════════════
             // ① 定义 L 形墙体轮廓（单位 mm）
-            //
-            //   Y
-            //   ↑  (0,200)──(150,200)
-            //   │     │           │
-            //   │  (0,100)─(100,100)
-            //   │             │
-            //   │          (100,0)─(150,0)
-            //   └────────────────────────→ X
             // ══════════════════════════════════════════
             var outline = new Vec2[]
             {
-                new Vec2(  0,   0),
+                new Vec2(100,   0),
                 new Vec2(150,   0),
                 new Vec2(150, 200),
                 new Vec2(  0, 200),
                 new Vec2(  0, 100),
                 new Vec2(100, 100),
-                new Vec2(100,   0),
             };
 
             var wall = new Wall("W-001", outline,
@@ -56,32 +47,31 @@ namespace CncWallStation.ViewModels
             // ══════════════════════════════════════════
             wall
                 .AddGroove("G-001", MachineSide.Top,
-                           new Vec2(10, 100), new Vec2(140, 100),
-                           width: 18f, depth: 10f)
+                           new Vec2(100, 50), new Vec2(150, 50),
+                           width: 18f, depth: 10f);
 
-                .AddHole("H-001", MachineSide.Top,
-                         center: new Vec2(30, 150), radius: 4f,
-                         depth: 18f, throughHole: true)
+                //.AddHole("H-001", MachineSide.Top,
+                //         center: new Vec2(30, 150), radius: 4f,
+                //         depth: 18f, throughHole: true)
 
-                .AddHole("H-002", MachineSide.Top,
-                         center: new Vec2(120, 150), radius: 4f,
-                         depth: 18f, throughHole: true)
+                //.AddHole("H-002", MachineSide.Top,
+                //         center: new Vec2(120, 150), radius: 4f,
+                //         depth: 18f, throughHole: true)
 
-                .AddPocket("P-001", MachineSide.Bottom,
-                           center: new Vec2(75, 50), width: 30f,
-                           height: 10f, depth: 5f, cornerRadius: 2f)
+                //.AddPocket("P-001", MachineSide.Bottom,
+                //           center: new Vec2(75, 50), width: 30f,
+                //           height: 10f, depth: 5f, cornerRadius: 2f)
 
-                .AddHole("H-003", MachineSide.Front,
-                         center: new Vec2(75, 0), radius: 5f,
-                         depth: 10f);
+                //.AddHole("H-003", MachineSide.Front,
+                //         center: new Vec2(75, 0), radius: 5f,
+                //         depth: 10f);
 
             // ══════════════════════════════════════════
             // ③ 初始状态
             // ══════════════════════════════════════════
             _logger.LogInformation("\n【初始状态】");
             wall.Print();
-            wall.PrintFaceReport();
-
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
             // ══════════════════════════════════════════
             // ④ 第一面加工（顶面 Top）
             // ══════════════════════════════════════════
@@ -92,9 +82,9 @@ namespace CncWallStation.ViewModels
             // ══════════════════════════════════════════
             // ⑤ 翻面（绕 X 轴，Top → Bottom）
             // ══════════════════════════════════════════
-            _logger.LogInformation("\n【执行翻面：绕 X 轴（Top ↔ Bottom）】");
-            wall.Flip(FlipAxis.AroundX);
-            wall.PrintFaceReport();
+            _logger.LogInformation("\n【执行翻面：绕 X 轴（Top -> Bottom）】");
+            wall.Flip(FlipAxis.AroundY);
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
 
             _logger.LogInformation("\n【第二面加工 - 翻面后顶面（原 Bottom）特征】");
             foreach (var f in wall.GetFeaturesByCurrentSide(MachineSide.Top))
@@ -104,8 +94,8 @@ namespace CncWallStation.ViewModels
             // ⑥ CNC 旋转定位（绕 Z 轴旋转 90°）
             // ══════════════════════════════════════════
             _logger.LogInformation("\n【CNC 旋转：绕 Z 轴 90°】");
-            wall.Rotate(Vec3.UnitZ, 90f, pivot: new Vec3(75, 100, 9));
-            wall.PrintFaceReport();
+            wall.Rotate(Vec3.UnitZ, 90f, pivot: new Vec3(50, 0, 0));
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
 
             _logger.LogInformation($"\n旋转后顶点[0]: {wall.GetWorldVertices()[0]}");
 
@@ -118,6 +108,7 @@ namespace CncWallStation.ViewModels
             var (bmin, bmax) = wall.GetBoundingBox();
             _logger.LogInformation($"包围盒 Min: {bmin}");
             _logger.LogInformation($"包围盒 Max: {bmax}");
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
 
             // ══════════════════════════════════════════
             // ⑧ 输出特征世界坐标（CNC 路径生成用）
@@ -133,14 +124,13 @@ namespace CncWallStation.ViewModels
             wall.UndoTransform();
             _logger.LogInformation($"撤销后顶点[0]: {wall.GetWorldVertices()[0]}");
             _logger.LogInformation($"剩余可撤销变换步数: {wall.UndoTransformSteps}");
-
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
             // ══════════════════════════════════════════
             // ⑩ 撤销翻面
             // ══════════════════════════════════════════
             _logger.LogInformation("\n【撤销翻面】");
             wall.UndoFlip();
-            wall.PrintFaceReport();
-
+            wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
             // ══════════════════════════════════════════
             // ⑪ SLERP 旋转动画插值（5 帧）
             // ══════════════════════════════════════════
@@ -154,7 +144,7 @@ namespace CncWallStation.ViewModels
                 _logger.LogInformation($"  t={t:F1} → {q}");
             }
 
-            _logger.LogError("\n完成。");
+            _logger.LogInformation("\n完成。");
         }
 
     }

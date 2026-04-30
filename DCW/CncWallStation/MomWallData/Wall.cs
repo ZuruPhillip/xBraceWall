@@ -222,7 +222,7 @@ namespace CncWallStation.MomWallData
         /// 自动同步更新所有特征的加工面法向量
         /// </summary>
         /// <param name="axis">旋转轴（世界坐标系）</param>
-        /// <param name="angleDeg">旋转角度（度）</param>
+        /// <param name="angleDeg">逆时针旋转角度（度）</param>
         /// <param name="pivot">旋转中心（null = 原点）</param>
         public Wall Rotate(Vec3 axis, float angleDeg, Vec3? pivot = null)
         {
@@ -392,7 +392,6 @@ namespace CncWallStation.MomWallData
             sb.AppendLine($"║  Wall [{Id}]  材料: {Material}");
             sb.AppendLine($"║  轮廓顶点数 : {Outline.Count}");
             sb.AppendLine($"║  厚度       : {Thickness}mm   底面高度: {BaseElevation}mm");
-            sb.AppendLine($"║  面积       : {OutlineArea():F2}mm²   体积: {Volume():F2}mm³");
             sb.AppendLine($"║  加工原点   : {MachineOrigin}   已翻面: {FlipCount} 次");
             sb.AppendLine($"║  当前变换   : {Transform}");
             sb.AppendLine($"║  可撤销变换 : {UndoTransformSteps} 步   可撤销翻面: {UndoFlipSteps} 步");
@@ -423,6 +422,276 @@ namespace CncWallStation.MomWallData
                     $"{f.CurrentSide,-6}{changed} ║ {f.LocalPos,-12} ║");
             }
             Console.WriteLine("╚══════╩══════════╩══════════╩══════════════╝");
+        }
+
+        /// <summary>
+        /// 打印旋转/翻面后所有顶点和特征的世界坐标
+        /// </summary>
+        public void PrintWorldCoordinates(string label = "")
+        {
+            var sb = new StringBuilder();
+
+            // ══════════════════════════════════════════════════════
+            // 列宽定义
+            // ══════════════════════════════════════════════════════
+            const int W_IDX = 3;   // 顶点序号
+            const int W_LOCAL = 18;   // 局部坐标
+            const int W_BOTTOM = 26;   // 底面世界坐标
+            const int W_TOP = 26;   // 顶面世界坐标
+
+            const int W_FID = 6;   // 特征 ID
+            const int W_FTYPE = 9;   // 特征类型
+            const int W_INITSIDE = 12;   // 初始加工面
+            const int W_CURSIDE = 12;   // 当前加工面
+            const int W_FWORLD = 27;   // 特征世界坐标
+
+            const int W_NID = 6;   // 法向量 ID
+            const int W_NORMAL = 30;   // 法向量
+            const int W_DIRECTION = 36;   // 朝向描述
+
+            // ══════════════════════════════════════════════════════
+            // 计算各子表内容宽度（不含最外层两侧 ║ 和空格）
+            //   每列占：W + 2（两侧各1空格）+ 1（║分隔）
+            //   最右列：W + 2（两侧各1空格，无║）
+            // ══════════════════════════════════════════════════════
+            //  顶点表：║_#_║_LOCAL_║_BOTTOM_║_TOP_║
+            int vtxInner = (W_IDX + 2) + 1
+                          + (W_LOCAL + 2) + 1
+                          + (W_BOTTOM + 2) + 1
+                          + (W_TOP + 2);
+
+            //  特征表：║_FID_║_FTYPE_║_INIT_║_CUR_║_WORLD_║
+            int ftInner = (W_FID + 2) + 1
+                          + (W_FTYPE + 2) + 1
+                          + (W_INITSIDE + 2) + 1
+                          + (W_CURSIDE + 2) + 1
+                          + (W_FWORLD + 2);
+
+            //  法向量表：║_NID_║_NORMAL_║_DIR_║
+            int nmInner = (W_NID + 2) + 1
+                          + (W_NORMAL + 2) + 1
+                          + (W_DIRECTION + 2);
+
+            // 取最宽的子表作为全局内容宽度
+            int IW = Math.Max(Math.Max(vtxInner, ftInner), nmInner);
+
+            // ══════════════════════════════════════════════════════
+            // 通用行构造辅助
+            // ══════════════════════════════════════════════════════
+
+            // 外框横线
+            string OuterTop = $"╔{new string('═', IW + 2)}╗";
+            string OuterBottom = $"╚{new string('═', IW + 2)}╝";
+            string OuterMid = $"╠{new string('═', IW + 2)}╣";
+
+            // 普通文本行（内容不足时自动右填空格，保证右边界对齐）
+            string TextRow(string content)
+                => $"║ {content.PadRight(IW)} ║";
+
+            // 子表行（内容 + 末尾填充空格到 IW，保证右边界对齐）
+            string TableRow(string rowContent)
+            {
+                // rowContent 是子表内部列格式，已含左侧空格
+                // 需要补右侧空格使总内容宽度 = IW
+                string padded = rowContent.PadRight(IW);
+                return $"║{padded}║";
+            }
+
+            // 子表分隔线（╠...╣，总宽 = IW + 2）
+            // 传入各列宽数组，自动构造内部 ╦/╬ 分隔
+            string SubLine(char left, char mid, char right, int[] colWidths)
+            {
+                var parts = new System.Text.StringBuilder();
+                parts.Append(left);
+                for (int ci = 0; ci < colWidths.Length; ci++)
+                {
+                    parts.Append(new string('═', colWidths[ci] + 2));
+                    parts.Append(ci < colWidths.Length - 1 ? mid : right);
+                }
+                // 补足到 IW + 2（含左右边界字符各1）
+                int built = 1 + colWidths.Sum(w => w + 2 + 1); // left + cols + 右边界
+                                                               // 右边界已含在上面循环末尾，不需额外处理
+                return parts.ToString().PadRight(IW + 2)
+                       .TrimEnd().PadRight(IW + 2); // 确保宽度
+            }
+
+            // 更可靠的子表分隔线构造（显式补足 ═ 到 IW+2）
+            string MakeSubLine(char leftCap, char sep, char rightCap, int[] cols)
+            {
+                var sb2 = new System.Text.StringBuilder();
+                sb2.Append(leftCap);
+                for (int ci = 0; ci < cols.Length; ci++)
+                {
+                    sb2.Append(new string('═', cols[ci] + 2));
+                    sb2.Append(ci < cols.Length - 1 ? sep : rightCap);
+                }
+                // 如果子表比 IW+2 窄，在 rightCap 前补 ═
+                int target = IW + 2;
+                int current = sb2.Length;
+                if (current < target)
+                {
+                    // 在最后一个 rightCap 前插入补充的 ═
+                    sb2.Insert(sb2.Length - 1, new string('═', target - current));
+                }
+                return sb2.ToString();
+            }
+
+            // ══════════════════════════════════════════════════════
+            // 标题区
+            // ══════════════════════════════════════════════════════
+            string title = string.IsNullOrEmpty(label)
+                           ? $"Wall [{Id}] 世界坐标报告"
+                           : $"Wall [{Id}] 世界坐标报告 - {label}";
+
+            sb.AppendLine(OuterTop);
+            sb.AppendLine(TextRow($"  {title}"));
+            sb.AppendLine(TextRow($"  当前变换 : {Transform}"));
+            sb.AppendLine(TextRow($"  已翻面   : {FlipCount} 次    加工原点 : {MachineOrigin}"));
+            sb.AppendLine(OuterMid);
+
+            // ══════════════════════════════════════════════════════
+            // 【轮廓顶点表】
+            // ══════════════════════════════════════════════════════
+            sb.AppendLine(TextRow($"  【轮廓顶点】共 {Outline.Count} 个顶点，每点含底面 / 顶面坐标"));
+
+            int[] vtxCols = { W_IDX, W_LOCAL, W_BOTTOM, W_TOP };
+
+            sb.AppendLine(MakeSubLine('╠', '╦', '╣', vtxCols));
+            sb.AppendLine(TableRow(
+                $" {"#",W_IDX} ║" +
+                $" {"局部坐标 (XY)",-(W_LOCAL)} ║" +
+                $" {"底面世界坐标 (Z=低)",-(W_BOTTOM)} ║" +
+                $" {"顶面世界坐标 (Z=高)",-(W_TOP)} "));
+            sb.AppendLine(MakeSubLine('╠', '╬', '╣', vtxCols));
+
+            for (int i = 0; i < Outline.Count; i++)
+            {
+                Vec2 localPt = Outline[i];
+                Vec3 bottomWorld = Transform.Apply(
+                    new Vec3(localPt.X, localPt.Y, BaseElevation));
+                Vec3 topWorld = Transform.Apply(
+                    new Vec3(localPt.X, localPt.Y, BaseElevation + Thickness));
+
+                sb.AppendLine(TableRow(
+                    $" {i.ToString(),W_IDX} ║" +
+                    $" {localPt.ToString(),-(W_LOCAL)} ║" +
+                    $" {bottomWorld.ToString(),-(W_BOTTOM)} ║" +
+                    $" {topWorld.ToString(),-(W_TOP)} "));
+            }
+
+            sb.AppendLine(OuterMid);
+
+            // ══════════════════════════════════════════════════════
+            // 【加工特征表】
+            // ══════════════════════════════════════════════════════
+            sb.AppendLine(TextRow($"  【加工特征】共 {Features.Count} 个特征"));
+
+            int[] ftCols = { W_FID, W_FTYPE, W_INITSIDE, W_CURSIDE, W_FWORLD };
+
+            sb.AppendLine(MakeSubLine('╠', '╦', '╣', ftCols));
+            sb.AppendLine(TableRow(
+                $" {"ID",-(W_FID)} ║" +
+                $" {"类型",-(W_FTYPE)} ║" +
+                $" {"初始面",-(W_INITSIDE)} ║" +
+                $" {"当前面",-(W_CURSIDE)} ║" +
+                $" {"世界坐标",-(W_FWORLD)} "));
+            sb.AppendLine(MakeSubLine('╠', '╬', '╣', ftCols));
+
+            foreach (var f in Features)
+            {
+                Vec3 worldPos = GetFeatureWorldPos(f);
+                string changed = f.InitialSide != f.CurrentSide ? "★" : " ";
+                string curSide = changed + f.CurrentSide.ToString();
+
+                sb.AppendLine(TableRow(
+                    $" {f.Id,-(W_FID)} ║" +
+                    $" {f.Type.ToString(),-(W_FTYPE)} ║" +
+                    $" {f.InitialSide.ToString(),-(W_INITSIDE)} ║" +
+                    $" {curSide,-(W_CURSIDE)} ║" +
+                    $" {worldPos.ToString(),-(W_FWORLD)} "));
+
+                // Groove 额外打印起点 / 终点
+                if (f is Groove groove)
+                {
+                    Vec3 startWorld = Transform.Apply(
+                        new Vec3(groove.StartPt.X, groove.StartPt.Y, BaseElevation));
+                    Vec3 endWorld = Transform.Apply(
+                        new Vec3(groove.EndPt.X, groove.EndPt.Y, BaseElevation));
+
+                    sb.AppendLine(TableRow(
+                        $" {"",-(W_FID)} ║" +
+                        $" {"",-(W_FTYPE)} ║" +
+                        $" {"  └─ 起点",-(W_INITSIDE)} ║" +
+                        $" {"",-(W_CURSIDE)} ║" +
+                        $" {"→ " + startWorld.ToString(),-(W_FWORLD)} "));
+
+                    sb.AppendLine(TableRow(
+                        $" {"",-(W_FID)} ║" +
+                        $" {"",-(W_FTYPE)} ║" +
+                        $" {"  └─ 终点",-(W_INITSIDE)} ║" +
+                        $" {"",-(W_CURSIDE)} ║" +
+                        $" {"→ " + endWorld.ToString(),-(W_FWORLD)} "));
+                }
+            }
+
+            sb.AppendLine(OuterMid);
+
+            // ══════════════════════════════════════════════════════
+            // 【法向量方向表】
+            // ══════════════════════════════════════════════════════
+            sb.AppendLine(TextRow("  【法向量方向（旋转后）】"));
+
+            int[] nmCols = { W_NID, W_NORMAL, W_DIRECTION };
+
+            sb.AppendLine(MakeSubLine('╠', '╦', '╣', nmCols));
+            sb.AppendLine(TableRow(
+                $" {"ID",-(W_NID)} ║" +
+                $" {"当前法向量",-(W_NORMAL)} ║" +
+                $" {"朝向描述",-(W_DIRECTION)} "));
+            sb.AppendLine(MakeSubLine('╠', '╬', '╣', nmCols));
+
+            foreach (var f in Features)
+            {
+                string direction = GetDirectionDesc(f.CurrentNormal);
+                sb.AppendLine(TableRow(
+                    $" {f.Id,-(W_NID)} ║" +
+                    $" {f.CurrentNormal.ToString(),-(W_NORMAL)} ║" +
+                    $" {direction,-(W_DIRECTION)} "));
+            }
+
+            sb.AppendLine(OuterMid);
+
+            // ══════════════════════════════════════════════════════
+            // 【包围盒 AABB】
+            // ══════════════════════════════════════════════════════
+            var (bmin, bmax) = GetBoundingBox();
+            Vec3 size = bmax - bmin;
+
+            sb.AppendLine(TextRow("  【世界坐标包围盒 AABB】"));
+            sb.AppendLine(TextRow($"  Min  : {bmin}"));
+            sb.AppendLine(TextRow($"  Max  : {bmax}"));
+            sb.AppendLine(TextRow($"  Size : X={size.X:F2}mm    Y={size.Y:F2}mm    Z={size.Z:F2}mm"));
+            sb.AppendLine(OuterBottom);
+
+            Console.Write(sb);
+        }
+
+        /// <summary>根据法向量返回中文朝向描述</summary>
+        private static string GetDirectionDesc(Vec3 normal)
+        {
+            var n = normal.Normalize();
+            float ax = MathF.Abs(n.X);
+            float ay = MathF.Abs(n.Y);
+            float az = MathF.Abs(n.Z);
+
+            if (az >= ax && az >= ay)
+                return n.Z > 0 ? "朝上   (+Z / Top)"
+                               : "朝下   (-Z / Bottom)";
+            if (ay >= ax)
+                return n.Y > 0 ? "朝前   (+Y / Front)"
+                               : "朝后   (-Y / Back)";
+            return n.X > 0 ? "朝右   (+X / Right)"
+                               : "朝左   (-X / Left)";
         }
 
         // ══════════════════════════════════════════════
