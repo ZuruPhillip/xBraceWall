@@ -163,6 +163,83 @@ namespace CncWallStation.MomWallData
             return this;
         }
 
+        // ══════════════════════════════════════════════════════════════
+        // Groove 添加方法
+        // ══════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// 添加对称槽（左右宽相等）
+        /// </summary>
+        public Groove AddGroove(string id,
+                                MachineSide side,
+                                Vec2 startPt,
+                                Vec2 endPt,
+                                float width,
+                                float depth,
+                                GrooveType grooveType = GrooveType.General)
+        {
+            var groove = new Groove(id, side, startPt, endPt,
+                                    width, depth, grooveType);
+            Features.Add(groove);
+            return groove;
+        }
+
+        /// <summary>
+        /// 添加非对称槽（左右宽可不同）
+        /// </summary>
+        public Groove AddAsymmetricGroove(string id,
+                                          MachineSide side,
+                                          Vec2 startPt,
+                                          Vec2 endPt,
+                                          float leftWidth,
+                                          float rightWidth,
+                                          float depth,
+                                          GrooveType grooveType = GrooveType.General)
+        {
+            var groove = new Groove(id, side, startPt, endPt,
+                                    leftWidth, rightWidth, depth, grooveType);
+            Features.Add(groove);
+            return groove;
+        }
+
+        /// <summary>
+        /// 添加钢柱槽（快捷方法）
+        /// </summary>
+        public Groove AddSteelColumnGroove(string id,
+                                           MachineSide side,
+                                           Vec2 startPt,
+                                           Vec2 endPt,
+                                           float width,
+                                           float depth)
+            => AddGroove(id, side, startPt, endPt,
+                         width, depth, GrooveType.SteelColumn);
+
+        /// <summary>
+        /// 添加顶板槽（快捷方法）
+        /// </summary>
+        public Groove AddTopPlateGroove(string id,
+                                        MachineSide side,
+                                        Vec2 startPt,
+                                        Vec2 endPt,
+                                        float width,
+                                        float depth)
+            => AddGroove(id, side, startPt, endPt,
+                         width, depth, GrooveType.TopPlate);
+
+        /// <summary>
+        /// 添加斜撑钢槽（快捷方法）
+        /// </summary>
+        public Groove AddXBraceSteelGroove(string id,
+                                           MachineSide side,
+                                           Vec2 startPt,
+                                           Vec2 endPt,
+                                           float leftWidth,
+                                           float rightWidth,
+                                           float depth)
+            => AddAsymmetricGroove(id, side, startPt, endPt,
+                                   leftWidth, rightWidth,
+                                   depth, GrooveType.XBraceSteel);
+
         /// <summary>添加圆孔（支持链式调用）</summary>
         public Wall AddHole(string id, MachineSide side,
                             Vec2 center, float radius, float depth,

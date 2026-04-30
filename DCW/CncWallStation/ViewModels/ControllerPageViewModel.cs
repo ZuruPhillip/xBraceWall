@@ -93,6 +93,53 @@ namespace CncWallStation.ViewModels
                     depth: 15f)
                 .LineTo(new Vec2(500, 0), depth: 15f);
 
+
+            // ── 对称槽 ────────────────────────────────────────────────
+
+            // 方式①：通用方法 + 指定类型
+            wall.AddGroove("G-001", MachineSide.Top,
+                startPt: new Vec2(0, 100),
+                endPt: new Vec2(600, 100),
+                width: 40f,
+                depth: 12f,
+                grooveType: GrooveType.SteelColumn);
+
+            // 方式②：快捷方法
+            wall.AddTopPlateGroove("G-002", MachineSide.Top,
+                startPt: new Vec2(0, 0),
+                endPt: new Vec2(600, 0),
+                width: 38f,
+                depth: 18f);
+
+            // ── 非对称槽 ──────────────────────────────────────────────
+
+            // 方式①：通用方法 + 指定类型
+            wall.AddAsymmetricGroove("G-003", MachineSide.Top,
+                startPt: new Vec2(0, 200),
+                endPt: new Vec2(600, 200),
+                leftWidth: 30f,   // 中心线左侧 30mm
+                rightWidth: 10f,   // 中心线右侧 10mm
+                depth: 15f,
+                grooveType: GrooveType.XBraceSteel);
+
+            // 方式②：快捷方法（斜撑钢槽默认非对称）
+            wall.AddXBraceSteelGroove("G-004", MachineSide.Top,
+                startPt: new Vec2(100, 300),
+                endPt: new Vec2(500, 100),
+                leftWidth: 25f,
+                rightWidth: 15f,
+                depth: 12f);
+
+            // ── 查询 ──────────────────────────────────────────────────
+            foreach (var f in wall.Features.OfType<Groove>())
+            {
+                Console.WriteLine(f.GetInfo());
+
+                // 打印四角坐标
+                var (p0, p1, p2, p3) = f.GetCorners();
+                Console.WriteLine($"  角点: P0={p0} P1={p1} P2={p2} P3={p3}");
+            }
+
             // ══════════════════════════════════════════
             // ③ 初始状态
             // ══════════════════════════════════════════
@@ -173,6 +220,5 @@ namespace CncWallStation.ViewModels
 
             _logger.LogInformation("\n完成。");
         }
-
     }
 }

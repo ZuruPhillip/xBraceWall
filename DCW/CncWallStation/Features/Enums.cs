@@ -34,4 +34,32 @@
         /// <summary>绕Z轴翻面：Front↔Back，Left↔Right</summary>
         AroundZ
     }
+
+    /// <summary>
+    /// 槽类型枚举
+    /// 描述槽的业务用途，便于后续加工路径分类处理
+    /// </summary>
+    public enum GrooveType
+    {
+        /// <summary>通用槽（未分类）</summary>
+        General,
+
+        /// <summary>钢柱槽（steelColumnGroove）</summary>
+        SteelColumn,
+
+        /// <summary>顶板槽（topPlateGroove）</summary>
+        TopPlate,
+
+        /// <summary>斜撑钢槽（xBraceSteelGroove）</summary>
+        XBraceSteel,
+
+        /// <summary>底板槽</summary>
+        BottomPlate,
+
+        /// <summary>侧板槽</summary>
+        SidePanel,
+
+        /// <summary>可扩展自定义类型</summary>
+        Custom
+    }
 }

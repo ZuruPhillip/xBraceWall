@@ -1,0 +1,853 @@
+{
+    "aacDensity": 500.0, 
+    "aacSlices": [
+        {
+            "contour": [
+                {
+                    "x": 0.0, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 0.0, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 598.8000000000001, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 598.8000000000001, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": null, 
+            "glueSegments": null, 
+            "id": "C43165F9-4ACA-B00F-4A47-F7AAFF111807_s0", 
+            "pn": "10001", 
+            "sliceColumn": 0
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 598.8000000000001, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 598.8000000000001, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1197.5, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1197.5, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 598.8000000000001, 
+                        "y": 2695.0
+                    }, 
+                    "startPoint": {
+                        "x": 598.8000000000001, 
+                        "y": 0.0
+                    }
+                }
+            ], 
+            "id": "C43165F9-4ACA-B00F-4A47-F7AAFF111807_s1", 
+            "pn": "10001", 
+            "sliceColumn": 1
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 1197.5, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 1197.5, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1796.3000000000002, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1796.3000000000002, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 1197.5, 
+                        "y": 2695.0
+                    }, 
+                    "startPoint": {
+                        "x": 1197.5, 
+                        "y": 0.0
+                    }
+                }
+            ], 
+            "id": "C43165F9-4ACA-B00F-4A47-F7AAFF111807_s2", 
+            "pn": "10001", 
+            "sliceColumn": 2
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 1796.3000000000002, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 1796.3000000000002, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 2395.0, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 2395.0, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 1796.3000000000002, 
+                        "y": 2695.0
+                    }, 
+                    "startPoint": {
+                        "x": 1796.3000000000002, 
+                        "y": 0.0
+                    }
+                }
+            ], 
+            "id": "C43165F9-4ACA-B00F-4A47-F7AAFF111807_s3", 
+            "pn": "10001", 
+            "sliceColumn": 3
+        }
+    ], 
+    "aacWallElevation": {
+        "contour": [
+            {
+                "x": 0.0, 
+                "y": 0.0
+            }, 
+            {
+                "x": 0.0, 
+                "y": 2695.0
+            },
+          {
+            "x": 2395.0,
+            "y": 2695.0
+          },
+          {
+            "x": 2395.0,
+            "y": 0.0
+          }
+        ]
+    }, 
+    "bendingKeys": {
+        "pn": "10016", 
+        "points": [
+            {
+                "x": 445.0, 
+                "y": 118.0, 
+                "z": 0.0
+            }, 
+            {
+                "x": 1195.0, 
+                "y": 118.0, 
+                "z": 0.0
+            }, 
+            {
+                "x": 1945.0, 
+                "y": 118.0, 
+                "z": 0.0
+            }
+        ]
+    }, 
+    "coreHeight": 2695.0, 
+    "coreThickness": 298.0, 
+    "faceFinishes": [
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 2880.0, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": [], 
+                    "glueThickness": 0.0, 
+                    "pn": "10019", 
+                    "thickness": 4.3
+                }
+            ]
+        }, 
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.0, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": -100.0, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2289.5, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2289.5, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": [
+                        {
+                            "pn": "MEP_DEVICE_8", 
+                            "point": {
+                                "x": 506.20000000000005, 
+                                "y": 283.5, 
+                                "z": 149.8
+                            }
+                        }
+                    ], 
+                    "glueThickness": 1.0, 
+                    "pn": "10019", 
+                    "thickness": 4.5
+                }
+            ]
+        }, 
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": -100.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1100.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1100.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": [], 
+                    "glueThickness": 0.8, 
+                    "pn": "10019", 
+                    "thickness": 3.0
+                }, 
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 1101.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": 1101.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2301.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2301.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": [], 
+                    "glueThickness": 0.8, 
+                    "pn": "10019", 
+                    "thickness": 3.0
+                }, 
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 2302.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": 2302.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2693.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2693.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": [], 
+                    "glueThickness": 0.8, 
+                    "pn": "10019", 
+                    "thickness": 3.0
+                }
+            ]
+        }
+    ], 
+    "id": "C43165F9-4ACA-B00F-4A47-F7AAFF111807_1", 
+    "mepCables": [
+        {
+            "pn": "MEP_CABLE_5", 
+            "points": [
+                {
+                    "frontFace": true, 
+                    "position": {
+                        "x": 506, 
+                        "y": 2695.0
+                    }, 
+                    "type": "waffleBox"
+                }, 
+                {
+                    "frontFace": true, 
+                    "position": {
+                        "x": 506, 
+                        "y": 184
+                    }, 
+                    "type": "corner"
+                }
+            ]
+        }
+    ], 
+    "mepDevices": [
+        {
+            "frontFace": true, 
+            "pn": "MEP_DEVICE_8", 
+            "position": {
+                "x": 506.20000000000005, 
+                "y": 149.8
+            }
+        }
+    ], 
+    "openingHoles": null, 
+    "pn": "10001", 
+    "rebars": {
+        "diameter": 6.0, 
+        "horizontalDepth": 29.0, 
+        "pn": "10015", 
+        "rods": [
+            {
+                "endPoint": {
+                    "x": 300.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 300.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 600.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 600.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 900.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 900.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1200.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 1200.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1500.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 1500.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1800.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 1800.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2100.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 2100.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 2500.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 2500.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 2200.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 2200.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 1900.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1900.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 1600.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1600.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 1300.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1300.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 1000.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1000.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 700.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 700.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 400.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 400.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 2395.0, 
+                    "y": 269.0, 
+                    "z": 100.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 100.0
+                }, 
+                "startThreading": false
+            }
+        ], 
+        "steelGrade": "HRB400E", 
+        "verticalDepth": 35.0
+    }, 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/wall_aac.json", 
+    "steelFrameColumns": [
+        {
+            "baseBracket": {
+                "pn": "10006"
+            }, 
+            "endPoint": {
+                "x": -50.0, 
+                "y": 248.0, 
+                "z": 2664.0
+            }, 
+            "height": 2612.0, 
+            "pn": "10003", 
+            "profileSize": 100.0, 
+            "profileThickness": 5.0, 
+            "rotation": 180.0, 
+            "startPoint": {
+                "x": -50.0, 
+                "y": 248.0, 
+                "z": 52.0
+            }, 
+            "topBracket": {
+                "isFlipped": true, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }, 
+        {
+            "baseBracket": {
+                "pn": "10006"
+            }, 
+            "endPoint": {
+                "x": 2445.0, 
+                "y": 248.0, 
+                "z": 2664.0
+            }, 
+            "height": 2612.0, 
+            "pn": "10003", 
+            "profileSize": 100.0, 
+            "profileThickness": 5.0, 
+            "rotation": 180.0, 
+            "startPoint": {
+                "x": 2445.0, 
+                "y": 248.0, 
+                "z": 52.0
+            }, 
+            "topBracket": {
+                "isFlipped": true, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }
+    ], 
+    "tensionTie": {
+        "diameter": 6.0, 
+        "length": 2245.0, 
+        "pn": "10013"
+    }, 
+    "topPlate": [
+        {
+            "endPoint": {
+                "x": 2495.0, 
+                "y": 58.0, 
+                "z": 2689.0
+            }, 
+            "ferruleHoles": {
+                "ferrulePn": "10018", 
+                "holeDiameter": 6.0, 
+                "points": [
+                    {
+                        "x": 300.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 600.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 900.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 1200.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 1500.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 1800.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 2100.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }
+                ]
+            }, 
+            "pn": "10023", 
+            "position": {
+                "x": -100.0, 
+                "y": 298.0, 
+                "z": 2689.0
+            }, 
+            "profileThickness": 9.0, 
+            "startPoint": {
+                "x": -100.0, 
+                "y": 58.0, 
+                "z": 2689.0
+            }, 
+            "studs": {
+                "holeDiameter": 12.0, 
+                "pn": "10014", 
+                "points": [
+                    {
+                        "x": 290.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 390.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 490.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 740.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1040.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1140.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1240.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1340.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1640.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1790.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1890.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 1990.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }, 
+                    {
+                        "x": 2090.0, 
+                        "y": 123.0, 
+                        "z": 2695.0
+                    }
+                ]
+            }, 
+            "width": 240.0
+        }
+    ], 
+    "waffleSlabLinks": [
+        {
+            "side": "Bottom", 
+            "uuid": "74DBD24D-45C6-CE13-7A0A-B19FF35C6344"
+        }, 
+        {
+            "side": "Top", 
+            "uuid": "3F36E898-4EAB-180C-E226-4DAE0BD60F56"
+        }
+    ], 
+    "xps": [
+        {
+            "height": 2695.0, 
+            "pn": "10026", 
+            "position": {
+                "x": 0.0, 
+                "y": 0.0, 
+                "z": 0.0
+            }
+        }, 
+        {
+            "height": 2695.0, 
+            "pn": "10027", 
+            "position": {
+                "x": 2893.0, 
+                "y": 0.0, 
+                "z": 0.0
+            }
+        }
+    ]
+}

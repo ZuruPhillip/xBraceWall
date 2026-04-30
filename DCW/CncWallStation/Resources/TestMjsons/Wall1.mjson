@@ -1,0 +1,638 @@
+{
+    "aacDensity": 500.0, 
+    "aacSlices": [
+        {
+            "contour": [
+                {
+                    "x": 0.0, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 0.0, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 466.70000000000005, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 466.70000000000005, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": null, 
+            "glueSegments": null, 
+            "id": "1D23FFA6-4FC3-1A98-86C8-938A32CC2E92_s0", 
+            "pn": "10001", 
+            "sliceColumn": 0
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 466.70000000000005, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 466.70000000000005, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 933.3000000000001, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 933.3000000000001, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 466.70000000000005, 
+                        "y": 2695.0
+                    }, 
+                    "startPoint": {
+                        "x": 466.70000000000005, 
+                        "y": 0.0
+                    }
+                }
+            ], 
+            "id": "1D23FFA6-4FC3-1A98-86C8-938A32CC2E92_s1", 
+            "pn": "10001", 
+            "sliceColumn": 1
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 933.3000000000001, 
+                    "y": 0.0
+                }, 
+                {
+                    "x": 933.3000000000001, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1400.0, 
+                    "y": 2695.0
+                }, 
+                {
+                    "x": 1400.0, 
+                    "y": 0.0
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 933.3000000000001, 
+                        "y": 2695.0
+                    }, 
+                    "startPoint": {
+                        "x": 933.3000000000001, 
+                        "y": 0.0
+                    }
+                }
+            ], 
+            "id": "1D23FFA6-4FC3-1A98-86C8-938A32CC2E92_s2", 
+            "pn": "10001", 
+            "sliceColumn": 2
+        }
+    ], 
+    "aacWallElevation": {
+        "contour": [
+            {
+                "x": 0.0, 
+                "y": 0.0
+            }, 
+            {
+                "x": 0.0, 
+                "y": 2695.0
+            }, 
+            {
+                "x": 1400.0, 
+                "y": 2695.0
+            }, 
+            {
+                "x": 1400.0, 
+                "y": 0.0
+            }
+        ]
+    }, 
+    "bendingKeys": {
+    }, 
+    "coreHeight": 2695.0, 
+    "coreThickness": 298.0, 
+    "faceFinishes": [
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 2880.0, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 2880.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 0.0, 
+                    "pn": "10019", 
+                    "thickness": 4.3
+                }
+            ]
+        }, 
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.0, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": -100.0, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1394.5, 
+                            "y": 0.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1394.5, 
+                            "y": 0.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 1.0, 
+                    "pn": "10019", 
+                    "thickness": 4.5
+                }
+            ]
+        }, 
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.0
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": -100.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1100.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1100.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 0.8, 
+                    "pn": "10019", 
+                    "thickness": 3.0
+                }, 
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 1101.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }, 
+                        {
+                            "x": 1101.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1698.0, 
+                            "y": 298.0, 
+                            "z": 2685.0
+                        }, 
+                        {
+                            "x": 1698.0, 
+                            "y": 298.0, 
+                            "z": 0.0
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 0.8, 
+                    "pn": "10019", 
+                    "thickness": 3.0
+                }
+            ]
+        }
+    ], 
+    "id": "1D23FFA6-4FC3-1A98-86C8-938A32CC2E92_1", 
+    "mepCables": null, 
+    "mepDevices": null, 
+    "openingHoles": null, 
+    "pn": "10001", 
+    "rebars": {
+        "diameter": 6.0, 
+        "horizontalDepth": 29.0, 
+        "pn": "10015", 
+        "rods": [
+            {
+                "endPoint": {
+                    "x": 300.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 300.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 600.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 600.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 900.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 900.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1200.0, 
+                    "y": 263.0, 
+                    "z": 2689.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 1200.0, 
+                    "y": 263.0, 
+                    "z": 0.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 2500.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 2500.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 2200.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 2200.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 1900.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1900.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 1600.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1600.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 1300.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1300.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 1000.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 1000.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 700.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 700.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 400.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 400.0
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1400.0, 
+                    "y": 269.0, 
+                    "z": 100.0
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.0, 
+                    "y": 269.0, 
+                    "z": 100.0
+                }, 
+                "startThreading": false
+            }
+        ], 
+        "steelGrade": "HRB400E", 
+        "verticalDepth": 35.0
+    }, 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/wall_aac.json", 
+    "steelFrameColumns": [
+        {
+            "baseBracket": {
+                "pn": "10006"
+            }, 
+            "endPoint": {
+                "x": -50.0, 
+                "y": 248.0, 
+                "z": 2664.0
+            }, 
+            "height": 2612.0, 
+            "pn": "10003", 
+            "profileSize": 100.0, 
+            "profileThickness": 5.0, 
+            "rotation": 180.0, 
+            "startPoint": {
+                "x": -50.0, 
+                "y": 248.0, 
+                "z": 52.0
+            }, 
+            "topBracket": {
+                "isFlipped": true, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }, 
+        {
+            "baseBracket": {
+                "pn": "10006"
+            },
+          "endPoint": {
+            "x": 1450.0,
+            "y": 248.0,
+            "z": 2664.0
+          }, 
+            "height": 2612.0, 
+            "pn": "10003", 
+            "profileSize": 100.0, 
+            "profileThickness": 5.0, 
+            "rotation": 180.0,
+          "startPoint": {
+            "x": 1450.0,
+            "y": 248.0,
+            "z": 52.0
+          }, 
+            "topBracket": {
+                "isFlipped": true, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }
+    ], 
+    "tensionTie": {
+        "diameter": 6.0, 
+        "length": 1250.0, 
+        "pn": "10013"
+    }, 
+    "topPlate": [
+        {
+            "endPoint": {
+                "x": 1500.0, 
+                "y": 58.0, 
+                "z": 2689.0
+            }, 
+            "ferruleHoles": {
+                "ferrulePn": "10018", 
+                "holeDiameter": 9.0, 
+                "points": [
+                    {
+                        "x": 300.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 600.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 900.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }, 
+                    {
+                        "x": 1200.0, 
+                        "y": 266.0, 
+                        "z": 2689.0
+                    }
+                ]
+            }, 
+            "pn": "10023", 
+            "position": {
+                "x": -100.0, 
+                "y": 298.0, 
+                "z": 2689.0
+            }, 
+            "profileThickness": 9.0, 
+            "startPoint": {
+                "x": -100.0, 
+                "y": 58.0, 
+                "z": 2689.0
+            }, 
+            "studs": {
+                "holeDiameter": 12.0, 
+                "pn": "10014", 
+                "points": [
+                    {
+                        "x": 1100.0, 
+                        "y": 148.0, 
+                        "z": 2695.0
+                    },
+                  {
+                    "x": 1000.0,
+                    "y": 148.0,
+                    "z": 2695.0
+                  },
+                  {
+                    "x": 900.0,
+                    "y": 148.0,
+                    "z": 2695.0
+                  },
+                  {
+                    "x": 800.0,
+                    "y": 148.0,
+                    "z": 2695.0
+                  },
+                  {
+                    "x": 650.0,
+                    "y": 148.0,
+                    "z": 2695.0
+                  },
+                  {
+                    "x": 350.0,
+                    "y": 148.0,
+                    "z": 2695.0
+                  }
+                ]
+            }, 
+            "width": 240.0
+        }
+    ], 
+    "waffleSlabLinks": [
+        {
+            "side": "Bottom", 
+            "uuid": "74DBD24D-45C6-CE13-7A0A-B19FF35C6344"
+        }, 
+        {
+            "side": "Top", 
+            "uuid": "3F36E898-4EAB-180C-E226-4DAE0BD60F56"
+        }
+    ], 
+    "xps": [
+        {
+            "height": 2695.0, 
+            "pn": "10026", 
+            "position": {
+                "x": 0.0, 
+                "y": 0.0, 
+                "z": 0.0
+            }
+        }, 
+        {
+            "height": 2695.0, 
+            "pn": "10027", 
+            "position": {
+                "x": 1898.0, 
+                "y": 0.0, 
+                "z": 0.0
+            }
+        }
+    ]
+}
