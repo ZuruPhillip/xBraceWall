@@ -1,5 +1,6 @@
 ﻿using CncWallStation.Transforms;
 using Infrastructure.Maths;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features.MepSlots
 {
@@ -16,15 +17,18 @@ namespace CncWallStation.Features.MepSlots
         public float Depth { get; set; }
 
         /// <summary>圆心（局部坐标）</summary>
+        [JsonPropertyName("center")]
         public Vec2 Center { get;  set; }
-
+        [JsonPropertyName("radius")]
         /// <summary>半径（mm）</summary>
         public float Radius { get;  set; }
 
         /// <summary>起始角度（弧度，从+X轴顺时针量）</summary>
+        [JsonIgnore]
         public float StartAngle { get;  set; }
 
         /// <summary>终止角度（弧度）</summary>
+        [JsonIgnore]
         public float EndAngle { get;  set; }
 
         /// <summary>是否顺时针（CW = true，CCW = false）</summary>
@@ -32,6 +36,24 @@ namespace CncWallStation.Features.MepSlots
 
         public float? OverrideWidth { get; set; } = null;
         // ── 派生属性 ─────────────────────────────────────────
+        /// <summary>
+        /// 起始角度（度，序列化用）
+        /// 内部存弧度，对外暴露角度便于阅读
+        /// </summary>
+        [JsonPropertyName("StartAngleDeg")]
+        public float StartAngleDeg
+        {
+            get => StartAngle * 180f / MathF.PI;
+            set => StartAngle = value * MathF.PI / 180f;
+        }
+
+        /// <summary>终止角度（度，序列化用）</summary>
+        [JsonPropertyName("EndAngleDeg")]
+        public float EndAngleDeg
+        {
+            get => EndAngle * 180f / MathF.PI;
+            set => EndAngle = value * MathF.PI / 180f;
+        }
 
         public Vec2 StartPoint =>
             Center + new Vec2(
@@ -44,6 +66,7 @@ namespace CncWallStation.Features.MepSlots
                 Radius * MathF.Sin(EndAngle));
 
         /// <summary>扫过角度（始终为正值）</summary>
+        [JsonIgnore]
         public float SweepAngle
         {
             get
@@ -64,9 +87,12 @@ namespace CncWallStation.Features.MepSlots
         }
 
         /// <summary>弧长</summary>
+        [JsonIgnore]
         public float Length => Radius * SweepAngle;
 
         // ── 构造 ─────────────────────────────────────────────
+
+        public ArcSegment() { }
 
         public ArcSegment(Vec2 center,
                           float radius,

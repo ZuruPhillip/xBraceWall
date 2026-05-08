@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Maths;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features.MepSlots
 {
@@ -6,6 +7,9 @@ namespace CncWallStation.Features.MepSlots
     /// 线槽路径段接口
     /// 每段拥有独立深度，宽度由 MepSlot 统一定义
     /// </summary>
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$segmentType")]
+    [JsonDerivedType(typeof(LineSegment), typeDiscriminator: "Line")]
+    [JsonDerivedType(typeof(ArcSegment), typeDiscriminator: "Arc")]
     public interface ISegment
     {
         /// <summary>段类型</summary>

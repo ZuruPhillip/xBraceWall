@@ -1,5 +1,6 @@
 ﻿using CncWallStation.Transforms;
 using Infrastructure.Maths;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features.MepSlots
 {
@@ -33,10 +34,12 @@ namespace CncWallStation.Features.MepSlots
         public float TotalLength => Segments.Sum(s => s.Length);
 
         /// <summary>最小深度</summary>
+        [JsonIgnore]
         public float MinDepth => Segments.Count > 0
                                       ? Segments.Min(s => s.Depth) : 0f;
 
         /// <summary>最大深度</summary>
+        [JsonIgnore]
         public float MaxDepth => Segments.Count > 0
                                       ? Segments.Max(s => s.Depth) : 0f;
 

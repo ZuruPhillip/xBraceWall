@@ -1,5 +1,6 @@
 ﻿using CncWallStation.Transforms;
 using Infrastructure.Maths;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features.MepSlots
 {
@@ -16,14 +17,17 @@ namespace CncWallStation.Features.MepSlots
         public float Depth { get; set; }
 
         /// <summary>方向向量（单位向量）</summary>
+        [JsonIgnore]
         public Vec2 Direction => (EndPoint - StartPoint).Normalize();
 
         /// <summary>线段长度</summary>
         public float Length => (EndPoint - StartPoint).Length();
 
-        public float? OverrideWidth { get; set; } = null; 
+        public float? OverrideWidth { get; set; } = null;
         // ── 构造 ─────────────────────────────────────────────
 
+        public LineSegment() { }
+        
         public LineSegment(Vec2 start, Vec2 end, float depth)
         {
             StartPoint = start;
