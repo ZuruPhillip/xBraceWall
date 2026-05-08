@@ -47,17 +47,17 @@
         /// <summary>钢柱槽（steelColumnGroove）</summary>
         SteelColumn,
 
-        /// <summary>顶板槽（topPlateGroove）</summary>
-        TopPlate,
-
         /// <summary>斜撑钢槽（xBraceSteelGroove）</summary>
         XBraceSteel,
 
-        /// <summary>底板槽</summary>
-        BottomPlate,
+        /// <summary>钢柱底板槽</summary>
+        BaseBracket,
 
-        /// <summary>侧板槽</summary>
-        SidePanel,
+        /// <summary>钢柱顶板槽</summary>
+        TopBracket,
+
+        /// <summary>顶板槽</summary>
+        TopPlate,
 
         /// <summary>可扩展自定义类型</summary>
         Custom

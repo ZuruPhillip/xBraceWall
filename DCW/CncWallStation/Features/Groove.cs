@@ -1,5 +1,6 @@
 ﻿using CncWallStation.Transforms;
 using Infrastructure.Maths;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features
 {
@@ -16,35 +17,42 @@ namespace CncWallStation.Features
         public GrooveType GrooveType { get; set; }
 
         /// <summary>槽起点（局部坐标，中心线）</summary>
-        public Vec2 StartPt { get; private set; }
+        public Vec2 StartPt { get;  set; }
 
         /// <summary>槽终点（局部坐标，中心线）</summary>
-        public Vec2 EndPt { get; private set; }
+        public Vec2 EndPt { get;  set; }
 
         /// <summary>
         /// 中心线左侧宽度（mm）
         /// 定义：沿 StartPt→EndPt 方向，左手侧的宽度
         /// </summary>
+        [JsonIgnore]
         public float LeftWidth { get; set; }
 
         /// <summary>
         /// 中心线右侧宽度（mm）
         /// 定义：沿 StartPt→EndPt 方向，右手侧的宽度
         /// </summary>
+        [JsonIgnore]
         public float RightWidth { get; set; }
 
-        /// <summary>总槽宽（只读）= LeftWidth + RightWidth</summary>
-        public float Width => LeftWidth + RightWidth;
-
-        /// <summary>是否对称槽（左右宽相等）</summary>
-        public bool IsSymmetric =>
-            MathF.Abs(LeftWidth - RightWidth) < 0.001f;
-
         /// <summary>中心线长度（mm）</summary>
+        [JsonPropertyName("length")]
         public float Length =>
             (EndPt - StartPt).Length();
 
+
+        /// <summary>总槽宽（只读）= LeftWidth + RightWidth</summary>
+        [JsonPropertyName("width")]
+        public float Width => LeftWidth + RightWidth;
+
+        /// <summary>是否对称槽（左右宽相等）</summary>
+        [JsonPropertyName("isSymmetric")]
+        public bool IsSymmetric =>
+            MathF.Abs(LeftWidth - RightWidth) < 0.001f;
+
         /// <summary>中心线方向（单位向量）</summary>
+        [JsonIgnore]
         public Vec2 Direction =>
             (EndPt - StartPt).Normalize();
 

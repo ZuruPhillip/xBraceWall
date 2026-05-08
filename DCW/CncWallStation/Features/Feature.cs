@@ -1,22 +1,29 @@
-﻿using CncWallStation.Transforms;
+﻿using CncWallStation.Features.MepSlots;
+using CncWallStation.Transforms;
 using Infrastructure.Maths;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Features
 {
     /// <summary>
     /// 加工特征基类
     /// </summary>
+    // ── 在 Feature 基类上声明多态类型映射 ────────────────────────
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(Groove), typeDiscriminator: "Groove")]
+    [JsonDerivedType(typeof(Hole), typeDiscriminator: "Hole")]
+    [JsonDerivedType(typeof(Pocket), typeDiscriminator: "Pocket")]
+    [JsonDerivedType(typeof(MepSlot), typeDiscriminator: "MepSlot")]
     public abstract class Feature
     {
         // ── 基本属性 ──────────────────────────────────────────
 
         /// <summary>特征编号</summary>
         public string Id { get; set; }
+
+        // ── 序列化时写出具体类型标识（反序列化时恢复多态）──
+        [JsonPropertyName("featureType")]
+        public string FeatureTypeName => Type.ToString();   // 新增：类型名称字符串
 
         /// <summary>特征类型</summary>
         public FeatureType Type { get; }
@@ -28,6 +35,7 @@ namespace CncWallStation.Features
         public float Depth { get; set; }
 
         /// <summary>加工面（含法向量，旋转/翻面后自动更新）</summary>
+        [JsonIgnore]
         public MachineFace Face { get; }
 
         /// <summary>备注</summary>
@@ -36,12 +44,15 @@ namespace CncWallStation.Features
         // ── 快捷属性 ──────────────────────────────────────────
 
         /// <summary>初始加工面枚举</summary>
+        [JsonPropertyName("initialSide")]
         public MachineSide InitialSide => Face.InitialSide;
 
         /// <summary>当前加工面（旋转/翻面后变化）</summary>
+        [JsonPropertyName("currentSide")]
         public MachineSide CurrentSide => Face.GetCurrentSide();
 
         /// <summary>当前法向量</summary>
+        [JsonPropertyName("currentNormal")]
         public Vec3 CurrentNormal => Face.CurrentNormal;
 
         // ── 构造 ──────────────────────────────────────────────

@@ -5,12 +5,16 @@
     /// </summary>
     public struct Vec3
     {
-        public float X, Y, Z;
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
 
         public static readonly Vec3 Zero = new Vec3(0, 0, 0);
         public static readonly Vec3 UnitX = new Vec3(1, 0, 0);
         public static readonly Vec3 UnitY = new Vec3(0, 1, 0);
         public static readonly Vec3 UnitZ = new Vec3(0, 0, 1);
+
+        public Vec3() { X = 0; Y = 0; Z = 0; }
 
         public Vec3(float x, float y, float z) { X = x; Y = y; Z = z; }
 

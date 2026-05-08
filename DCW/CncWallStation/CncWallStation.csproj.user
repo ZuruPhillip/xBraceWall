@@ -8,5 +8,8 @@
     <Compile Update="Views\ControllerPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\WallListPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

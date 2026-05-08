@@ -5,10 +5,11 @@
     /// </summary>
     public struct Vec2
     {
-        public float X, Y;
+        public float X { get; set; }
+        public float Y { get; set; }
 
         public static readonly Vec2 Zero = new Vec2(0, 0);
-
+        public Vec2() { X = 0; Y = 0; }
         public Vec2(float x, float y) { X = x; Y = y; }
 
         public static Vec2 operator +(Vec2 a, Vec2 b) => new Vec2(a.X + b.X, a.Y + b.Y);
@@ -25,6 +26,9 @@
 
         /// <summary>长度</summary>
         public float Length() => MathF.Sqrt(X * X + Y * Y);
+
+        /// <summary>长度的平方（避免开根号，用于比较大小）</summary>
+        public float LengthSquared() => X * X + Y * Y;
 
         /// <summary>归一化</summary>
         public Vec2 Normalize()

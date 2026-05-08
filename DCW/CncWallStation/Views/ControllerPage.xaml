@@ -25,10 +25,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                            CornerRadius="6"
-                            Padding="{TemplateBinding Padding}">
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -48,7 +48,7 @@
 
         <!-- 次级按钮样式 -->
         <Style x:Key="SecondaryButtonStyle" TargetType="Button"
-           BasedOn="{StaticResource ToolbarButtonStyle}">
+               BasedOn="{StaticResource ToolbarButtonStyle}">
             <Setter Property="Background" Value="#475569"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -62,9 +62,26 @@
     </Page.Resources>
 
     <Grid>
-        <Button Content="测试按钮"
-        Style="{StaticResource ToolbarButtonStyle}"
-        Command="{Binding WallRotationTestCommand}"
-        ToolTip="加载AAC墙体3D渲染页面"/>
+        <!-- 使用 StackPanel 水平排列两个按钮 -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="10">
+
+            <!-- 原有按钮，宽度修改为 160 -->
+            <Button Content="测试按钮"
+                    Width="160"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    Command="{Binding WallRotationTestCommand}"
+                    ToolTip="加载AAC墙体3D渲染页面"/>
+
+            <!-- 新增次级按钮，宽度为 140 -->
+            <Button Content="生成WallData数据"
+                    Width="140"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    Command="{Binding WallDataGenerateCommand}"
+                    ToolTip="BimWall转换为WallData数据"/>
+
+        </StackPanel>
     </Grid>
 </Page>

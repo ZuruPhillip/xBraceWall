@@ -30,31 +30,31 @@
         <!-- 左侧：HandyControl侧边菜单 -->
         <hc:SideMenu Grid.Column="0" Background="{DynamicResource SecondaryRegionBrush}" Margin="0,30,0,0">
             <hc:SideMenu.Items>
-                <!-- 首页 -->
+                <hc:SideMenuItem 
+                Header="墙体清单" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="WallListPage"/>
+
                 <hc:SideMenuItem 
                 Header="BIM数据渲染" 
-                
                 Command="{Binding NavigateCommand}"
                 CommandParameter="BimDataRenderPage"/>
 
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 
                 Header="控制页面" 
-                
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ControllerPage"/>
 
                 <!-- 生产报表 -->
                 <hc:SideMenuItem 
-                Header="生产报表" 
-                
+                Header="数据异常报告" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ReportPage"/>
 
                 <!-- 系统设置 -->
                 <hc:SideMenuItem 
                 Header="系统设置" 
-                
                 Command="{Binding NavigateCommand}"
                 CommandParameter="SettingPage"/>
             </hc:SideMenu.Items>

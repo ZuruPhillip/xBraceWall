@@ -2,6 +2,7 @@
 using CncWallStation.Features.MepSlots;
 using CncWallStation.Transforms;
 using Infrastructure.Maths;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace CncWallStation.MomWallData
@@ -15,62 +16,164 @@ namespace CncWallStation.MomWallData
     /// │ 翻面：坐标自动重映射，原点始终为左下角      │
     /// └─────────────────────────────────────────┘
     /// </summary>
-    public class Wall
+    public class MomWall
     {
         // ══════════════════════════════════════════════
         // 基本属性
         // ══════════════════════════════════════════════
 
-        /// <summary>墙体编号</summary>
         public string Id { get; set; }
-
-        /// <summary>材料名称</summary>
         public string Material { get; set; }
-
-        /// <summary>备注</summary>
         public string Remark { get; set; } = string.Empty;
 
         // ══════════════════════════════════════════════
         // 几何定义
         // ══════════════════════════════════════════════
 
-        /// <summary>俯视图轮廓顶点列表（逆时针顺序，局部坐标）</summary>
         public List<Vec2> Outline { get; private set; }
-
-        /// <summary>墙体厚度 Z 方向（mm）</summary>
         public float Thickness { get; set; }
-
-        /// <summary>底面高度（mm，默认 0）</summary>
         public float BaseElevation { get; set; }
+
+        // ══════════════════════════════════════════════
+        // 计算尺寸（AABB / OBB，由轮廓推算）
+        // ══════════════════════════════════════════════
+
+        /// <summary>轮廓 X 方向跨度（AABB，mm）</summary>
+        public float Length { get; private set; }
+
+        /// <summary>轮廓 Y 方向跨度（AABB，mm）</summary>
+        public float Width { get; private set; }
+
+        /// <summary>OBB 长轴长度（mm）</summary>
+        [JsonIgnore]
+        public float ObbLength { get; private set; }
+        [JsonIgnore]
+        /// <summary>OBB 短轴长度（mm）</summary>
+        public float ObbWidth { get; private set; }
+        [JsonIgnore]
+        /// <summary>OBB 长轴与 X 轴夹角（度）</summary>
+        public float ObbAngleDeg { get; private set; }
+
+        // ══════════════════════════════════════════════
+        // 【新增】实际尺寸
+        // ══════════════════════════════════════════════
+
+        /// <summary>
+        /// 实际长度（mm）
+        /// 默认等于 <see cref="Length"/>（AABB X 跨度）
+        /// 可独立赋值以反映裁切/公差后的真实尺寸
+        /// </summary>
+        [JsonIgnore]
+        public float ActualLength
+        {
+            get => _actualLength ?? Length;
+            set => _actualLength = value;
+        }
+        private float? _actualLength;
+
+        /// <summary>
+        /// 实际宽度（mm）
+        /// 默认等于 <see cref="Width"/>（AABB Y 跨度）
+        /// </summary>
+        [JsonIgnore]
+        public float ActualWidth
+        {
+            get => _actualWidth ?? Width;
+            set => _actualWidth = value;
+        }
+        private float? _actualWidth;
+
+        /// <summary>
+        /// 实际厚度（mm）
+        /// 默认等于 <see cref="Thickness"/>
+        /// </summary>
+        [JsonIgnore]
+        public float ActualThickness
+        {
+            get => _actualThickness ?? Thickness;
+            set => _actualThickness = value;
+        }
+        private float? _actualThickness;
+
+        /// <summary>
+        /// 重置实际尺寸，使其重新跟随计算值
+        /// </summary>
+        public void ResetActualDimensions()
+        {
+            _actualLength = null;
+            _actualWidth = null;
+            _actualThickness = null;
+        }
+
+        /// <summary>
+        /// 实际尺寸是否已被手动覆盖（任意一项）
+        /// </summary>
+        [JsonIgnore]
+        public bool IsActualDimensionOverridden =>
+            _actualLength.HasValue ||
+            _actualWidth.HasValue ||
+            _actualThickness.HasValue;
+
+        // ══════════════════════════════════════════════
+        // 【新增】基准点 PivotPoint
+        // ══════════════════════════════════════════════
+
+        /// <summary>
+        /// 墙体基准点（局部坐标系，mm）
+        /// 默认 = 轮廓左下角（minX, minY）+ BaseElevation
+        ///
+        /// 用途：
+        ///   - 旋转中心参考点
+        ///   - CNC 加工原点对齐
+        ///   - BIM 定位锚点
+        ///
+        /// 赋 null 可重置为默认左下角自动计算值
+        /// </summary>
+        public Vec3 PivotPoint
+        {
+            get
+            {
+                if (_pivotPoint.HasValue)
+                    return _pivotPoint.Value;
+
+                // 默认：轮廓 AABB 左下角 + BaseElevation
+                var (minX, minY, _, _) = GetOutlineBounds();
+                return new Vec3(minX, minY, BaseElevation);
+            }
+            set => _pivotPoint = value;
+        }
+        private Vec3? _pivotPoint;
+
+        /// <summary>
+        /// 重置基准点，使其重新跟随左下角自动计算
+        /// </summary>
+        public void ResetPivotPoint() => _pivotPoint = null;
+
+        /// <summary>
+        /// 基准点是否已被手动覆盖
+        /// </summary>
+        [JsonIgnore]
+        public bool IsPivotOverridden => _pivotPoint.HasValue;
 
         // ══════════════════════════════════════════════
         // 加工特征
         // ══════════════════════════════════════════════
 
-        /// <summary>加工特征集合</summary>
         public List<Feature> Features { get; private set; } = new List<Feature>();
 
         // ══════════════════════════════════════════════
-        // 空间变换（旋转 / 平移）
+        // 空间变换
         // ══════════════════════════════════════════════
 
-        /// <summary>当前空间变换</summary>
         public Transform3D Transform { get; private set; } = new Transform3D();
-
-        /// <summary>变换历史栈（支持撤销）</summary>
         private readonly Stack<Transform3D> _transformHistory = new Stack<Transform3D>();
 
         // ══════════════════════════════════════════════
         // 翻面状态
         // ══════════════════════════════════════════════
 
-        /// <summary>当前加工原点（局部坐标，始终为左下角）</summary>
         public Vec2 MachineOrigin { get; private set; } = Vec2.Zero;
-
-        /// <summary>已翻面次数</summary>
         public int FlipCount { get; private set; } = 0;
-
-        /// <summary>翻面历史快照（支持撤销翻面）</summary>
         private readonly Stack<FlipSnapshot> _flipHistory = new Stack<FlipSnapshot>();
 
         // ══════════════════════════════════════════════
@@ -84,24 +187,144 @@ namespace CncWallStation.MomWallData
         // 构造函数
         // ══════════════════════════════════════════════
 
-        public Wall(string id,
-                    IEnumerable<Vec2> outline,
-                    float thickness,
-                    float baseElevation = 0f,
-                    string material = "木材")
+        /// <summary>
+        /// 构造墙体
+        /// 自动计算 Length / Width（AABB）及 OBB 方向尺寸
+        /// PivotPoint 默认为轮廓左下角（minX, minY, BaseElevation）
+        /// </summary>
+        public MomWall(string id,
+                       IEnumerable<Vec2> outline,
+                       float thickness,
+                       float baseElevation = 0f,
+                       string material = "AAC")
         {
             Id = id;
             Material = material;
             Outline = new List<Vec2>(outline);
             Thickness = thickness;
             BaseElevation = baseElevation;
+
+            // 计算 AABB / OBB 尺寸（同时为 PivotPoint 默认值做准备）
+            RecalculateDimensions();
+        }
+
+        // ══════════════════════════════════════════════
+        // 尺寸计算
+        // ══════════════════════════════════════════════
+
+        /// <summary>
+        /// 重新计算平面尺寸（AABB + OBB）
+        /// 调用时机：构造 / Flip / UndoFlip / 外部修改 Outline 后
+        /// 注意：手动覆盖的 ActualLength/Width/Thickness 不受影响
+        ///       PivotPoint 若未被手动覆盖，下次访问时自动跟随新轮廓
+        /// </summary>
+        public void RecalculateDimensions()
+        {
+            if (Outline == null || Outline.Count == 0)
+            {
+                Length = Width = ObbLength = ObbWidth = ObbAngleDeg = 0f;
+                return;
+            }
+            ComputeAabbDimensions();
+            ComputeObbDimensions();
+        }
+
+        private void ComputeAabbDimensions()
+        {
+            var (minX, minY, maxX, maxY) = GetOutlineBounds();
+            Length = maxX - minX;
+            Width = maxY - minY;
+        }
+
+        private void ComputeObbDimensions()
+        {
+            if (Outline.Count < 3)
+            {
+                ObbLength = Length; ObbWidth = Width; ObbAngleDeg = 0f;
+                return;
+            }
+
+            var hull = ComputeConvexHull(Outline);
+            if (hull.Count < 2)
+            {
+                ObbLength = Length; ObbWidth = Width; ObbAngleDeg = 0f;
+                return;
+            }
+
+            float minArea = float.MaxValue;
+            float bestLen = Length, bestWid = Width, bestAngle = 0f;
+            int n = hull.Count;
+
+            for (int i = 0; i < n; i++)
+            {
+                Vec2 edgeDir = (hull[(i + 1) % n] - hull[i]).Normalize();
+                Vec2 perpDir = new Vec2(-edgeDir.Y, edgeDir.X);
+
+                float minP1 = float.MaxValue, maxP1 = float.MinValue;
+                float minP2 = float.MaxValue, maxP2 = float.MinValue;
+
+                foreach (var pt in hull)
+                {
+                    float p1 = pt.Dot(edgeDir);
+                    float p2 = pt.Dot(perpDir);
+                    if (p1 < minP1) minP1 = p1;
+                    if (p1 > maxP1) maxP1 = p1;
+                    if (p2 < minP2) minP2 = p2;
+                    if (p2 > maxP2) maxP2 = p2;
+                }
+
+                float spanLen = maxP1 - minP1;
+                float spanWid = maxP2 - minP2;
+                float area = spanLen * spanWid;
+
+                if (area < minArea)
+                {
+                    minArea = area;
+                    bestLen = spanLen;
+                    bestWid = spanWid;
+                    bestAngle = MathF.Atan2(edgeDir.Y, edgeDir.X) * 180f / MathF.PI;
+                }
+            }
+
+            ObbLength = MathF.Max(bestLen, bestWid);
+            ObbWidth = MathF.Min(bestLen, bestWid);
+            ObbAngleDeg = bestAngle;
+        }
+
+        private static List<Vec2> ComputeConvexHull(List<Vec2> points)
+        {
+            int n = points.Count;
+            if (n < 3) return new List<Vec2>(points);
+
+            var sorted = points.OrderBy(p => p.Y).ThenBy(p => p.X).ToList();
+            Vec2 pivot = sorted[0];
+
+            var rest = sorted
+                .Skip(1)
+                .OrderBy(p => MathF.Atan2(p.Y - pivot.Y, p.X - pivot.X))
+                .ThenBy(p => (p - pivot).LengthSquared())
+                .ToList();
+
+            var stack = new List<Vec2> { pivot };
+            foreach (var pt in rest)
+            {
+                while (stack.Count >= 2)
+                {
+                    Vec2 a = stack[^2], b = stack[^1];
+                    if ((b - a).Cross(pt - a) <= 0f)
+                        stack.RemoveAt(stack.Count - 1);
+                    else
+                        break;
+                }
+                stack.Add(pt);
+            }
+            return stack;
         }
 
         // ══════════════════════════════════════════════
         // 几何属性
         // ══════════════════════════════════════════════
 
-        /// <summary>俯视图轮廓面积（Shoelace 公式）</summary>
         public float OutlineArea()
         {
             float area = 0f;
@@ -115,12 +338,8 @@ namespace CncWallStation.MomWallData
             return MathF.Abs(area) * 0.5f;
         }
 
-        /// <summary>体积（不含特征减除量）</summary>
         public float Volume() => OutlineArea() * Thickness;
 
-        /// <summary>
-        /// 获取轮廓包围盒（局部坐标）
-        /// </summary>
         public (float minX, float minY, float maxX, float maxY) GetOutlineBounds()
         {
             float minX = float.MaxValue, minY = float.MaxValue;
@@ -135,7 +354,6 @@ namespace CncWallStation.MomWallData
             return (minX, minY, maxX, maxY);
         }
 
-        /// <summary>点是否在轮廓内（射线法）</summary>
         public bool ContainsPoint(Vec2 pt)
         {
             int n = Outline.Count;
@@ -151,117 +369,73 @@ namespace CncWallStation.MomWallData
         }
 
         // ══════════════════════════════════════════════
-        // 特征管理
+        // 特征管理（省略，与原版完全一致）
         // ══════════════════════════════════════════════
 
-        /// <summary>添加切槽（支持链式调用）</summary>
-        public Wall AddGroove(string id, MachineSide side,
-                              Vec2 startPt, Vec2 endPt,
-                              float width, float depth)
+        public MomWall AddGroove(string id, MachineSide side,
+                                 Vec2 startPt, Vec2 endPt,
+                                 float width, float depth)
         {
             Features.Add(new Groove(id, side, startPt, endPt, width, depth));
             return this;
         }
 
-        // ══════════════════════════════════════════════════════════════
-        // Groove 添加方法
-        // ══════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// 添加对称槽（左右宽相等）
-        /// </summary>
-        public Groove AddGroove(string id,
-                                MachineSide side,
-                                Vec2 startPt,
-                                Vec2 endPt,
-                                float width,
-                                float depth,
+        public Groove AddGroove(string id, MachineSide side,
+                                Vec2 startPt, Vec2 endPt,
+                                float width, float depth,
                                 GrooveType grooveType = GrooveType.General)
         {
-            var groove = new Groove(id, side, startPt, endPt,
-                                    width, depth, grooveType);
-            Features.Add(groove);
-            return groove;
+            var g = new Groove(id, side, startPt, endPt, width, depth, grooveType);
+            Features.Add(g);
+            return g;
         }
 
-        /// <summary>
-        /// 添加非对称槽（左右宽可不同）
-        /// </summary>
-        public Groove AddAsymmetricGroove(string id,
-                                          MachineSide side,
-                                          Vec2 startPt,
-                                          Vec2 endPt,
-                                          float leftWidth,
-                                          float rightWidth,
+        public Groove AddAsymmetricGroove(string id, MachineSide side,
+                                          Vec2 startPt, Vec2 endPt,
+                                          float leftWidth, float rightWidth,
                                           float depth,
                                           GrooveType grooveType = GrooveType.General)
         {
-            var groove = new Groove(id, side, startPt, endPt,
-                                    leftWidth, rightWidth, depth, grooveType);
-            Features.Add(groove);
-            return groove;
+            var g = new Groove(id, side, startPt, endPt,
+                               leftWidth, rightWidth, depth, grooveType);
+            Features.Add(g);
+            return g;
         }
 
-        /// <summary>
-        /// 添加钢柱槽（快捷方法）
-        /// </summary>
-        public Groove AddSteelColumnGroove(string id,
-                                           MachineSide side,
-                                           Vec2 startPt,
-                                           Vec2 endPt,
-                                           float width,
-                                           float depth)
-            => AddGroove(id, side, startPt, endPt,
-                         width, depth, GrooveType.SteelColumn);
+        public Groove AddSteelColumnGroove(string id, MachineSide side,
+                                           Vec2 startPt, Vec2 endPt,
+                                           float width, float depth)
+            => AddGroove(id, side, startPt, endPt, width, depth, GrooveType.SteelColumn);
 
-        /// <summary>
-        /// 添加顶板槽（快捷方法）
-        /// </summary>
-        public Groove AddTopPlateGroove(string id,
-                                        MachineSide side,
-                                        Vec2 startPt,
-                                        Vec2 endPt,
-                                        float width,
-                                        float depth)
-            => AddGroove(id, side, startPt, endPt,
-                         width, depth, GrooveType.TopPlate);
+        public Groove AddTopPlateGroove(string id, MachineSide side,
+                                        Vec2 startPt, Vec2 endPt,
+                                        float width, float depth)
+            => AddGroove(id, side, startPt, endPt, width, depth, GrooveType.TopPlate);
 
-        /// <summary>
-        /// 添加斜撑钢槽（快捷方法）
-        /// </summary>
-        public Groove AddXBraceSteelGroove(string id,
-                                           MachineSide side,
-                                           Vec2 startPt,
-                                           Vec2 endPt,
-                                           float leftWidth,
-                                           float rightWidth,
+        public Groove AddXBraceSteelGroove(string id, MachineSide side,
+                                           Vec2 startPt, Vec2 endPt,
+                                           float leftWidth, float rightWidth,
                                            float depth)
             => AddAsymmetricGroove(id, side, startPt, endPt,
-                                   leftWidth, rightWidth,
-                                   depth, GrooveType.XBraceSteel);
+                                   leftWidth, rightWidth, depth, GrooveType.XBraceSteel);
 
-        /// <summary>添加圆孔（支持链式调用）</summary>
-        public Wall AddHole(string id, MachineSide side,
-                            Vec2 center, float radius, float depth,
-                            bool throughHole = false)
+        public MomWall AddHole(string id, MachineSide side,
+                               Vec2 center, float radius, float depth,
+                               bool throughHole = false)
         {
             Features.Add(new Hole(id, side, center, radius, depth, throughHole));
             return this;
         }
 
-        /// <summary>添加矩形挖坑（支持链式调用）</summary>
-        public Wall AddPocket(string id, MachineSide side,
-                              Vec2 center, float width, float height,
-                              float depth, float cornerRadius = 0f)
+        public MomWall AddPocket(string id, MachineSide side,
+                                 Vec2 center, float width, float height,
+                                 float depth, float cornerRadius = 0f)
         {
             Features.Add(new Pocket(id, side, center, width, height,
                                     depth, cornerRadius));
             return this;
         }
 
-        /// <summary>
-        /// 添加电线管道线槽（链式调用，返回 MepSlot 供继续配置路径）
-        /// </summary>
         public MepSlot AddMepSlot(string id, MachineSide side, float width)
         {
             var slot = new MepSlot(id, side, width);
@@ -269,35 +443,29 @@ namespace CncWallStation.MomWallData
             return slot;
         }
 
-        /// <summary>按 ID 移除特征</summary>
         public bool RemoveFeature(string id)
         {
             var f = Features.FirstOrDefault(x => x.Id == id);
             return f != null && Features.Remove(f);
         }
 
-        /// <summary>按特征类型查询</summary>
         public IEnumerable<Feature> GetFeaturesByType(FeatureType type) =>
             Features.Where(f => f.Type == type);
 
-        /// <summary>按初始加工面查询</summary>
         public IEnumerable<Feature> GetFeaturesByInitialSide(MachineSide side) =>
             Features.Where(f => f.InitialSide == side);
 
-        /// <summary>按当前加工面查询（旋转/翻面后使用）</summary>
         public IEnumerable<Feature> GetFeaturesByCurrentSide(MachineSide side) =>
             Features.Where(f => f.CurrentSide == side);
 
-        /// <summary>获取当前法向量Z > 0 可从上方加工的特征</summary>
         public IEnumerable<Feature> GetAccessibleFeatures() =>
             Features.Where(f => f.Face.IsAccessible);
 
         // ══════════════════════════════════════════════
-        // 空间变换（旋转 / 平移）
+        // 空间变换
         // ══════════════════════════════════════════════
 
-        /// <summary>平移（支持链式调用）</summary>
-        public Wall Translate(Vec3 delta)
+        public MomWall Translate(Vec3 delta)
         {
             _transformHistory.Push(Transform.Clone());
             Transform.Translation = Transform.Translation + delta;
@@ -305,32 +473,18 @@ namespace CncWallStation.MomWallData
             return this;
         }
 
-        /// <summary>
-        /// 旋转（支持链式调用）
-        /// 自动同步更新所有特征的加工面法向量
-        /// </summary>
-        /// <param name="axis">旋转轴（世界坐标系）</param>
-        /// <param name="angleDeg">逆时针旋转角度（度）</param>
-        /// <param name="pivot">旋转中心（null = 原点）</param>
-        public Wall Rotate(Vec3 axis, float angleDeg, Vec3? pivot = null)
+        public MomWall Rotate(Vec3 axis, float angleDeg, Vec3? pivot = null)
         {
             _transformHistory.Push(Transform.Clone());
-
             float rad = angleDeg * MathF.PI / 180f;
             Quaternion q = Quaternion.FromAxisAngle(axis, rad);
-
             Transform.Pivot = pivot ?? Vec3.Zero;
             Transform.Rotation = (q * Transform.Rotation).Normalize();
-
-            // 同步更新所有特征的加工面法向量
-            foreach (var f in Features)
-                f.ApplyRotation(q);
-
+            foreach (var f in Features) f.ApplyRotation(q);
             _bboxDirty = true;
             return this;
         }
 
-        /// <summary>撤销上一步旋转/平移</summary>
         public bool UndoTransform()
         {
             if (_transformHistory.Count == 0) return false;
@@ -340,8 +494,7 @@ namespace CncWallStation.MomWallData
             return true;
         }
 
-        /// <summary>重置所有旋转/平移变换</summary>
-        public Wall ResetTransform()
+        public MomWall ResetTransform()
         {
             _transformHistory.Clear();
             Transform = new Transform3D();
@@ -350,10 +503,8 @@ namespace CncWallStation.MomWallData
             return this;
         }
 
-        /// <summary>可撤销旋转/平移步数</summary>
         public int UndoTransformSteps => _transformHistory.Count;
 
-        /// <summary>撤销后从当前旋转重建所有特征法向量</summary>
         private void RebuildFeatureNormals()
         {
             foreach (var f in Features)
@@ -367,54 +518,74 @@ namespace CncWallStation.MomWallData
         // 翻面操作
         // ══════════════════════════════════════════════
 
-        /// <summary>
-        /// 翻面（Top↔Bottom，坐标自动重映射，加工原点始终为左下角）
-        /// 支持链式调用
-        /// </summary>
-        public Wall Flip(FlipAxis axis = FlipAxis.AroundX)
+        public MomWall Flip(FlipAxis axis = FlipAxis.AroundX)
         {
             var bounds = GetOutlineBounds();
 
-            // 保存翻面前完整快照
             _flipHistory.Push(FlipSnapshot.Capture(
-                Outline, Features, MachineOrigin, FlipCount));
+                Outline, Features, MachineOrigin, FlipCount,
+                _pivotPoint, _actualLength, _actualWidth, _actualThickness));
 
-            // 重映射轮廓顶点
             for (int i = 0; i < Outline.Count; i++)
                 Outline[i] = FlipRemapper.RemapPoint(Outline[i], axis, bounds);
 
-            // 重映射所有特征坐标 + 更新加工面
             foreach (var f in Features)
                 f.ApplyFlip(axis, bounds);
 
-            // 重新计算加工原点（翻面后左下角）
             var nb = GetOutlineBounds();
             MachineOrigin = new Vec2(nb.minX, nb.minY);
             FlipCount++;
             _bboxDirty = true;
+
+            RecalculateDimensions();
+
+            // PivotPoint 若未手动覆盖，自动跟随新左下角（无需额外处理）
+            // 若已手动覆盖，翻面后同步做镜像重映射
+            if (_pivotPoint.HasValue)
+                _pivotPoint = RemapPivotOnFlip(_pivotPoint.Value, axis, bounds);
+
             return this;
         }
 
-        /// <summary>撤销翻面</summary>
         public bool UndoFlip()
         {
             if (_flipHistory.Count == 0) return false;
             _flipHistory.Pop().Restore(this);
             _bboxDirty = true;
+            RecalculateDimensions();
             return true;
         }
 
-        /// <summary>可撤销翻面步数</summary>
         public int UndoFlipSteps => _flipHistory.Count;
+
+        /// <summary>翻面时重映射手动设置的 PivotPoint</summary>
+        private static Vec3 RemapPivotOnFlip(
+            Vec3 pivot,
+            FlipAxis axis,
+            (float minX, float minY, float maxX, float maxY) bounds)
+        {
+            return axis switch
+            {
+                // 绕 X 翻面：Y 坐标镜像
+                FlipAxis.AroundX => new Vec3(
+                    pivot.X,
+                    bounds.minY + (bounds.maxY - pivot.Y),
+                    pivot.Z),
+
+                // 绕 Y 翻面：X 坐标镜像
+                FlipAxis.AroundY => new Vec3(
+                    bounds.minX + (bounds.maxX - pivot.X),
+                    pivot.Y,
+                    pivot.Z),
+
+                _ => pivot
+            };
+        }
 
         // ══════════════════════════════════════════════
         // 世界坐标计算
         // ══════════════════════════════════════════════
 
-        /// <summary>
-        /// 获取变换后的世界坐标顶点列表
-        /// 每个轮廓点 → 底面顶点 + 顶面顶点
-        /// </summary>
         public List<Vec3> GetWorldVertices()
         {
             var result = new List<Vec3>(Outline.Count * 2);
@@ -426,22 +597,22 @@ namespace CncWallStation.MomWallData
             return result;
         }
 
-        /// <summary>获取指定特征的世界坐标</summary>
         public Vec3 GetFeatureWorldPos(Feature feature) =>
             Transform.Apply(new Vec3(
                 feature.LocalPos.X,
                 feature.LocalPos.Y,
                 BaseElevation));
 
-        /// <summary>所有特征的世界坐标（CNC 路径生成用）</summary>
         public IEnumerable<(Feature Feature, Vec3 WorldPos)> GetFeaturesWorldPos() =>
             Features.Select(f => (f, GetFeatureWorldPos(f)));
+
+        /// <summary>获取 PivotPoint 的世界坐标（含变换）</summary>
+        public Vec3 GetPivotWorldPos() => Transform.Apply(PivotPoint);
 
         // ══════════════════════════════════════════════
         // 包围盒 AABB
         // ══════════════════════════════════════════════
 
-        /// <summary>获取轴对齐包围盒（含变换后坐标）</summary>
         public (Vec3 Min, Vec3 Max) GetBoundingBox()
         {
             if (_bboxDirty) ComputeBBox();
@@ -452,18 +623,15 @@ namespace CncWallStation.MomWallData
         {
             var verts = GetWorldVertices();
             if (verts.Count == 0) return;
-
             _bboxMin = _bboxMax = verts[0];
             foreach (var v in verts)
             {
-                _bboxMin = new Vec3(
-                    MathF.Min(_bboxMin.X, v.X),
-                    MathF.Min(_bboxMin.Y, v.Y),
-                    MathF.Min(_bboxMin.Z, v.Z));
-                _bboxMax = new Vec3(
-                    MathF.Max(_bboxMax.X, v.X),
-                    MathF.Max(_bboxMax.Y, v.Y),
-                    MathF.Max(_bboxMax.Z, v.Z));
+                _bboxMin = new Vec3(MathF.Min(_bboxMin.X, v.X),
+                                    MathF.Min(_bboxMin.Y, v.Y),
+                                    MathF.Min(_bboxMin.Z, v.Z));
+                _bboxMax = new Vec3(MathF.Max(_bboxMax.X, v.X),
+                                    MathF.Max(_bboxMax.Y, v.Y),
+                                    MathF.Max(_bboxMax.Z, v.Z));
             }
             _bboxDirty = false;
         }
@@ -472,44 +640,41 @@ namespace CncWallStation.MomWallData
         // 打印输出
         // ══════════════════════════════════════════════
 
-        /// <summary>打印墙体完整信息</summary>
         public void Print()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("╔══════════════════════════════════════════════╗");
+            sb.AppendLine("╔══════════════════════════════════════════════════╗");
             sb.AppendLine($"║  Wall [{Id}]  材料: {Material}");
-            sb.AppendLine($"║  轮廓顶点数 : {Outline.Count}");
-            sb.AppendLine($"║  厚度       : {Thickness}mm   底面高度: {BaseElevation}mm");
-            sb.AppendLine($"║  加工原点   : {MachineOrigin}   已翻面: {FlipCount} 次");
-            sb.AppendLine($"║  当前变换   : {Transform}");
-            sb.AppendLine($"║  可撤销变换 : {UndoTransformSteps} 步   可撤销翻面: {UndoFlipSteps} 步");
-            sb.AppendLine($"╠══════════════════════════════════════════════╣");
+            sb.AppendLine($"║  轮廓顶点数  : {Outline.Count}");
+            sb.AppendLine($"║  Thickness   : {Thickness}mm   底面高度: {BaseElevation}mm");
+            sb.AppendLine($"║  ┌─ AABB     : L={Length:F2}  W={Width:F2}  H={Thickness:F2} mm");
+            sb.AppendLine($"║  └─ OBB      : L={ObbLength:F2}  W={ObbWidth:F2}  " +
+                          $"Angle={ObbAngleDeg:F2}°");
+            // 实际尺寸
+            string actualMark = IsActualDimensionOverridden ? "（已覆盖）" : "（跟随计算值）";
+            sb.AppendLine($"║  实际尺寸{actualMark}");
+            sb.AppendLine($"║    ActualLength    = {ActualLength:F2} mm");
+            sb.AppendLine($"║    ActualWidth     = {ActualWidth:F2} mm");
+            sb.AppendLine($"║    ActualThickness = {ActualThickness:F2} mm");
+            // PivotPoint
+            string pivotMark = IsPivotOverridden ? "（已手动设置）" : "（默认左下角）";
+            sb.AppendLine($"║  PivotPoint {pivotMark}");
+            sb.AppendLine($"║    Local  = {PivotPoint}");
+            sb.AppendLine($"║    World  = {GetPivotWorldPos()}");
+            sb.AppendLine($"║  加工原点    : {MachineOrigin}   已翻面: {FlipCount} 次");
+            sb.AppendLine($"║  当前变换    : {Transform}");
+            sb.AppendLine($"║  可撤销变换  : {UndoTransformSteps} 步   " +
+                          $"可撤销翻面: {UndoFlipSteps} 步");
+            sb.AppendLine("╠══════════════════════════════════════════════════╣");
             sb.AppendLine($"║  特征列表（共 {Features.Count} 个）");
             foreach (var f in Features)
                 sb.AppendLine($"║    {f.GetInfo()}");
-
             var (bmin, bmax) = GetBoundingBox();
-            sb.AppendLine($"╠══════════════════════════════════════════════╣");
+            sb.AppendLine("╠══════════════════════════════════════════════════╣");
             sb.AppendLine($"║  包围盒 Min : {bmin}");
             sb.AppendLine($"║  包围盒 Max : {bmax}");
-            sb.AppendLine("╚══════════════════════════════════════════════╝");
+            sb.AppendLine("╚══════════════════════════════════════════════════╝");
             Console.Write(sb);
-        }
-
-        /// <summary>打印加工面变化报告</summary>
-        public void PrintFaceReport()
-        {
-            Console.WriteLine("╔══════╦══════════╦══════════╦══════════════╗");
-            Console.WriteLine("║ ID   ║ 初始加工面║ 当前加工面║ 当前坐标     ║");
-            Console.WriteLine("╠══════╬══════════╬══════════╬══════════════╣");
-            foreach (var f in Features)
-            {
-                string changed = f.InitialSide != f.CurrentSide ? " ★" : "  ";
-                Console.WriteLine(
-                    $"║ {f.Id,-4} ║ {f.InitialSide,-8} ║ " +
-                    $"{f.CurrentSide,-6}{changed} ║ {f.LocalPos,-12} ║");
-            }
-            Console.WriteLine("╚══════╩══════════╩══════════╩══════════════╝");
         }
 
         /// <summary>
@@ -783,10 +948,9 @@ namespace CncWallStation.MomWallData
         }
 
         // ══════════════════════════════════════════════
-        // 内部：翻面快照
+        // 翻面快照（含新增字段）
         // ══════════════════════════════════════════════
 
-        /// <summary>翻面前状态快照（用于撤销）</summary>
         private class FlipSnapshot
         {
             private readonly List<Vec2> _outline;
@@ -794,42 +958,67 @@ namespace CncWallStation.MomWallData
             private readonly List<MachineSide> _featureSides;
             private readonly Vec2 _machineOrigin;
             private readonly int _flipCount;
+            // 新增：快照实际尺寸和 Pivot
+            private readonly Vec3? _pivotPoint;
+            private readonly float? _actualLength;
+            private readonly float? _actualWidth;
+            private readonly float? _actualThickness;
 
             private FlipSnapshot(
                 List<Vec2> outline,
                 List<Vec2> featurePositions,
                 List<MachineSide> featureSides,
                 Vec2 machineOrigin,
-                int flipCount)
+                int flipCount,
+                Vec3? pivotPoint,
+                float? actualLength,
+                float? actualWidth,
+                float? actualThickness)
             {
                 _outline = outline;
                 _featurePositions = featurePositions;
                 _featureSides = featureSides;
                 _machineOrigin = machineOrigin;
                 _flipCount = flipCount;
+                _pivotPoint = pivotPoint;
+                _actualLength = actualLength;
+                _actualWidth = actualWidth;
+                _actualThickness = actualThickness;
             }
 
             public static FlipSnapshot Capture(
                 List<Vec2> outline,
                 List<Feature> features,
                 Vec2 machineOrigin,
-                int flipCount)
-            {
-                return new FlipSnapshot(
+                int flipCount,
+                Vec3? pivotPoint,
+                float? actualLength,
+                float? actualWidth,
+                float? actualThickness)
+                => new FlipSnapshot(
                     new List<Vec2>(outline),
                     features.Select(f => f.LocalPos).ToList(),
                     features.Select(f => f.Face.GetCurrentSide()).ToList(),
                     machineOrigin,
-                    flipCount);
-            }
+                    flipCount,
+                    pivotPoint,
+                    actualLength,
+                    actualWidth,
+                    actualThickness);
 
-            public void Restore(Wall wall)
+            public void Restore(MomWall wall)
             {
                 wall.Outline = new List<Vec2>(_outline);
                 wall.MachineOrigin = _machineOrigin;
                 wall.FlipCount = _flipCount;
+                wall._pivotPoint = _pivotPoint;
+                wall._actualLength = _actualLength;
+                wall._actualWidth = _actualWidth;
+                wall._actualThickness = _actualThickness;
 
-                for (int i = 0; i < wall.Features.Count && i < _featurePositions.Count; i++)
+                for (int i = 0;
+                     i < wall.Features.Count && i < _featurePositions.Count;
+                     i++)
                 {
                     wall.Features[i].LocalPos = _featurePositions[i];
                     wall.Features[i].Face.ApplyFlipSide(_featureSides[i]);

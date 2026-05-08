@@ -1,24 +1,35 @@
 ﻿using CncWallStation.Commands;
 using CncWallStation.Features;
 using CncWallStation.MomWallData;
+using CncWallStation.VersionMappers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Infrastructure.Maths;
 using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.ViewModels
 {
     public partial class ControllerPageViewModel : ObservableObject
     {
+        private readonly BimWallMapperFactory _factory = new();
         private readonly ILogger<ControllerPageViewModel> _logger;
 
         public RelayCommand WallRotationTestCommand { get; }
-
+        public RelayCommand WallDataGenerateCommand { get; }
         public ControllerPageViewModel(ILogger<ControllerPageViewModel> logger)
         {
             _logger = logger;
 
             WallRotationTestCommand = new RelayCommand(
                 execute: _ => ExecuteLoadRender()
+            );
+
+            WallDataGenerateCommand = new RelayCommand(
+                execute: _ => LoadFromFile()
             );
         }
 
@@ -37,7 +48,7 @@ namespace CncWallStation.ViewModels
                 new Vec2(100, 100),
             };
 
-            var wall = new Wall("W-001", outline,
+            var wall = new MomWall("W-001", outline,
                                 thickness: 18f,
                                 baseElevation: 0f,
                                 material: "多层板");
@@ -130,6 +141,17 @@ namespace CncWallStation.ViewModels
                 rightWidth: 15f,
                 depth: 12f);
 
+            // 手动覆盖实际尺寸（如有加工公差）
+            wall.ActualLength = 1398f;
+            wall.ActualThickness = 2693f;
+
+            // 手动设置基准点（如对齐钢柱中心）
+            wall.PivotPoint = new Vec3(-50f, 148f, 0f);
+
+            // 重置
+            wall.ResetActualDimensions();   // 恢复跟随计算值
+            wall.ResetPivotPoint();         // 恢复左下角
+
             // ── 查询 ──────────────────────────────────────────────────
             foreach (var f in wall.Features.OfType<Groove>())
             {
@@ -219,6 +241,109 @@ namespace CncWallStation.ViewModels
             }
 
             _logger.LogInformation("\n完成。");
+        }
+
+
+        /// <summary>
+        /// 从文件路径读取并转换为 MomWallData
+        /// </summary>
+        public MomWall LoadFromFile()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\Resources\\TestMjsons\\Wall1.mjson");
+
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"文件不存在：{filePath}");
+
+            string json = File.ReadAllText(filePath, Encoding.UTF8);
+
+            return ConvertToMom(json);
+        }
+
+        /// <summary>
+        /// 从文件路径异步读取并转换为 MomWallData
+        /// </summary>
+        public async Task<MomWall> LoadFromFileAsync(string filePath)
+        {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException($"文件不存在：{filePath}");
+
+            string json = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
+            return ConvertToMom(json);
+        }
+
+        private MomWall ConvertToMom(string json)
+        {
+            // 1. 解析版本
+            string version = BimDataVersionResolver.ResolveVersion(json);
+            _logger.LogInformation($"检测到 BimData 版本：v{version}");
+
+            // 2. 获取对应 Mapper
+            IBimWallMapper mapper = _factory.GetMapper(version);
+
+            // 3. 转换
+            var momWall = mapper.Map(json);
+
+            SaveMomWallToJson(momWall);
+            // ══════════════════════════════════════════
+            // ③ 初始状态
+            // ══════════════════════════════════════════
+            _logger.LogInformation("\n【初始状态】");
+            momWall.Print();
+            momWall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+            // ══════════════════════════════════════════
+            // ④ 第一面加工（顶面 Top）
+            // ══════════════════════════════════════════
+            _logger.LogInformation("\n【第一面加工 - 顶面 Top 特征】");
+            foreach (var f in momWall.GetFeaturesByCurrentSide(MachineSide.Top))
+                _logger.LogInformation($"  {f.GetInfo()}");
+
+            return momWall;
+        }
+
+        /// <summary>
+        /// 将 MomWall 对象序列化为 JSON 并保存到本地
+        /// 文件路径：./output/momwall/{wallId}_{timestamp}.json
+        /// </summary>
+        private void SaveMomWallToJson(MomWall momWall)
+        {
+            try
+            {
+                // ── 1. 构造输出目录 ────────────────────────────────────
+                string outputDir = Path.Combine(
+                    AppContext.BaseDirectory, "output", "momwall");
+
+                Directory.CreateDirectory(outputDir); // 目录不存在则自动创建
+
+                // ── 2. 构造文件名（墙 ID + 时间戳，避免覆盖）────────────
+                string fileName = $"momwall_{momWall.Id}.json";
+                string filePath = Path.Combine(outputDir, fileName);
+
+                // ── 3. 序列化 ─────────────────────────────────────────
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,               // 格式化缩进
+                    Encoder = JavaScriptEncoder   // 保留中文，不转义
+                                         .UnsafeRelaxedJsonEscaping,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    // ── 枚举序列化为字符串 ──────────────────────────────────
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+                };
+                
+
+                string momWallJson = JsonSerializer.Serialize(momWall, options);
+
+                // ── 4. 写入文件 ────────────────────────────────────────
+                File.WriteAllText(filePath, momWallJson, Encoding.UTF8);
+
+                _logger.LogInformation(
+                    $"MomWall 已保存：{filePath}");
+            }
+            catch (Exception ex)
+            {
+                // 保存失败不应中断主流程，仅记录警告
+                _logger.LogWarning(
+                    $"MomWall JSON 保存失败（Wall Id={momWall?.Id}）：{ex.Message}");
+            }
         }
     }
 }
