@@ -16,20 +16,21 @@ namespace CncWallStation.Features.MepSlots
         public float Depth { get; set; }
 
         /// <summary>圆心（局部坐标）</summary>
-        public Vec2 Center { get; private set; }
+        public Vec2 Center { get;  set; }
 
         /// <summary>半径（mm）</summary>
-        public float Radius { get; private set; }
+        public float Radius { get;  set; }
 
         /// <summary>起始角度（弧度，从+X轴顺时针量）</summary>
-        public float StartAngle { get; private set; }
+        public float StartAngle { get;  set; }
 
         /// <summary>终止角度（弧度）</summary>
-        public float EndAngle { get; private set; }
+        public float EndAngle { get;  set; }
 
         /// <summary>是否顺时针（CW = true，CCW = false）</summary>
-        public bool IsClockwise { get; private set; }
+        public bool IsClockwise { get;  set; }
 
+        public float? OverrideWidth { get; set; } = null;
         // ── 派生属性 ─────────────────────────────────────────
 
         public Vec2 StartPoint =>

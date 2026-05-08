@@ -21,6 +21,7 @@ namespace CncWallStation.Features.MepSlots
         /// <summary>线段长度</summary>
         public float Length => (EndPoint - StartPoint).Length();
 
+        public float? OverrideWidth { get; set; } = null; 
         // ── 构造 ─────────────────────────────────────────────
 
         public LineSegment(Vec2 start, Vec2 end, float depth)

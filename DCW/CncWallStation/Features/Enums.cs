@@ -3,8 +3,8 @@
     /// <summary>特征类型</summary>
     public enum FeatureType
     {
-        Groove,      // 切槽
-        Hole,        // 圆形开孔
+        Groove,      // 矩形切槽
+        Hole,        // 开孔(圆孔/腰孔)
         Pocket,      // 矩形挖坑
         MepSlot,     // 电线管道线槽
         PolygonCut   // 多边形切割（扩展用）
@@ -59,7 +59,20 @@
         /// <summary>顶板槽</summary>
         TopPlate,
 
+        /// <summary>胶水密封槽</summary>
+        GlueSeal,
+
         /// <summary>可扩展自定义类型</summary>
         Custom
+    }
+
+    /// <summary>孔形状类型</summary>
+    public enum HoleShape
+    {
+        /// <summary>圆形孔</summary>
+        Round,
+
+        /// <summary>腰孔（长圆孔/槽孔）</summary>
+        Slotted
     }
 }

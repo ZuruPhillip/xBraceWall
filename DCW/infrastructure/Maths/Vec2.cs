@@ -37,6 +37,16 @@
             return l < 1e-6f ? Zero : new Vec2(X / l, Y / l);
         }
 
+        /// <summary>从角度和距离生成偏移向量（角度单位：度）</summary>
+        public static Vec2 FromAngle(float angleDeg, float length)
+        {
+            float rad = angleDeg * MathF.PI / 180f;
+            return new Vec2(
+                MathF.Cos(rad) * length,
+                MathF.Sin(rad) * length
+            );
+        }
+
         public override string ToString() => $"({X:F3}, {Y:F3})";
     }
 }

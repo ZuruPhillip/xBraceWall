@@ -152,6 +152,14 @@ namespace CncWallStation.Features.MepSlots
             return this;
         }
 
+        /// <summary>获取某段的实际加工宽度（优先用段自身覆盖值）</summary>
+        public float GetSegmentWidth(int segIndex)
+        {
+            if (segIndex < 0 || segIndex >= Segments.Count)
+                throw new ArgumentOutOfRangeException(nameof(segIndex));
+            return Segments[segIndex].OverrideWidth ?? Width;
+        }
+
         // ══════════════════════════════════════════════════
         // 路径查询
         // ══════════════════════════════════════════════════

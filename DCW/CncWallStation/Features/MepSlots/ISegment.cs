@@ -23,6 +23,11 @@ namespace CncWallStation.Features.MepSlots
         /// <summary>本段近似长度（mm）</summary>
         float Length { get; }
 
+        /// <summary>
+        /// 局部宽度覆盖（null = 使用 MepSlot.Width 全槽默认值）
+        /// </summary>
+        float? OverrideWidth { get; set; }
+
         /// <summary>翻面时重映射坐标</summary>
         ISegment Remap(
             FlipAxis axis,

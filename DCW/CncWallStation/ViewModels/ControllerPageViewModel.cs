@@ -249,7 +249,7 @@ namespace CncWallStation.ViewModels
         /// </summary>
         public MomWall LoadFromFile()
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\Resources\\TestMjsons\\Wall1.mjson");
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\Resources\\TestMjsons\\Wall3.mjson");
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"文件不存在：{filePath}");
