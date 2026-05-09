@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CncWallStation.MomWallData;
 
-namespace CncWallStation.MomWallData
+namespace CncWallStation.Features.Grooves
 {
     public static class PropertyConverter
     {

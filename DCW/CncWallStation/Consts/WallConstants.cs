@@ -2,6 +2,7 @@
 {
     public static class WallConstants
     {
+        #region 墙体产品参数
         // ══════════════════════════════════════════════════════════
         // 钢柱槽基础尺寸
         // ══════════════════════════════════════════════════════════
@@ -249,7 +250,22 @@
         /// </summary>
         public const float ProppingSideSlotDepth = 30f;// 沿 Y 轴
 
+        /// <summary>胶缝/密封条距边缘距离（mm）</summary>
+        public const float GlueSealEdgeDistance = 107f;
 
+        /// <summary>胶缝/密封条槽深度（mm）</summary>
+        public const float GlueSealDepth = 15f;
+        #endregion
+
+
+        #region PLC 刀具参数
+
+        /// <summary>胶缝/密封条刀具厚度（mm）</summary>
+        public const float GlueSealToolThickness = 12f;
+
+        
+
+        #endregion
         ///// <summary>
         ///// 槽最小切削深度（mm）
         ///// 低于此值视为加工不足，需告警

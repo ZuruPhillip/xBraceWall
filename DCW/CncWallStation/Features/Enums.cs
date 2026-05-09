@@ -76,4 +76,5 @@
         /// <summary>腰孔（长圆孔/槽孔）</summary>
         Slotted
     }
+
 }

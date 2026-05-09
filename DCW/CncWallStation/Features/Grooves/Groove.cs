@@ -2,7 +2,7 @@
 using Infrastructure.Maths;
 using System.Text.Json.Serialization;
 
-namespace CncWallStation.Features
+namespace CncWallStation.Features.Grooves
 {
     /// <summary>
     /// 切槽特征（直线型刀路）
