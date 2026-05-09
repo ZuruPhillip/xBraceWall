@@ -145,6 +145,31 @@
         public const float DeviceTaperLen = 60f;
 
         // ══════════════════════════════════════════════════════════
+        // Mep Device基础尺寸
+        // ══════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// 开关盒切削宽度（mm）
+        /// </summary>
+        public const float DevicePocketWidth = 120f;
+
+        /// <summary>
+        /// 开关盒切削长度（mm）
+        /// </summary>
+        public const float DevicePocketLength = 160f;
+
+        /// <summary>
+        /// 开关盒切削深度（mm）
+        /// </summary>
+        public const float DevicePocketDepth = 60f;
+
+        /// <summary>
+        /// 开关盒切削圆角半径（mm）
+        /// </summary>
+        public const float DevicePocketCornerRadius = 10f;
+
+
+        // ══════════════════════════════════════════════════════════
         // BendingKey基础尺寸
         // ══════════════════════════════════════════════════════════
 

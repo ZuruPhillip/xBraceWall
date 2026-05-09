@@ -39,6 +39,8 @@ namespace CncWallStation.VersionMappers
             //生成MepCableSlot数据
             ConvertMepCableToFeature(dto.MepCables, momWallData);
 
+            //生成设备盒线槽数据
+            ConvertDeviceToFeature(dto.MepDevices,momWallData);
             return momWallData;
         }
 
@@ -270,8 +272,52 @@ namespace CncWallStation.VersionMappers
         private static void ConvertDeviceToFeature(
             BimMepDeviceDtoV000? device, MomWall momWallData)
         {
+            if (device == null) return;
+            if (device.Position == null)
+            {
+                Console.WriteLine($"[WARN] MepDevice [{device.Pn}] 缺少 Position，已跳过");
+                return;
+            }
+
+            // ── 加工面 ───────────────────────────────────────────────────────
+            MachineSide side = device.FrontFace
+                ? MachineSide.Top
+                : MachineSide.Bottom;
+
+            // ── 特征 ID ──────────────────────────────────────────────────────
+            string id = string.IsNullOrWhiteSpace(device.Pn)
+                ? $"MepDevice-{device.Position.X:F0}-{device.Position.Y:F0}"
+                : $"MepDevice-{device.Pn}";
+
+            // ── 中心点坐标 ───────────────────────────────────────────────────
+            var center = new Vec2(
+                (float)device.Position.X,
+                (float)device.Position.Y);
+
+            // ── 构造 Pocket Feature ──────────────────────────────────────────
+            var pocket = new Pocket(
+                id: id,
+                side: side,
+                center: center,
+                length: WallConstants.DevicePocketLength,
+                width: WallConstants.DevicePocketWidth,
+                depth: WallConstants.DevicePocketDepth,
+                cornerRadius: WallConstants.DevicePocketCornerRadius);
+
+            momWallData.Features.Add(pocket);
+        }
 
 
+        /// <summary>
+        /// 将 Mep Device DTO 列表批量转换为 Pocket Feature 并添加到 MomWall
+        /// </summary>
+        private static void ConvertDeviceToFeature(
+            List<BimMepDeviceDtoV000?>? devices, MomWall momWallData)
+        {
+            if (devices == null || devices.Count == 0) return;
+
+            foreach (var device in devices)
+                ConvertDeviceToFeature(device, momWallData);
         }
 
         /// <summary>
