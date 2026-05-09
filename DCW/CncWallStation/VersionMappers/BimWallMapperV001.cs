@@ -2,6 +2,7 @@
 using CncWallStation.Consts;
 using CncWallStation.Features;
 using CncWallStation.Features.MepSlots;
+using CncWallStation.Features.Props;
 using CncWallStation.MomWallData;
 using CncWallStation.Transforms;
 using Infrastructure.Maths;
@@ -41,6 +42,10 @@ namespace CncWallStation.VersionMappers
 
             //生成设备盒线槽数据
             ConvertDeviceToFeature(dto.MepDevices,momWallData);
+
+            //生成斜撑数据
+            ConvertProppingToFeature(1000f,momWallData);
+
             return momWallData;
         }
 
@@ -333,6 +338,18 @@ namespace CncWallStation.VersionMappers
             {
                 MepCableConverter.Convert(mepCable, momWallData);
             }
+        }
+
+        /// <summary>
+        /// 将多个斜撑 DTO 批量转换为 Propping Feature 并添加到 MomWall
+        /// 
+        private static void ConvertProppingToFeature(float centerX,
+            MomWall momWallData)
+        {
+            ProppingConverter.Convert(
+                centerX: centerX,
+                momWallData: momWallData,
+                id: "Propping-01");
         }
 
     }

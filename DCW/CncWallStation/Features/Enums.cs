@@ -7,6 +7,7 @@
         Hole,        // 开孔(圆孔/腰孔)
         Pocket,      // 矩形挖坑
         MepSlot,     // 电线管道线槽
+        Propping,    // 斜撑
         PolygonCut   // 多边形切割（扩展用）
     }
 

@@ -1,4 +1,5 @@
 ﻿using CncWallStation.Features.MepSlots;
+using CncWallStation.Features.Props;
 using CncWallStation.Transforms;
 using Infrastructure.Maths;
 using System.Text.Json.Serialization;
@@ -14,6 +15,7 @@ namespace CncWallStation.Features
     [JsonDerivedType(typeof(Hole), typeDiscriminator: "Hole")]
     [JsonDerivedType(typeof(Pocket), typeDiscriminator: "Pocket")]
     [JsonDerivedType(typeof(MepSlot), typeDiscriminator: "MepSlot")]
+    [JsonDerivedType(typeof(Propping), typeDiscriminator: "Propping")]
     public abstract class Feature
     {
         // ── 基本属性 ──────────────────────────────────────────

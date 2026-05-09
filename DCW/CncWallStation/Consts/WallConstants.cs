@@ -196,6 +196,60 @@
         public const float BendingKeyHoleSlotAngleDeg = 0f;// 沿 X 轴
 
 
+        // ══════════════════════════════════════════════════════════
+        // 斜撑槽基础尺寸
+        // ══════════════════════════════════════════════════════════
+        /// <summary>
+        /// 斜撑槽顶面总长度（mm）
+        /// </summary>
+        public const float ProppingTopSlotLength = 300f;// 沿 Y 轴
+
+        /// <summary>
+        /// 斜撑槽顶面总宽度（mm）
+        /// </summary>
+        public const float ProppingTopSlotWidth = 100f;// 沿 X 轴
+
+        /// <summary>
+        /// 斜撑槽顶面中间长度（mm）
+        /// </summary>
+        public const float ProppingTopSlotMidLength = 200f;// 沿 Y 轴
+
+        /// <summary>
+        /// 斜撑槽顶面中间宽度（mm）
+        /// </summary>
+        public const float ProppingTopSlotMidWidth = 60f;// 沿 X 轴
+
+        /// <summary>
+        /// 斜撑槽顶面深度（mm）
+        /// </summary>
+        public const float ProppingTopSlotDepth = 30f;// 沿 X 轴
+
+        /// <summary>
+        /// 斜撑槽侧面总长度（mm）
+        /// </summary>
+        public const float ProppingSideSlotLength = 100f;// 沿 Z 轴
+
+        /// <summary>
+        /// 斜撑槽侧面总宽度（mm）
+        /// </summary>
+        public const float ProppingSideSlotWidth = 300f;// 沿 X 轴
+
+        /// <summary>
+        /// 斜撑槽侧面总长度（mm）
+        /// </summary>
+        public const float ProppingSideSlotEdgeLength = 30f;// 沿 Z 轴
+
+        /// <summary>
+        /// 斜撑槽侧面总宽度（mm）
+        /// </summary>
+        public const float ProppingSideSlotEdgeWidth = 100f;// 沿 X 轴
+
+        /// <summary>
+        /// 斜撑槽侧面深度（mm）
+        /// </summary>
+        public const float ProppingSideSlotDepth = 30f;// 沿 Y 轴
+
+
         ///// <summary>
         ///// 槽最小切削深度（mm）
         ///// 低于此值视为加工不足，需告警
