@@ -33,7 +33,7 @@ namespace CncWallStation.Plcs.Handlers
     /// </summary>
     public static class XBraceHandler
     {
-        private const float TOL = 1e-3f;
+        private const float Tol = 1e-3f;
 
         public static void Handle(Groove g, PlcConvertContext ctx, MomWall wall)
         {
@@ -54,7 +54,7 @@ namespace CncWallStation.Plcs.Handlers
             float dx = end.X - start.X;
             float dy = end.Y - start.Y;
 
-            if (MathF.Abs(dx) <= TOL || MathF.Abs(dy) <= TOL)
+            if (MathF.Abs(dx) <= Tol || MathF.Abs(dy) <= Tol)
                 throw new InvalidOperationException(
                     $"[XBrace {g.Id}] 必须为斜向 (dx={dx:F3}, dy={dy:F3})");
 

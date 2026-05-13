@@ -1,4 +1,4 @@
-﻿using CncWallStation.Features;
+using CncWallStation.Features;
 using CncWallStation.Features.Grooves;
 using CncWallStation.Features.MepSlots;
 using CncWallStation.MomWallData;
@@ -45,10 +45,9 @@ namespace CncWallStation.Plcs
 
             if (slotHoles.Count > 0)
                 BendingKeyHandler.HandleBatch(slotHoles, ctx, wall);
-
-            //TODO : 仅仅处理当前面
-            //if (rebarSlots.Count > 0)
-                //RebarSlotHandler.HandleBatch(rebarSlots, ctx, wall);
+            
+            if (rebarSlots.Count > 0)
+                RebarSlotHandler.HandleBatch(rebarSlots, ctx, wall);
 
             //6.批量处理 Step（自动合并等间距共线孔）
             var stepGrooves = grooves.Where(
