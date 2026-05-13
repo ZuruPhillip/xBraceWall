@@ -17,6 +17,8 @@ namespace CncWallStation.Features
     [JsonDerivedType(typeof(Pocket), typeDiscriminator: "Pocket")]
     [JsonDerivedType(typeof(MepSlot), typeDiscriminator: "MepSlot")]
     [JsonDerivedType(typeof(Propping), typeDiscriminator: "Propping")]
+    [JsonDerivedType(typeof(RebarSlot), typeDiscriminator: "RebarSlot")]
+    [JsonDerivedType(typeof(Window), typeDiscriminator: "Window")]
     public abstract class Feature
     {
         // ── 基本属性 ──────────────────────────────────────────

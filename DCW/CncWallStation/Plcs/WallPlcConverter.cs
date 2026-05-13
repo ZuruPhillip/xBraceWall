@@ -1,6 +1,7 @@
 using CncWallStation.Features;
 using CncWallStation.Features.Grooves;
 using CncWallStation.Features.MepSlots;
+using CncWallStation.Features.Props;
 using CncWallStation.MomWallData;
 using CncWallStation.Plcs.Handlers;
 
@@ -32,7 +33,7 @@ namespace CncWallStation.Plcs
                     case RebarSlot r: rebarSlots.Add(r); break;
                     case Window w: WindowHandler.Handle(w, ctx); break;
                     case MepSlot m: cableSlots.Add(m); break;
-                    //case Propping pr: ProppingHandler.Handle(pr, ctx); break;
+                    case Propping pr: ProppingHandler.Handle(pr, ctx); break;
                     default: throw new NotSupportedException(f.GetType().Name);
                 }
             }
