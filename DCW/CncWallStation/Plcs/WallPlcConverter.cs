@@ -50,6 +50,9 @@ namespace CncWallStation.Plcs
             if (rebarSlots.Count > 0)
                 RebarSlotHandler.HandleBatch(rebarSlots, ctx, wall);
 
+            if (cableSlots.Count > 0)
+                CableHandler.HandleBatch(cableSlots, ctx);
+
             //6.批量处理 Step（自动合并等间距共线孔）
             var stepGrooves = grooves.Where(
                 g => g.GrooveType == GrooveType.SteelColumn
