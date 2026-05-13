@@ -77,25 +77,6 @@ namespace CncWallStation.ViewModels
 		[ObservableProperty]
 		private DateTime? _filterDateTo;
 
-		// ==================== 分层搜索（级联） ====================
-		[ObservableProperty]
-		private string _cascadeHouseNumber = string.Empty;
-
-		[ObservableProperty]
-		private int? _cascadeFloor;
-
-		[ObservableProperty]
-		private string _cascadeWallId = string.Empty;
-
-		[ObservableProperty]
-		private ObservableCollection<string> _cascadeHouseList = new();
-
-		[ObservableProperty]
-		private ObservableCollection<int> _cascadeFloorList = new();
-
-		[ObservableProperty]
-		private ObservableCollection<string> _cascadeWallIdList = new();
-
 		// ==================== 状态属性 ====================
 		[ObservableProperty]
 		private bool _isLoading;
@@ -139,7 +120,6 @@ namespace CncWallStation.ViewModels
 		{
 			_logger = logger;
 
-			InitCascadeData();
 			LoadMockData();
 			ApplyFilters();
 		}
@@ -282,7 +262,6 @@ namespace CncWallStation.ViewModels
 
 				ImportProgressMessage = $"导入完成：成功 {successCount}，失败 {failCount}，重复 {duplicateCount}";
 				await Task.Delay(2000);
-				InitCascadeData();
 				ApplyFilters();
 
 				_logger.LogInformation("批量导入完成: 成功{Success}, 失败{Fail}, 重复{Dup}",
@@ -360,7 +339,6 @@ namespace CncWallStation.ViewModels
 			}
 
 			SelectedItems.Clear();
-			InitCascadeData();
 			ApplyFilters();
 			_logger.LogInformation("批量删除: {Count}条", toRemove.Count);
 		}
@@ -450,9 +428,6 @@ namespace CncWallStation.ViewModels
 			SelectedPriorities.Clear();
 			FilterDateFrom = null;
 			FilterDateTo = null;
-			CascadeHouseNumber = string.Empty;
-			CascadeFloor = null;
-			CascadeWallId = string.Empty;
 			CurrentPage = 1;
 			ApplyFilters();
 		}
@@ -506,79 +481,6 @@ namespace CncWallStation.ViewModels
 			ApplyFilters();
 		}
 
-		// ==================== 属性变更钩子：自动触发级联 ====================
-		partial void OnCascadeHouseNumberChanged(string value)
-		{
-			ExecuteCascadeLogic(value);
-		}
-
-		partial void OnCascadeFloorChanged(int? value)
-		{
-			if (value.HasValue)
-				ExecuteFloorCascadeLogic();
-		}
-
-		partial void OnCascadeWallIdChanged(string value)
-		{
-			if (!string.IsNullOrWhiteSpace(value))
-			{
-				CurrentPage = 1;
-				ApplyFilters();
-			}
-		}
-
-		// ==================== 命令：级联房屋编号变更 ====================
-		private void ExecuteCascadeLogic(string houseNumber)
-		{
-			CascadeFloorList.Clear();
-			CascadeWallIdList.Clear();
-			CascadeFloor = null;
-			CascadeWallId = string.Empty;
-
-			if (string.IsNullOrWhiteSpace(houseNumber))
-			{
-				CascadeFloorList = new ObservableCollection<int>();
-				return;
-			}
-
-			var floors = _allItems
-				.Where(x => x.HouseNumber == houseNumber)
-				.Select(x => x.Floor)
-				.Distinct()
-				.OrderBy(f => f)
-				.ToList();
-
-			CascadeFloorList = new ObservableCollection<int>(floors);
-
-			CurrentPage = 1;
-			ApplyFilters();
-		}
-
-		// ==================== 命令：级联楼层变更 ====================
-		private void ExecuteFloorCascadeLogic()
-		{
-			CascadeWallIdList.Clear();
-			CascadeWallId = string.Empty;
-
-			if (string.IsNullOrWhiteSpace(CascadeHouseNumber) || !CascadeFloor.HasValue)
-			{
-				CascadeWallIdList = new ObservableCollection<string>();
-				return;
-			}
-
-			var wallIds = _allItems
-				.Where(x => x.HouseNumber == CascadeHouseNumber && x.Floor == CascadeFloor.Value)
-				.Select(x => x.WallId)
-				.Distinct()
-				.OrderBy(w => w)
-				.ToList();
-
-			CascadeWallIdList = new ObservableCollection<string>(wallIds);
-
-			CurrentPage = 1;
-			ApplyFilters();
-		}
-
 		// ==================== 核心方法：应用筛选 ====================
 		public void ApplyFilters()
 		{
@@ -605,16 +507,6 @@ namespace CncWallStation.ViewModels
 
 			if (FilterDateTo.HasValue)
 				query = query.Where(x => x.ImportTime <= FilterDateTo.Value.AddDays(1));
-
-			// 级联筛选（分层搜索）
-			if (!string.IsNullOrWhiteSpace(CascadeHouseNumber))
-				query = query.Where(x => x.HouseNumber == CascadeHouseNumber);
-
-			if (CascadeFloor.HasValue)
-				query = query.Where(x => x.Floor == CascadeFloor.Value);
-
-			if (!string.IsNullOrWhiteSpace(CascadeWallId))
-				query = query.Where(x => x.WallId == CascadeWallId);
 
 			// 排序
 			query = SortField switch
@@ -673,13 +565,6 @@ namespace CncWallStation.ViewModels
 
 			var floors = source.Select(x => x.Floor).Distinct().OrderBy(f => f).ToList();
 			AvailableFloors = new ObservableCollection<int>(floors);
-		}
-
-		// ==================== 初始化级联数据 ====================
-		private void InitCascadeData()
-		{
-			var houses = _allItems.Select(x => x.HouseNumber).Distinct().OrderBy(h => h).ToList();
-			CascadeHouseList = new ObservableCollection<string>(houses);
 		}
 
 		// ==================== 解析 .mjson 文件 ====================

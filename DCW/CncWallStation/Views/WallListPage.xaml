@@ -70,7 +70,6 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
@@ -217,7 +216,7 @@
 					<TextBlock Text="状态:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
 					<ListBox ItemsSource="{Binding AllStatuses}"
 							 SelectionMode="Extended"
-							 Width="130" Height="28"
+							 Width="240" Height="28"
 							 SelectionChanged="StatusListBox_SelectionChanged">
 						<ListBox.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -238,7 +237,7 @@
 					<TextBlock Text="优先级:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
 					<ListBox ItemsSource="{Binding AllPriorities}"
 							 SelectionMode="Extended"
-							 Width="110" Height="28"
+							 Width="140" Height="28"
 							 SelectionChanged="PriorityListBox_SelectionChanged">
 						<ListBox.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -274,34 +273,8 @@
 			</WrapPanel>
 		</Border>
 
-		<!-- ============ 分层搜索 ============ -->
-		<Border Grid.Row="2" Padding="10,6" Background="{DynamicResource SecondaryRegionBrush}"
-				BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1">
-			<StackPanel Orientation="Horizontal">
-				<TextBlock Text="分层搜索:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="13" FontWeight="SemiBold"/>
-
-				<TextBlock Text="房屋编号" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
-				<ComboBox ItemsSource="{Binding CascadeHouseList}"
-						  SelectedItem="{Binding CascadeHouseNumber}"
-						  Width="140" Height="28" Margin="0,0,10,0"/>
-
-				<TextBlock Text="→ 楼层" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
-				<ComboBox ItemsSource="{Binding CascadeFloorList}"
-						  SelectedValue="{Binding CascadeFloor}"
-						  Width="80" Height="28" Margin="0,0,10,0"/>
-
-				<TextBlock Text="→ 墙体ID" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
-				<ComboBox ItemsSource="{Binding CascadeWallIdList}"
-						  SelectedItem="{Binding CascadeWallId}"
-						  Width="180" Height="28" Margin="0,0,10,0"/>
-
-				<Button Content="重置分层" Command="{Binding ResetFilterCommand}"
-						Width="80" Height="26" VerticalAlignment="Center" FontSize="12"/>
-			</StackPanel>
-		</Border>
-
 		<!-- ============ 数据表格 ============ -->
-		<DataGrid Grid.Row="3"
+		<DataGrid Grid.Row="2"
 				  ItemsSource="{Binding DisplayItems}"
 				  AutoGenerateColumns="False"
 				  IsReadOnly="True"
@@ -458,7 +431,7 @@
 		</DataGrid>
 
 		<!-- ============ 空状态 ============ -->
-		<Border Grid.Row="3" Background="{DynamicResource PrimaryRegionBrush}"
+		<Border Grid.Row="2" Background="{DynamicResource PrimaryRegionBrush}"
 				Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisConverter}}">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,0">
 				<TextBlock Text="📭" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
@@ -469,7 +442,7 @@
 		</Border>
 
 		<!-- ============ 分页栏 ============ -->
-		<Border Grid.Row="4" Padding="10,6" Background="{DynamicResource SecondaryRegionBrush}"
+		<Border Grid.Row="3" Padding="10,6" Background="{DynamicResource SecondaryRegionBrush}"
 				BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
 			<Grid>
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -515,7 +488,7 @@
 		</Border>
 
 		<!-- ============ 导入进度覆盖层 ============ -->
-		<Border Grid.RowSpan="5" Background="#80000000"
+		<Border Grid.RowSpan="4" Background="#80000000"
 				Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}">
 			<Border Background="{DynamicResource PrimaryRegionBrush}" CornerRadius="8"
 					Width="400" Height="160" HorizontalAlignment="Center" VerticalAlignment="Center"
