@@ -29,3 +29,9 @@ bld/
 
 # Hidden folders
 .hidden/
+
+#agent
+.codebuddy/agents
+
+#idea
+.idea

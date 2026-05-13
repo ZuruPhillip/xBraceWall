@@ -2,6 +2,10 @@
 {
     public static class WallConstants
     {
+        #region Tolerance
+        public const float DirectionTolerance = 1e-3f;            // 方向判定容差（mm）
+        #endregion
+
         #region 墙体产品参数
         // ══════════════════════════════════════════════════════════
         // 钢柱槽基础尺寸
@@ -196,6 +200,29 @@
         /// </summary>
         public const float BendingKeyHoleSlotAngleDeg = 0f;// 沿 X 轴
 
+        // ══════════════════════════════════════════════════════════
+        // XBrace槽基础尺寸
+        // ══════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// XBrace槽偏移墙上边距离（mm）
+        /// </summary>
+        public const float XBraceTopOffset = 4f;   // 向外（上方）偏移
+
+        /// <summary>
+        /// XBrace槽偏移墙下边距离（mm）
+        /// </summary>
+        public const float XBraceBottomOffset = 6f;   // 向外（下方）偏移
+
+        /// <summary>
+        /// XBrace槽宽度（mm）
+        /// </summary>
+        public const float XBraceGrooveWidth = 60f;    // 槽宽 (mm)
+
+        /// <summary>
+        /// XBrace槽深度（mm）
+        /// </summary>
+        public const float XBraceGrooveDepth = 40f;    // 槽深 (mm)
 
         // ══════════════════════════════════════════════════════════
         // 斜撑槽基础尺寸
@@ -263,7 +290,7 @@
         /// <summary>胶缝/密封条刀具厚度（mm）</summary>
         public const float GlueSealToolThickness = 12f;
 
-        
+        public const float SlotToolDiameter = 20f;
 
         #endregion
         ///// <summary>
@@ -286,7 +313,7 @@
         /// 单侧宽度加工余量（mm）
         /// 槽宽在钢柱每侧的额外加工间隙，用于安装配合
         /// </summary>
-        public const float ColumnSteelWidthClearancePerSide = 3f;
+        private const float ColumnSteelWidthClearancePerSide = 3f;
 
         /// <summary>
         /// 双侧宽度加工余量合计（mm）

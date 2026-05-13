@@ -59,5 +59,17 @@
         // T16  XPS / 胶缝
         public const int XpsOffset = 2;
         public const int GlueSeam = 3;
+
+        /// <summary>T8F30 X 斜槽（左下→右上）</summary>
+        public const int XBraceUpRight = 30;
+
+        /// <summary>T8F31 X 斜槽（左上→右下）</summary>
+        public const int XBraceDownRight = 31;
+
+        /// <summary>T8F32 X 宽槽（左下→右上，宽槽>刀径×2）</summary>
+        public const int XBraceUpRightWide = 32;
+
+        /// <summary>T8F33 X 宽槽（左上→右下，宽槽>刀径×2）</summary>
+        public const int XBraceDownRightWide = 33;
     }
 }
