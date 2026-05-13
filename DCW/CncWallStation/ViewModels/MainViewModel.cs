@@ -17,7 +17,8 @@ namespace CncWallStation.ViewModels
         private readonly Dictionary<string, Type> _pageMap = new()
         {
             { "ControllerPage", typeof(Views.ControllerPage) },
-            { "BimDataRenderPage", typeof(Views.BimDataRenderPage) }
+            { "BimDataRenderPage", typeof(Views.BimDataRenderPage) },
+            { "WallListPage", typeof(Views.WallListPage) }
         };
 
         public MainViewModel(

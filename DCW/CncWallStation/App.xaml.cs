@@ -42,6 +42,8 @@ namespace CncWallStation
                     services.AddTransient<MainWindow>();
                     services.AddTransient<BimDataRenderViewModel>();
                     services.AddTransient<BimDataRenderPage>();
+                    services.AddTransient<WallListPageViewModel>();
+                    services.AddTransient<WallListPage>();
                 })
                 .Build();
         }

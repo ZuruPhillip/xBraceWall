@@ -1,14 +1,541 @@
 ﻿<Page x:Class="CncWallStation.Views.WallListPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:CncWallStation.Views"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="WallListPage">
+      xmlns:models="clr-namespace:CncWallStation.Models"
+      mc:Ignorable="d"
+      d:DesignHeight="800" d:DesignWidth="1400"
+      Title="墙体清单">
 
-    <Grid>
-        
-    </Grid>
+	<Page.Resources>
+		<local:PriorityToBrushConverter x:Key="PriorityToBrushConverter"/>
+		<local:PriorityToTextConverter x:Key="PriorityToTextConverter"/>
+		<local:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
+		<local:StatusToTextConverter x:Key="StatusToTextConverter"/>
+		<local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+		<local:BoolInvertConverter x:Key="BoolInvertConverter"/>
+
+		<!-- 优先级 Tag 模板（左色条 + 半透明底 + 深色文字） -->
+		<DataTemplate x:Key="PriorityTagTemplate">
+			<Border CornerRadius="3" Margin="2" Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
+					Opacity="0.20">
+				<Border CornerRadius="3" Margin="0">
+					<Border.Background>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Color="#00000000" Offset="0"/>
+							<GradientStop Color="#10000000" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.Background>
+					<DockPanel LastChildFill="True">
+						<Border Width="3" DockPanel.Dock="Left"
+								Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
+								CornerRadius="3,0,0,3"/>
+						<TextBlock Text="{Binding Priority, Converter={StaticResource PriorityToTextConverter}}"
+								   Foreground="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}"
+								   FontSize="12" FontWeight="SemiBold"
+								   Padding="6,2" VerticalAlignment="Center"/>
+					</DockPanel>
+				</Border>
+			</Border>
+		</DataTemplate>
+
+		<!-- 状态 Tag 模板（左色条 + 半透明底 + 深色文字） -->
+		<DataTemplate x:Key="StatusTagTemplate">
+			<Border CornerRadius="3" Margin="2" Background="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+					Opacity="0.20">
+				<Border CornerRadius="3" Margin="0">
+					<Border.Background>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Color="#00000000" Offset="0"/>
+							<GradientStop Color="#10000000" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.Background>
+					<DockPanel LastChildFill="True">
+						<Border Width="3" DockPanel.Dock="Left"
+								Background="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+								CornerRadius="3,0,0,3"/>
+						<TextBlock Text="{Binding Status, Converter={StaticResource StatusToTextConverter}}"
+								   Foreground="{Binding Status, Converter={StaticResource StatusToBrushConverter}}"
+								   FontSize="12" FontWeight="SemiBold"
+								   Padding="6,2" VerticalAlignment="Center"/>
+					</DockPanel>
+				</Border>
+			</Border>
+		</DataTemplate>
+	</Page.Resources>
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<!-- ============ 工具栏 ============ -->
+		<Border Grid.Row="0" Padding="10" Background="{DynamicResource SecondaryRegionBrush}"
+				BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+			<Grid>
+				<StackPanel Orientation="Horizontal">
+					<Button Content="📂 批量导入"
+							Command="{Binding ImportCommand}"
+							Width="110" Height="32" Margin="0,0,10,0"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"/>
+
+					<Separator Margin="5,4"/>
+
+					<!-- 批量优先级 -->
+					<Button Content="⚡ 优先级" Width="100" Height="32" Margin="5,0,2,0">
+						<Button.ContextMenu>
+							<ContextMenu>
+								<MenuItem Command="{Binding ModifyPriorityCommand}"
+										  CommandParameter="{x:Static models:ProcessPriority.高}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#E74C3C" Margin="0,0,6,0"/>
+											<TextBlock Text="高" Foreground="#E74C3C" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyPriorityCommand}"
+										  CommandParameter="{x:Static models:ProcessPriority.中}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#F39C12" Margin="0,0,6,0"/>
+											<TextBlock Text="中" Foreground="#F39C12" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyPriorityCommand}"
+										  CommandParameter="{x:Static models:ProcessPriority.低}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#27AE60" Margin="0,0,6,0"/>
+											<TextBlock Text="低" Foreground="#27AE60" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+							</ContextMenu>
+						</Button.ContextMenu>
+					</Button>
+
+					<!-- 批量状态 -->
+					<Button Content="📋 状态" Width="100" Height="32" Margin="2,0,2,0">
+						<Button.ContextMenu>
+							<ContextMenu>
+								<MenuItem Command="{Binding ModifyStatusCommand}"
+										  CommandParameter="{x:Static models:ProcessStatus.待加工}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#95A5A6" Margin="0,0,6,0"/>
+											<TextBlock Text="待加工" Foreground="#7F8C8D" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyStatusCommand}"
+										  CommandParameter="{x:Static models:ProcessStatus.加工中}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#3498DB" Margin="0,0,6,0"/>
+											<TextBlock Text="加工中" Foreground="#2980B9" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyStatusCommand}"
+										  CommandParameter="{x:Static models:ProcessStatus.已完成}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#27AE60" Margin="0,0,6,0"/>
+											<TextBlock Text="已完成" Foreground="#27AE60" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyStatusCommand}"
+										  CommandParameter="{x:Static models:ProcessStatus.异常}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#E74C3C" Margin="0,0,6,0"/>
+											<TextBlock Text="异常" Foreground="#C0392B" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+							</ContextMenu>
+						</Button.ContextMenu>
+					</Button>
+
+					<Separator Margin="5,4"/>
+
+					<Button Content="🗑 删除选中"
+							Command="{Binding DeleteSelectedCommand}"
+							Width="100" Height="32" Margin="5,0,2,0"
+							Foreground="#E74C3C"/>
+
+					<Button Content="⬇ 导出"
+							Command="{Binding ExportCommand}"
+							Width="80" Height="32" Margin="2,0,0,0"/>
+				</StackPanel>
+
+				<!-- 加载指示器 -->
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+							Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}">
+					<ProgressBar IsIndeterminate="True" Width="20" Height="20" Margin="0,0,5,0"/>
+					<TextBlock Text="处理中..." VerticalAlignment="Center" Opacity="0.7"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- ============ 筛选栏 ============ -->
+		<Border Grid.Row="1" Padding="10,8" Background="{DynamicResource PrimaryRegionBrush}">
+			<WrapPanel>
+				<!-- 房屋编号 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="房屋编号:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<TextBox Text="{Binding SearchHouseNumber, UpdateSourceTrigger=PropertyChanged}"
+							 Width="120" Height="28"/>
+				</StackPanel>
+
+				<!-- 楼层 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="楼层:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<ComboBox ItemsSource="{Binding AvailableFloors}"
+							  SelectedValue="{Binding FilterFloor}"
+							  Width="80" Height="28"/>
+				</StackPanel>
+
+				<!-- 墙体ID -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="墙体ID:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<TextBox Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
+							 Width="140" Height="28"/>
+				</StackPanel>
+
+				<!-- 加工状态 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="状态:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<ListBox ItemsSource="{Binding AllStatuses}"
+							 SelectionMode="Extended"
+							 Width="130" Height="28"
+							 SelectionChanged="StatusListBox_SelectionChanged">
+						<ListBox.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ListBox.ItemsPanel>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Converter={StaticResource StatusToTextConverter}}"
+										   FontSize="11" Margin="3,0"/>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</StackPanel>
+
+				<!-- 加工优先级 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="优先级:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<ListBox ItemsSource="{Binding AllPriorities}"
+							 SelectionMode="Extended"
+							 Width="110" Height="28"
+							 SelectionChanged="PriorityListBox_SelectionChanged">
+						<ListBox.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ListBox.ItemsPanel>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Converter={StaticResource PriorityToTextConverter}}"
+										   FontSize="11" Margin="3,0"/>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</StackPanel>
+
+				<!-- 时间范围 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="时间:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<DatePicker SelectedDate="{Binding FilterDateFrom}"
+								Width="120" Height="28"/>
+					<TextBlock Text="—" VerticalAlignment="Center" Margin="3,0"/>
+					<DatePicker SelectedDate="{Binding FilterDateTo}"
+								Width="120" Height="28"/>
+				</StackPanel>
+
+				<!-- 搜索/重置 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,0,4" VerticalAlignment="Center">
+					<Button Content="🔍 搜索" Command="{Binding SearchCommand}"
+							Width="70" Height="28" Margin="0,0,5,0"/>
+					<Button Content="↺ 重置" Command="{Binding ResetFilterCommand}"
+							Width="70" Height="28"/>
+				</StackPanel>
+			</WrapPanel>
+		</Border>
+
+		<!-- ============ 分层搜索 ============ -->
+		<Border Grid.Row="2" Padding="10,6" Background="{DynamicResource SecondaryRegionBrush}"
+				BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1">
+			<StackPanel Orientation="Horizontal">
+				<TextBlock Text="分层搜索:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="13" FontWeight="SemiBold"/>
+
+				<TextBlock Text="房屋编号" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
+				<ComboBox ItemsSource="{Binding CascadeHouseList}"
+						  SelectedItem="{Binding CascadeHouseNumber}"
+						  Width="140" Height="28" Margin="0,0,10,0"/>
+
+				<TextBlock Text="→ 楼层" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
+				<ComboBox ItemsSource="{Binding CascadeFloorList}"
+						  SelectedValue="{Binding CascadeFloor}"
+						  Width="80" Height="28" Margin="0,0,10,0"/>
+
+				<TextBlock Text="→ 墙体ID" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="12"/>
+				<ComboBox ItemsSource="{Binding CascadeWallIdList}"
+						  SelectedItem="{Binding CascadeWallId}"
+						  Width="180" Height="28" Margin="0,0,10,0"/>
+
+				<Button Content="重置分层" Command="{Binding ResetFilterCommand}"
+						Width="80" Height="26" VerticalAlignment="Center" FontSize="12"/>
+			</StackPanel>
+		</Border>
+
+		<!-- ============ 数据表格 ============ -->
+		<DataGrid Grid.Row="3"
+				  ItemsSource="{Binding DisplayItems}"
+				  AutoGenerateColumns="False"
+				  IsReadOnly="True"
+				  SelectionMode="Extended"
+				  SelectionUnit="FullRow"
+				  CanUserAddRows="False"
+				  CanUserDeleteRows="False"
+				  CanUserReorderColumns="False"
+				  CanUserResizeColumns="True"
+				  CanUserSortColumns="False"
+				  GridLinesVisibility="Horizontal"
+				  RowHeight="38"
+				  ColumnHeaderHeight="36"
+				  VerticalScrollBarVisibility="Auto"
+				  HorizontalScrollBarVisibility="Auto"
+				  BorderThickness="0"
+				  SelectionChanged="DataGrid_SelectionChanged">
+
+			<DataGrid.Columns>
+				<!-- 房屋编号 -->
+				<DataGridTemplateColumn Header="房屋编号" Width="110">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="房屋编号 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="HouseNumber"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<Button Content="{Binding HouseNumber}"
+									Background="Transparent" BorderThickness="0"
+									Foreground="#2980B9" Cursor="Hand"
+									Command="{Binding DataContext.ViewDetailCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="{Binding}"
+									ToolTip="点击查看详情">
+								<Button.Template>
+									<ControlTemplate TargetType="Button">
+										<TextBlock Text="{TemplateBinding Content}"
+												   Foreground="{TemplateBinding Foreground}"
+												   Cursor="{TemplateBinding Cursor}"
+												   TextDecorations="Underline"/>
+									</ControlTemplate>
+								</Button.Template>
+							</Button>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 楼层 -->
+				<DataGridTemplateColumn Header="楼层" Width="80">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="楼层 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="Floor"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Floor}" HorizontalAlignment="Center"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 墙体ID -->
+				<DataGridTemplateColumn Header="墙体ID" Width="180">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="墙体ID ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="WallId"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding WallId}" FontFamily="Consolas" FontSize="11"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 导入时间 -->
+				<DataGridTemplateColumn Header="导入时间" Width="160">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="导入时间 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="ImportTime"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding ImportTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" FontSize="11"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- mjson 数据 -->
+				<DataGridTemplateColumn Header="mjson 数据" Width="220">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding MjsonData, Converter={x:Static local:WallListPage.TruncateConverter}}"
+										   Width="150" TextTrimming="CharacterEllipsis"
+										   FontSize="10" FontFamily="Consolas"
+										   Opacity="0.6" VerticalAlignment="Center"/>
+								<Button Content="📋" Width="28" Height="24"
+										Margin="4,0,0,0" ToolTip="查看完整 JSON"
+										Command="{Binding DataContext.ViewDetailCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+										CommandParameter="{Binding}"/>
+							</StackPanel>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 加工优先级 -->
+				<DataGridTemplateColumn Header="优先级" Width="90">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="优先级 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="Priority"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentPresenter ContentTemplate="{StaticResource PriorityTagTemplate}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 加工状态 -->
+				<DataGridTemplateColumn Header="状态" Width="90">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="状态 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="Status"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentPresenter ContentTemplate="{StaticResource StatusTagTemplate}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<!-- ============ 空状态 ============ -->
+		<Border Grid.Row="3" Background="{DynamicResource PrimaryRegionBrush}"
+				Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisConverter}}">
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,0">
+				<TextBlock Text="📭" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+				<TextBlock Text="暂无匹配数据" FontSize="16" HorizontalAlignment="Center" Opacity="0.6"/>
+				<TextBlock Text="请调整筛选条件或导入新数据" FontSize="13" HorizontalAlignment="Center"
+						   Opacity="0.4" Margin="0,4,0,0"/>
+			</StackPanel>
+		</Border>
+
+		<!-- ============ 分页栏 ============ -->
+		<Border Grid.Row="4" Padding="10,6" Background="{DynamicResource SecondaryRegionBrush}"
+				BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+			<Grid>
+				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+					<TextBlock FontSize="12" VerticalAlignment="Center">
+						<Run Text="共 "/>
+						<Run Text="{Binding TotalItems}" FontWeight="Bold"/>
+						<Run Text=" 条记录"/>
+					</TextBlock>
+					<Separator Margin="12,2"/>
+					<TextBlock Text="每页" VerticalAlignment="Center" FontSize="12" Margin="0,0,4,0"/>
+					<ComboBox ItemsSource="{Binding PageSizeOptions}"
+							  SelectedValue="{Binding PageSize}"
+							  Width="65" Height="26" FontSize="12"
+							  SelectionChanged="PageSize_SelectionChanged"/>
+					<TextBlock Text="条" VerticalAlignment="Center" FontSize="12" Margin="2,0,0,0"/>
+				</StackPanel>
+
+				<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+					<Button Content="◀◀" Width="32" Height="26"
+							Command="{Binding GoToPageCommand}" CommandParameter="1"
+							IsEnabled="{Binding HasPreviousPage}" FontSize="10" Margin="0,0,2,0"/>
+					<Button Content="◀" Width="32" Height="26"
+							Command="{Binding GoToPageCommand}"
+							CommandParameter="{Binding CurrentPage, Converter={x:Static local:WallListPage.PrevPageConverter}}"
+							IsEnabled="{Binding HasPreviousPage}" FontSize="10" Margin="0,0,4,0"/>
+					<TextBlock VerticalAlignment="Center" FontSize="12" Margin="4,0">
+						<Run Text="第 "/>
+						<Run Text="{Binding CurrentPage}" FontWeight="Bold"/>
+						<Run Text=" / "/>
+						<Run Text="{Binding TotalPages}" FontWeight="Bold"/>
+						<Run Text=" 页"/>
+					</TextBlock>
+					<Button Content="▶" Width="32" Height="26"
+							Command="{Binding GoToPageCommand}"
+							CommandParameter="{Binding CurrentPage, Converter={x:Static local:WallListPage.NextPageConverter}}"
+							IsEnabled="{Binding HasNextPage}" FontSize="10" Margin="4,0,2,0"/>
+					<Button Content="▶▶" Width="32" Height="26"
+							Command="{Binding GoToPageCommand}"
+							CommandParameter="{Binding TotalPages}"
+							IsEnabled="{Binding HasNextPage}" FontSize="10"/>
+				</StackPanel>
+			</Grid>
+		</Border>
+
+		<!-- ============ 导入进度覆盖层 ============ -->
+		<Border Grid.RowSpan="5" Background="#80000000"
+				Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}">
+			<Border Background="{DynamicResource PrimaryRegionBrush}" CornerRadius="8"
+					Width="400" Height="160" HorizontalAlignment="Center" VerticalAlignment="Center"
+					BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+				<StackPanel VerticalAlignment="Center" Margin="30">
+					<TextBlock Text="📂 批量导入" FontSize="16" FontWeight="Bold"
+							   HorizontalAlignment="Center" Margin="0,0,0,10"/>
+					<TextBlock Text="{Binding ImportProgressMessage}" FontSize="12"
+							   HorizontalAlignment="Center" Margin="0,0,0,12"
+							   TextTrimming="CharacterEllipsis" MaxWidth="340"/>
+					<ProgressBar Value="{Binding ImportProgressValue}"
+								 Maximum="{Binding ImportProgressMax}"
+								 Height="8" Margin="0,0,0,6"/>
+					<TextBlock HorizontalAlignment="Center" FontSize="11" Opacity="0.6">
+						<Run Text="{Binding ImportProgressValue}"/>
+						<Run Text=" / "/>
+						<Run Text="{Binding ImportProgressMax}"/>
+					</TextBlock>
+				</StackPanel>
+			</Border>
+		</Border>
+	</Grid>
 </Page>
