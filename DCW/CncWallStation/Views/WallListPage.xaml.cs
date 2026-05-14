@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Threading;
 using CncWallStation.Models;
 using CncWallStation.ViewModels;
 
@@ -27,14 +28,122 @@ namespace CncWallStation.Views
 
 		#region 事件处理
 
-		/// <summary>DataGrid 选择变更 → 同步到 ViewModel</summary>
+		/// <summary>DataGrid 行高亮变更（仅视觉，不联动 CheckBox）</summary>
 		private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (sender is DataGrid dg)
+			// DataGrid 行选中仅用于行高亮视觉效果，不以 IsSelected / SelectedItems 为数据源
+		}
+
+		/// <summary>行 CheckBox 勾选 → 同步 SelectedItems</summary>
+		private void RowCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			_viewModel.SyncSelectedItemsAndAllSelected();
+		}
+
+		/// <summary>行 CheckBox 取消勾选 → 同步 SelectedItems</summary>
+		private void RowCheckBox_Unchecked(object sender, RoutedEventArgs e)
+		{
+			_viewModel.SyncSelectedItemsAndAllSelected();
+		}
+
+		/// <summary>列头 CheckBox 勾选 → 全选当前页</summary>
+		private void HeaderCheckBox_Checked(object sender, RoutedEventArgs e)
+		{
+			_viewModel.SelectAllCurrentPage();
+		}
+
+		/// <summary>列头 CheckBox 取消 → 全不选当前页</summary>
+		private void HeaderCheckBox_Unchecked(object sender, RoutedEventArgs e)
+		{
+			_viewModel.DeselectAllCurrentPage();
+		}
+
+		/// <summary>Ctrl+C → 复制当前单元格文本</summary>
+		private void DataGrid_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			if (e.Key != System.Windows.Input.Key.C
+				|| System.Windows.Input.Keyboard.Modifiers != System.Windows.Input.ModifierKeys.Control
+				|| sender is not DataGrid dg)
+				return;
+
+			var cell = dg.CurrentCell;
+			var element = cell.Column.GetCellContent(cell.Item);
+			if (element is null) return;
+
+			var text = ExtractTextFromCell(element, cell.Column);
+			if (!string.IsNullOrEmpty(text))
 			{
-				var selected = dg.SelectedItems.Cast<WallListItem>().ToList();
-				_viewModel.SelectedItems = new System.Collections.ObjectModel.ObservableCollection<WallListItem>(selected);
+				System.Windows.Clipboard.SetText(text);
+				e.Handled = true;
 			}
+		}
+
+		/// <summary>从 DataGrid 单元格的视觉树中提取文本</summary>
+		private static string ExtractTextFromCell(FrameworkElement element, DataGridColumn column)
+		{
+			// 遍历视觉树找 TextBlock
+			var textBlock = FindVisualChild<TextBlock>(element);
+			if (textBlock != null)
+				return textBlock.Text ?? string.Empty;
+
+			return string.Empty;
+		}
+
+		/// <summary>右键菜单 → 复制当前单元格内容</summary>
+		private void ContextMenu_CopyCell(object sender, RoutedEventArgs e)
+		{
+			if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+				return;
+
+			var cell = dg.CurrentCell;
+			var element = cell.Column.GetCellContent(cell.Item);
+			if (element is null) return;
+
+			var text = ExtractTextFromCell(element, cell.Column);
+			if (string.IsNullOrEmpty(text)) return;
+
+			// ContextMenu 打开期间剪贴板被 WPF 锁定，延迟到菜单关闭后再写入
+			var capturedText = text;
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				try { Clipboard.SetText(capturedText); }
+				catch (System.Runtime.InteropServices.COMException)
+				{
+					// 剪贴板被其他进程占用，静默忽略
+				}
+			}), DispatcherPriority.Background);
+		}
+
+		private static string PriorityToText(ProcessPriority p) => p switch
+		{
+			ProcessPriority.高 => "高",
+			ProcessPriority.中 => "中",
+			ProcessPriority.低 => "低",
+			_ => "未知"
+		};
+
+		private static string StatusToText(ProcessStatus s) => s switch
+		{
+			ProcessStatus.待加工 => "待加工",
+			ProcessStatus.加工中 => "加工中",
+			ProcessStatus.已完成 => "已完成",
+			ProcessStatus.异常 => "异常",
+			_ => "未知"
+		};
+
+		/// <summary>在视觉树中查找指定类型的子元素</summary>
+		private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+				if (child is T found)
+					return found;
+				var result = FindVisualChild<T>(child);
+				if (result != null)
+					return result;
+			}
+			return null;
 		}
 
 		/// <summary>状态多选 ListBox 变更</summary>
@@ -58,49 +167,6 @@ namespace CncWallStation.Views
 				_viewModel.SearchCommand.Execute(null);
 			}
 		}
-
-		/// <summary>DataGrid 行复制到剪贴板（Ctrl+C）</summary>
-		private void DataGrid_CopyingRowClipboardContent(object sender, DataGridRowClipboardEventArgs e)
-		{
-			if (e.Item is not WallListItem item) return;
-
-			var modified = e.ClipboardRowContent.Select(cell =>
-			{
-				var content = cell.Column.Header switch
-				{
-					"项目号" => item.HouseNumber,
-					"楼层" => item.Floor.ToString(),
-					"墙体ID" => item.WallId,
-					"导入时间" => item.ImportTime.ToString("yyyy-MM-dd HH:mm:ss"),
-					"mjson 数据" => item.MjsonData,
-					"优先级" => PriorityToText(item.Priority),
-					"状态" => StatusToText(item.Status),
-					_ => cell.Content
-				};
-				return new DataGridClipboardCellContent(cell.Item, cell.Column, content);
-			}).ToList();
-
-			e.ClipboardRowContent.Clear();
-			foreach (var c in modified)
-				e.ClipboardRowContent.Add(c);
-		}
-
-		private static string PriorityToText(ProcessPriority p) => p switch
-		{
-			ProcessPriority.高 => "高",
-			ProcessPriority.中 => "中",
-			ProcessPriority.低 => "低",
-			_ => "未知"
-		};
-
-		private static string StatusToText(ProcessStatus s) => s switch
-		{
-			ProcessStatus.待加工 => "待加工",
-			ProcessStatus.加工中 => "加工中",
-			ProcessStatus.已完成 => "已完成",
-			ProcessStatus.异常 => "异常",
-			_ => "未知"
-		};
 
 		/// <summary>每页条数变更</summary>
 		private void PageSize_SelectionChanged(object sender, SelectionChangedEventArgs e)

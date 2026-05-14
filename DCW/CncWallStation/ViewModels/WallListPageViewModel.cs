@@ -40,6 +40,10 @@ namespace CncWallStation.ViewModels
         [ObservableProperty]
         private ObservableCollection<WallListItem> _selectedItems = new();
 
+        /// <summary>列头全选状态：true=全选, false=全不选, null=部分选中</summary>
+        [ObservableProperty]
+        private bool? _isAllSelected = false;
+
         // ==================== 分页按钮状态 ====================
         [ObservableProperty]
         private bool _hasPreviousPage;
@@ -398,6 +402,7 @@ namespace CncWallStation.ViewModels
             var toRemove = SelectedItems.ToList();
             foreach (var item in toRemove)
             {
+                item.IsSelected = false;
                 _allItems.Remove(item);
                 DisplayItems.Remove(item);
             }
@@ -619,6 +624,52 @@ namespace CncWallStation.ViewModels
                 .ToList();
 
             DisplayItems = new ObservableCollection<WallListItem>(pageItems);
+            UpdateIsAllSelected();
+        }
+
+        // ==================== CheckBox 选中同步 ====================
+
+        /// <summary>
+        /// 从 IsSelected 属性重建 SelectedItems 集合，并刷新全选状态
+        /// （行 CheckBox 勾选/取消后由 code-behind 调用）
+        /// </summary>
+        public void SyncSelectedItemsAndAllSelected()
+        {
+            var selected = _allItems.Where(x => x.IsSelected).ToList();
+            SelectedItems = new ObservableCollection<WallListItem>(selected);
+            UpdateIsAllSelected();
+        }
+
+        /// <summary>根据当前页 DisplayItems 的 IsSelected 计算全选状态</summary>
+        private void UpdateIsAllSelected()
+        {
+            var currentPage = DisplayItems.ToList();
+            if (currentPage.Count == 0)
+            {
+                IsAllSelected = false;
+                return;
+            }
+
+            var selectedCount = currentPage.Count(x => x.IsSelected);
+            IsAllSelected = selectedCount == currentPage.Count ? true
+                          : selectedCount == 0 ? false
+                          : null;
+        }
+
+        /// <summary>全选当前页（列头 CheckBox 勾选时调用）</summary>
+        public void SelectAllCurrentPage()
+        {
+            foreach (var item in DisplayItems)
+                item.IsSelected = true;
+            SyncSelectedItemsAndAllSelected();
+        }
+
+        /// <summary>取消全选当前页（列头 CheckBox 取消时调用）</summary>
+        public void DeselectAllCurrentPage()
+        {
+            foreach (var item in DisplayItems)
+                item.IsSelected = false;
+            SyncSelectedItemsAndAllSelected();
         }
 
         // ==================== 更新可选楼层列表 ====================

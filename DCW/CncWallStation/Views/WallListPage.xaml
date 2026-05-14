@@ -275,6 +275,7 @@
 
 		<!-- ============ 数据表格 ============ -->
 		<DataGrid Grid.Row="2"
+				  x:Name="WallDataGrid"
 				  ItemsSource="{Binding DisplayItems}"
 				  AutoGenerateColumns="False"
 				  IsReadOnly="False"
@@ -285,8 +286,7 @@
 				  CanUserReorderColumns="False"
 				  CanUserResizeColumns="True"
 				  CanUserSortColumns="False"
-				  ClipboardCopyMode="IncludeHeader"
-				  CopyingRowClipboardContent="DataGrid_CopyingRowClipboardContent"
+				  PreviewKeyDown="DataGrid_PreviewKeyDown"
 				  GridLinesVisibility="Horizontal"
 				  RowHeight="38"
 				  ColumnHeaderHeight="36"
@@ -295,12 +295,31 @@
 				  BorderThickness="0"
 				  SelectionChanged="DataGrid_SelectionChanged">
 
+			<DataGrid.ContextMenu>
+				<ContextMenu>
+					<MenuItem Header="📋 复制" Click="ContextMenu_CopyCell"
+							  InputGestureText="Ctrl+C"/>
+				</ContextMenu>
+			</DataGrid.ContextMenu>
+
 			<DataGrid.Columns>
-				<!-- 复选框多选列 -->
+				<!-- 复选框多选列（含列头全选） -->
 				<DataGridTemplateColumn Width="40" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<CheckBox IsChecked="{Binding DataContext.IsAllSelected,
+										RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									  IsThreeState="True"
+									  Checked="HeaderCheckBox_Checked"
+									  Unchecked="HeaderCheckBox_Unchecked"
+									  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<CheckBox IsChecked="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=TwoWay}"
+							<CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+									  Checked="RowCheckBox_Checked"
+									  Unchecked="RowCheckBox_Unchecked"
 									  HorizontalAlignment="Center" VerticalAlignment="Center"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
@@ -318,21 +337,11 @@
 					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<Button Content="{Binding HouseNumber}"
-									Background="Transparent" BorderThickness="0"
-									Foreground="#2980B9" Cursor="Hand"
-									Command="{Binding DataContext.ViewDetailCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="{Binding}"
-									ToolTip="点击查看详情">
-								<Button.Template>
-									<ControlTemplate TargetType="Button">
-										<TextBlock Text="{TemplateBinding Content}"
-												   Foreground="{TemplateBinding Foreground}"
-												   Cursor="{TemplateBinding Cursor}"
-												   TextDecorations="Underline"/>
-									</ControlTemplate>
-								</Button.Template>
-							</Button>
+							<TextBlock Text="{Binding HouseNumber}"
+									  Foreground="#2980B9"
+									  FontSize="13" FontWeight="Normal"
+									  VerticalAlignment="Center"
+									  ToolTip="{Binding HouseNumber}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
@@ -384,24 +393,6 @@
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding ImportTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" FontSize="11"/>
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
-
-				<!-- mjson 数据 -->
-				<DataGridTemplateColumn Header="mjson 数据" Width="220">
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="{Binding MjsonData, Converter={x:Static local:WallListPage.TruncateConverter}}"
-										   Width="150" TextTrimming="CharacterEllipsis"
-										   FontSize="10" FontFamily="Consolas"
-										   Opacity="0.6" VerticalAlignment="Center"/>
-								<Button Content="📋" Width="28" Height="24"
-										Margin="4,0,0,0" ToolTip="查看完整 JSON"
-										Command="{Binding DataContext.ViewDetailCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-										CommandParameter="{Binding}"/>
-							</StackPanel>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>

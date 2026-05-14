@@ -1,4 +1,4 @@
-using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CncWallStation.Models
 {
@@ -26,7 +26,7 @@ namespace CncWallStation.Models
 	/// <summary>
 	/// 墙体清单数据项
 	/// </summary>
-	public class WallListItem
+	public partial class WallListItem : ObservableObject
 	{
 		/// <summary>房屋编号</summary>
 		public string HouseNumber { get; set; } = string.Empty;
@@ -48,6 +48,10 @@ namespace CncWallStation.Models
 
 		/// <summary>加工状态</summary>
 		public ProcessStatus Status { get; set; } = ProcessStatus.待加工;
+
+		/// <summary>是否被 CheckBox 选中（独立于 DataGrid 行选中）</summary>
+		[ObservableProperty]
+		private bool _isSelected;
 	}
 
 	/// <summary>
