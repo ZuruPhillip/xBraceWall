@@ -9,12 +9,12 @@ namespace CncWallStation
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(MainViewModel mainViewModel, ControllerPage controllerPage)
+        public MainWindow(MainViewModel mainViewModel, WallListPage wallListPage)
         {
             InitializeComponent();
             DataContext = mainViewModel;
             mainViewModel.SetFrame(MainFrame);
-            MainFrame.Navigate(controllerPage);
+            MainFrame.Navigate(wallListPage);
         }
     }
 }

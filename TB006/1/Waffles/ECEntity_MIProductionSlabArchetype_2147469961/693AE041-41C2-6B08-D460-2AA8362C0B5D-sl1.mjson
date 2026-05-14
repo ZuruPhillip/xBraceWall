@@ -1,0 +1,5259 @@
+{
+    "beamsData": [
+        {
+            "bottomRebarDescription": "3-N16 1", 
+            "id": "B1", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r2_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r3_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8847.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8847.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r4_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8747.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8747.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r5_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 8647.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 8647.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 8650.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 8650.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 306.00, 
+            "topRebarDescription": "3-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 8847.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8847.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 8747.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8747.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 8647.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 8647.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "3-N16 1", 
+            "id": "B3", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r2_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r3_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 53.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 53.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r4_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 153.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 153.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }, 
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": -1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r5_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5375.00, 
+                            "y": 253.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7775.00, 
+                            "y": 253.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 5375.00, 
+                    "y": 250.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 7775.00, 
+                    "y": 250.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 306.00, 
+            "topRebarDescription": "3-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 53.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 53.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 153.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 153.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 253.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 253.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }
+    ], 
+    "height": 460.00, 
+    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D", 
+    "joistsData": [
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj0", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 1150.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 1150.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 1150.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 1150.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 1150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 1150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj1", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 1750.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 1750.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 1750.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 1750.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 1750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 1750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj2", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 2650.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 2650.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 2650.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 2650.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 2650.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 2650.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj3", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 3550.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 3550.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 3550.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 3550.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 3550.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 3550.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj4", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 4450.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 4450.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 4450.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 4450.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 4450.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 4450.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj5", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 5350.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 5350.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 5350.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 5350.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 5350.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 5350.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj6", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 6250.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 6250.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 6250.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 6250.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 6250.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 6250.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj7", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 7150.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 7150.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 7150.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 7150.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 7150.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 7150.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj8", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 1.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 2400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7775.00, 
+                            "y": 7750.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5375.00, 
+                            "y": 7750.00, 
+                            "z": 390.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7775.00, 
+                    "y": 7750.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5375.00, 
+                    "y": 7750.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5354.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6246.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 5800.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6254.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7146.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 6700.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7154.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7746.00, 
+                            "y": 7750.00, 
+                            "z": 374.00
+                        }, 
+                        "startPoint": {
+                            "x": 7450.00, 
+                            "y": 7750.00, 
+                            "z": 54.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj14", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 8650.00, 
+                            "z": 70.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 250.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 8650.00, 
+                            "z": 406.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 250.00, 
+                            "z": 406.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 5350.00, 
+                    "y": 8650.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 5350.00, 
+                    "y": 250.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 1146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 1154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 1746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 1754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 2646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 2654.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 3546.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 3554.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 4446.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 4454.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 5346.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 5354.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 6246.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 6254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 7146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 7154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 7746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 7754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 5350.00, 
+                            "y": 8646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 5350.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj15", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 8650.00, 
+                            "z": 70.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 250.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 8650.00, 
+                            "z": 406.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 250.00, 
+                            "z": 406.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 6250.00, 
+                    "y": 8650.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 6250.00, 
+                    "y": 250.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 1146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 1154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 1746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 1754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 2646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 2654.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 3546.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 3554.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 4446.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 4454.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 5346.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 5354.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 6246.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 6254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 7146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 7154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 7746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 7754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 6250.00, 
+                            "y": 8646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 6250.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }
+            ]
+        }, 
+        {
+            "bottomRebarDescription": "1-N16 1", 
+            "id": "wj16", 
+            "rebarsBottom": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r0_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 8650.00, 
+                            "z": 70.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 250.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "rebarsTop": [
+                {
+                    "diameter": 16.00, 
+                    "direction": {
+                        "x": 0.00, 
+                        "y": 1.00, 
+                        "z": 0.00
+                    }, 
+                    "endThreading": "Straight", 
+                    "id": "_r1_0", 
+                    "length": 8400.00, 
+                    "segment": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 8650.00, 
+                            "z": 406.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 250.00, 
+                            "z": 406.00
+                        }
+                    }, 
+                    "startThreading": "Straight"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 7150.00, 
+                    "y": 8650.00, 
+                    "z": 0.00
+                }, 
+                "startPoint": {
+                    "x": 7150.00, 
+                    "y": 250.00, 
+                    "z": 0.00
+                }
+            }, 
+            "thickness": 112.00, 
+            "topRebarDescription": "1-N16 1", 
+            "trussDiagonals": [
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 1146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 1154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 1746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 1450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 1754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 2646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 2200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 2654.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 3546.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 3100.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 3554.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 4446.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 4000.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 4454.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 5346.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 4900.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 5354.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 6246.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 5800.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 6254.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 7146.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 6700.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 7154.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 7746.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 7450.00, 
+                            "z": 70.00
+                        }
+                    }
+                }, 
+                {
+                    "first": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 7754.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }, 
+                    "second": {
+                        "endPoint": {
+                            "x": 7150.00, 
+                            "y": 8646.00, 
+                            "z": 390.00
+                        }, 
+                        "startPoint": {
+                            "x": 7150.00, 
+                            "y": 8200.00, 
+                            "z": 70.00
+                        }
+                    }
+                }
+            ]
+        }
+    ], 
+    "panelBreaks": [], 
+    "perimeter": [
+        {
+            "x": 7775.00, 
+            "y": 8900.00
+        }, 
+        {
+            "x": 5375.00, 
+            "y": 8900.00
+        }, 
+        {
+            "x": 5375.00, 
+            "y": 0.00
+        }, 
+        {
+            "x": 7775.00, 
+            "y": 0.00
+        }
+    ], 
+    "podsData": [
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp7", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp9", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 600.00
+            }, 
+            "description": "P5x5x3.88\nT0,0,0 \nG6x6\n", 
+            "id": "wp11", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 600.00
+            }, 
+            "description": "P8x5x3.88\nT0,0,0 \nG6x9\n", 
+            "id": "wp12", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp15", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 600.00
+            }, 
+            "description": "P8x5x3.88\nT0,0,0 \nG6x9\n", 
+            "id": "wp22", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp23", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp24", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp32", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp31", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp33", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp37", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp42", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp43", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp48", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp50", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp56", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp59", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp60", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp68", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp70", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp74", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 600.00
+            }, 
+            "description": "P5x5x3.88\nT0,0,0 \nG6x6\n", 
+            "id": "wp76", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 600.00
+            }, 
+            "description": "P8x5x3.88\nT0,0,0 \nG6x9\n", 
+            "id": "wp79", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 600.00
+            }, 
+            "description": "P8x5x3.88\nT0,0,0 \nG6x9\n", 
+            "id": "wp88", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 488.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp90", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 7450.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 600.00, 
+                "y": 900.00
+            }, 
+            "description": "P5x8x3.88\nT0,0,90 \nG6x9\n", 
+            "id": "wp92", 
+            "podCenter": {
+                "x": 7450.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 488.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp95", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 5800.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp98", 
+            "podCenter": {
+                "x": 5800.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }, 
+        {
+            "cellCenter": {
+                "x": 6700.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "cellSize": {
+                "x": 900.00, 
+                "y": 900.00
+            }, 
+            "description": "P8x8x3.88\nT0,0,0 \nG9x9\n", 
+            "id": "wp99", 
+            "podCenter": {
+                "x": 6700.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "podSize": {
+                "x": 788.00, 
+                "y": 788.00
+            }
+        }
+    ], 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/waffle_slab.json", 
+    "shuttering": [
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 348.00
+            }, 
+            "id": "sp0", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 8747.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 8747.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "C8BC9880-41D5-0F57-38E4-8E95DF58DC05"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 348.00
+            }, 
+            "id": "sp1", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 625.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }, 
+                {
+                    "distanceFromStartPoint": 1525.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 0.00, 
+                    "y": 153.00
+                }, 
+                "startPoint": {
+                    "x": 2400.00, 
+                    "y": 153.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "605F0749-411E-3C8C-3A95-A7833AB127E4"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp2", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 1150.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 1150.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "6ACDFB2A-45EC-2AD0-95C1-A6BEB11E09F1"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp3", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 1750.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 1750.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "3402DDE2-4D9E-5BB6-3F90-D596EB920778"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp4", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 2650.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 2650.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "340D6D6E-4723-AD9D-39A1-8688E44899BD"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp5", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 3550.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 3550.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "015082DA-422E-20A6-41AA-B8B584B91935"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp6", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 4450.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 4450.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "72D57C6E-4371-C081-4BEB-4AA45C18BCB0"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp7", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 5350.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 5350.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "A3635E5F-4F35-C51D-5CF0-8CBD88C751FE"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp8", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 6250.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 6250.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "B04ABF7A-41CC-3080-28F4-B2A0BD6F80F8"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp9", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 7150.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 7150.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "E79CDD1B-4EB8-9322-83A2-52BF845BDE46"
+        }, 
+        {
+            "dimensions": {
+                "length": 2400.00, 
+                "width": 154.00
+            }, 
+            "id": "sp10", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 875.00, 
+                    "id": "81ADA81F-4435-A418-4258-38BB4C59E576"
+                }, 
+                {
+                    "distanceFromStartPoint": 1775.00, 
+                    "id": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 2400.00, 
+                    "y": 7750.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 7750.00
+                }
+            }, 
+            "split": 3, 
+            "uid": "034C4F8E-4B78-194D-BC74-9182AC0221C2"
+        }, 
+        {
+            "dimensions": {
+                "length": 8900.00, 
+                "width": 154.00
+            }, 
+            "id": "sp11", 
+            "intersections": [], 
+            "segment": {
+                "endPoint": {
+                    "x": -25.00, 
+                    "y": 8900.00
+                }, 
+                "startPoint": {
+                    "x": -25.00, 
+                    "y": 0.00
+                }
+            }, 
+            "split": 0, 
+            "uid": "4909CAFC-44D6-A8CA-0D19-E7AC08C5B01E"
+        }, 
+        {
+            "dimensions": {
+                "length": 8900.00, 
+                "width": 154.00
+            }, 
+            "id": "sp12", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 153.00, 
+                    "id": "605F0749-411E-3C8C-3A95-A7833AB127E4"
+                }, 
+                {
+                    "distanceFromStartPoint": 1150.00, 
+                    "id": "6ACDFB2A-45EC-2AD0-95C1-A6BEB11E09F1"
+                }, 
+                {
+                    "distanceFromStartPoint": 1750.00, 
+                    "id": "3402DDE2-4D9E-5BB6-3F90-D596EB920778"
+                }, 
+                {
+                    "distanceFromStartPoint": 2650.00, 
+                    "id": "340D6D6E-4723-AD9D-39A1-8688E44899BD"
+                }, 
+                {
+                    "distanceFromStartPoint": 3550.00, 
+                    "id": "015082DA-422E-20A6-41AA-B8B584B91935"
+                }, 
+                {
+                    "distanceFromStartPoint": 4450.00, 
+                    "id": "72D57C6E-4371-C081-4BEB-4AA45C18BCB0"
+                }, 
+                {
+                    "distanceFromStartPoint": 5350.00, 
+                    "id": "A3635E5F-4F35-C51D-5CF0-8CBD88C751FE"
+                }, 
+                {
+                    "distanceFromStartPoint": 6250.00, 
+                    "id": "B04ABF7A-41CC-3080-28F4-B2A0BD6F80F8"
+                }, 
+                {
+                    "distanceFromStartPoint": 7150.00, 
+                    "id": "E79CDD1B-4EB8-9322-83A2-52BF845BDE46"
+                }, 
+                {
+                    "distanceFromStartPoint": 7750.00, 
+                    "id": "034C4F8E-4B78-194D-BC74-9182AC0221C2"
+                }, 
+                {
+                    "distanceFromStartPoint": 8747.00, 
+                    "id": "C8BC9880-41D5-0F57-38E4-8E95DF58DC05"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 875.00, 
+                    "y": 8900.00
+                }, 
+                "startPoint": {
+                    "x": 875.00, 
+                    "y": 0.00
+                }
+            }, 
+            "split": 0, 
+            "uid": "81ADA81F-4435-A418-4258-38BB4C59E576"
+        }, 
+        {
+            "dimensions": {
+                "length": 8900.00, 
+                "width": 154.00
+            }, 
+            "id": "sp13", 
+            "intersections": [
+                {
+                    "distanceFromStartPoint": 153.00, 
+                    "id": "605F0749-411E-3C8C-3A95-A7833AB127E4"
+                }, 
+                {
+                    "distanceFromStartPoint": 1150.00, 
+                    "id": "6ACDFB2A-45EC-2AD0-95C1-A6BEB11E09F1"
+                }, 
+                {
+                    "distanceFromStartPoint": 1750.00, 
+                    "id": "3402DDE2-4D9E-5BB6-3F90-D596EB920778"
+                }, 
+                {
+                    "distanceFromStartPoint": 2650.00, 
+                    "id": "340D6D6E-4723-AD9D-39A1-8688E44899BD"
+                }, 
+                {
+                    "distanceFromStartPoint": 3550.00, 
+                    "id": "015082DA-422E-20A6-41AA-B8B584B91935"
+                }, 
+                {
+                    "distanceFromStartPoint": 4450.00, 
+                    "id": "72D57C6E-4371-C081-4BEB-4AA45C18BCB0"
+                }, 
+                {
+                    "distanceFromStartPoint": 5350.00, 
+                    "id": "A3635E5F-4F35-C51D-5CF0-8CBD88C751FE"
+                }, 
+                {
+                    "distanceFromStartPoint": 6250.00, 
+                    "id": "B04ABF7A-41CC-3080-28F4-B2A0BD6F80F8"
+                }, 
+                {
+                    "distanceFromStartPoint": 7150.00, 
+                    "id": "E79CDD1B-4EB8-9322-83A2-52BF845BDE46"
+                }, 
+                {
+                    "distanceFromStartPoint": 7750.00, 
+                    "id": "034C4F8E-4B78-194D-BC74-9182AC0221C2"
+                }, 
+                {
+                    "distanceFromStartPoint": 8747.00, 
+                    "id": "C8BC9880-41D5-0F57-38E4-8E95DF58DC05"
+                }
+            ], 
+            "segment": {
+                "endPoint": {
+                    "x": 1775.00, 
+                    "y": 8900.00
+                }, 
+                "startPoint": {
+                    "x": 1775.00, 
+                    "y": 0.00
+                }
+            }, 
+            "split": 0, 
+            "uid": "5C9B02B9-46F5-3A71-7143-18BBEF7B7539"
+        }
+    ], 
+    "tunnelsData": [
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt10", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 1150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt15", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt16", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 1150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt17", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 1750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt23", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt24", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 1750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt25", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt30", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 1150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt31", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt37", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 1450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt42", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 1750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt43", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt44", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 2650.00, 
+                "z": 0.00
+            }, 
+            "id": "wt45", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 2650.00, 
+                "z": 0.00
+            }, 
+            "id": "wt47", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt52", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "id": "wt60", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 3550.00, 
+                "z": 0.00
+            }, 
+            "id": "wt61", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 2200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt62", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 2650.00, 
+                "z": 0.00
+            }, 
+            "id": "wt63", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 3550.00, 
+                "z": 0.00
+            }, 
+            "id": "wt65", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "id": "wt71", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 4450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt72", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "id": "wt81", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 3550.00, 
+                "z": 0.00
+            }, 
+            "id": "wt82", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 4450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt84", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 3100.00, 
+                "z": 0.00
+            }, 
+            "id": "wt85", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "id": "wt92", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 4450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt93", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 4000.00, 
+                "z": 0.00
+            }, 
+            "id": "wt94", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 5350.00, 
+                "z": 0.00
+            }, 
+            "id": "wt97", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "id": "wt107", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 5350.00, 
+                "z": 0.00
+            }, 
+            "id": "wt108", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "id": "wt113", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 6250.00, 
+                "z": 0.00
+            }, 
+            "id": "wt114", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 6250.00, 
+                "z": 0.00
+            }, 
+            "id": "wt116", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "id": "wt124", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "id": "wt128", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 4900.00, 
+                "z": 0.00
+            }, 
+            "id": "wt130", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 5350.00, 
+                "z": 0.00
+            }, 
+            "id": "wt131", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 5800.00, 
+                "z": 0.00
+            }, 
+            "id": "wt134", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 6250.00, 
+                "z": 0.00
+            }, 
+            "id": "wt135", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 7150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt142", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 7750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt146", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt151", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 7750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt152", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt160", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt163", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 7450.00, 
+                "z": 0.00
+            }, 
+            "id": "wt165", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 351.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 7750.00, 
+                "z": 0.00
+            }, 
+            "id": "wt166", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt169", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt174", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5350.00, 
+                "y": 8200.00, 
+                "z": 0.00
+            }, 
+            "id": "wt175", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6250.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt176", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 7150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt177", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7150.00, 
+                "y": 6700.00, 
+                "z": 0.00
+            }, 
+            "id": "wt178", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 112.00, 
+                "y": 426.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 7150.00, 
+                "z": 0.00
+            }, 
+            "id": "wt179", 
+            "isBlind": false, 
+            "length": 112.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 112.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 293.50, 
+                "z": 0.00
+            }, 
+            "id": "wt188", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 293.50, 
+                "z": 0.00
+            }, 
+            "id": "wt189", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 293.50, 
+                "z": 0.00
+            }, 
+            "id": "wt190", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 5800.00, 
+                "y": 8606.50, 
+                "z": 0.00
+            }, 
+            "id": "wt211", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard900"
+        }, 
+        {
+            "center": {
+                "x": 7450.00, 
+                "y": 8606.50, 
+                "z": 0.00
+            }, 
+            "id": "wt213", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 351.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard600"
+        }, 
+        {
+            "center": {
+                "x": 6700.00, 
+                "y": 8606.50, 
+                "z": 0.00
+            }, 
+            "id": "wt216", 
+            "isBlind": true, 
+            "length": 25.00, 
+            "size": {
+                "x": 426.00, 
+                "y": 25.00
+            }, 
+            "type": "Standard900"
+        }
+    ], 
+    "voids": []
+}

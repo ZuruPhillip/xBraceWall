@@ -1,0 +1,213 @@
+{
+    "proppingElements": [
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": -1200.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": -1200.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": -1200.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": -1200.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": 1500.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": 1500.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": -1200.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": -1200.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": 1500.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": 1500.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": 3300.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 4200.00, 
+                    "y": 3300.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": 1500.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": 1500.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": 3300.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 6900.00, 
+                    "y": 3300.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }, 
+        {
+            "body": {
+                "length": 2645.00, 
+                "pn": "PN_VerticalPropping_Body"
+            }, 
+            "foot": {
+                "pn": "PN_VerticalPropping_Foot", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": 3300.00, 
+                    "z": 20.00
+                }
+            }, 
+            "head": {
+                "pn": "PN_VerticalPropping_Head", 
+                "position": {
+                    "x": 8700.00, 
+                    "y": 3300.00, 
+                    "z": 2665.00
+                }
+            }, 
+            "isValid": true
+        }
+    ], 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/propping.json", 
+    "uuid": "BACD10F2-4EF6-6512-A9DA-DABC30846C40"
+}

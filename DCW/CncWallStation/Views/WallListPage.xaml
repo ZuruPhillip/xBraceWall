@@ -189,9 +189,9 @@
 		<!-- ============ 筛选栏 ============ -->
 		<Border Grid.Row="1" Padding="10,8" Background="{DynamicResource PrimaryRegionBrush}">
 			<WrapPanel>
-				<!-- 房屋编号 -->
+				<!-- 项目号 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
-					<TextBlock Text="房屋编号:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<TextBlock Text="项目号:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
 					<TextBox Text="{Binding SearchHouseNumber, UpdateSourceTrigger=PropertyChanged}"
 							 Width="120" Height="28"/>
 				</StackPanel>
@@ -277,7 +277,7 @@
 		<DataGrid Grid.Row="2"
 				  ItemsSource="{Binding DisplayItems}"
 				  AutoGenerateColumns="False"
-				  IsReadOnly="True"
+				  IsReadOnly="False"
 				  SelectionMode="Extended"
 				  SelectionUnit="FullRow"
 				  CanUserAddRows="False"
@@ -285,6 +285,8 @@
 				  CanUserReorderColumns="False"
 				  CanUserResizeColumns="True"
 				  CanUserSortColumns="False"
+				  ClipboardCopyMode="IncludeHeader"
+				  CopyingRowClipboardContent="DataGrid_CopyingRowClipboardContent"
 				  GridLinesVisibility="Horizontal"
 				  RowHeight="38"
 				  ColumnHeaderHeight="36"
@@ -294,11 +296,21 @@
 				  SelectionChanged="DataGrid_SelectionChanged">
 
 			<DataGrid.Columns>
-				<!-- 房屋编号 -->
-				<DataGridTemplateColumn Header="房屋编号" Width="110">
+				<!-- 复选框多选列 -->
+				<DataGridTemplateColumn Width="40" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<CheckBox IsChecked="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=TwoWay}"
+									  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 项目号 -->
+				<DataGridTemplateColumn Header="项目号" Width="110">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="房屋编号 ⬍" Background="Transparent" BorderThickness="0"
+							<Button Content="项目号 ⬍" Background="Transparent" BorderThickness="0"
 									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
 									CommandParameter="HouseNumber"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>

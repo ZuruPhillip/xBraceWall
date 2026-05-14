@@ -1,0 +1,53 @@
+{
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/slab_edges.json", 
+    "slabEdges": [
+        {
+            "segment": {
+                "endPoint": {
+                    "x": 0.00, 
+                    "y": 8900.00
+                }, 
+                "startPoint": {
+                    "x": 8900.00, 
+                    "y": 8900.00
+                }
+            }
+        }, 
+        {
+            "segment": {
+                "endPoint": {
+                    "x": 0.00, 
+                    "y": 0.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 8900.00
+                }
+            }
+        }, 
+        {
+            "segment": {
+                "endPoint": {
+                    "x": 8900.00, 
+                    "y": 0.00
+                }, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 0.00
+                }
+            }
+        }, 
+        {
+            "segment": {
+                "endPoint": {
+                    "x": 8900.00, 
+                    "y": 8900.00
+                }, 
+                "startPoint": {
+                    "x": 8900.00, 
+                    "y": 0.00
+                }
+            }
+        }
+    ]
+}

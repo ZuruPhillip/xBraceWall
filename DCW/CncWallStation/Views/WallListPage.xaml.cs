@@ -59,6 +59,49 @@ namespace CncWallStation.Views
 			}
 		}
 
+		/// <summary>DataGrid 行复制到剪贴板（Ctrl+C）</summary>
+		private void DataGrid_CopyingRowClipboardContent(object sender, DataGridRowClipboardEventArgs e)
+		{
+			if (e.Item is not WallListItem item) return;
+
+			var modified = e.ClipboardRowContent.Select(cell =>
+			{
+				var content = cell.Column.Header switch
+				{
+					"项目号" => item.HouseNumber,
+					"楼层" => item.Floor.ToString(),
+					"墙体ID" => item.WallId,
+					"导入时间" => item.ImportTime.ToString("yyyy-MM-dd HH:mm:ss"),
+					"mjson 数据" => item.MjsonData,
+					"优先级" => PriorityToText(item.Priority),
+					"状态" => StatusToText(item.Status),
+					_ => cell.Content
+				};
+				return new DataGridClipboardCellContent(cell.Item, cell.Column, content);
+			}).ToList();
+
+			e.ClipboardRowContent.Clear();
+			foreach (var c in modified)
+				e.ClipboardRowContent.Add(c);
+		}
+
+		private static string PriorityToText(ProcessPriority p) => p switch
+		{
+			ProcessPriority.高 => "高",
+			ProcessPriority.中 => "中",
+			ProcessPriority.低 => "低",
+			_ => "未知"
+		};
+
+		private static string StatusToText(ProcessStatus s) => s switch
+		{
+			ProcessStatus.待加工 => "待加工",
+			ProcessStatus.加工中 => "加工中",
+			ProcessStatus.已完成 => "已完成",
+			ProcessStatus.异常 => "异常",
+			_ => "未知"
+		};
+
 		/// <summary>每页条数变更</summary>
 		private void PageSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{

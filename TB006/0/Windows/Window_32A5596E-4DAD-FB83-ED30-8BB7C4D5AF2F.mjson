@@ -1,0 +1,795 @@
+{
+    "dimension": {
+        "x": 2000.00, 
+        "y": 307.30, 
+        "z": 2685.00
+    }, 
+    "fastenerScrews": [
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 2492.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 2192.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 1892.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 1592.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 1292.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 1092.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 792.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 492.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 0.00, 
+                "y": 47.50, 
+                "z": 192.50
+            }, 
+            "side": "Left"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 2492.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 2192.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 1892.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 1592.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 1292.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 1092.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 792.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 492.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 2000.00, 
+                "y": 47.50, 
+                "z": 192.50
+            }, 
+            "side": "Right"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1850.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1550.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1250.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 950.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 750.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 450.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 150.00, 
+                "y": 47.50, 
+                "z": 0.00
+            }, 
+            "side": "Bottom"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1850.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1550.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 1250.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 950.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 750.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 450.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }, 
+        {
+            "pn": "fastener_screw", 
+            "position": {
+                "x": 150.00, 
+                "y": 47.50, 
+                "z": 2685.00
+            }, 
+            "side": "Top"
+        }
+    ], 
+    "frameMaterial": "Dark", 
+    "frameSections": [
+        {
+            "length": 1988.00, 
+            "pn": "win_top_frame"
+        }, 
+        {
+            "length": 1988.00, 
+            "pn": "win_bottom_frame"
+        }, 
+        {
+            "length": 2669.00, 
+            "pn": "win_left_frame"
+        }, 
+        {
+            "length": 2669.00, 
+            "pn": "win_right_frame"
+        }
+    ], 
+    "glassType": "", 
+    "layoutName": "Double Fixed", 
+    "panels": [
+        {
+            "dimension": {
+                "x": 994.00, 
+                "y": 307.30, 
+                "z": 2645.00
+            }, 
+            "epdmFoamGasket": {
+                "length": 0.00, 
+                "pn": "epdm_foam_gasket"
+            }, 
+            "exteriorFrameCornerBracket": {
+                "amount": 0, 
+                "pn": "exterior_frame_corner_bracket"
+            }, 
+            "flatHeadScrew": {
+                "amount": 0, 
+                "pn": "flat_head_screw"
+            }, 
+            "frameCornerAlignmentPlate": {
+                "amount": 0, 
+                "pn": "frame_corner_alignment_plate"
+            }, 
+            "glassSettingBlock": [
+                {
+                    "pn": "glass_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }, 
+                {
+                    "pn": "glass_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "headExteriorClip": {
+                "length": 0.00, 
+                "pn": "top_exterior_clip"
+            }, 
+            "headFrameSealingGasket": {
+                "length": 0.00, 
+                "pn": "head_frame_sealing_gasket"
+            }, 
+            "headFrameSealingGasketClip": {
+                "length": 0.00, 
+                "pn": "head_frame_sealing_gasket_clip"
+            }, 
+            "headSashScrewCoverClip": {
+                "length": 0.00, 
+                "pn": "head_sash_screw_cover_clip"
+            }, 
+            "headSillFrameExteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Top"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Bottom"
+                }
+            ], 
+            "headSillFrameInteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Top"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Bottom"
+                }
+            ], 
+            "hingeSide": "None", 
+            "horseshoeShim": [
+                {
+                    "pn": "horseshoe_shim", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "side": "Left"
+                }, 
+                {
+                    "pn": "horseshoe_shim", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "side": "Right"
+                }
+            ], 
+            "insulatedGlassUnit": {
+                "height": 2594.00, 
+                "length": 964.00, 
+                "pn": "dual18l"
+            }, 
+            "interiorFrameCornerBracket": {
+                "amount": 0, 
+                "pn": "interior_frame_corner_bracket"
+            }, 
+            "jambExteriorClip": [
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_exterior_clip", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_exterior_clip", 
+                    "side": "Right"
+                }
+            ], 
+            "jambFrameExteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Right"
+                }
+            ], 
+            "jambFrameInteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Right"
+                }
+            ], 
+            "jambSashScrewCoverClip": [
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_sash_screw_cover_clip", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_sash_screw_cover_clip", 
+                    "side": "Right"
+                }
+            ], 
+            "position": {
+                "x": 6.00, 
+                "y": 0.00, 
+                "z": 0.00
+            }, 
+            "sashSections": [
+                {
+                    "length": 977.00, 
+                    "pn": "sash_fixed_top"
+                }, 
+                {
+                    "length": 977.00, 
+                    "pn": "sash_fixed_bottom"
+                }, 
+                {
+                    "length": 2607.00, 
+                    "pn": "sash_fixed_left"
+                }, 
+                {
+                    "length": 2607.00, 
+                    "pn": "sash_fixed_right"
+                }
+            ], 
+            "sashSettingBlock": [
+                {
+                    "pn": "sash_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "screwHoleCap": [
+                {
+                    "pn": "screw_hole_cap", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "sillExteriorClip": {
+                "length": 0.00, 
+                "pn": "bottom_exterior_clip", 
+                "position": {
+                    "x": 0.00, 
+                    "y": 0.00, 
+                    "z": 0.00
+                }
+            }, 
+            "socketHeadShoulderBolt": [
+                {
+                    "pn": "socket_head_shoulder_bolt", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }, 
+                {
+                    "pn": "socket_head_shoulder_bolt", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "weepCover": {
+                "length": 0.00, 
+                "pn": "weep_cover"
+            }
+        }, 
+        {
+            "dimension": {
+                "x": 994.00, 
+                "y": 307.30, 
+                "z": 2645.00
+            }, 
+            "epdmFoamGasket": {
+                "length": 0.00, 
+                "pn": "epdm_foam_gasket"
+            }, 
+            "exteriorFrameCornerBracket": {
+                "amount": 0, 
+                "pn": "exterior_frame_corner_bracket"
+            }, 
+            "flatHeadScrew": {
+                "amount": 0, 
+                "pn": "flat_head_screw"
+            }, 
+            "frameCornerAlignmentPlate": {
+                "amount": 0, 
+                "pn": "frame_corner_alignment_plate"
+            }, 
+            "glassSettingBlock": [
+                {
+                    "pn": "glass_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }, 
+                {
+                    "pn": "glass_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "headExteriorClip": {
+                "length": 0.00, 
+                "pn": "top_exterior_clip"
+            }, 
+            "headFrameSealingGasket": {
+                "length": 0.00, 
+                "pn": "head_frame_sealing_gasket"
+            }, 
+            "headFrameSealingGasketClip": {
+                "length": 0.00, 
+                "pn": "head_frame_sealing_gasket_clip"
+            }, 
+            "headSashScrewCoverClip": {
+                "length": 0.00, 
+                "pn": "head_sash_screw_cover_clip"
+            }, 
+            "headSillFrameExteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Top"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Bottom"
+                }
+            ], 
+            "headSillFrameInteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Top"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Bottom"
+                }
+            ], 
+            "hingeSide": "None", 
+            "horseshoeShim": [
+                {
+                    "pn": "horseshoe_shim", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "side": "Left"
+                }, 
+                {
+                    "pn": "horseshoe_shim", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }, 
+                    "side": "Right"
+                }
+            ], 
+            "insulatedGlassUnit": {
+                "height": 2594.00, 
+                "length": 964.00, 
+                "pn": "dual18l"
+            }, 
+            "interiorFrameCornerBracket": {
+                "amount": 0, 
+                "pn": "interior_frame_corner_bracket"
+            }, 
+            "jambExteriorClip": [
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_exterior_clip", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_exterior_clip", 
+                    "side": "Right"
+                }
+            ], 
+            "jambFrameExteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_exterior_gasket", 
+                    "side": "Right"
+                }
+            ], 
+            "jambFrameInteriorGasket": [
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "frame_interior_gasket", 
+                    "side": "Right"
+                }
+            ], 
+            "jambSashScrewCoverClip": [
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_sash_screw_cover_clip", 
+                    "side": "Left"
+                }, 
+                {
+                    "length": 0.00, 
+                    "pn": "jamb_sash_screw_cover_clip", 
+                    "side": "Right"
+                }
+            ], 
+            "position": {
+                "x": 1006.00, 
+                "y": 0.00, 
+                "z": 0.00
+            }, 
+            "sashSections": [
+                {
+                    "length": 977.00, 
+                    "pn": "sash_fixed_top"
+                }, 
+                {
+                    "length": 977.00, 
+                    "pn": "sash_fixed_bottom"
+                }, 
+                {
+                    "length": 2607.00, 
+                    "pn": "sash_fixed_left"
+                }, 
+                {
+                    "length": 2607.00, 
+                    "pn": "sash_fixed_right"
+                }
+            ], 
+            "sashSettingBlock": [
+                {
+                    "pn": "sash_setting_block", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "screwHoleCap": [
+                {
+                    "pn": "screw_hole_cap", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "sillExteriorClip": {
+                "length": 0.00, 
+                "pn": "bottom_exterior_clip", 
+                "position": {
+                    "x": 0.00, 
+                    "y": 0.00, 
+                    "z": 0.00
+                }
+            }, 
+            "socketHeadShoulderBolt": [
+                {
+                    "pn": "socket_head_shoulder_bolt", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }, 
+                {
+                    "pn": "socket_head_shoulder_bolt", 
+                    "position": {
+                        "x": 0.00, 
+                        "y": 0.00, 
+                        "z": 0.00
+                    }
+                }
+            ], 
+            "weepCover": {
+                "length": 0.00, 
+                "pn": "weep_cover"
+            }
+        }
+    ], 
+    "pn": "PN_Window_Double_Fixed", 
+    "position": {
+        "x": 1600.00, 
+        "y": 0.00, 
+        "z": 0.00
+    }, 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/window.json", 
+    "tileMaterial": "Light", 
+    "uuid": "32A5596E-4DAD-FB83-ED30-8BB7C4D5AF2F"
+}

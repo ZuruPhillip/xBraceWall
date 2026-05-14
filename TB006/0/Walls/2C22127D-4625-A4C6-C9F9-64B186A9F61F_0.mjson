@@ -1,0 +1,619 @@
+{
+    "aacDensity": 500.00, 
+    "aacSlices": [
+        {
+            "contour": [
+                {
+                    "x": 0.00, 
+                    "y": 0.00
+                }, 
+                {
+                    "x": 0.00, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 464.70, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 464.70, 
+                    "y": 0.00
+                }
+            ], 
+            "gluePn": null, 
+            "glueSegments": null, 
+            "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_s0", 
+            "pn": "10001", 
+            "sliceColumn": 0
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 464.70, 
+                    "y": 0.00
+                }, 
+                {
+                    "x": 464.70, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 929.30, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 929.30, 
+                    "y": 0.00
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 464.70, 
+                        "y": 2695.00
+                    }, 
+                    "startPoint": {
+                        "x": 464.70, 
+                        "y": 0.00
+                    }
+                }
+            ], 
+            "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_s1", 
+            "pn": "10001", 
+            "sliceColumn": 1
+        }, 
+        {
+            "contour": [
+                {
+                    "x": 929.30, 
+                    "y": 0.00
+                }, 
+                {
+                    "x": 929.30, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 1394.00, 
+                    "y": 2695.00
+                }, 
+                {
+                    "x": 1394.00, 
+                    "y": 0.00
+                }
+            ], 
+            "gluePn": "10021", 
+            "glueSegments": [
+                {
+                    "endPoint": {
+                        "x": 929.30, 
+                        "y": 2695.00
+                    }, 
+                    "startPoint": {
+                        "x": 929.30, 
+                        "y": 0.00
+                    }
+                }
+            ], 
+            "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_s2", 
+            "pn": "10001", 
+            "sliceColumn": 2
+        }
+    ], 
+    "aacWallElevation": {
+        "contour": [
+            {
+                "x": 0.00, 
+                "y": 0.00
+            }, 
+            {
+                "x": 0.00, 
+                "y": 2695.00
+            }, 
+            {
+                "x": 1394.00, 
+                "y": 2695.00
+            }, 
+            {
+                "x": 1394.00, 
+                "y": 0.00
+            }
+        ]
+    }, 
+    "bendingKeys": {
+        "pn": "10016", 
+        "points": [
+            {
+                "x": 1094.00, 
+                "y": 180.00, 
+                "z": 0.00
+            }, 
+            {
+                "x": 344.00, 
+                "y": 180.00, 
+                "z": 0.00
+            }
+        ]
+    }, 
+    "coreHeight": 2695.00, 
+    "coreThickness": 298.00, 
+    "faceFinishes": [
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.00
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": 294.00, 
+                            "y": 298.00, 
+                            "z": 0.00
+                        }, 
+                        {
+                            "x": 294.00, 
+                            "y": 298.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 1494.00, 
+                            "y": 298.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 1494.00, 
+                            "y": 298.00, 
+                            "z": 0.00
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 0.80, 
+                    "pn": "10019", 
+                    "thickness": 3.00
+                }, 
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.00, 
+                            "y": 298.00, 
+                            "z": 0.00
+                        }, 
+                        {
+                            "x": -100.00, 
+                            "y": 298.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 293.00, 
+                            "y": 298.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 293.00, 
+                            "y": 298.00, 
+                            "z": 0.00
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 0.80, 
+                    "pn": "10019", 
+                    "thickness": 3.00
+                }
+            ]
+        }, 
+        {
+            "beautySealant": {
+                "colour": "Grey", 
+                "size": 1.00
+            }, 
+            "finishes": [
+                {
+                    "artwork": null, 
+                    "contour": [
+                        {
+                            "x": -100.00, 
+                            "y": 0.00, 
+                            "z": 0.00
+                        }, 
+                        {
+                            "x": -100.00, 
+                            "y": 0.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 1494.00, 
+                            "y": 0.00, 
+                            "z": 2685.00
+                        }, 
+                        {
+                            "x": 1494.00, 
+                            "y": 0.00, 
+                            "z": 0.00
+                        }
+                    ], 
+                    "cutouts": null, 
+                    "glueThickness": 1.00, 
+                    "pn": "10019", 
+                    "thickness": 4.50
+                }
+            ]
+        }
+    ], 
+    "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_0", 
+    "mepCables": null, 
+    "mepDevices": null, 
+    "openingHoles": null, 
+    "pn": "10001", 
+    "rebars": {
+        "diameter": 6.00, 
+        "horizontalDepth": 26.00, 
+        "pn": "10015", 
+        "rods": [
+            {
+                "endPoint": {
+                    "x": 300.00, 
+                    "y": 32.00, 
+                    "z": 2689.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 300.00, 
+                    "y": 32.00, 
+                    "z": 0.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 600.00, 
+                    "y": 32.00, 
+                    "z": 2689.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 600.00, 
+                    "y": 32.00, 
+                    "z": 0.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 900.00, 
+                    "y": 32.00, 
+                    "z": 2689.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 900.00, 
+                    "y": 32.00, 
+                    "z": 0.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1200.00, 
+                    "y": 32.00, 
+                    "z": 2689.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 1200.00, 
+                    "y": 32.00, 
+                    "z": 0.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 2500.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 2500.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 2200.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 2200.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 1900.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 1900.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 1600.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 1600.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 1300.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 1300.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 1000.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 1000.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 700.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 700.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 400.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 400.00
+                }, 
+                "startThreading": false
+            }, 
+            {
+                "endPoint": {
+                    "x": 1394.00, 
+                    "y": 26.00, 
+                    "z": 100.00
+                }, 
+                "endThreading": false, 
+                "startPoint": {
+                    "x": 0.00, 
+                    "y": 26.00, 
+                    "z": 100.00
+                }, 
+                "startThreading": false
+            }
+        ], 
+        "steelGrade": "HRB400E", 
+        "verticalDepth": 32.00
+    }, 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/wall_aac.json", 
+    "steelFrameColumns": [
+        {
+            "baseBracket": {
+                "pn": "10006"
+            }, 
+            "endPoint": {
+                "x": -50.00, 
+                "y": 50.00, 
+                "z": 2664.00
+            }, 
+            "height": 2612.00, 
+            "pn": "10003", 
+            "profileSize": 100.00, 
+            "profileThickness": 5.00, 
+            "rotation": 0.00, 
+            "startPoint": {
+                "x": -50.00, 
+                "y": 50.00, 
+                "z": 52.00
+            }, 
+            "topBracket": {
+                "isFlipped": false, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }, 
+        {
+            "baseBracket": {
+                "pn": "10006"
+            }, 
+            "endPoint": {
+                "x": 1444.00, 
+                "y": 50.00, 
+                "z": 2664.00
+            }, 
+            "height": 2612.00, 
+            "pn": "10003", 
+            "profileSize": 100.00, 
+            "profileThickness": 5.00, 
+            "rotation": 0.00, 
+            "startPoint": {
+                "x": 1444.00, 
+                "y": 50.00, 
+                "z": 52.00
+            }, 
+            "topBracket": {
+                "isFlipped": false, 
+                "pinNumber": 6, 
+                "pinPn": "10088", 
+                "pn": "10005"
+            }
+        }
+    ], 
+    "tensionTie": {
+        "diameter": 6.00, 
+        "length": 1244.00, 
+        "pn": "10013"
+    }, 
+    "topPlate": [
+        {
+            "endPoint": {
+                "x": 1494.00, 
+                "y": 0.00, 
+                "z": 2689.00
+            }, 
+            "ferruleHoles": {
+                "ferrulePn": "10018", 
+                "holeDiameter": 6.00, 
+                "points": [
+                    {
+                        "x": 300.00, 
+                        "y": 32.00, 
+                        "z": 2689.00
+                    }, 
+                    {
+                        "x": 600.00, 
+                        "y": 32.00, 
+                        "z": 2689.00
+                    }, 
+                    {
+                        "x": 900.00, 
+                        "y": 32.00, 
+                        "z": 2689.00
+                    }, 
+                    {
+                        "x": 1200.00, 
+                        "y": 32.00, 
+                        "z": 2689.00
+                    }
+                ]
+            }, 
+            "pn": "10023", 
+            "position": {
+                "x": -100.00, 
+                "y": 240.00, 
+                "z": 2689.00
+            }, 
+            "profileThickness": 6.00, 
+            "startPoint": {
+                "x": -100.00, 
+                "y": 0.00, 
+                "z": 2689.00
+            }, 
+            "studs": {
+                "holeDiameter": 12.00, 
+                "pn": "10014", 
+                "points": [
+                    {
+                        "x": 1140.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 1040.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 940.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 640.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 490.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 390.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }, 
+                    {
+                        "x": 290.00, 
+                        "y": 175.00, 
+                        "z": 2695.00
+                    }
+                ]
+            }, 
+            "width": 240.00
+        }
+    ], 
+    "waffleSlabLinks": [
+        {
+            "side": "Bottom", 
+            "uuid": "69B02631-4C20-0ABB-222B-3D81E2896437"
+        }, 
+        {
+            "side": "Top", 
+            "uuid": "693AE041-41C2-6B08-D460-2AA8362C0B5D"
+        }
+    ], 
+    "xps": [
+        {
+            "height": 2695.00, 
+            "pn": "10026", 
+            "position": {
+                "x": 0.00, 
+                "y": 100.00, 
+                "z": 0.00
+            }
+        }, 
+        {
+            "height": 2695.00, 
+            "pn": "10026", 
+            "position": {
+                "x": 1494.00, 
+                "y": 100.00, 
+                "z": 0.00
+            }
+        }
+    ]
+}

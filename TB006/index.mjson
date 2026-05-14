@@ -1,0 +1,129 @@
+{
+    "floors": {
+        "0": {
+            "columns": [], 
+            "doors": [
+                {
+                    "file": "0/Doors/Door_3BFDD05E-40FC-3417-8E49-2D882D59E7C6.mjson", 
+                    "id": "3BFDD05E-40FC-3417-8E49-2D882D59E7C6"
+                }
+            ], 
+            "electrical": [], 
+            "furniture": [], 
+            "hvac": [], 
+            "plumbing": [], 
+            "propping": [
+                {
+                    "file": "0/Propping/BACD10F24EF66512A9DADABC30846C40_0.mjson", 
+                    "id": "BACD10F24EF66512A9DADABC30846C40_0"
+                }
+            ], 
+            "stairs": [], 
+            "waffles": [
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437"
+                }, 
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437-sl0.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437-sl0"
+                }, 
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437-sl1.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437-sl1"
+                }, 
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437-sl2.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437-sl2"
+                }, 
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437-sl3.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437-sl3"
+                }, 
+                {
+                    "file": "0/Waffles/ECEntity_MIProductionSlabArchetype_2147469651/69B02631-4C20-0ABB-222B-3D81E2896437-SlabEdge.mjson", 
+                    "id": "69B02631-4C20-0ABB-222B-3D81E2896437-SlabEdge"
+                }
+            ], 
+            "walls": [
+                {
+                    "file": "0/Walls/2C22127D-4625-A4C6-C9F9-64B186A9F61F_0.mjson", 
+                    "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_0"
+                }, 
+                {
+                    "file": "0/Walls/2C22127D-4625-A4C6-C9F9-64B186A9F61F_1.mjson", 
+                    "id": "2C22127D-4625-A4C6-C9F9-64B186A9F61F_1"
+                }, 
+                {
+                    "file": "0/Walls/04D635FD-4430-9E4C-DFE8-66805449F046_0.mjson", 
+                    "id": "04D635FD-4430-9E4C-DFE8-66805449F046_0"
+                }, 
+                {
+                    "file": "0/Walls/04D635FD-4430-9E4C-DFE8-66805449F046_1.mjson", 
+                    "id": "04D635FD-4430-9E4C-DFE8-66805449F046_1"
+                }, 
+                {
+                    "file": "0/Walls/18355022-4AE9-1867-DB29-958D2239D2F2_0.mjson", 
+                    "id": "18355022-4AE9-1867-DB29-958D2239D2F2_0"
+                }, 
+                {
+                    "file": "0/Walls/18355022-4AE9-1867-DB29-958D2239D2F2_1.mjson", 
+                    "id": "18355022-4AE9-1867-DB29-958D2239D2F2_1"
+                }, 
+                {
+                    "file": "0/Walls/D887AB57-4666-B629-A081-688527919886_0.mjson", 
+                    "id": "D887AB57-4666-B629-A081-688527919886_0"
+                }, 
+                {
+                    "file": "0/Walls/D887AB57-4666-B629-A081-688527919886_1.mjson", 
+                    "id": "D887AB57-4666-B629-A081-688527919886_1"
+                }
+            ], 
+            "windows": [
+                {
+                    "file": "0/Windows/Window_32A5596E-4DAD-FB83-ED30-8BB7C4D5AF2F.mjson", 
+                    "id": "32A5596E-4DAD-FB83-ED30-8BB7C4D5AF2F"
+                }
+            ]
+        }, 
+        "1": {
+            "columns": [], 
+            "doors": [], 
+            "electrical": [], 
+            "furniture": [], 
+            "hvac": [], 
+            "plumbing": [], 
+            "propping": [], 
+            "stairs": [], 
+            "waffles": [
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D"
+                }, 
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D-sl0.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D-sl0"
+                }, 
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D-sl1.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D-sl1"
+                }, 
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D-sl2.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D-sl2"
+                }, 
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D-sl3.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D-sl3"
+                }, 
+                {
+                    "file": "1/Waffles/ECEntity_MIProductionSlabArchetype_2147469961/693AE041-41C2-6B08-D460-2AA8362C0B5D-SlabEdge.mjson", 
+                    "id": "693AE041-41C2-6B08-D460-2AA8362C0B5D-SlabEdge"
+                }
+            ], 
+            "walls": [], 
+            "windows": []
+        }
+    }, 
+    "schema": "https://proxy.zurutech.online/mjson-schema-public/schemas/v0.0.0/index.json"
+}
