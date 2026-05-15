@@ -67,13 +67,18 @@ namespace CncWallStation.ViewModels
         private ObservableCollection<int> _availableFloors = new();
 
         [ObservableProperty]
-        private ObservableCollection<ProcessStatus> _selectedStatuses = new();
+        private ProcessStatus? _filterStatus;
 
         [ObservableProperty]
-        private ObservableCollection<ProcessPriority> _selectedPriorities = new();
+        private ProcessPriority? _filterPriority;
 
         [ObservableProperty]
-        private ObservableCollection<PipelineStage> _selectedPipelineStages = new();
+        private PipelineStage? _filterPipelineStage;
+
+        [ObservableProperty]
+        private bool _filterIsLatest = true;
+
+        public List<bool> IsLatestOptions { get; } = new() { true, false };
 
         [ObservableProperty]
         private DateTime? _filterDateFrom;
@@ -112,7 +117,7 @@ namespace CncWallStation.ViewModels
 
         // ==================== 可用选项列表（用于下拉筛选） ====================
         public List<ProcessStatus> AllStatuses { get; } = new()
-        { ProcessStatus.待加工, ProcessStatus.加工中, ProcessStatus.已完成, ProcessStatus.异常 };
+        { ProcessStatus.待校验, ProcessStatus.待加工, ProcessStatus.加工中, ProcessStatus.已完成, ProcessStatus.异常 };
 
         public List<ProcessPriority> AllPriorities { get; } = new()
         { ProcessPriority.高, ProcessPriority.中, ProcessPriority.低 };
@@ -278,7 +283,7 @@ namespace CncWallStation.ViewModels
                             BimJsonData = jsonContent,
                             PipelineStage = PipelineStage.Imported,
                             Priority = (int)MapFloorToPriority(floor),
-                            Status = 0,
+                            Status = (int)ProcessStatus.待校验,
                             ImportTime = DateTime.Now,
                             UpdatedAt = DateTime.Now,
                             UpdatedBy = importedBy
@@ -657,9 +662,10 @@ namespace CncWallStation.ViewModels
             SearchHouseNumber = string.Empty;
             SearchWallId = string.Empty;
             FilterFloor = null;
-            SelectedStatuses.Clear();
-            SelectedPriorities.Clear();
-            SelectedPipelineStages.Clear();
+            FilterStatus = null;
+            FilterPriority = null;
+            FilterPipelineStage = null;
+            FilterIsLatest = true;
             FilterDateFrom = null;
             FilterDateTo = null;
             CurrentPage = 1;
@@ -720,16 +726,16 @@ namespace CncWallStation.ViewModels
         {
             try
             {
-                var pipelineStages = SelectedPipelineStages.Any()
-                    ? SelectedPipelineStages.ToList()
+                var pipelineStages = FilterPipelineStage.HasValue
+                    ? new List<PipelineStage> { FilterPipelineStage.Value }
                     : null;
 
-                var statuses = SelectedStatuses.Any()
-                    ? SelectedStatuses.Select(s => (int)s).ToList()
+                var statuses = FilterStatus.HasValue
+                    ? new List<int> { (int)FilterStatus.Value }
                     : null;
 
-                var priorities = SelectedPriorities.Any()
-                    ? SelectedPriorities.Select(p => (int)p).ToList()
+                var priorities = FilterPriority.HasValue
+                    ? new List<int> { (int)FilterPriority.Value }
                     : null;
 
                 var (items, totalCount) = await _wallRepo.QueryWallsAsync(
@@ -745,7 +751,7 @@ namespace CncWallStation.ViewModels
                     sortAscending: SortAscending,
                     page: CurrentPage,
                     pageSize: PageSize,
-                    latestOnly: true);
+                    latestOnly: FilterIsLatest);
 
                 // 映射 Entity → Display Model
                 _filteredItems = items.Select(MapToWallListItem).ToList();
@@ -796,6 +802,7 @@ namespace CncWallStation.ViewModels
                 PipelineStage = entity.PipelineStage,
                 Priority = (ProcessPriority)entity.Priority,
                 Status = (ProcessStatus)entity.Status,
+                Version = entity.Project?.Version ?? 0,
                 UpdatedAt = entity.UpdatedAt,
                 UpdatedBy = entity.UpdatedBy
             };
@@ -869,12 +876,13 @@ namespace CncWallStation.ViewModels
         private static async Task ExportCsvAsync(string filePath, List<WallListItem> data)
         {
             await using var writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8);
-            await writer.WriteLineAsync("房屋编号,楼层,墙体ID,导入时间,管线阶段,加工优先级,加工状态");
+            await writer.WriteLineAsync("房屋编号,楼层,墙体ID,版本号,导入时间,管线阶段,加工优先级,加工状态");
 
             foreach (var item in data)
             {
                 await writer.WriteLineAsync(
                     $"\"{item.HouseNumber}\",{item.Floor},\"{item.WallId}\"," +
+                    $"{item.Version}," +
                     $"\"{item.ImportTime:yyyy-MM-dd HH:mm:ss}\",{item.PipelineStageText},{item.Priority},{item.Status}");
             }
         }
@@ -887,6 +895,7 @@ namespace CncWallStation.ViewModels
                 x.HouseNumber,
                 x.Floor,
                 x.WallId,
+                x.Version,
                 ImportTime = x.ImportTime.ToString("yyyy-MM-dd HH:mm:ss"),
                 PipelineStage = x.PipelineStageText,
                 Priority = x.Priority.ToString(),

@@ -16,6 +16,7 @@
 		<local:StatusToTextConverter x:Key="StatusToTextConverter"/>
 		<local:PipelineStageToBrushConverter x:Key="PipelineStageToBrushConverter"/>
 		<local:PipelineStageToTextConverter x:Key="PipelineStageToTextConverter"/>
+		<local:IsLatestToTextConverter x:Key="IsLatestToTextConverter"/>
 		<local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
 		<local:BoolInvertConverter x:Key="BoolInvertConverter"/>
 
@@ -158,6 +159,15 @@
 						<Button.ContextMenu>
 							<ContextMenu>
 								<MenuItem Command="{Binding ModifyStatusCommand}"
+										  CommandParameter="{x:Static models:ProcessStatus.待校验}">
+									<MenuItem.Header>
+										<StackPanel Orientation="Horizontal">
+											<Border Width="8" Height="8" CornerRadius="4" Background="#E67E22" Margin="0,0,6,0"/>
+											<TextBlock Text="待校验" Foreground="#E67E22" FontWeight="SemiBold"/>
+										</StackPanel>
+									</MenuItem.Header>
+								</MenuItem>
+								<MenuItem Command="{Binding ModifyStatusCommand}"
 										  CommandParameter="{x:Static models:ProcessStatus.待加工}">
 									<MenuItem.Header>
 										<StackPanel Orientation="Horizontal">
@@ -243,68 +253,65 @@
 							 Width="140" Height="28"/>
 				</StackPanel>
 
-				<!-- 加工状态 -->
-				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
-					<TextBlock Text="状态:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
-					<ListBox ItemsSource="{Binding AllStatuses}"
-							 SelectionMode="Extended"
-							 Width="240" Height="28"
-							 SelectionChanged="StatusListBox_SelectionChanged">
-						<ListBox.ItemsPanel>
-							<ItemsPanelTemplate>
-								<StackPanel Orientation="Horizontal"/>
-							</ItemsPanelTemplate>
-						</ListBox.ItemsPanel>
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource StatusToTextConverter}}"
-										   FontSize="11" Margin="3,0"/>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-				</StackPanel>
+			<!-- 加工状态 -->
+			<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+				<TextBlock Text="状态:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+				<ComboBox ItemsSource="{Binding AllStatuses}"
+						  SelectedValue="{Binding FilterStatus}"
+						  Width="110" Height="28"
+						  SelectionChanged="StatusComboBox_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Converter={StaticResource StatusToTextConverter}}" FontSize="12"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+			</StackPanel>
 
-				<!-- 加工优先级 -->
-				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
-					<TextBlock Text="优先级:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
-					<ListBox ItemsSource="{Binding AllPriorities}"
-							 SelectionMode="Extended"
-							 Width="140" Height="28"
-							 SelectionChanged="PriorityListBox_SelectionChanged">
-						<ListBox.ItemsPanel>
-							<ItemsPanelTemplate>
-								<StackPanel Orientation="Horizontal"/>
-							</ItemsPanelTemplate>
-						</ListBox.ItemsPanel>
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource PriorityToTextConverter}}"
-										   FontSize="11" Margin="3,0"/>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-				</StackPanel>
+			<!-- 加工优先级 -->
+			<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+				<TextBlock Text="优先级:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+				<ComboBox ItemsSource="{Binding AllPriorities}"
+						  SelectedValue="{Binding FilterPriority}"
+						  Width="90" Height="28"
+						  SelectionChanged="PriorityComboBox_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Converter={StaticResource PriorityToTextConverter}}" FontSize="12"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+			</StackPanel>
 
-				<!-- 管线阶段 -->
-				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
-					<TextBlock Text="管线:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
-					<ListBox ItemsSource="{Binding AllPipelineStages}"
-							 SelectionMode="Extended"
-							 Width="100" Height="28"
-							 SelectionChanged="PipelineStageListBox_SelectionChanged">
-						<ListBox.ItemsPanel>
-							<ItemsPanelTemplate>
-								<StackPanel Orientation="Horizontal"/>
-							</ItemsPanelTemplate>
-						</ListBox.ItemsPanel>
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource PipelineStageToTextConverter}}"
-										   FontSize="10" Margin="2,0"/>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-				</StackPanel>
+			<!-- 管线状态 -->
+			<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+				<TextBlock Text="管线状态:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+				<ComboBox ItemsSource="{Binding AllPipelineStages}"
+						  SelectedValue="{Binding FilterPipelineStage}"
+						  Width="120" Height="28"
+						  SelectionChanged="PipelineStageComboBox_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Converter={StaticResource PipelineStageToTextConverter}}" FontSize="11"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+			</StackPanel>
+
+			<!-- 版本筛选 -->
+			<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+				<TextBlock Text="版本:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+				<ComboBox ItemsSource="{Binding IsLatestOptions}"
+						  SelectedValue="{Binding FilterIsLatest}"
+						  Width="110" Height="28"
+						  SelectionChanged="IsLatestComboBox_SelectionChanged">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Converter={StaticResource IsLatestToTextConverter}}" FontSize="12"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+			</StackPanel>
 
 				<!-- 时间范围 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
@@ -436,6 +443,24 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
+				<!-- 版本号 -->
+				<DataGridTemplateColumn Header="版本号" Width="80">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="版本号 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="Version"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Version}" HorizontalAlignment="Center"
+									  FontSize="12" FontWeight="SemiBold"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
 				<!-- 导入时间 -->
 				<DataGridTemplateColumn Header="导入时间" Width="160">
 					<DataGridTemplateColumn.HeaderTemplate>
@@ -470,11 +495,13 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 管线阶段 -->
-				<DataGridTemplateColumn Header="管线阶段" Width="130">
+				<!-- 管线状态 -->
+				<DataGridTemplateColumn Header="管线状态" Width="130">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="管线阶段" Background="Transparent" BorderThickness="0"
+							<Button Content="管线状态 ⬍" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="PipelineStage"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.HeaderTemplate>

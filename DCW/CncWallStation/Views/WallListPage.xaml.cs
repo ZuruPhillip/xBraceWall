@@ -150,37 +150,28 @@ namespace CncWallStation.Views
 			return null;
 		}
 
-		/// <summary>状态多选 ListBox 变更</summary>
-		private void StatusListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		/// <summary>状态 ComboBox 变更 → 自动搜索</summary>
+		private void StatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (sender is ListBox lb)
-			{
-				_viewModel.SelectedStatuses = new System.Collections.ObjectModel.ObservableCollection<ProcessStatus>(
-					lb.SelectedItems.Cast<ProcessStatus>());
-				_viewModel.SearchCommand.Execute(null);
-			}
+			_viewModel.SearchCommand.Execute(null);
 		}
 
-		/// <summary>优先级多选 ListBox 变更</summary>
-		private void PriorityListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		/// <summary>优先级 ComboBox 变更 → 自动搜索</summary>
+		private void PriorityComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (sender is ListBox lb)
-			{
-				_viewModel.SelectedPriorities = new System.Collections.ObjectModel.ObservableCollection<ProcessPriority>(
-					lb.SelectedItems.Cast<ProcessPriority>());
-				_viewModel.SearchCommand.Execute(null);
-			}
+			_viewModel.SearchCommand.Execute(null);
 		}
 
-		/// <summary>管线阶段多选 ListBox 变更</summary>
-		private void PipelineStageListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		/// <summary>管线状态 ComboBox 变更 → 自动搜索</summary>
+		private void PipelineStageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (sender is ListBox lb)
-			{
-				_viewModel.SelectedPipelineStages = new System.Collections.ObjectModel.ObservableCollection<PipelineStage>(
-					lb.SelectedItems.Cast<PipelineStage>());
-				_viewModel.SearchCommand.Execute(null);
-			}
+			_viewModel.SearchCommand.Execute(null);
+		}
+
+		/// <summary>版本筛选 ComboBox 变更 → 自动搜索</summary>
+		private void IsLatestComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			_viewModel.SearchCommand.Execute(null);
 		}
 
 		/// <summary>每页条数变更</summary>
@@ -254,6 +245,7 @@ namespace CncWallStation.Views
 		{
 			return value is ProcessStatus s ? s switch
 			{
+				ProcessStatus.待校验 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E67E22")),
 				ProcessStatus.待加工 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#95A5A6")),
 				ProcessStatus.加工中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498DB")),
 				ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")),
@@ -273,6 +265,7 @@ namespace CncWallStation.Views
 		{
 			return value is ProcessStatus s ? s switch
 			{
+				ProcessStatus.待校验 => "待校验",
 				ProcessStatus.待加工 => "待加工",
 				ProcessStatus.加工中 => "加工中",
 				ProcessStatus.已完成 => "已完成",
@@ -331,6 +324,18 @@ namespace CncWallStation.Views
 				PipelineStage.Ready => "待加工",
 				_ => "未知"
 			} : "未知";
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> throw new NotImplementedException();
+	}
+
+	/// <summary>是否最新版本 → 中文</summary>
+	public class IsLatestToTextConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value is bool b ? b ? "仅最新版本" : "不限" : "不限";
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

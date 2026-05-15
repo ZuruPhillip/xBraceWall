@@ -18,10 +18,11 @@ namespace CncWallStation.Models
 	/// </summary>
 	public enum ProcessStatus
 	{
-		待加工 = 0,
-		加工中 = 1,
-		已完成 = 2,
-		异常 = 3
+		待校验 = 0,
+		待加工 = 1,
+		加工中 = 2,
+		已完成 = 3,
+		异常 = 4
 	}
 
 	/// <summary>
@@ -74,7 +75,10 @@ namespace CncWallStation.Models
 		public ProcessPriority Priority { get; set; } = ProcessPriority.中;
 
 		/// <summary>加工状态</summary>
-		public ProcessStatus Status { get; set; } = ProcessStatus.待加工;
+		public ProcessStatus Status { get; set; } = ProcessStatus.待校验;
+
+		/// <summary>版本号（来自所属项目批次）</summary>
+		public int Version { get; set; }
 
 		/// <summary>最后更新时间</summary>
 		public DateTime UpdatedAt { get; set; } = DateTime.Now;

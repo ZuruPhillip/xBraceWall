@@ -152,6 +152,9 @@ namespace CncWallStation.Repositories
                 "pipelinestage" => sortAscending
                     ? query.OrderBy(w => w.PipelineStage)
                     : query.OrderByDescending(w => w.PipelineStage),
+                "version" => sortAscending
+                    ? query.OrderBy(w => w.Project.Version)
+                    : query.OrderByDescending(w => w.Project.Version),
                 _ => sortAscending
                     ? query.OrderByDescending(w => w.ImportTime)
                     : query.OrderBy(w => w.ImportTime)
@@ -161,6 +164,7 @@ namespace CncWallStation.Repositories
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Include(w => w.Project)
                 .Include(w => w.ValidationErrors)
                 .AsNoTracking()
                 .ToListAsync();

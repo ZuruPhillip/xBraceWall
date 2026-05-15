@@ -1,3 +1,4 @@
+using CncWallStation.Models;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
 using Microsoft.Extensions.Logging;
@@ -171,7 +172,7 @@ namespace CncWallStation.Services
 
             // ========== 全部通过 → Ready ==========
             await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.Ready);
-            await _wallRepo.UpdateStatusAsync(wallId, 0, wall.UpdatedBy ?? Environment.UserName); // 0 = 待加工
+            await _wallRepo.UpdateStatusAsync(wallId, (int)ProcessStatus.待加工, wall.UpdatedBy ?? Environment.UserName);
 
             result.FinalStage = PipelineStage.Ready;
             result.MomJsonData = convertResult.MomJsonData;
