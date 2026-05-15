@@ -14,6 +14,8 @@
 		<local:PriorityToTextConverter x:Key="PriorityToTextConverter"/>
 		<local:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
 		<local:StatusToTextConverter x:Key="StatusToTextConverter"/>
+		<local:PipelineStageToBrushConverter x:Key="PipelineStageToBrushConverter"/>
+		<local:PipelineStageToTextConverter x:Key="PipelineStageToTextConverter"/>
 		<local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
 		<local:BoolInvertConverter x:Key="BoolInvertConverter"/>
 
@@ -64,6 +66,30 @@
 				</Border>
 			</Border>
 		</DataTemplate>
+
+		<!-- 管线阶段 Tag 模板（左色条 + 半透明底 + 深色文字） -->
+		<DataTemplate x:Key="PipelineStageTagTemplate">
+			<Border CornerRadius="3" Margin="2" Background="{Binding PipelineStage, Converter={StaticResource PipelineStageToBrushConverter}}"
+					Opacity="0.20">
+				<Border CornerRadius="3" Margin="0">
+					<Border.Background>
+						<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+							<GradientStop Color="#00000000" Offset="0"/>
+							<GradientStop Color="#10000000" Offset="1"/>
+						</LinearGradientBrush>
+					</Border.Background>
+					<DockPanel LastChildFill="True">
+						<Border Width="3" DockPanel.Dock="Left"
+								Background="{Binding PipelineStage, Converter={StaticResource PipelineStageToBrushConverter}}"
+								CornerRadius="3,0,0,3"/>
+						<TextBlock Text="{Binding PipelineStageText}"
+								   Foreground="{Binding PipelineStage, Converter={StaticResource PipelineStageToBrushConverter}}"
+								   FontSize="12" FontWeight="SemiBold"
+								   Padding="6,2" VerticalAlignment="Center"/>
+					</DockPanel>
+				</Border>
+			</Border>
+		</DataTemplate>
 	</Page.Resources>
 
 	<Grid>
@@ -83,6 +109,12 @@
 							Command="{Binding ImportCommand}"
 							Width="110" Height="32" Margin="0,0,10,0"
 							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"/>
+
+					<Button Content="🚀 执行管线"
+							Command="{Binding ExecutePipelineCommand}"
+							Width="100" Height="32" Margin="0,0,10,0"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
+							ToolTip="对选中墙体依次执行 校验Bim→转换→校验Mom，全部通过后进入待加工状态"/>
 
 					<Separator Margin="5,4"/>
 
@@ -253,6 +285,27 @@
 					</ListBox>
 				</StackPanel>
 
+				<!-- 管线阶段 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
+					<TextBlock Text="管线:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
+					<ListBox ItemsSource="{Binding AllPipelineStages}"
+							 SelectionMode="Extended"
+							 Width="100" Height="28"
+							 SelectionChanged="PipelineStageListBox_SelectionChanged">
+						<ListBox.ItemsPanel>
+							<ItemsPanelTemplate>
+								<StackPanel Orientation="Horizontal"/>
+							</ItemsPanelTemplate>
+						</ListBox.ItemsPanel>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Converter={StaticResource PipelineStageToTextConverter}}"
+										   FontSize="10" Margin="2,0"/>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</StackPanel>
+
 				<!-- 时间范围 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,15,4">
 					<TextBlock Text="时间:" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="13"/>
@@ -299,6 +352,9 @@
 				<ContextMenu>
 					<MenuItem Header="📋 复制" Click="ContextMenu_CopyCell"
 							  InputGestureText="Ctrl+C"/>
+					<Separator/>
+					<MenuItem Header="🔍 查看详情" Click="ContextMenu_ViewDetail"/>
+					<MenuItem Header="✏ 编辑 JSON" Click="ContextMenu_EditJson"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 
@@ -410,6 +466,30 @@
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<ContentPresenter ContentTemplate="{StaticResource PriorityTagTemplate}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 管线阶段 -->
+				<DataGridTemplateColumn Header="管线阶段" Width="130">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="管线阶段" Background="Transparent" BorderThickness="0"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<StackPanel>
+								<ContentPresenter ContentTemplate="{StaticResource PipelineStageTagTemplate}"/>
+								<TextBlock Text="{Binding ValidationErrorSummary}"
+										   FontSize="9" Foreground="#E74C3C"
+										   TextTrimming="CharacterEllipsis"
+										   MaxWidth="120"
+										   Visibility="{Binding ValidationErrorSummary, Converter={StaticResource BoolToVisConverter}}"
+										   ToolTip="{Binding ValidationErrorSummary}"
+										   Margin="2,0,0,0"/>
+							</StackPanel>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>

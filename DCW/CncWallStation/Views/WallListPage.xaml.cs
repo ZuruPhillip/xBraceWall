@@ -8,6 +8,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CncWallStation.Models;
+using CncWallStation.Models.Enums;
 using CncWallStation.ViewModels;
 
 namespace CncWallStation.Views
@@ -114,22 +115,25 @@ namespace CncWallStation.Views
 			}), DispatcherPriority.Background);
 		}
 
-		private static string PriorityToText(ProcessPriority p) => p switch
+		/// <summary>右键菜单 → 查看详情</summary>
+		private void ContextMenu_ViewDetail(object sender, RoutedEventArgs e)
 		{
-			ProcessPriority.高 => "高",
-			ProcessPriority.中 => "中",
-			ProcessPriority.低 => "低",
-			_ => "未知"
-		};
+			if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+				return;
 
-		private static string StatusToText(ProcessStatus s) => s switch
+			if (dg.SelectedItem is WallListItem item)
+				_viewModel.ViewDetailCommand.Execute(item);
+		}
+
+		/// <summary>右键菜单 → 编辑 JSON（异常状态下可编辑）</summary>
+		private void ContextMenu_EditJson(object sender, RoutedEventArgs e)
 		{
-			ProcessStatus.待加工 => "待加工",
-			ProcessStatus.加工中 => "加工中",
-			ProcessStatus.已完成 => "已完成",
-			ProcessStatus.异常 => "异常",
-			_ => "未知"
-		};
+			if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+				return;
+
+			if (dg.SelectedItem is WallListItem item)
+				_viewModel.EditJsonDataCommand.Execute(item);
+		}
 
 		/// <summary>在视觉树中查找指定类型的子元素</summary>
 		private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
@@ -168,13 +172,24 @@ namespace CncWallStation.Views
 			}
 		}
 
+		/// <summary>管线阶段多选 ListBox 变更</summary>
+		private void PipelineStageListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (sender is ListBox lb)
+			{
+				_viewModel.SelectedPipelineStages = new System.Collections.ObjectModel.ObservableCollection<PipelineStage>(
+					lb.SelectedItems.Cast<PipelineStage>());
+				_viewModel.SearchCommand.Execute(null);
+			}
+		}
+
 		/// <summary>每页条数变更</summary>
-		private void PageSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private async void PageSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (sender is ComboBox cb && cb.SelectedItem is int size)
 			{
 				_viewModel.PageSize = size;
-				_viewModel.ApplyFilters();
+				await _viewModel.ApplyFiltersAsync();
 			}
 		}
 
@@ -270,13 +285,71 @@ namespace CncWallStation.Views
 			=> throw new NotImplementedException();
 	}
 
+	/// <summary>管线阶段 → 画刷</summary>
+	public class PipelineStageToBrushConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value is PipelineStage s ? s switch
+			{
+				PipelineStage.Imported => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#95A5A6")),
+				PipelineStage.ValidatingBim => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8E44AD")),
+				PipelineStage.BimValid => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2980B9")),
+				PipelineStage.BimInvalid => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+				PipelineStage.Converting => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F39C12")),
+				PipelineStage.ConversionFailed => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+				PipelineStage.Converted => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")),
+				PipelineStage.ValidatingMom => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8E44AD")),
+				PipelineStage.MomValid => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2980B9")),
+				PipelineStage.MomInvalid => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+				PipelineStage.Ready => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#16A085")),
+				_ => new SolidColorBrush(Colors.Gray)
+			} : new SolidColorBrush(Colors.Gray);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> throw new NotImplementedException();
+	}
+
+	/// <summary>管线阶段 → 中文</summary>
+	public class PipelineStageToTextConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value is PipelineStage s ? s switch
+			{
+				PipelineStage.Imported => "已导入",
+				PipelineStage.ValidatingBim => "校验Bim中",
+				PipelineStage.BimValid => "Bim校验通过",
+				PipelineStage.BimInvalid => "Bim校验失败",
+				PipelineStage.Converting => "转换中",
+				PipelineStage.ConversionFailed => "转换失败",
+				PipelineStage.Converted => "已转换",
+				PipelineStage.ValidatingMom => "校验Mom中",
+				PipelineStage.MomValid => "Mom校验通过",
+				PipelineStage.MomInvalid => "Mom校验失败",
+				PipelineStage.Ready => "待加工",
+				_ => "未知"
+			} : "未知";
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> throw new NotImplementedException();
+	}
+
 	/// <summary>Bool → Visibility</summary>
 	public class BoolToVisibilityConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			var boolVal = value is bool b && b;
-			if (parameter is string s && s == "invert")
+			var boolVal = value switch
+			{
+				bool b => b,
+				string s => !string.IsNullOrEmpty(s),
+				_ => value != null
+			};
+
+			if (parameter is string p && p == "invert")
 				boolVal = !boolVal;
 			return boolVal ? Visibility.Visible : Visibility.Collapsed;
 		}
