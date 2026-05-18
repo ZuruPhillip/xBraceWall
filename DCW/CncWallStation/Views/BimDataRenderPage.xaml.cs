@@ -7,24 +7,25 @@ namespace CncWallStation.Views
 {
     /// <summary>
     /// BimDataRenderPage.xaml 的交互逻辑
-    /// - 初始化 WebView2
-    /// - 向 ViewModel 注入 JS 执行委托
-    /// - 通过 MVVM 命令驱动页面行为
+    /// - 通过 DI 注入 ViewModel
+    /// - 管理 WebView2 生命周期
+    /// - 分发 HTML postMessage 到 ViewModel
     /// </summary>
     public partial class BimDataRenderPage : Page
     {
         private readonly BimDataRenderViewModel _viewModel;
 
-        public BimDataRenderPage()
+        /// <summary>
+        /// 构造函数（通过 DI 注入 ViewModel）
+        /// </summary>
+        public BimDataRenderPage(BimDataRenderViewModel viewModel)
         {
             InitializeComponent();
 
-            // 创建 ViewModel 并绑定
-            _viewModel = new BimDataRenderViewModel();
+            _viewModel = viewModel;
             DataContext = _viewModel;
 
             // ── 向 ViewModel 注入 WebView2 功能委托 ──
-            // ViewModel 不直接持有 WebView2，而是通过委托调用
 
             // 注入：导航到 HTML 文件
             _viewModel.NavigateToHtml = () =>
@@ -52,11 +53,10 @@ namespace CncWallStation.Views
             try
             {
                 await BimWebView.EnsureCoreWebView2Async(null);
-                // 初始化成功后，WebView2 准备就绪，等待用户点击"加载渲染"
             }
             catch (Exception ex)
             {
-                _viewModel.OnRenderFailed($"WebView2 初始化失败: {ex.Message}");
+                _viewModel.OnPageFailed($"WebView2 初始化失败: {ex.Message}");
                 MessageBox.Show(
                     $"WebView2 运行时初始化失败！\n\n" +
                     $"请确保已安装 Microsoft Edge WebView2 Runtime。\n\n" +
@@ -78,15 +78,15 @@ namespace CncWallStation.Views
         {
             if (!e.IsSuccess)
             {
-                _viewModel.OnRenderFailed("CoreWebView2 初始化未成功");
+                _viewModel.OnPageFailed("CoreWebView2 初始化未成功");
                 return;
             }
 
-            // 允许访问本地文件（file:// 协议）
+            // 启用 WebMessage 通信（postMessage）
             BimWebView.CoreWebView2.Settings.IsWebMessageEnabled = true;
             BimWebView.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = true;
 
-            // 监听 WebView2 发送的消息（HTML → WPF 通信）
+            // 监听 HTML → WPF 消息
             BimWebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
         }
 
@@ -96,7 +96,6 @@ namespace CncWallStation.Views
             CoreWebView2NavigationStartingEventArgs e)
         {
             _viewModel.IsLoading = true;
-            _viewModel.StatusMessage = $"🔄 正在导航到: {e.Uri}";
         }
 
         /// <summary>导航完成事件</summary>
@@ -106,41 +105,43 @@ namespace CncWallStation.Views
         {
             if (e.IsSuccess)
             {
-                // 隐藏占位遮罩，显示 WebView2 内容
+                // 隐藏占位遮罩
                 PlaceholderPanel.Visibility = Visibility.Collapsed;
-                _viewModel.OnRenderLoaded();
+
+                // 通知 ViewModel 页面加载完成（将触发数据注入）
+                _viewModel.OnPageLoaded();
             }
             else
             {
-                _viewModel.OnRenderFailed($"导航失败 (HTTP {e.HttpStatusCode})");
+                _viewModel.OnPageFailed($"导航失败 (HTTP {e.HttpStatusCode})");
             }
         }
 
-        /// <summary>接收来自 HTML/JS 的消息（可用于双向通信）</summary>
+        /// <summary>接收来自 HTML/JS 的 postMessage</summary>
         private void OnWebMessageReceived(
             object? sender,
             CoreWebView2WebMessageReceivedEventArgs args)
         {
             try
             {
-                string message = args.TryGetWebMessageAsString();
+                var message = args.TryGetWebMessageAsString();
 
-                // 解析来自 Three.js 页面的消息
-                if (message.StartsWith("wallInfo:"))
+                // 分发到 ViewModel 统一处理
+                // 在 UI 线程上调用
+                Application.Current?.Dispatcher.Invoke(() =>
                 {
-                    _viewModel.WallInfo = message.Substring(9);
-                }
-                else if (message.StartsWith("status:"))
-                {
-                    _viewModel.StatusMessage = message.Substring(7);
-                }
-                // 可根据需要扩展更多消息类型
+                    _viewModel.HandleWebMessage(message);
+                });
             }
             catch (Exception ex)
             {
                 _viewModel.StatusMessage = $"⚠️ 消息解析错误: {ex.Message}";
             }
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
-

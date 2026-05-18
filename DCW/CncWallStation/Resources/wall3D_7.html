@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>AAC 墙体 3D 渲染引擎</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#0d0d1c; font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; overflow:hidden; }
+    canvas { display:block; }
+
+    /* ── 信息面板（左上·透明·不阻挡操作） ── */
+    #info-panel {
+      position:fixed; top:16px; left:16px;
+      background:rgba(13,13,28,0.30); backdrop-filter:blur(3px);
+      border:1px solid rgba(97,218,251,0.20); border-radius:10px;
+      padding:12px 16px; color:#fff; min-width:200px; z-index:100;
+      pointer-events:none;
+      display:none;
+    }
+    #info-panel h3 {
+      font-size:11px; font-weight:700; color:#61dafb;
+      margin-bottom:8px; padding-bottom:6px;
+      border-bottom:1px solid rgba(97,218,251,0.15);
+      letter-spacing:1px;
+    }
+    #info-panel .row { display:flex; justify-content:space-between; margin-bottom:5px; font-size:11px; }
+    #info-panel .lbl { color:#aaaacc; }
+    #info-panel .val { color:#fff; font-weight:600; }
+
+    /* ── 图例（右上·透明·不阻挡操作） ── */
+    #legend {
+      position:fixed; top:16px; right:16px;
+      background:rgba(13,13,28,0.30); backdrop-filter:blur(3px);
+      border:1px solid rgba(97,218,251,0.20); border-radius:10px;
+      padding:12px 16px; color:#fff; min-width:170px; z-index:100;
+      pointer-events:none;
+      display:none;
+    }
+    #legend h3 {
+      font-size:11px; font-weight:700; color:#61dafb;
+      margin-bottom:8px; padding-bottom:6px;
+      border-bottom:1px solid rgba(97,218,251,0.15);
+      letter-spacing:1px;
+    }
+    #legend .item { display:flex; align-items:center; margin-bottom:6px; font-size:11px; color:#ccccdd; }
+    #legend .dot { width:12px; height:12px; border-radius:2px; margin-right:9px; flex-shrink:0; border:1px solid rgba(255,255,255,0.10); }
+
+    /* ── 砖块悬浮面板 ── */
+    #brick-tooltip {
+      position:fixed;
+      background:rgba(8,8,28,0.95); backdrop-filter:blur(8px);
+      border:1px solid #f5a623; border-radius:10px;
+      padding:10px 14px; color:#fff;
+      pointer-events:none; z-index:300; display:none;
+      min-width:200px;
+      box-shadow:0 4px 20px rgba(245,166,35,0.25);
+    }
+    #brick-tooltip .btitle {
+      color:#f5a623; font-weight:700; font-size:10px;
+      letter-spacing:1.5px; margin-bottom:7px;
+      text-transform:uppercase;
+    }
+    #brick-tooltip .brow { display:flex; justify-content:space-between; gap:14px; margin-bottom:3px; font-size:12px; }
+    #brick-tooltip .bkey { color:#ccaa66; }
+    #brick-tooltip .bval { color:#fff; font-weight:600; font-size:11px; }
+
+    /* ── 底部提示 ── */
+    #hint-bar {
+      position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+      background:rgba(13,13,28,0.55); backdrop-filter:blur(4px);
+      border:1px solid rgba(97,218,251,0.15); border-radius:24px;
+      padding:7px 22px; display:flex; gap:16px;
+      color:#8888aa; font-size:10px; z-index:100; white-space:nowrap;
+      pointer-events:none;
+    }
+    #hint-bar b { color:#bbb; margin-right:2px; }
+  </style>
+</head>
+<body>
+
+<div id="info-panel">
+  <h3>📐 墙体参数</h3>
+  <div class="row"><span class="lbl"><span style="color:#ff5555">■</span> X 宽度</span><span class="val" id="v-x">—</span></div>
+  <div class="row"><span class="lbl"><span style="color:#55ff88">■</span> Y 高度</span><span class="val" id="v-y">—</span></div>
+  <div class="row"><span class="lbl"><span style="color:#5588ff">■</span> Z 厚度</span><span class="val" id="v-z">—</span></div>
+  <div class="row"><span class="lbl">砖块分片</span><span class="val" id="v-slc">—</span></div>
+  <div class="row"><span class="lbl">轮廓顶点</span><span class="val" id="v-ver">—</span></div>
+</div>
+
+<div id="legend">
+  <h3>🎨 图例</h3>
+  <div class="item"><div class="dot" style="background:#c8a87a;opacity:.45;"></div>AAC 整体墙体</div>
+  <div class="item"><div class="dot" style="background:#e8c97a;"></div>砖块 · 列 0</div>
+  <div class="item"><div class="dot" style="background:#d4a856;"></div>砖块 · 列 1</div>
+  <div class="item"><div class="dot" style="background:#bf8c3c;"></div>砖块 · 列 2</div>
+  <div class="item"><div class="dot" style="background:#ff6060;height:3px;border-radius:1px;"></div>竖向胶缝</div>
+  <div class="item"><div class="dot" style="background:#ffd700;"></div>尺寸标注</div>
+  <div class="item"><div class="dot" style="background:#00ffcc;"></div>悬停高亮边</div>
+</div>
+
+<div id="brick-tooltip">
+  <div class="btitle">🪨 砖块信息</div>
+  <div class="brow"><span class="bkey">列号</span><span class="bval" id="bt-col">—</span></div>
+  <div class="brow"><span class="bkey">宽度 (X)</span><span class="bval" id="bt-w">—</span></div>
+  <div class="brow"><span class="bkey">高度 (Y)</span><span class="bval" id="bt-h">—</span></div>
+  <div class="brow"><span class="bkey">厚度 (Z)</span><span class="bval" id="bt-t">—</span></div>
+  <div class="brow"><span class="bkey">胶缝</span><span class="bval" id="bt-glue">—</span></div>
+  <div class="brow"><span class="bkey">零件号</span><span class="bval" id="bt-pn">—</span></div>
+</div>
+
+<div id="hint-bar">
+  <span><b>左键</b>旋转</span><span><b>右键</b>平移</span><span><b>滚轮</b>缩放</span><span><b>双击</b>复位</span>
+  <span><b>悬停墙边</b>测量</span><span><b>悬停砖块</b>信息</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+  /* ================================================================
+   *  AAC 墙体 3D 渲染引擎 (wall3D_7)
+   *  场景构建 / 射线检测 / 信息面板&图例(HTML自管) / 砖块悬浮(HTML)
+   *  边缘测量 → postMessage → WPF
+   * ================================================================ */
+
+  var renderer, scene, camera, controls;
+  var layers = {};
+  var brickMeshes = [];
+  var EDGES = [];
+  var hlLine;
+  var hovBrick = null;
+  var defaultPos, defaultTarget;
+  var BRICK_COLORS = [
+    { face: 0xe8c97a, side: 0xd0b060 },
+    { face: 0xd4a856, side: 0xbc9040 },
+    { face: 0xbf8c3c, side: 0xa87428 }
+  ];
+  var animateId = null;
+
+  function notify(type, data) {
+    if (window.chrome && window.chrome.webview) {
+      try { window.chrome.webview.postMessage(type + ':' + JSON.stringify(data)); } catch (e) {}
+    }
+  }
+  function notifyRaw(msg) {
+    if (window.chrome && window.chrome.webview) {
+      try { window.chrome.webview.postMessage(msg); } catch (e) {}
+    }
+  }
+
+  /* ═══ 工具函数 ═══ */
+  var fmt = function (v) { return (+v).toFixed(1); };
+  function placeEl(el, mx, my, dy) {
+    var tw = el.offsetWidth || 190, th = el.offsetHeight || 120;
+    var tx = mx + 18, ty = my + 18 + (dy || 0);
+    if (tx + tw > window.innerWidth) tx = mx - tw - 12;
+    if (ty + th > window.innerHeight) ty = my - th - 12;
+    el.style.left = tx + 'px'; el.style.top = ty + 'px';
+  }
+
+  /* ═══ 对外 API ═══ */
+
+  window.loadWallData = function (jsonStr) {
+    try {
+      var D = JSON.parse(jsonStr);
+      rebuildScene(D);
+      notifyRaw('status:场景重建完成');
+    } catch (e) {
+      notifyRaw('status:数据解析失败: ' + e.message);
+    }
+  };
+
+  window.toggleLayer = function (name, visible) {
+    if (layers[name]) { layers[name].visible = visible; }
+  };
+
+  window.resetCamera = function () {
+    if (camera && controls && defaultPos) {
+      camera.position.copy(defaultPos);
+      controls.target.copy(defaultTarget);
+      controls.update();
+      notifyRaw('status:视角已重置');
+    }
+  };
+
+  /* ═══ 场景初始化 ═══ */
+  function initScene() {
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    document.body.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0d0d1c);
+    scene.fog = new THREE.Fog(0x0d0d1c, 16000, 30000);
+
+    camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 1, 60000);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 200;
+    controls.maxDistance = 22000;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    var sun = new THREE.DirectionalLight(0xfff8ee, 1.1);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near = 100; sun.shadow.camera.far = 18000;
+    sun.shadow.camera.left = -2000; sun.shadow.camera.right = 2000;
+    sun.shadow.camera.top = 4000; sun.shadow.camera.bottom = -500;
+    sun.shadow.bias = -0.0003;
+    scene.add(sun);
+
+    var rim = new THREE.DirectionalLight(0x6688bb, 0.28);
+    rim.position.set(-1800, 500, -2000);
+    scene.add(rim);
+
+    var hlMat = new THREE.LineBasicMaterial({ color: 0x00ffcc });
+    var hlGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+    hlLine = new THREE.Line(hlGeo, hlMat);
+    hlLine.visible = false;
+    scene.add(hlLine);
+
+    setupMouseInteraction();
+
+    /* ── 双击复位 ── */
+    renderer.domElement.addEventListener('dblclick', function () {
+      if (camera && controls && defaultPos && defaultTarget) {
+        camera.position.copy(defaultPos);
+        controls.target.copy(defaultTarget);
+        controls.update();
+      }
+    });
+
+    window.addEventListener('resize', function () {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    notifyRaw('status:渲染引擎就绪，等待数据注入');
+
+    (function animate() {
+      animateId = requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    })();
+  }
+
+  /* ═══ 重建场景 ═══ */
+  function rebuildScene(D) {
+    clearScene();
+
+    document.getElementById('info-panel').style.display = 'block';
+    document.getElementById('legend').style.display = 'block';
+
+    var W = Math.max.apply(null, D.wallContour.map(function (p) { return p.x; })) -
+            Math.min.apply(null, D.wallContour.map(function (p) { return p.x; }));
+    var H = Math.max.apply(null, D.wallContour.map(function (p) { return p.y; })) -
+            Math.min.apply(null, D.wallContour.map(function (p) { return p.y; }));
+    var TH = D.thickness;
+    var xMinW = Math.min.apply(null, D.wallContour.map(function (p) { return p.x; }));
+    var yMinW = Math.min.apply(null, D.wallContour.map(function (p) { return p.y; }));
+
+    var cx = W / 2 + xMinW, cy = H / 2 + yMinW, cz = TH / 2;
+
+    camera.position.set(cx + 1400, cy + 400, TH + 4500);
+    controls.target.set(cx, cy, cz);
+    controls.update();
+    defaultPos = camera.position.clone();
+    defaultTarget = controls.target.clone();
+
+    scene.children.forEach(function (obj) {
+      if (obj.isDirectionalLight && obj.intensity > 0.5) {
+        obj.position.set(cx + 2200, H + 1500, TH + 2800);
+      }
+    });
+
+    document.getElementById('v-x').textContent = Math.round(W) + ' mm';
+    document.getElementById('v-y').textContent = Math.round(H) + ' mm';
+    document.getElementById('v-z').textContent = Math.round(TH) + ' mm';
+    document.getElementById('v-slc').textContent = D.slices.length + ' 块';
+    document.getElementById('v-ver').textContent = D.wallContour.length + ' 个';
+
+    layers = { wall: new THREE.Group(), slices: new THREE.Group(), joints: new THREE.Group(), dim: new THREE.Group() };
+    for (var k in layers) scene.add(layers[k]);
+
+    function makeShape(pts) {
+      var s = new THREE.Shape();
+      for (var i = 0; i < pts.length; i++) {
+        if (i === 0) s.moveTo(pts[i].x, pts[i].y); else s.lineTo(pts[i].x, pts[i].y);
+      }
+      s.closePath(); return s;
+    }
+    function extrude(shape, depth, mat) {
+      var m = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: depth, bevelEnabled: false }), mat);
+      m.castShadow = true; m.receiveShadow = true; return m;
+    }
+    function addLine(pts, mat, grp) {
+      var ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat);
+      if (mat.isLineDashedMaterial) ln.computeLineDistances();
+      grp.add(ln);
+    }
+    function v3(x, y, z) { return new THREE.Vector3(x, y, z); }
+
+    // 整体墙体
+    var wFaceMat = new THREE.MeshStandardMaterial({
+      color: 0xc8a87a, roughness: 0.82, metalness: 0.01,
+      transparent: true, opacity: 0.12, side: THREE.DoubleSide
+    });
+    var wSideMat = new THREE.MeshStandardMaterial({
+      color: 0xaa8855, roughness: 0.85, metalness: 0.01, transparent: true, opacity: 0.12
+    });
+    layers.wall.add(extrude(makeShape(D.wallContour), TH, [wFaceMat, wSideMat]));
+
+    var outMat = new THREE.LineBasicMaterial({ color: 0x99bbdd, transparent: true, opacity: 0.35 });
+    [0, TH].forEach(function (z) {
+      var pts = D.wallContour.map(function (p) { return v3(p.x, p.y, z); });
+      pts.push(pts[0].clone());
+      addLine(pts, outMat, layers.wall);
+    });
+    D.wallContour.forEach(function (p) {
+      addLine([v3(p.x, p.y, 0), v3(p.x, p.y, TH)], outMat, layers.wall);
+    });
+
+    // 砖块
+    brickMeshes = [];
+    D.slices.forEach(function (sl, idx) {
+      var clr = BRICK_COLORS[sl.col % BRICK_COLORS.length];
+      var fMat = new THREE.MeshStandardMaterial({
+        color: clr.face, roughness: 0.75, metalness: 0.03,
+        polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+      });
+      var sMat = new THREE.MeshStandardMaterial({
+        color: clr.side, roughness: 0.80, metalness: 0.03,
+        polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+      });
+      var mesh = extrude(makeShape(sl.contour), TH, [fMat, sMat]);
+      mesh.position.z = 0;
+      mesh.name = 'slice_' + idx;
+      var oxs = sl.contour.map(function (p) { return p.x; });
+      var oys = sl.contour.map(function (p) { return p.y; });
+      mesh.userData = {
+        col: sl.col, gluePn: sl.gluePn || null,
+        hasGlue: sl.gluePn && sl.gluePn !== null,
+        brickW: Math.max.apply(null, oxs) - Math.min.apply(null, oxs),
+        brickH: Math.max.apply(null, oys) - Math.min.apply(null, oys),
+        brickT: TH, pn: sl.pn || ''
+      };
+      layers.slices.add(mesh);
+      brickMeshes.push(mesh);
+    });
+
+    // 接缝线
+    var jMat = new THREE.LineBasicMaterial({ color: 0xff6060 });
+    var jFaint = new THREE.LineBasicMaterial({ color: 0xff6060, transparent: true, opacity: 0.4 });
+    var bBoxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
+    D.slices.forEach(function (sl) {
+      [0, TH].forEach(function (z) {
+        var pts = sl.contour.map(function (p) { return v3(p.x, p.y, z); });
+        pts.push(pts[0].clone());
+        addLine(pts, bBoxMat, layers.joints);
+      });
+      if (!sl.glueSegs) return;
+      sl.glueSegs.forEach(function (seg) {
+        var fp = [v3(seg.s.x, seg.s.y, 0), v3(seg.e.x, seg.e.y, 0)];
+        var bp = [v3(seg.s.x, seg.s.y, TH), v3(seg.e.x, seg.e.y, TH)];
+        addLine(fp, jMat, layers.joints); addLine(bp, jMat, layers.joints);
+        addLine([fp[0], bp[0]], jFaint, layers.joints); addLine([fp[1], bp[1]], jFaint, layers.joints);
+      });
+    });
+
+    // 尺寸标注
+    var dimMat = new THREE.LineBasicMaterial({ color: 0xffd700 });
+    var dashMat = new THREE.LineDashedMaterial({ color: 0xffd700, dashSize: 14, gapSize: 8 });
+    var TICK = 32, OFFX = 160, OFFY = 160, OFFZ = 180;
+    function dimSeg(p1, p2, tick, axis) {
+      addLine([p1, p2], dimMat, layers.dim);
+      var t = tick;
+      if (axis === 'x') {
+        addLine([v3(p1.x, p1.y - t, p1.z), v3(p1.x, p1.y + t, p1.z)], dimMat, layers.dim);
+        addLine([v3(p2.x, p2.y - t, p2.z), v3(p2.x, p2.y + t, p2.z)], dimMat, layers.dim);
+      } else if (axis === 'y') {
+        addLine([v3(p1.x - t, p1.y, p1.z), v3(p1.x + t, p1.y, p1.z)], dimMat, layers.dim);
+        addLine([v3(p2.x - t, p2.y, p2.z), v3(p2.x + t, p2.y, p2.z)], dimMat, layers.dim);
+      } else {
+        addLine([v3(p1.x, p1.y - t, p1.z), v3(p1.x, p1.y + t, p1.z)], dimMat, layers.dim);
+        addLine([v3(p2.x, p2.y - t, p2.z), v3(p2.x, p2.y + t, p2.z)], dimMat, layers.dim);
+      }
+    }
+    var yMaxW = Math.max.apply(null, D.wallContour.map(function (p) { return p.y; }));
+    var xMaxW = Math.max.apply(null, D.wallContour.map(function (p) { return p.x; }));
+    dimSeg(v3(xMinW, -OFFY, 0), v3(xMaxW, -OFFY, 0), TICK, 'x');
+    addLine([v3(xMinW, yMinW, 0), v3(xMinW, -OFFY, 0)], dashMat, layers.dim);
+    addLine([v3(xMaxW, yMinW, 0), v3(xMaxW, -OFFY, 0)], dashMat, layers.dim);
+    dimSeg(v3(xMinW - OFFX, yMinW, 0), v3(xMinW - OFFX, yMaxW, 0), TICK, 'y');
+    addLine([v3(xMinW, yMinW, 0), v3(xMinW - OFFX, yMinW, 0)], dashMat, layers.dim);
+    addLine([v3(xMinW, yMaxW, 0), v3(xMinW - OFFX, yMaxW, 0)], dashMat, layers.dim);
+    dimSeg(v3(xMaxW + OFFZ, -OFFY, 0), v3(xMaxW + OFFZ, -OFFY, TH), TICK, 'z');
+    addLine([v3(xMaxW, yMinW, 0), v3(xMaxW + OFFZ, -OFFY, 0)], dashMat, layers.dim);
+    addLine([v3(xMaxW, yMinW, TH), v3(xMaxW + OFFZ, -OFFY, TH)], dashMat, layers.dim);
+
+    D.slices.forEach(function (sl) {
+      var oxs = sl.contour.map(function (p) { return p.x; });
+      var xMinS = Math.min.apply(null, oxs), xMaxS = Math.max.apply(null, oxs);
+      var yOff = -OFFY - 75 - sl.col * 52;
+      dimSeg(v3(xMinS, yOff, 0), v3(xMaxS, yOff, 0), 22, 'x');
+      addLine([v3(xMinS, yMinW, 0), v3(xMinS, yOff, 0)], dashMat, layers.dim);
+      addLine([v3(xMaxS, yMinW, 0), v3(xMaxS, yOff, 0)], dashMat, layers.dim);
+    });
+
+    // 地面 & 网格
+    var gnd = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), new THREE.MeshStandardMaterial({ color: 0x181828, roughness: 1.0 }));
+    gnd.rotation.x = -Math.PI / 2; gnd.position.set(cx, -3, cz); gnd.receiveShadow = true;
+    scene.add(gnd);
+    var grid = new THREE.GridHelper(14000, 70, 0x222244, 0x1a1a33);
+    grid.position.set(cx, -2, cz); scene.add(grid);
+    var axes = new THREE.AxesHelper(360);
+    axes.position.set(xMinW - 200, yMinW - 200, 0); scene.add(axes);
+
+    // 边缘列表
+    var CR = [
+      { x: xMinW, y: yMinW, z: 0 }, { x: xMaxW, y: yMinW, z: 0 },
+      { x: xMaxW, y: yMaxW, z: 0 }, { x: xMinW, y: yMaxW, z: 0 },
+      { x: xMinW, y: yMinW, z: TH }, { x: xMaxW, y: yMinW, z: TH },
+      { x: xMaxW, y: yMaxW, z: TH }, { x: xMinW, y: yMaxW, z: TH }
+    ];
+    function mkE(a, b, type) {
+      var A = v3(CR[a].x, CR[a].y, CR[a].z), B = v3(CR[b].x, CR[b].y, CR[b].z);
+      return { A: A, B: B, type: type, len: A.distanceTo(B) };
+    }
+    var bW = Math.round(xMaxW - xMinW), bH = Math.round(yMaxW - yMinW), bT = Math.round(TH);
+    EDGES = [
+      mkE(0, 1, '宽度边 X=' + bW + 'mm'), mkE(1, 2, '高度边 Y=' + bH + 'mm'),
+      mkE(2, 3, '宽度边 X=' + bW + 'mm'), mkE(3, 0, '高度边 Y=' + bH + 'mm'),
+      mkE(4, 5, '宽度边 X=' + bW + 'mm'), mkE(5, 6, '高度边 Y=' + bH + 'mm'),
+      mkE(6, 7, '宽度边 X=' + bW + 'mm'), mkE(7, 4, '高度边 Y=' + bH + 'mm'),
+      mkE(0, 4, '厚度边 Z=' + bT + 'mm'), mkE(1, 5, '厚度边 Z=' + bT + 'mm'),
+      mkE(2, 6, '厚度边 Z=' + bT + 'mm'), mkE(3, 7, '厚度边 Z=' + bT + 'mm')
+    ];
+
+    notifyRaw('status:场景重建完成');
+  }
+
+  function clearScene() {
+    if (animateId) cancelAnimationFrame(animateId);
+    document.getElementById('info-panel').style.display = 'none';
+    document.getElementById('legend').style.display = 'none';
+    document.getElementById('brick-tooltip').style.display = 'none';
+    hovBrick = null;
+    function disposeGroup(group) {
+      if (!group || !group.children) return;
+      while (group.children.length > 0) {
+        var child = group.children[0];
+        disposeGroup(child);
+        group.remove(child);
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) child.material.forEach(function (m) { m.dispose(); });
+          else child.material.dispose();
+        }
+      }
+      if (group.parent) group.parent.remove(group);
+    }
+    for (var k in layers) { if (layers[k]) disposeGroup(layers[k]); }
+    layers = {}; brickMeshes = []; EDGES = [];
+    (function reAnimate() {
+      animateId = requestAnimationFrame(reAnimate);
+      controls.update(); renderer.render(scene, camera);
+    })();
+  }
+
+  /* ═══ 鼠标交互（边缘测量 → postMessage / 砖块悬浮 → HTML DOM） ═══ */
+  function setupMouseInteraction() {
+    var ray = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+    var PICK = 28;
+
+    function toScr(p3) {
+      var p = p3.clone().project(camera);
+      return { x: (p.x + 1) / 2 * window.innerWidth, y: -(p.y - 1) / 2 * window.innerHeight };
+    }
+    function sDist(px, py, ax, ay, bx, by) {
+      var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+      if (l2 === 0) return Math.hypot(px - ax, py - ay);
+      var t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / l2));
+      return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+    }
+    function hlBrick(mesh) {
+      if (hovBrick === mesh) return;
+      clearHL();
+      hovBrick = mesh;
+      (Array.isArray(mesh.material) ? mesh.material : [mesh.material])
+        .forEach(function (m) { if (m.emissive) m.emissive.set(0x442200); });
+    }
+    function clearHL() {
+      if (!hovBrick) return;
+      (Array.isArray(hovBrick.material) ? hovBrick.material : [hovBrick.material])
+        .forEach(function (m) { if (m.emissive) m.emissive.set(0x000000); });
+      hovBrick = null;
+    }
+
+    var tipB = document.getElementById('brick-tooltip');
+    var tipBShown = false;
+
+    window.addEventListener('mousemove', function (e) {
+      var mx = e.clientX, my = e.clientY;
+
+      /* ── 边缘测量 → postMessage ── */
+      var best = null, bd = 1e9;
+      EDGES.forEach(function (ed) {
+        var sA = toScr(ed.A), sB = toScr(ed.B);
+        var d = sDist(mx, my, sA.x, sA.y, sB.x, sB.y);
+        if (d < bd) { bd = d; best = ed; }
+      });
+      if (best && bd < PICK) {
+        var pos = hlLine.geometry.attributes.position;
+        pos.setXYZ(0, best.A.x, best.A.y, best.A.z);
+        pos.setXYZ(1, best.B.x, best.B.y, best.B.z);
+        pos.needsUpdate = true; hlLine.visible = true;
+        notify('edgeMeasure', {
+          type: best.type, length: Math.round(best.len * 10) / 10,
+          start: { x: Math.round(best.A.x*10)/10, y: Math.round(best.A.y*10)/10, z: Math.round(best.A.z*10)/10 },
+          end: { x: Math.round(best.B.x*10)/10, y: Math.round(best.B.y*10)/10, z: Math.round(best.B.z*10)/10 }
+        });
+      } else {
+        hlLine.visible = false;
+        notifyRaw('edgeMeasure:');
+      }
+
+      /* ── 砖块悬浮 → HTML 面板 ── */
+      mouse.set((mx / window.innerWidth) * 2 - 1, -(my / window.innerHeight) * 2 + 1);
+      ray.setFromCamera(mouse, camera);
+      var hits = ray.intersectObjects(brickMeshes, false);
+      if (hits.length > 0) {
+        var ud = hits[0].object.userData;
+        hlBrick(hits[0].object);
+        // 仅首次显示时设置位置，之后不再跳动
+        document.getElementById('bt-col').textContent = '第 ' + ud.col + ' 列';
+        document.getElementById('bt-w').textContent = fmt(ud.brickW) + ' mm';
+        document.getElementById('bt-h').textContent = fmt(ud.brickH) + ' mm';
+        document.getElementById('bt-t').textContent = fmt(ud.brickT) + ' mm';
+        document.getElementById('bt-glue').textContent = ud.hasGlue ? '✅ 有 (pn:' + ud.gluePn + ')' : '❌ 无';
+        document.getElementById('bt-pn').textContent = ud.pn || '—';
+        if (!tipBShown) {
+          tipB.style.display = 'block';
+          tipBShown = true;
+        }
+        // 更新位置：抑制频繁跳动，只在偏移较大时才移动
+        var curLeft = parseFloat(tipB.style.left) || 0;
+        var curTop = parseFloat(tipB.style.top) || 0;
+        if (Math.abs(mx + 18 - curLeft) > 40 || Math.abs(my + 18 - curTop) > 40) {
+          placeEl(tipB, mx, my, 0);
+        }
+      } else {
+        clearHL();
+        if (tipBShown) {
+          tipB.style.display = 'none';
+          tipBShown = false;
+        }
+      }
+    });
+
+    renderer.domElement.addEventListener('mouseleave', function () {
+      hlLine.visible = false; clearHL();
+      notifyRaw('edgeMeasure:');
+      if (tipBShown) { tipB.style.display = 'none'; tipBShown = false; }
+    });
+  }
+
+  /* ═══ 启动 ═══ */
+  window.addEventListener('load', function () {
+    if (typeof THREE === 'undefined') { notifyRaw('status:Three.js 加载失败'); return; }
+    if (typeof THREE.OrbitControls === 'undefined') { notifyRaw('status:OrbitControls 加载失败'); return; }
+    initScene();
+    notifyRaw('status:渲染引擎初始化完成');
+  });
+</script>
+</body>
+</html>

@@ -6,40 +6,80 @@
       xmlns:vm="clr-namespace:CncWallStation.ViewModels" 
       xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1200"
-      Title="BIM 3D 墙体渲染">
+      d:DesignHeight="700" d:DesignWidth="1200"
+      Title="BIM 数据渲染"
+      FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
     <Page.Resources>
-        <!-- 按钮统一样式 -->
-        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="MinWidth" Value="110"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="Margin" Value="4,0"/>
-            <Setter Property="FontSize" Value="13"/>
+        <!-- ═══ 转换器 ═══ -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <!-- ═══ 颜色常量 ═══ -->
+        <SolidColorBrush x:Key="TextPrimary" Color="#262626"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#8C8C8C"/>
+        <SolidColorBrush x:Key="BorderLight" Color="#F0F0F0"/>
+        <SolidColorBrush x:Key="BorderGray" Color="#D9D9D9"/>
+        <SolidColorBrush x:Key="AccentBlue" Color="#1677FF"/>
+        <SolidColorBrush x:Key="AccentBlueBg" Color="#E6F4FF"/>
+        <SolidColorBrush x:Key="BrandRed" Color="#E60012"/>
+        <SolidColorBrush x:Key="StatusGreen" Color="#52C41A"/>
+        <SolidColorBrush x:Key="StatusGray" Color="#BFBFBF"/>
+
+        <!-- ═══ 文本样式 ═══ -->
+        <Style x:Key="TitleText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#2563EB"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#262626"/>
+        </Style>
+        <Style x:Key="DetailLabelText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#8C8C8C"/>
+        </Style>
+        <Style x:Key="DetailValueText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#262626"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="AuxiliaryText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#8C8C8C"/>
+        </Style>
+
+        <!-- ═══ 基础按钮样式（白底细边框） ═══ -->
+        <Style x:Key="BaseButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="MinWidth" Value="64"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#262626"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                CornerRadius="6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1D4ED8"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#94A3B8"/>
+                                <Setter Property="Background" Value="#F5F5F5"/>
+                                <Setter Property="BorderBrush" Value="#1677FF"/>
+                                <Setter Property="Foreground" Value="#1677FF"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#1E40AF"/>
+                                <Setter Property="Background" Value="#E6F4FF"/>
+                                <Setter Property="BorderBrush" Value="#1677FF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#F5F5F5"/>
+                                <Setter Property="Foreground" Value="#BFBFBF"/>
+                                <Setter Property="BorderBrush" Value="#F0F0F0"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -47,224 +87,306 @@
             </Setter>
         </Style>
 
-        <!-- 次级按钮样式 -->
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button"
-               BasedOn="{StaticResource ToolbarButtonStyle}">
-            <Setter Property="Background" Value="#475569"/>
+        <!-- ═══ 主按钮样式（蓝底白字） ═══ -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#1677FF"/>
+            <Setter Property="BorderBrush" Value="#1677FF"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#334155"/>
+                    <Setter Property="Background" Value="#4096FF"/>
+                    <Setter Property="BorderBrush" Value="#4096FF"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#0958D9"/>
+                    <Setter Property="BorderBrush" Value="#0958D9"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#94A3B8"/>
+                    <Setter Property="Background" Value="#D9D9D9"/>
+                    <Setter Property="BorderBrush" Value="#D9D9D9"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- ═══ 输入框样式 ═══ -->
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#262626"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="2,0">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#1677FF"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#4096FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ═══ 图层 ToggleButton 样式 ═══ -->
+        <Style x:Key="LayerToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="MinWidth" Value="56"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#262626"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E6F4FF"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#1677FF"/>
+                                <Setter Property="Foreground" Value="#1677FF"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#1677FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Page.Resources>
 
-    <Grid Background="#0F172A">
+    <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>
-            <!-- 标题栏 -->
-            <RowDefinition Height="56"/>
-            <!-- 工具栏 -->
-            <RowDefinition Height="52"/>
-            <!-- WebView2 渲染区域（主体） -->
-            <RowDefinition Height="*"/>
-            <!-- 状态栏 -->
-            <RowDefinition Height="36"/>
+            <RowDefinition Height="Auto"/> <!-- Row 0: 标题+搜索栏 -->
+            <RowDefinition Height="Auto"/> <!-- Row 0.5: 墙体详情行 -->
+            <RowDefinition Height="Auto"/> <!-- Row 1: 工具栏 -->
+            <RowDefinition Height="*"/>    <!-- Row 2: WebView2 -->
+            <RowDefinition Height="32"/>   <!-- Row 3: 状态栏 -->
         </Grid.RowDefinitions>
 
         <!-- ══════════════════════════════════════════ -->
-        <!--  Row 0 · 标题栏                            -->
+        <!--  Row 0 · 标题 + 搜索栏（合并）                -->
         <!-- ══════════════════════════════════════════ -->
-        <Border Grid.Row="0"
-                Background="#1E3A5F"
-                BorderBrush="#2563EB"
-                BorderThickness="0,0,0,2">
-            <Grid>
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#F0F0F0"
+                BorderThickness="0,0,0,1" Padding="16,10">
+            <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- 图标 + 标题 -->
-                <StackPanel Grid.Column="0"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            Margin="16,0,0,0">
-                    <TextBlock Text="🧱"
-                               FontSize="24"
-                               VerticalAlignment="Center"
-                               Margin="0,0,10,0"/>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="BIM 数据渲染"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="White"/>
-                        <TextBlock Text="AAC 墙体三维可视化"
-                                   FontSize="11"
-                                   Foreground="#94A3B8"/>
-                    </StackPanel>
+                <!-- 左侧：标题 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="&#x25A0;" FontSize="18" Foreground="#E60012"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="BIM 数据渲染" Style="{StaticResource TitleText}" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- 墙体参数信息 -->
-                <TextBlock Grid.Column="1"
-                           Text="{Binding WallInfo}"
-                           Foreground="#60A5FA"
-                           FontSize="13"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                <!-- 右侧：搜索控件 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="墙体ID"
+                               FontSize="13" Foreground="#262626" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
 
+                    <TextBox Width="360"
+                             Style="{StaticResource SearchTextBoxStyle}"
+                             Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"
+                             ToolTip="输入墙体ID，默认查询最新版本" TextChanged="TextBox_TextChanged">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchWallCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
 
+                    <Button Content="&#x1F50D; 搜索"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding SearchWallCommand}"
+                            Margin="8,0,0,0"/>
+                </StackPanel>
             </Grid>
         </Border>
 
         <!-- ══════════════════════════════════════════ -->
-        <!--  Row 1 · 工具栏                            -->
+        <!--  Row 1.5 · 墙体详情行（搜索到才显示）           -->
         <!-- ══════════════════════════════════════════ -->
-        <Border Grid.Row="1"
-                Background="#1E293B"
-                BorderBrush="#334155"
-                BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="12,0">
+        <Border Grid.Row="1" Background="#E6F4FF"
+                BorderBrush="#F0F0F0" BorderThickness="0,0,0,1"
+                Padding="16,10"
+                Visibility="{Binding IsWallFound, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}" Width="40"/>
+                <TextBlock Text="{Binding DetailWallId}" Style="{StaticResource DetailValueText}" Width="120"/>
 
-                <!-- 🔵 主操作 -->
-                <Button Content="🚀 加载渲染"
-                        Style="{StaticResource ToolbarButtonStyle}"
-                        Command="{Binding LoadRenderCommand}"
-                        ToolTip="加载AAC墙体3D渲染页面"/>
+                <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <Separator Width="1" Height="24"
-                           Background="#334155" Margin="6,0"/>
+                <TextBlock Text="项目" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="100"/>
 
-                <!-- 视角控制 -->
-                <Button Content="🔄 重置视角"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Command="{Binding ResetViewCommand}"
-                        ToolTip="重置摄像机到默认视角（等同页面双击）"/>
+                <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <Button Content="🧱 砖块图层"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Command="{Binding ToggleBrickLayerCommand}"
-                        ToolTip="切换砖块图层的显示/隐藏"/>
+                <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="70"/>
 
-                <Button Content="📐 标注图层"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Command="{Binding ToggleAnnotationCommand}"
-                        ToolTip="切换尺寸标注图层的显示/隐藏"/>
+                <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <Separator Width="1" Height="24"
-                           Background="#334155" Margin="6,0"/>
+                <TextBlock Text="阶段" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{Binding DetailStage}" Style="{StaticResource DetailValueText}" Width="80"/>
 
-                <Button Content="📤 导出"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Command="{Binding ExportCommand}"
-                        ToolTip="导出当前渲染截图"/>
+                <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
+
+                <TextBlock Text="版本" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{Binding DetailVersion}" Style="{StaticResource DetailValueText}" Width="50"/>
+
+                <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
+
+                <TextBlock Text="导入" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{Binding DetailImportTime}" Style="{StaticResource DetailValueText}"/>
             </StackPanel>
         </Border>
 
         <!-- ══════════════════════════════════════════ -->
-        <!--  Row 2 · WebView2 渲染主区域               -->
+        <!--  Row 2 · 工具栏                              -->
         <!-- ══════════════════════════════════════════ -->
-        <Grid Grid.Row="2">
+        <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="#F0F0F0"
+                BorderThickness="0,0,0,1" Padding="16,8">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-            <!-- WebView2 控件：嵌入 Three.js HTML 页面 -->
+                <!-- 主操作 -->
+                <Button Content="&#x25B6; 加载渲染"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding LoadRenderCommand}"
+                        ToolTip="加载墙体BimJSON数据并渲染3D场景"
+                        Margin="0,0,4,0"/>
+
+                <Separator Width="1" Height="20" Background="#F0F0F0"
+                           Margin="4,0,8,0"/>
+
+                <!-- 4 个图层切换按钮 -->
+                <ToggleButton Content="墙体"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsWallVisible}"
+                              ToolTip="切换墙体图层"
+                              Margin="0,0,2,0"/>
+                <ToggleButton Content="砖块"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsBrickVisible}"
+                              ToolTip="切换砖块图层"
+                              Margin="2,0,2,0"/>
+                <ToggleButton Content="接缝"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsJointVisible}"
+                              ToolTip="切换接缝图层"
+                              Margin="2,0,2,0"/>
+                <ToggleButton Content="标注"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsDimVisible}"
+                              ToolTip="切换标注图层"
+                              Margin="2,0,0,0"/>
+
+                <Separator Width="1" Height="20" Background="#F0F0F0"
+                           Margin="8,0,8,0"/>
+
+                <Button Content="&#x21BA; 重置视角"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding ResetViewCommand}"
+                        ToolTip="重置摄像机到默认视角"
+                        Margin="0,0,4,0"/>
+
+                <Button Content="&#x21E9; 导出"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding ExportCommand}"
+                        ToolTip="导出当前渲染截图"/>
+
+                <TextBlock Text="左键旋转 · 右键平移 · 滚轮缩放 · 双击复位"
+                           Style="{StaticResource AuxiliaryText}"
+                           VerticalAlignment="Center" Margin="24,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!--  Row 3 · WebView2 渲染区（全宽）               -->
+        <!-- ══════════════════════════════════════════ -->
+        <Grid Grid.Row="3" Background="#0D0D1C">
+
+            <!-- WebView2 -->
             <wv2:WebView2 x:Name="BimWebView"
                           NavigationCompleted="BimWebView_NavigationCompleted"
                           NavigationStarting="BimWebView_NavigationStarting"
                           CoreWebView2InitializationCompleted="BimWebView_CoreWebView2InitializationCompleted"/>
 
-            <!-- 占位遮罩：未加载时显示 -->
-            <Border x:Name="PlaceholderPanel"
-                    Background="#0F172A"
-                    Visibility="Visible">
-                <StackPanel HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Margin="20">
-
-                    <TextBlock Text="🧱"
-                               FontSize="64"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,16"/>
-
-                    <TextBlock Text="AAC 墙体三维渲染"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="White"
-                               HorizontalAlignment="Center"/>
-
-                    <TextBlock Text="BIM 数据可视化"
-                               FontSize="15"
-                               Foreground="#64748B"
-                               HorizontalAlignment="Center"
-                               Margin="0,8,0,0"/>
-
-                    
-
-                    <TextBlock Text="点击上方 🚀 加载渲染 按钮以启动3D场景"
-                               FontSize="14"
-                               Foreground="#475569"
-                               HorizontalAlignment="Center"
-                               Margin="0,32,0,0"/>
-
-                    <!-- 操作提示卡片 -->
-                    <Border Background="#1E293B"
-                            CornerRadius="8"
-                            Padding="20,14"
-                            Margin="0,20,0,0"
-                            MaxWidth="500">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                <TextBlock Text="🖱 交互操作" Foreground="#94A3B8"
-                                           FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <TextBlock Text="左键 · 旋转场景" Foreground="#CBD5E1" FontSize="12"/>
-                                <TextBlock Text="右键 · 平移视图" Foreground="#CBD5E1" FontSize="12"/>
-                                <TextBlock Text="滚轮 · 缩放" Foreground="#CBD5E1" FontSize="12"/>
-                                <TextBlock Text="双击 · 复位视角" Foreground="#CBD5E1" FontSize="12"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="🔍 悬停检测" Foreground="#94A3B8"
-                                           FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                                <TextBlock Text="悬停墙边 · 测量长度" Foreground="#CBD5E1" FontSize="12"/>
-                                <TextBlock Text="悬停砖块 · 显示信息" Foreground="#CBD5E1" FontSize="12"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+            <!-- 占位遮罩 -->
+            <Border x:Name="PlaceholderPanel" Background="#0D0D1C" Visibility="Visible">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="&#x1F3D7;" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                    <TextBlock Text="AAC 墙体三维渲染" FontSize="22" FontWeight="SemiBold"
+                               Foreground="#FFFFFF" HorizontalAlignment="Center"/>
+                    <TextBlock Text="BIM 数据可视化引擎" FontSize="14" Foreground="#8888AA"
+                               HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                    <TextBlock Text="输入墙体ID搜索 → 点击「加载渲染」启动 3D 场景"
+                               FontSize="13" Foreground="#555577"
+                               HorizontalAlignment="Center" Margin="0,24,0,0"/>
                 </StackPanel>
             </Border>
+
         </Grid>
 
         <!-- ══════════════════════════════════════════ -->
-        <!--  Row 3 · 状态栏                            -->
+        <!--  Row 4 · 状态栏                              -->
         <!-- ══════════════════════════════════════════ -->
-        <Border Grid.Row="3"
-                Background="#0F172A"
-                BorderBrush="#1E293B"
-                BorderThickness="0,1,0,0">
+        <Border Grid.Row="4" Background="#FFFFFF" BorderBrush="#F0F0F0" BorderThickness="0,1,0,0">
             <Grid Margin="16,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0"
-                           Text="{Binding StatusMessage}"
-                           Foreground="#94A3B8"
-                           FontSize="12"
-                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8" VerticalAlignment="Center" Margin="0,0,6,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#BFBFBF"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsRendering}" Value="True">
+                                        <Setter Property="Fill" Value="#52C41A"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource AuxiliaryText}" VerticalAlignment="Center"/>
+                </StackPanel>
 
-                <TextBlock Grid.Column="1"
-                           Text="ShutteringStation · BIM 渲染模块 v1.0"
-                           Foreground="#334155"
-                           FontSize="11"
-                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="BIM 渲染模块 v2.0"
+                           Style="{StaticResource AuxiliaryText}" Foreground="#D9D9D9" VerticalAlignment="Center"/>
             </Grid>
         </Border>
     </Grid>

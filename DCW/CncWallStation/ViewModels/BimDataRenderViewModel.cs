@@ -1,47 +1,55 @@
-﻿using CncWallStation.Commands;
+﻿using BimWallData;
+using BimWallData.V000;
+using CncWallStation.Commands;
+using CncWallStation.Models.Dtos;
+using CncWallStation.Services.Application;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-
 
 namespace CncWallStation.ViewModels
 {
     /// <summary>
     /// BimDataRenderPage 的 ViewModel
-    /// 使用 CommunityToolkit.Mvvm 的 ObservableObject
-    /// 命令使用自定义 RelayCommand
+    /// 负责墙体搜索（按WallId+最新版本）、数据加载管道、图层状态、悬停数据
     /// </summary>
     public partial class BimDataRenderViewModel : ObservableObject
     {
-        // ────────────────────────────────────────────────
-        // 可观察属性（使用 CommunityToolkit.Mvvm 的属性通知）
-        // ────────────────────────────────────────────────
+        private readonly IWallAppService _wallAppService;
+        private readonly BimJsonDeserializer _deserializer;
+        private readonly ILogger<BimDataRenderViewModel> _logger;
 
-        private string _statusMessage = "就绪 · 等待操作";
+        // ── 构造函数（DI 注入） ──
+
+        public BimDataRenderViewModel(
+            IWallAppService wallAppService,
+            BimJsonDeserializer deserializer,
+            ILogger<BimDataRenderViewModel> logger)
+        {
+            _wallAppService = wallAppService;
+            _deserializer = deserializer;
+            _logger = logger;
+
+            HtmlFilePath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Resources",
+                "wall3D_7.html");
+
+            InitializeCommands();
+        }
+
+        // ──────────────────────────────────────────
+        //  状态属性
+        // ──────────────────────────────────────────
+
+        private string _statusMessage = "就绪 · 请输入墙体ID搜索";
         public string StatusMessage
         {
             get => _statusMessage;
             set => SetProperty(ref _statusMessage, value);
-        }
-
-        private string _wallInfo = "";
-        public string WallInfo
-        {
-            get => _wallInfo;
-            set => SetProperty(ref _wallInfo, value);
-        }
-
-        private bool _isLoading = false;
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set
-            {
-                SetProperty(ref _isLoading, value);
-                // 刷新所有命令的 CanExecute 状态
-                CommandManager.InvalidateRequerySuggested();
-            }
         }
 
         private string _htmlFilePath = string.Empty;
@@ -51,182 +59,594 @@ namespace CncWallStation.ViewModels
             set => SetProperty(ref _htmlFilePath, value);
         }
 
-        // ────────────────────────────────────────────────
-        // 命令：使用自定义 RelayCommand（来自 Commands 命名空间）
-        // ────────────────────────────────────────────────
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                SetProperty(ref _isLoading, value);
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
 
-        /// <summary>加载/刷新 Three.js 3D 墙体渲染页面</summary>
-        public RelayCommand LoadRenderCommand { get; }
+        private bool _isRendering;
+        public bool IsRendering
+        {
+            get => _isRendering;
+            set => SetProperty(ref _isRendering, value);
+        }
 
-        /// <summary>重置视角（向 WebView2 注入 JS）</summary>
-        public RelayCommand ResetViewCommand { get; }
+        private bool _isPageLoaded;
+        public bool IsPageLoaded
+        {
+            get => _isPageLoaded;
+            set => SetProperty(ref _isPageLoaded, value);
+        }
 
-        /// <summary>切换砖块图层显示（向 WebView2 注入 JS）</summary>
-        public RelayCommand ToggleBrickLayerCommand { get; }
+        // ──────────────────────────────────────────
+        //  墙体搜索与选取
+        // ──────────────────────────────────────────
 
-        /// <summary>切换标注图层显示（向 WebView2 注入 JS）</summary>
-        public RelayCommand ToggleAnnotationCommand { get; }
+        private string _searchWallId = string.Empty;
+        public string SearchWallId
+        {
+            get => _searchWallId;
+            set => SetProperty(ref _searchWallId, value);
+        }
 
-        /// <summary>导出截图提示</summary>
-        public RelayCommand ExportCommand { get; }
+        private WallDto? _foundWall;
+        public WallDto? FoundWall
+        {
+            get => _foundWall;
+            set
+            {
+                if (SetProperty(ref _foundWall, value))
+                {
+                    IsWallFound = value != null;
+                    UpdateDetailInfo();
+                    OnPropertyChanged(nameof(CanLoadRender));
+                }
+            }
+        }
 
-        // ────────────────────────────────────────────────
-        // 供 View 调用的 JS 注入回调（由 View 注册）
-        // ────────────────────────────────────────────────
+        private bool _isWallFound;
+        public bool IsWallFound
+        {
+            get => _isWallFound;
+            set => SetProperty(ref _isWallFound, value);
+        }
 
-        /// <summary>由 View 注入：执行 JavaScript 的委托</summary>
-        public Func<string, System.Threading.Tasks.Task>? ExecuteScriptAsync { get; set; }
+        /// <summary>是否可加载渲染（有墙体且非加载中）</summary>
+        public bool CanLoadRender => !IsLoading && FoundWall != null;
 
-        /// <summary>由 View 注入：重新导航的委托</summary>
+        // ──────────────────────────────────────────
+        //  墙体详情信息（搜索栏下一行展示）
+        // ──────────────────────────────────────────
+
+        private string _detailWallId = "—";
+        public string DetailWallId
+        {
+            get => _detailWallId;
+            set => SetProperty(ref _detailWallId, value);
+        }
+
+        private string _detailProject = "—";
+        public string DetailProject
+        {
+            get => _detailProject;
+            set => SetProperty(ref _detailProject, value);
+        }
+
+        private string _detailFloor = "—";
+        public string DetailFloor
+        {
+            get => _detailFloor;
+            set => SetProperty(ref _detailFloor, value);
+        }
+
+        private string _detailStage = "—";
+        public string DetailStage
+        {
+            get => _detailStage;
+            set => SetProperty(ref _detailStage, value);
+        }
+
+        private string _detailVersion = "—";
+        public string DetailVersion
+        {
+            get => _detailVersion;
+            set => SetProperty(ref _detailVersion, value);
+        }
+
+        private string _detailImportTime = "—";
+        public string DetailImportTime
+        {
+            get => _detailImportTime;
+            set => SetProperty(ref _detailImportTime, value);
+        }
+
+        // ──────────────────────────────────────────
+        //  图层可见性状态
+        // ──────────────────────────────────────────
+
+        private bool _isWallVisible = true;
+        public bool IsWallVisible
+        {
+            get => _isWallVisible;
+            set
+            {
+                if (SetProperty(ref _isWallVisible, value))
+                    ExecuteLayerToggle("wall", value);
+            }
+        }
+
+        private bool _isBrickVisible = true;
+        public bool IsBrickVisible
+        {
+            get => _isBrickVisible;
+            set
+            {
+                if (SetProperty(ref _isBrickVisible, value))
+                    ExecuteLayerToggle("slices", value);
+            }
+        }
+
+        private bool _isJointVisible = true;
+        public bool IsJointVisible
+        {
+            get => _isJointVisible;
+            set
+            {
+                if (SetProperty(ref _isJointVisible, value))
+                    ExecuteLayerToggle("joints", value);
+            }
+        }
+
+        private bool _isDimVisible = true;
+        public bool IsDimVisible
+        {
+            get => _isDimVisible;
+            set
+            {
+                if (SetProperty(ref _isDimVisible, value))
+                    ExecuteLayerToggle("dim", value);
+            }
+        }
+
+        // ──────────────────────────────────────────
+        //  悬停浮窗数据（边缘测量）
+        // ──────────────────────────────────────────
+
+        private EdgeMeasurementInfo? _edgeMeasurement;
+        public EdgeMeasurementInfo? EdgeMeasurement
+        {
+            get => _edgeMeasurement;
+            set => SetProperty(ref _edgeMeasurement, value);
+        }
+
+        private bool _isEdgeTipVisible;
+        public bool IsEdgeTipVisible
+        {
+            get => _isEdgeTipVisible;
+            set => SetProperty(ref _isEdgeTipVisible, value);
+        }
+
+        // ──────────────────────────────────────────
+        //  砖块悬停浮窗数据
+        // ──────────────────────────────────────────
+
+        private BrickHoverInfo? _brickHover;
+        public BrickHoverInfo? BrickHover
+        {
+            get => _brickHover;
+            set => SetProperty(ref _brickHover, value);
+        }
+
+        private bool _isBrickTipVisible;
+        public bool IsBrickTipVisible
+        {
+            get => _isBrickTipVisible;
+            set => SetProperty(ref _isBrickTipVisible, value);
+        }
+
+        // ──────────────────────────────────────────
+        //  命令
+        // ──────────────────────────────────────────
+
+        public RelayCommand SearchWallCommand { get; private set; } = null!;
+        public RelayCommand LoadRenderCommand { get; private set; } = null!;
+        public RelayCommand ResetViewCommand { get; private set; } = null!;
+        public RelayCommand ExportCommand { get; private set; } = null!;
+
+        // ──────────────────────────────────────────
+        //  供 View 注入的委托
+        // ──────────────────────────────────────────
+
+        public Func<string, Task>? ExecuteScriptAsync { get; set; }
         public Action? NavigateToHtml { get; set; }
 
-        // ────────────────────────────────────────────────
-        // 构造函数
-        // ────────────────────────────────────────────────
+        // ══════════════════════════════════════════
+        //  初始化命令
+        // ══════════════════════════════════════════
 
-        public BimDataRenderViewModel()
+        private void InitializeCommands()
         {
-            // 解析 HTML 文件路径（输出目录下的 Resources 文件夹）
-            HtmlFilePath = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Resources",
-                "wall3D_6.html");
-
-            // ── 使用自定义 RelayCommand 绑定各命令 ──
+            SearchWallCommand = new RelayCommand(
+                execute: _ => _ = SearchWallAsync(),
+                canExecute: _ => !IsLoading);
 
             LoadRenderCommand = new RelayCommand(
-                execute: _ => ExecuteLoadRender(),
-                canExecute: _ => !IsLoading
-            );
+                execute: _ => _ = LoadRenderAsync(),
+                canExecute: _ => !IsLoading && FoundWall != null);
 
             ResetViewCommand = new RelayCommand(
-                execute: _ => ExecuteResetView(),
-                canExecute: _ => !IsLoading
-            );
-
-            ToggleBrickLayerCommand = new RelayCommand(
-                execute: _ => ExecuteToggleBrickLayer(),
-                canExecute: _ => !IsLoading
-            );
-
-            ToggleAnnotationCommand = new RelayCommand(
-                execute: _ => ExecuteToggleAnnotation(),
-                canExecute: _ => !IsLoading
-            );
+                execute: _ => _ = ExecuteResetViewAsync(),
+                canExecute: _ => !IsLoading && IsPageLoaded);
 
             ExportCommand = new RelayCommand(
                 execute: _ => ExecuteExport(),
-                canExecute: _ => !IsLoading
-            );
+                canExecute: _ => !IsLoading);
         }
 
-        // ────────────────────────────────────────────────
-        // 命令执行方法
-        // ────────────────────────────────────────────────
+        // ══════════════════════════════════════════
+        //  墙体搜索（按 WallId + 最新版本）
+        // ══════════════════════════════════════════
 
-        /// <summary>加载 Three.js 墙体渲染页面</summary>
-        private void ExecuteLoadRender()
+        private async Task SearchWallAsync()
         {
-            if (!File.Exists(HtmlFilePath))
+            if (string.IsNullOrWhiteSpace(SearchWallId))
             {
-                StatusMessage = $"❌ 找不到文件: {HtmlFilePath}";
-                MessageBox.Show(
-                    $"找不到 wall3D_6.html 文件！\n路径：{HtmlFilePath}",
-                    "文件缺失",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                StatusMessage = "⚠️ 请输入墙体ID";
                 return;
             }
 
             IsLoading = true;
-            StatusMessage = "🔄 正在加载墙体3D模型渲染...";
+            FoundWall = null;
+            StatusMessage = "🔍 正在搜索墙体...";
 
-            // 触发 View 中注入的导航委托
-            NavigateToHtml?.Invoke();
+            try
+            {
+                var input = new WallQueryInput
+                {
+                    WallId = SearchWallId.Trim(),
+                    Page = 1,
+                    PageSize = 1,
+                    LatestOnly = true
+                };
+
+                var result = await _wallAppService.QueryWallsAsync(input);
+
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    if (result.TotalCount > 0 && result.Items.Count > 0)
+                    {
+                        FoundWall = result.Items[0];
+                        StatusMessage = $"✅ 找到墙体: {FoundWall.WallId}";
+                    }
+                    else
+                    {
+                        StatusMessage = "⚠️ 未匹配到墙体记录";
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "搜索墙体失败");
+                StatusMessage = $"❌ 搜索失败: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
-        /// <summary>重置 Three.js 摄像机视角（双击复位等效）</summary>
-        private async void ExecuteResetView()
+        private void UpdateDetailInfo()
         {
-            StatusMessage = "🔄 正在重置视角...";
-            if (ExecuteScriptAsync != null)
+            if (FoundWall == null)
             {
-                // 调用 HTML 页面内的 resetCamera / 双击事件
-                await ExecuteScriptAsync(
-                    "if(typeof resetCamera === 'function') resetCamera(); " +
-                    "else document.dispatchEvent(new MouseEvent('dblclick'));");
+                DetailWallId = "—";
+                DetailProject = "—";
+                DetailFloor = "—";
+                DetailStage = "—";
+                DetailVersion = "—";
+                DetailImportTime = "—";
+                return;
+            }
+
+            DetailWallId = FoundWall.WallId;
+            DetailProject = FoundWall.ProjectNumber;
+            DetailFloor = $"楼层 {FoundWall.Floor}";
+            DetailStage = FoundWall.PipelineStage.ToString();
+            DetailVersion = $"v{FoundWall.Version}";
+            DetailImportTime = FoundWall.ImportTime.ToString("yyyy-MM-dd HH:mm");
+        }
+
+        // ══════════════════════════════════════════
+        //  数据加载与渲染（核心管道）
+        // ══════════════════════════════════════════
+
+        private async Task LoadRenderAsync()
+        {
+            if (FoundWall == null)
+            {
+                StatusMessage = "⚠️ 请先搜索并找到墙体";
+                return;
+            }
+
+            if (!File.Exists(HtmlFilePath))
+            {
+                StatusMessage = $"❌ 找不到渲染文件: {HtmlFilePath}";
+                return;
+            }
+
+            IsLoading = true;
+            IsRendering = false;
+            StatusMessage = "🔄 正在加载墙体数据...";
+
+            try
+            {
+                _logger.LogInformation("加载墙体详情: WallId={WallId}", FoundWall.WallId);
+                var detail = await _wallAppService.GetDetailAsync(FoundWall.Id);
+
+                if (detail == null || string.IsNullOrWhiteSpace(detail.BimJsonData))
+                {
+                    StatusMessage = "❌ 该墙体没有 BimJSON 数据";
+                    IsLoading = false;
+                    return;
+                }
+
+                StatusMessage = "🔄 正在解析 BimJSON 数据...";
+
+                var version = BimJsonDeserializer.ExtractVersion(detail.BimJsonData);
+                _logger.LogInformation("BimJSON 版本: v{Version}", version);
+
+                var dto = _deserializer.DeserializeOrThrow(detail.BimJsonData);
+                dto.Validate();
+
+                StatusMessage = $"🔄 BimJSON 解析成功 (v{version})，正在映射渲染数据...";
+
+                MapToDObject(dto);
+
+                IsRendering = true;
+                NavigateToHtml?.Invoke();
+
+                StatusMessage = $"🔄 正在注入渲染数据 (v{version})...";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "加载渲染数据失败");
+                StatusMessage = $"❌ 加载失败: {ex.Message}";
+                IsLoading = false;
+                IsRendering = false;
+            }
+        }
+
+        public async void OnPageLoaded()
+        {
+            IsPageLoaded = true;
+
+            if (!IsRendering)
+            {
+                IsLoading = false;
+                StatusMessage = "✅ 渲染页面已就绪";
+                return;
+            }
+
+            if (ExecuteScriptAsync != null && !string.IsNullOrEmpty(_cachedDObjectJson))
+            {
+                try
+                {
+                    var escaped = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                    await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                    StatusMessage = "✅ AAC墙体3D渲染模型加载完成";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "注入渲染数据失败");
+                    StatusMessage = $"❌ 渲染数据注入失败: {ex.Message}";
+                }
+            }
+
+            IsLoading = false;
+            IsRendering = false;
+            _cachedDObjectJson = string.Empty;
+        }
+
+        private string _cachedDObjectJson = string.Empty;
+
+        public void OnPageFailed(string error)
+        {
+            IsLoading = false;
+            IsRendering = false;
+            IsPageLoaded = false;
+            _cachedDObjectJson = string.Empty;
+            StatusMessage = $"❌ 页面加载失败: {error}";
+        }
+
+        // ══════════════════════════════════════════
+        //  BimWallDtoBase → Three.js D 对象映射
+        // ══════════════════════════════════════════
+
+        private void MapToDObject(BimWallDtoBase dto)
+        {
+            var contour = dto.AacWallElevation!.Contour
+                .Select(p => new { x = p.X, y = p.Y })
+                .ToList();
+
+            var slices = new List<object>();
+            if (dto is BimWallDtoV000 v000 && v000.AacSlices != null)
+            {
+                foreach (var sl in v000.AacSlices)
+                {
+                    var slContour = sl.Contour
+                        .Select(p => new { x = p.X, y = p.Y })
+                        .ToList();
+
+                    var glueSegs = sl.GlueSegments?
+                        .Select(g => new
+                        {
+                            s = new { x = g.StartPoint.X, y = g.StartPoint.Y },
+                            e = new { x = g.EndPoint.X, y = g.EndPoint.Y }
+                        })
+                        .ToList();
+
+                    slices.Add(new
+                    {
+                        contour = slContour,
+                        col = sl.SliceColumn,
+                        gluePn = v000.Pn,
+                        glueSegs = glueSegs,
+                        pn = sl.Id
+                    });
+                }
+            }
+
+            var dObject = new
+            {
+                wallContour = contour,
+                thickness = dto.CoreThickness,
+                slices = slices
+            };
+
+            _cachedDObjectJson = JsonConvert.SerializeObject(dObject, Formatting.None);
+        }
+
+        // ══════════════════════════════════════════
+        //  图层切换
+        // ══════════════════════════════════════════
+
+        private async void ExecuteLayerToggle(string layerName, bool visible)
+        {
+            if (ExecuteScriptAsync != null && IsPageLoaded)
+            {
+                try
+                {
+                    var vis = visible ? "true" : "false";
+                    await ExecuteScriptAsync($"toggleLayer('{layerName}', {vis})");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "图层切换失败: {Layer}", layerName);
+                }
+            }
+        }
+
+        // ══════════════════════════════════════════
+        //  视角重置
+        // ══════════════════════════════════════════
+
+        private async Task ExecuteResetViewAsync()
+        {
+            if (ExecuteScriptAsync != null && IsPageLoaded)
+            {
+                await ExecuteScriptAsync("resetCamera()");
                 StatusMessage = "✅ 视角已重置";
             }
             else
             {
-                StatusMessage = "⚠️ 页面尚未加载，请先点击\"加载渲染\"";
+                StatusMessage = "⚠️ 页面尚未加载";
             }
         }
 
-        /// <summary>切换砖块图层可见性</summary>
-        private async void ExecuteToggleBrickLayer()
-        {
-            StatusMessage = "🔄 切换砖块图层...";
-            if (ExecuteScriptAsync != null)
-            {
-                await ExecuteScriptAsync(
-                    @"(function(){
-                        var cb = document.getElementById('layer-brick');
-                        if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
-                      })();");
-                StatusMessage = "✅ 砖块图层已切换";
-            }
-            else
-            {
-                StatusMessage = "⚠️ 页面尚未加载，请先点击\"加载渲染\"";
-            }
-        }
+        // ══════════════════════════════════════════
+        //  导出
+        // ══════════════════════════════════════════
 
-        /// <summary>切换尺寸标注图层可见性</summary>
-        private async void ExecuteToggleAnnotation()
-        {
-            StatusMessage = "🔄 切换标注图层...";
-            if (ExecuteScriptAsync != null)
-            {
-                await ExecuteScriptAsync(
-                    @"(function(){
-                        var cb = document.getElementById('layer-dim');
-                        if(cb){ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
-                      })();");
-                StatusMessage = "✅ 标注图层已切换";
-            }
-            else
-            {
-                StatusMessage = "⚠️ 页面尚未加载，请先点击\"加载渲染\"";
-            }
-        }
-
-        /// <summary>导出提示</summary>
         private void ExecuteExport()
         {
             MessageBox.Show(
-                "可在墙体3D模型中使用 renderer.domElement.toDataURL() 导出 PNG 截图。\n" +
-                "当前版本为演示，完整导出功能可在此扩展。",
+                "可在墙体3D模型中使用 renderer.domElement.toDataURL() 导出 PNG 截图。",
                 "导出提示",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
-            StatusMessage = "ℹ️ 导出功能已触发（演示）";
+            StatusMessage = "ℹ️ 导出功能已触发";
         }
 
-        // ────────────────────────────────────────────────
-        // 加载完成回调（由 View 在 NavigationCompleted 时调用）
-        // ────────────────────────────────────────────────
+        // ══════════════════════════════════════════
+        //  HTML postMessage 处理
+        // ══════════════════════════════════════════
 
-        public void OnRenderLoaded()
+        public void HandleWebMessage(string message)
         {
-            IsLoading = false;
-            StatusMessage = "✅AAC墙体3D渲染模型加载完成";
+            try
+            {
+                if (string.IsNullOrEmpty(message)) return;
+
+                if (message.StartsWith("edgeMeasure:"))
+                {
+                    // "edgeMeasure:" = 12 字符
+                    HandleEdgeMeasure(message.Length > 12 ? message[12..] : "");
+                }
+                else if (message.StartsWith("status:"))
+                {
+                    // "status:" = 7 字符
+                    var status = message.Length > 7 ? message[7..] : "";
+                    if (!string.IsNullOrEmpty(status))
+                        StatusMessage = status;
+                }
+                // 砖块悬浮由 HTML 自管，不再通过 postMessage 回传
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "处理 WebMessage 异常");
+            }
         }
 
-        public void OnRenderFailed(string error)
+        private void HandleEdgeMeasure(string json)
         {
-            IsLoading = false;
-            StatusMessage = $"❌ 渲染加载失败: {error}";
+            if (string.IsNullOrEmpty(json))
+            {
+                EdgeMeasurement = null;
+                IsEdgeTipVisible = false;
+                return;
+            }
+            try
+            {
+                var data = JsonConvert.DeserializeAnonymousType(json, new
+                {
+                    type = "",
+                    length = 0.0,
+                    start = new { x = 0.0, y = 0.0, z = 0.0 },
+                    end = new { x = 0.0, y = 0.0, z = 0.0 }
+                });
+                if (data != null)
+                {
+                    EdgeMeasurement = new EdgeMeasurementInfo
+                    {
+                        EdgeType = data.type,
+                        Length = $"{data.length:F1} mm",
+                        StartPoint = $"({data.start.x:F1}, {data.start.y:F1}, {data.start.z:F1})",
+                        EndPoint = $"({data.end.x:F1}, {data.end.y:F1}, {data.end.z:F1})"
+                    };
+                    IsEdgeTipVisible = true;
+                }
+            }
+            catch { }
         }
+
+    }
+
+
+    // ══════════════════════════════════════════════
+    //  辅助数据模型
+    // ══════════════════════════════════════════════
+
+    public class EdgeMeasurementInfo
+    {
+        public string EdgeType { get; set; } = string.Empty;
+        public string Length { get; set; } = string.Empty;
+        public string StartPoint { get; set; } = string.Empty;
+        public string EndPoint { get; set; } = string.Empty;
+    }
+
+    public class BrickHoverInfo
+    {
+        public string Column { get; set; } = string.Empty;
+        public string Width { get; set; } = string.Empty;
+        public string Height { get; set; } = string.Empty;
+        public string Thickness { get; set; } = string.Empty;
+        public string GlueInfo { get; set; } = string.Empty;
+        public string Pn { get; set; } = string.Empty;
     }
 }

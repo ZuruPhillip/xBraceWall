@@ -88,6 +88,7 @@ namespace CncWallStation
 
                     //服务注册
                     services.AddTransient<MainWindow>();
+                    services.AddTransient<BimJsonDeserializer>();
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
 
                 })
