@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace CncWallStation.Data
+namespace CncWallStation.EntityFrameworkCore
 {
     /// <summary>
     /// EF Core 设计时工厂（用于 dotnet ef migrations 命令）

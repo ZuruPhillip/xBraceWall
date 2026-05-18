@@ -1,7 +1,9 @@
 using CncWallStation.Models;
+using CncWallStation.Models.Dtos;
+using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
-using CncWallStation.Repositories;
 using CncWallStation.Services;
+using CncWallStation.Services.Application;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -16,7 +18,8 @@ namespace CncWallStation.ViewModels
     public partial class WallListPageViewModel : ObservableObject
     {
         private readonly ILogger<WallListPageViewModel> _logger;
-        private readonly IWallRepository _wallRepo;
+        private readonly IWallAppService _wallAppService;
+        private readonly IProjectAppService _projectAppService;
         private readonly IPipelineService _pipelineService;
 
         // ==================== 全量数据缓存（当前筛选结果） ====================
@@ -134,11 +137,13 @@ namespace CncWallStation.ViewModels
         // ==================== 构造函数 ====================
         public WallListPageViewModel(
             ILogger<WallListPageViewModel> logger,
-            IWallRepository wallRepo,
+            IWallAppService wallAppService,
+            IProjectAppService projectAppService,
             IPipelineService pipelineService)
         {
             _logger = logger;
-            _wallRepo = wallRepo;
+            _wallAppService = wallAppService;
+            _projectAppService = projectAppService;
             _pipelineService = pipelineService;
 
             // 启动时从数据库加载数据
@@ -252,14 +257,12 @@ namespace CncWallStation.ViewModels
                 var hostName = Environment.MachineName;
                 var importedBy = Environment.UserName;
 
-                // 归档旧版本
-                await _wallRepo.ArchiveOldVersionsAsync(projectNumber);
-
-                // 创建新的导入批次
-                var projectId = await _wallRepo.CreateProjectAsync(
+                // 通过 ProjectAppService 归档 + 创建批次
+                await _projectAppService.ArchiveOldVersionsAsync(projectNumber);
+                var projectId = await _projectAppService.CreateProjectAsync(
                     projectNumber, rootFolder, hostName, importedBy, fileEntries.Count);
 
-                var walls = new List<Models.Entities.WallEntity>();
+                var walls = new List<WallEntity>();
 
                 for (int i = 0; i < fileEntries.Count; i++)
                 {
@@ -274,21 +277,18 @@ namespace CncWallStation.ViewModels
                     {
                         var jsonContent = await File.ReadAllTextAsync(filePath);
 
-                        walls.Add(new Models.Entities.WallEntity
+                        //通过公有构造函数创建实体
+                        var wall = new WallEntity(
+                            projectId,
+                            wallId,
+                            projectNumber,
+                            floor,
+                            jsonContent)
                         {
-                            ProjectId = projectId,
-                            WallId = wallId,
-                            ProjectNumber = projectNumber,
-                            Floor = floor,
-                            BimJsonData = jsonContent,
-                            PipelineStage = PipelineStage.Imported,
-                            Priority = (int)MapFloorToPriority(floor),
-                            Status = (int)ProcessStatus.待校验,
-                            ImportTime = DateTime.Now,
-                            UpdatedAt = DateTime.Now,
-                            UpdatedBy = importedBy
-                        });
 
+                        };
+
+                        walls.Add(wall);
                         successCount++;
                     }
                     catch (Exception ex)
@@ -301,10 +301,10 @@ namespace CncWallStation.ViewModels
                         await Task.Delay(1);
                 }
 
-                // 批量写入数据库
+                // InsertManyAsync 批量写入
                 if (walls.Count > 0)
                 {
-                    await _wallRepo.AddWallsAsync(walls);
+                    await _wallAppService.InsertManyAsync(walls);
                 }
 
                 ImportProgressMessage = $"导入完成：成功 {successCount}，失败 {failCount}";
@@ -431,9 +431,13 @@ namespace CncWallStation.ViewModels
             }
 
             var updatedBy = Environment.UserName;
+            var wallIds = SelectedItems.Select(i => i.Id).ToList();
+
+            // 通过 WallAppService.UpdatePrioritiesAsync 批量更新
+            await _wallAppService.UpdatePrioritiesAsync(wallIds, (int)priority, updatedBy);
+
             foreach (var item in SelectedItems)
             {
-                await _wallRepo.UpdatePriorityAsync(item.Id, (int)priority, updatedBy);
                 item.Priority = priority;
                 item.UpdatedBy = updatedBy;
                 item.UpdatedAt = DateTime.Now;
@@ -454,9 +458,13 @@ namespace CncWallStation.ViewModels
             }
 
             var updatedBy = Environment.UserName;
+            var wallIds = SelectedItems.Select(i => i.Id).ToList();
+
+            // 通过 WallAppService.UpdateStatusesAsync 批量更新
+            await _wallAppService.UpdateStatusesAsync(wallIds, (int)status, updatedBy);
+
             foreach (var item in SelectedItems)
             {
-                await _wallRepo.UpdateStatusAsync(item.Id, (int)status, updatedBy);
                 item.Status = status;
                 item.UpdatedBy = updatedBy;
                 item.UpdatedAt = DateTime.Now;
@@ -486,10 +494,14 @@ namespace CncWallStation.ViewModels
                 return;
 
             var toRemove = SelectedItems.ToList();
+            var wallIds = toRemove.Select(i => i.Id).ToList();
+
+            // DeleteDirectAsync 批量删除（不加载实体）
+            await _wallAppService.DeleteManyAsync(wallIds);
+
             foreach (var item in toRemove)
             {
                 item.IsSelected = false;
-                await _wallRepo.DeleteWallAsync(item.Id);
                 DisplayItems.Remove(item);
             }
 
@@ -578,7 +590,6 @@ namespace CncWallStation.ViewModels
         {
             if (item == null) return;
 
-            // 仅异常状态允许编辑
             if (item.PipelineStage != PipelineStage.BimInvalid &&
                 item.PipelineStage != PipelineStage.ConversionFailed &&
                 item.PipelineStage != PipelineStage.MomInvalid)
@@ -588,14 +599,12 @@ namespace CncWallStation.ViewModels
                 return;
             }
 
-            // 确定编辑哪个 JSON
             bool editMom = item.PipelineStage == PipelineStage.MomInvalid ||
                            item.PipelineStage == PipelineStage.ConversionFailed;
 
             var currentJson = editMom ? item.MomJsonData ?? "" : item.MjsonData;
             var title = editMom ? "编辑 MomJSON 数据" : "编辑 BimJSON 数据";
 
-            // 简化版：用 InputBox 方式编辑（实际可用专门的 JSON 编辑窗口）
             var inputWindow = new Window
             {
                 Title = $"{title} - {item.WallId}",
@@ -629,7 +638,8 @@ namespace CncWallStation.ViewModels
                 else
                     newBim = textBox.Text;
 
-                await _wallRepo.UpdateJsonDataAsync(item.Id, newBim, newMom, updatedBy);
+                // 通过 WallAppService 更新
+                await _wallAppService.UpdateJsonDataAsync(item.Id, newBim, newMom, updatedBy);
 
                 if (editMom)
                     item.MomJsonData = newMom;
@@ -726,36 +736,38 @@ namespace CncWallStation.ViewModels
         {
             try
             {
-                var pipelineStages = FilterPipelineStage.HasValue
-                    ? new List<PipelineStage> { FilterPipelineStage.Value }
-                    : null;
+                // 构建 WallQueryInput DTO
+                var input = new WallQueryInput
+                {
+                    ProjectNumber = string.IsNullOrWhiteSpace(SearchHouseNumber) ? null : SearchHouseNumber,
+                    Floor = FilterFloor,
+                    WallId = string.IsNullOrWhiteSpace(SearchWallId) ? null : SearchWallId,
+                    Statuses = FilterStatus.HasValue
+                        ? new List<int> { (int)FilterStatus.Value }
+                        : null,
+                    Priorities = FilterPriority.HasValue
+                        ? new List<int> { (int)FilterPriority.Value }
+                        : null,
+                    PipelineStages = FilterPipelineStage.HasValue
+                        ? new List<PipelineStage> { FilterPipelineStage.Value }
+                        : null,
+                    ImportTimeFrom = FilterDateFrom,
+                    ImportTimeTo = FilterDateTo,
+                    SortField = SortField,
+                    SortAscending = SortAscending,
+                    Page = CurrentPage,
+                    PageSize = PageSize,
+                    LatestOnly = FilterIsLatest
+                };
 
-                var statuses = FilterStatus.HasValue
-                    ? new List<int> { (int)FilterStatus.Value }
-                    : null;
+                // 通过 WallAppService.QueryWallsAsync 获取分页数据
+                var pagedResult = await _wallAppService.QueryWallsAsync(input);
 
-                var priorities = FilterPriority.HasValue
-                    ? new List<int> { (int)FilterPriority.Value }
-                    : null;
+                //DTO → WallListItem 映射
+                var entities = pagedResult.Items;
+                _filteredItems = MapDtosToWallListItems(entities);
 
-                var (items, totalCount) = await _wallRepo.QueryWallsAsync(
-                    projectNumber: string.IsNullOrWhiteSpace(SearchHouseNumber) ? null : SearchHouseNumber,
-                    floor: FilterFloor,
-                    wallId: string.IsNullOrWhiteSpace(SearchWallId) ? null : SearchWallId,
-                    statuses: statuses,
-                    priorities: priorities,
-                    pipelineStages: pipelineStages,
-                    importTimeFrom: FilterDateFrom,
-                    importTimeTo: FilterDateTo,
-                    sortField: SortField,
-                    sortAscending: SortAscending,
-                    page: CurrentPage,
-                    pageSize: PageSize,
-                    latestOnly: FilterIsLatest);
-
-                // 映射 Entity → Display Model
-                _filteredItems = items.Select(MapToWallListItem).ToList();
-                TotalItems = totalCount;
+                TotalItems = (int)pagedResult.TotalCount;
                 TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
 
                 if (CurrentPage > TotalPages)
@@ -787,36 +799,24 @@ namespace CncWallStation.ViewModels
             UpdateIsAllSelected();
         }
 
-        // ==================== Entity → WallListItem 映射 ====================
-        private static WallListItem MapToWallListItem(Models.Entities.WallEntity entity)
+        // ==================== DTO → WallListItem 映射（兼容现有 MVVM 展示层） ====================
+        private static List<WallListItem> MapDtosToWallListItems(List<WallDto> dtos)
         {
-            var item = new WallListItem
+            return dtos.Select(dto => new WallListItem
             {
-                Id = entity.Id,
-                HouseNumber = entity.ProjectNumber,
-                Floor = entity.Floor,
-                WallId = entity.WallId,
-                ImportTime = entity.ImportTime,
-                MjsonData = entity.BimJsonData,
-                MomJsonData = entity.MomJsonData,
-                PipelineStage = entity.PipelineStage,
-                Priority = (ProcessPriority)entity.Priority,
-                Status = (ProcessStatus)entity.Status,
-                Version = entity.Project?.Version ?? 0,
-                UpdatedAt = entity.UpdatedAt,
-                UpdatedBy = entity.UpdatedBy
-            };
-
-            // 汇总校验失败原因
-            if (entity.ValidationErrors?.Count > 0)
-            {
-                item.ValidationErrorSummary = string.Join("; ",
-                    entity.ValidationErrors
-                        .OrderByDescending(e => e.CreatedAt)
-                        .Select(e => e.ErrorMessage));
-            }
-
-            return item;
+                Id = dto.Id,
+                HouseNumber = dto.ProjectNumber,
+                Floor = dto.Floor,
+                WallId = dto.WallId,
+                ImportTime = dto.ImportTime,
+                PipelineStage = dto.PipelineStage,
+                Priority = (ProcessPriority)dto.Priority,
+                Status = (ProcessStatus)dto.Status,
+                Version = dto.Version,
+                UpdatedAt = dto.UpdatedAt,
+                UpdatedBy = dto.UpdatedBy,
+                ValidationErrorSummary = dto.ValidationErrorSummary
+            }).ToList();
         }
 
         // ==================== CheckBox 选中同步 ====================
@@ -867,7 +867,7 @@ namespace CncWallStation.ViewModels
         // ==================== 更新可选楼层列表 ====================
         private async Task UpdateAvailableFloorsAsync()
         {
-            var floors = await _wallRepo.GetAvailableFloorsAsync(
+            var floors = await _wallAppService.GetAvailableFloorsAsync(
                 string.IsNullOrWhiteSpace(SearchHouseNumber) ? null : SearchHouseNumber);
             AvailableFloors = new ObservableCollection<int>(floors);
         }

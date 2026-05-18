@@ -1,10 +1,10 @@
 using CncWallStation.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CncWallStation.Data
+namespace CncWallStation.EntityFrameworkCore
 {
     /// <summary>
-    /// EF Core 数据库上下文
+    /// EF Core 数据库上下文（ABP 风格实体）
     /// </summary>
     public class AppDbContext : DbContext
     {
@@ -25,6 +25,11 @@ namespace CncWallStation.Data
             {
                 entity.ToTable("Project");
 
+                // 主键自增（因 Entity<int> 基类不携带 [DatabaseGenerated] 注解）
+                entity.HasKey(p => p.Id);
+                entity.Property(p => p.Id)
+                    .ValueGeneratedOnAdd();
+
                 entity.HasIndex(p => new { p.ProjectNumber, p.Version }).IsUnique();
                 entity.HasIndex(p => p.ProjectNumber);
                 entity.HasIndex(p => p.IsLatest);
@@ -38,6 +43,11 @@ namespace CncWallStation.Data
             modelBuilder.Entity<WallEntity>(entity =>
             {
                 entity.ToTable("Wall");
+
+                // 主键自增
+                entity.HasKey(w => w.Id);
+                entity.Property(w => w.Id)
+                    .ValueGeneratedOnAdd();
 
                 // 唯一约束：同一版本内 WallId 不重复
                 entity.HasIndex(w => new { w.ProjectId, w.WallId }).IsUnique();
@@ -80,6 +90,11 @@ namespace CncWallStation.Data
             modelBuilder.Entity<ValidationErrorEntity>(entity =>
             {
                 entity.ToTable("ValidationError");
+
+                // 主键自增
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
 
                 entity.HasIndex(e => e.WallId).HasDatabaseName("IX_ValidationError_WallId");
                 entity.HasIndex(e => e.GroupId).HasDatabaseName("IX_ValidationError_GroupId");

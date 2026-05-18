@@ -2,6 +2,7 @@
 using CncWallStation.Features;
 using CncWallStation.Features.Grooves;
 using CncWallStation.MomWallData;
+using Infrastructure.Maths;
 
 namespace CncWallStation.Plcs.Handlers
 {
@@ -88,9 +89,8 @@ namespace CncWallStation.Plcs.Handlers
         // 标准化：始终保证 X0 ≤ X1，方便由 dy 符号判定方向
         // ══════════════════════════════════════════════════════
 
-        private static (Infrastructure.Maths.Vec2 start, Infrastructure.Maths.Vec2 end)
-            NormalizeLeftToRight(
-                Infrastructure.Maths.Vec2 a, Infrastructure.Maths.Vec2 b)
+        private static (Vec2 start, Vec2 end)
+            NormalizeLeftToRight(Vec2 a, Vec2 b)
         {
             return a.X <= b.X ? (a, b) : (b, a);
         }

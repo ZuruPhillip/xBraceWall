@@ -1,6 +1,8 @@
+using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Models;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CncWallStation.Services
@@ -10,21 +12,14 @@ namespace CncWallStation.Services
     /// </summary>
     public interface IPipelineService
     {
-        /// <summary>
-        /// 手动执行完整管线：ValidateBim → ConvertToMom → ValidateMom
-        /// 三步共享同一 GroupId，任一失败即终止
-        /// </summary>
+        /// <summary>手动执行完整管线：ValidateBim → ConvertToMom → ValidateMom</summary>
         Task<PipelineResult> ExecutePipelineAsync(long wallId);
 
-        /// <summary>
-        /// 对导入批次中指定状态的墙体批量执行管线
-        /// </summary>
+        /// <summary>对导入批次中指定状态的墙体批量执行管线</summary>
         Task<int> BatchExecuteAsync(int projectId);
     }
 
-    /// <summary>
-    /// 管线执行结果
-    /// </summary>
+    /// <summary>管线执行结果</summary>
     public class PipelineResult
     {
         public PipelineStage FinalStage { get; set; }
@@ -33,9 +28,7 @@ namespace CncWallStation.Services
         public string? MomJsonData { get; set; }
     }
 
-    /// <summary>
-    /// 校验错误条目（DTO）
-    /// </summary>
+    /// <summary>校验错误条目（DTO）</summary>
     public class ValidationErrorEntry
     {
         public PipelineStage Stage { get; set; }
@@ -44,25 +37,79 @@ namespace CncWallStation.Services
     }
 
     /// <summary>
-    /// 管线服务实现
+    /// 管线服务实现（基于 IDbContextFactory，每次管线执行使用独立 DbContext）
     /// </summary>
     public class PipelineService : IPipelineService
     {
-        private readonly Repositories.IWallRepository _wallRepo;
+        private readonly IDbContextFactory<AppDbContext> _dbFactory;
         private readonly ILogger<PipelineService> _logger;
 
-        public PipelineService(Repositories.IWallRepository wallRepo, ILogger<PipelineService> logger)
+        public PipelineService(
+            IDbContextFactory<AppDbContext> dbFactory,
+            ILogger<PipelineService> logger)
         {
-            _wallRepo = wallRepo;
+            _dbFactory = dbFactory;
             _logger = logger;
         }
 
+        // ==================== 主入口：执行单个墙体管线 ====================
+
         public async Task<PipelineResult> ExecutePipelineAsync(long wallId)
+        {
+            // 每次管线执行使用独立 DbContext（足够长寿命覆盖整个管线，但不跨方法共享）
+            await using var db = await _dbFactory.CreateDbContextAsync();
+            return await ExecutePipelineInternalAsync(db, wallId);
+        }
+
+        // ==================== 批量执行 ====================
+
+        public async Task<int> BatchExecuteAsync(int projectId)
+        {
+            // 先用一个独立 DbContext 查询待处理列表（短生命周期）
+            List<long> wallIds;
+            await using (var db = await _dbFactory.CreateDbContextAsync())
+            {
+                wallIds = await db.Walls
+                    .AsNoTracking()
+                    .Where(w => w.ProjectId == projectId &&
+                                (w.PipelineStage == PipelineStage.Imported ||
+                                 w.PipelineStage == PipelineStage.BimInvalid ||
+                                 w.PipelineStage == PipelineStage.ConversionFailed ||
+                                 w.PipelineStage == PipelineStage.MomInvalid))
+                    .Select(w => w.Id)
+                    .ToListAsync();
+            }
+
+            int successCount = 0;
+            foreach (var id in wallIds)
+            {
+                try
+                {
+                    // 每个墙体使用独立 DbContext，互不影响
+                    await using var db = await _dbFactory.CreateDbContextAsync();
+                    var result = await ExecutePipelineInternalAsync(db, id);
+                    if (result.FinalStage == PipelineStage.Ready)
+                        successCount++;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "批量管线执行异常: WallId={WallId}", id);
+                }
+            }
+
+            _logger.LogInformation("批量管线完成: 成功 {Success}/{Total}", successCount, wallIds.Count);
+            return successCount;
+        }
+
+        // ==================== 核心管线逻辑（共享 DbContext） ====================
+
+        private async Task<PipelineResult> ExecutePipelineInternalAsync(AppDbContext db, long wallId)
         {
             var groupId = Guid.NewGuid().ToString("N");
             var result = new PipelineResult { GroupId = groupId };
 
-            var wall = await _wallRepo.GetWallByIdAsync(wallId);
+            // 加载实体（带跟踪，便于后续修改）
+            var wall = await db.Walls.FirstOrDefaultAsync(w => w.Id == wallId);
             if (wall == null)
             {
                 result.FinalStage = PipelineStage.Imported;
@@ -75,26 +122,22 @@ namespace CncWallStation.Services
             }
 
             _logger.LogInformation("开始执行管线: WallId={WallId}, GroupId={GroupId}", wallId, groupId);
+            var updatedBy = wall.UpdatedBy ?? Environment.UserName;
 
             // ========== 步骤 1：校验 BimJSON ==========
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.ValidatingBim);
+            wall.UpdatePipelineStage(PipelineStage.ValidatingBim);
+            await db.SaveChangesAsync();
 
             var bimErrors = ValidateBimJson(wall.BimJsonData);
             if (bimErrors.Count > 0)
             {
-                await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.BimInvalid);
+                wall.UpdatePipelineStage(PipelineStage.BimInvalid);
 
-                var errorEntities = bimErrors.Select(e => new ValidationErrorEntity
-                {
-                    WallId = wallId,
-                    GroupId = groupId,
-                    PipelineStage = PipelineStage.ValidatingBim,
-                    ErrorCode = e.ErrorCode,
-                    ErrorMessage = e.ErrorMessage,
-                    CreatedAt = DateTime.Now
-                }).ToList();
-
-                await _wallRepo.AddValidationErrorsAsync(errorEntities);
+                var errorEntities = bimErrors.Select(e => new ValidationErrorEntity(
+                    wallId, groupId, PipelineStage.ValidatingBim, e.ErrorMessage, e.ErrorCode))
+                    .ToList();
+                await db.ValidationErrors.AddRangeAsync(errorEntities);
+                await db.SaveChangesAsync();
 
                 result.FinalStage = PipelineStage.BimInvalid;
                 result.Errors = bimErrors;
@@ -102,29 +145,23 @@ namespace CncWallStation.Services
                 return result;
             }
 
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.BimValid);
+            wall.UpdatePipelineStage(PipelineStage.BimValid);
+            await db.SaveChangesAsync();
             _logger.LogInformation("BimJSON 校验通过: WallId={WallId}", wallId);
 
             // ========== 步骤 2：转换 BimJSON → MomJSON ==========
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.Converting);
+            wall.UpdatePipelineStage(PipelineStage.Converting);
+            await db.SaveChangesAsync();
 
             var convertResult = ConvertToMom(wall.BimJsonData);
             if (!convertResult.Success)
             {
-                await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.ConversionFailed);
+                wall.UpdatePipelineStage(PipelineStage.ConversionFailed);
 
-                await _wallRepo.AddValidationErrorsAsync(new List<ValidationErrorEntity>
-                {
-                    new ValidationErrorEntity
-                    {
-                        WallId = wallId,
-                        GroupId = groupId,
-                        PipelineStage = PipelineStage.Converting,
-                        ErrorCode = "CONVERT_FAILED",
-                        ErrorMessage = convertResult.ErrorMessage ?? "转换失败",
-                        CreatedAt = DateTime.Now
-                    }
-                });
+                await db.ValidationErrors.AddAsync(new ValidationErrorEntity(
+                    wallId, groupId, PipelineStage.Converting,
+                    convertResult.ErrorMessage ?? "转换失败", "CONVERT_FAILED"));
+                await db.SaveChangesAsync();
 
                 result.FinalStage = PipelineStage.ConversionFailed;
                 result.Errors.Add(new ValidationErrorEntry
@@ -137,29 +174,26 @@ namespace CncWallStation.Services
                 return result;
             }
 
-            await _wallRepo.UpdateMomJsonDataAsync(wallId, convertResult.MomJsonData!);
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.Converted);
+            // 通过领域方法更新 MomJsonData + 阶段
+            wall.UpdateMomJsonData(convertResult.MomJsonData!);
+            wall.UpdatePipelineStage(PipelineStage.Converted);
+            await db.SaveChangesAsync();
             _logger.LogInformation("BimJSON→MomJSON 转换完成: WallId={WallId}", wallId);
 
             // ========== 步骤 3：校验 MomJSON ==========
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.ValidatingMom);
+            wall.UpdatePipelineStage(PipelineStage.ValidatingMom);
+            await db.SaveChangesAsync();
 
             var momErrors = ValidateMomJson(convertResult.MomJsonData!);
             if (momErrors.Count > 0)
             {
-                await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.MomInvalid);
+                wall.UpdatePipelineStage(PipelineStage.MomInvalid);
 
-                var errorEntities = momErrors.Select(e => new ValidationErrorEntity
-                {
-                    WallId = wallId,
-                    GroupId = groupId,
-                    PipelineStage = PipelineStage.ValidatingMom,
-                    ErrorCode = e.ErrorCode,
-                    ErrorMessage = e.ErrorMessage,
-                    CreatedAt = DateTime.Now
-                }).ToList();
-
-                await _wallRepo.AddValidationErrorsAsync(errorEntities);
+                var errorEntities = momErrors.Select(e => new ValidationErrorEntity(
+                    wallId, groupId, PipelineStage.ValidatingMom, e.ErrorMessage, e.ErrorCode))
+                    .ToList();
+                await db.ValidationErrors.AddRangeAsync(errorEntities);
+                await db.SaveChangesAsync();
 
                 result.FinalStage = PipelineStage.MomInvalid;
                 result.Errors = momErrors;
@@ -168,11 +202,12 @@ namespace CncWallStation.Services
                 return result;
             }
 
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.MomValid);
+            wall.UpdatePipelineStage(PipelineStage.MomValid);
 
             // ========== 全部通过 → Ready ==========
-            await _wallRepo.UpdatePipelineStageAsync(wallId, PipelineStage.Ready);
-            await _wallRepo.UpdateStatusAsync(wallId, (int)ProcessStatus.待加工, wall.UpdatedBy ?? Environment.UserName);
+            wall.UpdatePipelineStage(PipelineStage.Ready);
+            wall.UpdateStatus((int)ProcessStatus.待加工, updatedBy);
+            await db.SaveChangesAsync();
 
             result.FinalStage = PipelineStage.Ready;
             result.MomJsonData = convertResult.MomJsonData;
@@ -181,39 +216,7 @@ namespace CncWallStation.Services
             return result;
         }
 
-        public async Task<int> BatchExecuteAsync(int projectId)
-        {
-            var (walls, _) = await _wallRepo.QueryWallsAsync(
-                page: 1, pageSize: int.MaxValue);
-
-            var toProcess = walls
-                .Where(w => w.ProjectId == projectId &&
-                            (w.PipelineStage == PipelineStage.Imported ||
-                             w.PipelineStage == PipelineStage.BimInvalid ||
-                             w.PipelineStage == PipelineStage.ConversionFailed ||
-                             w.PipelineStage == PipelineStage.MomInvalid))
-                .ToList();
-
-            int successCount = 0;
-            foreach (var wall in toProcess)
-            {
-                try
-                {
-                    var result = await ExecutePipelineAsync(wall.Id);
-                    if (result.FinalStage == PipelineStage.Ready)
-                        successCount++;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "批量管线执行异常: WallId={WallId}", wall.Id);
-                }
-            }
-
-            _logger.LogInformation("批量管线完成: 成功 {Success}/{Total}", successCount, toProcess.Count);
-            return successCount;
-        }
-
-        // ==================== BimJSON 校验 ====================
+        // ==================== BimJSON 校验（纯函数，不变） ====================
 
         private List<ValidationErrorEntry> ValidateBimJson(string bimJsonData)
         {
@@ -246,7 +249,6 @@ namespace CncWallStation.Services
                     return errors;
                 }
 
-                // 校验必要字段
                 bool hasId = root.TryGetProperty("id", out _) ||
                              root.TryGetProperty("wallId", out _) ||
                              root.TryGetProperty("wall_id", out _);
@@ -261,7 +263,6 @@ namespace CncWallStation.Services
                     });
                 }
 
-                // 校验 features 数组（如果存在）
                 if (root.TryGetProperty("features", out var features))
                 {
                     if (features.ValueKind != System.Text.Json.JsonValueKind.Array)
@@ -314,7 +315,7 @@ namespace CncWallStation.Services
             return errors;
         }
 
-        // ==================== BimJSON → MomJSON 转换 ====================
+        // ==================== BimJSON → MomJSON 转换（纯函数，不变） ====================
 
         private (bool Success, string? MomJsonData, string? ErrorMessage) ConvertToMom(string bimJsonData)
         {
@@ -323,10 +324,8 @@ namespace CncWallStation.Services
                 using var doc = System.Text.Json.JsonDocument.Parse(bimJsonData);
                 var root = doc.RootElement;
 
-                // 构建 MomJSON 结构
                 var momObj = new Dictionary<string, object?>();
 
-                // 复制基础字段
                 if (root.TryGetProperty("id", out var idProp))
                     momObj["id"] = idProp.GetString() ?? string.Empty;
                 else if (root.TryGetProperty("wallId", out var wallIdProp))
@@ -339,7 +338,6 @@ namespace CncWallStation.Services
                 if (root.TryGetProperty("floor", out var fl))
                     momObj["floor"] = fl.GetInt32();
 
-                // 转换 features 为 momFeatures
                 if (root.TryGetProperty("features", out var features) &&
                     features.ValueKind == System.Text.Json.JsonValueKind.Array)
                 {
@@ -360,7 +358,6 @@ namespace CncWallStation.Services
                     momObj["momFeatures"] = new List<object>();
                 }
 
-                // 添加元数据
                 momObj["convertedAt"] = DateTime.Now.ToString("o");
                 momObj["sourceVersion"] = "1.0";
 
@@ -391,7 +388,7 @@ namespace CncWallStation.Services
             };
         }
 
-        // ==================== MomJSON 校验 ====================
+        // ==================== MomJSON 校验（纯函数，不变） ====================
 
         private List<ValidationErrorEntry> ValidateMomJson(string momJsonData)
         {
@@ -424,7 +421,6 @@ namespace CncWallStation.Services
                     return errors;
                 }
 
-                // 校验 id
                 if (!root.TryGetProperty("id", out var idProp) || string.IsNullOrWhiteSpace(idProp.GetString()))
                 {
                     errors.Add(new ValidationErrorEntry
@@ -435,7 +431,6 @@ namespace CncWallStation.Services
                     });
                 }
 
-                // 校验 momFeatures
                 if (root.TryGetProperty("momFeatures", out var momFeatures))
                 {
                     if (momFeatures.ValueKind != System.Text.Json.JsonValueKind.Array)
@@ -475,7 +470,6 @@ namespace CncWallStation.Services
                     });
                 }
 
-                // 校验转换元数据
                 if (!root.TryGetProperty("convertedAt", out _))
                 {
                     errors.Add(new ValidationErrorEntry
