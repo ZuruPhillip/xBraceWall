@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CncWallStation.EntityFrameworkCore;
+using CncWallStation.Extensions;
 using CncWallStation.Services;
 using CncWallStation.Services.Application;
 using CncWallStation.Services.Mappings;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System.Reflection;
 using System.Windows;
 
 namespace CncWallStation
@@ -84,22 +86,10 @@ namespace CncWallStation
                         return config.CreateMapper();
                     });
 
-                    // ==================== 应用服务层（查询层） ====================
-                    services.AddTransient<IWallAppService, WallAppService>();
-                    services.AddTransient<IProjectAppService, ProjectAppService>();
-
-                    // ==================== 领域服务层 ====================
-                    services.AddTransient<IPipelineService, PipelineService>();
-
-                    // ==================== ViewModel & View ====================
-                    services.AddTransient<ControllerPageViewModel>();
-                    services.AddTransient<ControllerPage>();
-                    services.AddTransient<MainViewModel>();
+                    //服务注册
                     services.AddTransient<MainWindow>();
-                    services.AddTransient<BimDataRenderViewModel>();
-                    services.AddTransient<BimDataRenderPage>();
-                    services.AddTransient<WallListPageViewModel>();
-                    services.AddTransient<WallListPage>();
+                    services.AddConventionalServices(Assembly.GetExecutingAssembly());
+
                 })
                 .Build();
         }
