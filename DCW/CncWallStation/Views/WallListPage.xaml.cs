@@ -65,6 +65,7 @@ namespace CncWallStation.Views
                 return;
 
             var cell = dg.CurrentCell;
+            if (cell.Column is null) return;
             var element = cell.Column.GetCellContent(cell.Item);
             if (element is null) return;
 
@@ -94,6 +95,7 @@ namespace CncWallStation.Views
                 return;
 
             var cell = dg.CurrentCell;
+            if (cell.Column is null) return;
             var element = cell.Column.GetCellContent(cell.Item);
             if (element is null) return;
 
@@ -110,26 +112,6 @@ namespace CncWallStation.Views
                     // 剪贴板被其他进程占用，静默忽略
                 }
             }), DispatcherPriority.Background);
-        }
-
-        /// <summary>右键菜单 → 查看详情</summary>
-        private void ContextMenu_ViewDetail(object sender, RoutedEventArgs e)
-        {
-            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
-                return;
-
-            if (dg.SelectedItem is WallListItem item)
-                _viewModel.ViewDetailCommand.Execute(item);
-        }
-
-        /// <summary>右键菜单 → 编辑 JSON（异常状态下可编辑）</summary>
-        private void ContextMenu_EditJson(object sender, RoutedEventArgs e)
-        {
-            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
-                return;
-
-            if (dg.SelectedItem is WallListItem item)
-                _viewModel.EditJsonDataCommand.Execute(item);
         }
 
         /// <summary>在视觉树中查找指定类型的子元素</summary>
@@ -306,21 +288,7 @@ namespace CncWallStation.Views
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is PipelineStage s ? s switch
-            {
-                PipelineStage.Imported => "已导入",
-                PipelineStage.ValidatingBim => "校验Bim中",
-                PipelineStage.BimValid => "Bim校验通过",
-                PipelineStage.BimInvalid => "Bim校验失败",
-                PipelineStage.Converting => "转换中",
-                PipelineStage.ConversionFailed => "转换失败",
-                PipelineStage.Converted => "已转换",
-                PipelineStage.ValidatingMom => "校验Mom中",
-                PipelineStage.MomValid => "Mom校验通过",
-                PipelineStage.MomInvalid => "Mom校验失败",
-                PipelineStage.Ready => "待加工",
-                _ => "未知"
-            } : "未知";
+            return value is PipelineStage s ? s.ToDisplayText() : "未知";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

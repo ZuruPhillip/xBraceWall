@@ -34,7 +34,10 @@
 
 	<!-- 将 HTML 文件复制到输出目录 -->
 	<ItemGroup>
-		<Content Include="Resources\Htmls\BimWall3D.html">
+		<Content Include="Resources\wall3D_6.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\wall3D_7.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
@@ -52,5 +55,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\BimWallData\BimWallData.csproj" />
 	  <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\Htmls\" />
 	</ItemGroup>
 </Project>

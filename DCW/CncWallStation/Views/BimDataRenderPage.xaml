@@ -74,18 +74,18 @@
                 Padding="16,10"
                 Visibility="{Binding IsWallFound, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}" Width="40"/>
-                <TextBlock Text="{Binding DetailWallId}" Style="{StaticResource DetailValueText}" Width="120"/>
+                <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}" Width="60"/>
+                <TextBlock Text="{Binding DetailWallId}" Style="{StaticResource DetailValueText}" Width="280"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
                 <TextBlock Text="项目" Style="{StaticResource DetailLabelText}" Width="30"/>
-                <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="100"/>
+                <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="80"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
                 <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}" Width="30"/>
-                <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="70"/>
+                <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="80"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
@@ -216,7 +216,7 @@
                     <TextBlock Text="{Binding StatusMessage}" Style="{StaticResource AuxiliaryText}" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <TextBlock Grid.Column="1" Text="BIM 渲染模块 v2.0"
+                <TextBlock Grid.Column="1" Text="BIM 渲染模块 v1.0"
                            Style="{StaticResource AuxiliaryText}" Foreground="#D9D9D9" VerticalAlignment="Center"/>
             </Grid>
         </Border>

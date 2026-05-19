@@ -55,21 +55,7 @@ namespace CncWallStation.Models
 		public PipelineStage PipelineStage { get; set; } = PipelineStage.Imported;
 
 		/// <summary>管线阶段显示文本</summary>
-		public string PipelineStageText => PipelineStage switch
-		{
-			PipelineStage.Imported => "已导入",
-			PipelineStage.ValidatingBim => "校验Bim中",
-			PipelineStage.BimValid => "Bim校验通过",
-			PipelineStage.BimInvalid => "Bim校验失败",
-			PipelineStage.Converting => "转换中",
-			PipelineStage.ConversionFailed => "转换失败",
-			PipelineStage.Converted => "已转换",
-			PipelineStage.ValidatingMom => "校验Mom中",
-			PipelineStage.MomValid => "Mom校验通过",
-			PipelineStage.MomInvalid => "Mom校验失败",
-			PipelineStage.Ready => "待加工",
-			_ => "未知"
-		};
+		public string PipelineStageText => PipelineStage.ToDisplayText();
 
 		/// <summary>加工优先级</summary>
 		public ProcessPriority Priority { get; set; } = ProcessPriority.中;

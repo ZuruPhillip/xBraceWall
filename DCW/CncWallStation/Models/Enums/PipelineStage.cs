@@ -5,7 +5,7 @@ namespace CncWallStation.Models.Enums
     /// </summary>
     public enum PipelineStage
     {
-        /// <summary>BimJSON 已导入，待校验</summary>
+        /// <summary>BimJSON 待校验</summary>
         Imported = 0,
 
         /// <summary>BimJSON 校验中</summary>
@@ -37,5 +37,28 @@ namespace CncWallStation.Models.Enums
 
         /// <summary>全部通过，Status 设为待加工</summary>
         Ready = 10
+    }
+
+    /// <summary>
+    /// PipelineStage 扩展方法
+    /// </summary>
+    public static class PipelineStageExtensions
+    {
+        /// <summary>获取管线阶段的中文显示文本</summary>
+        public static string ToDisplayText(this PipelineStage stage) => stage switch
+        {
+            PipelineStage.Imported => "待校验",
+            PipelineStage.ValidatingBim => "校验Bim中",
+            PipelineStage.BimValid => "Bim校验通过",
+            PipelineStage.BimInvalid => "Bim校验失败",
+            PipelineStage.Converting => "转换中",
+            PipelineStage.ConversionFailed => "转换失败",
+            PipelineStage.Converted => "已转换",
+            PipelineStage.ValidatingMom => "校验Mom中",
+            PipelineStage.MomValid => "Mom校验通过",
+            PipelineStage.MomInvalid => "Mom校验失败",
+            PipelineStage.Ready => "待加工",
+            _ => "未知"
+        };
     }
 }

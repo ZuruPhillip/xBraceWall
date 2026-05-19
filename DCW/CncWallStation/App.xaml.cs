@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Extensions;
-using CncWallStation.Services;
 using CncWallStation.Services.Application;
 using CncWallStation.Services.Configs;
 using CncWallStation.Services.Mappings;
 using CncWallStation.ViewModels;
-using CncWallStation.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

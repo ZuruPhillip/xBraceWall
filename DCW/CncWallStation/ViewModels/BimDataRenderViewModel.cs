@@ -36,7 +36,8 @@ namespace CncWallStation.ViewModels
             HtmlFilePath = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
                 "Resources",
-                "wall3D_7.html");
+                "Htmls",
+                "BimWall3D.html");
 
             InitializeCommands();
         }
@@ -357,7 +358,7 @@ namespace CncWallStation.ViewModels
             DetailWallId = FoundWall.WallId;
             DetailProject = FoundWall.ProjectNumber;
             DetailFloor = $"楼层 {FoundWall.Floor}";
-            DetailStage = FoundWall.PipelineStage.ToString();
+            DetailStage = FoundWall.PipelineStageText;
             DetailVersion = $"v{FoundWall.Version}";
             DetailImportTime = FoundWall.ImportTime.ToString("yyyy-MM-dd HH:mm");
         }

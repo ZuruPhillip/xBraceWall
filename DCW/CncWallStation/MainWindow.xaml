@@ -44,21 +44,36 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="BimDataRenderPage"/>
 
+                <hc:SideMenuItem 
+                Header="MOM数据渲染" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="MomDataRenderPage"/>
+
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 
                 Header="JSON编辑器" 
                 Command="{Binding NavigateCommand}"
-                CommandParameter="JsonEditPage"/>     
+                CommandParameter="JsonEditPage"/>
 
+
+                <hc:SideMenuItem 
+                Header="数据预检" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="DataCheckPage"/>
+                
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 
                 Header="控制页面" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ControllerPage"/>
 
-                <!-- 生产报表 -->
                 <hc:SideMenuItem 
-                Header="数据异常报告" 
+                Header="质量控制" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="QualityControlPage"/>
+                
+                <hc:SideMenuItem 
+                Header="生产报表" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ReportPage"/>
 
