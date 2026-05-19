@@ -133,6 +133,22 @@ namespace CncWallStation.Services.Application
             return _mapper.Map<WallDetailDto>(entity);
         }
 
+        public async Task<WallDetailDto?> GetDetailByWallIdAsync(string wallId)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var entity = await db.Walls
+                .Include(w => w.Project)
+                .Include(w => w.ValidationErrors)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(w => w.WallId == wallId);
+
+            if (entity == null)
+                return null;
+
+            return _mapper.Map<WallDetailDto>(entity);
+        }
+
         // ==================== 简单查询 ====================
 
         public async Task<List<WallDto>> GetByProjectNumberAsync(string projectNumber)

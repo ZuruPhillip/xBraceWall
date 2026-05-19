@@ -46,6 +46,12 @@
 
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 
+                Header="JSON编辑器" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="JsonEditPage"/>     
+
+                <!-- 控制页面 -->
+                <hc:SideMenuItem 
                 Header="控制页面" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ControllerPage"/>

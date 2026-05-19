@@ -17,6 +17,9 @@ namespace CncWallStation.Services.Application
         /// <summary>按 ID 获取墙体详情（含完整数据 + 导航属性）</summary>
         Task<WallDetailDto?> GetDetailAsync(long wallId);
 
+        /// <summary>按 WallId（字符串）获取墙体详情</summary>
+        Task<WallDetailDto?> GetDetailByWallIdAsync(string wallId);
+
         /// <summary>按项目号获取墙体列表（简单查询）</summary>
         Task<List<WallDto>> GetByProjectNumberAsync(string projectNumber);
 

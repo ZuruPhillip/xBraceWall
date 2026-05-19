@@ -3,6 +3,7 @@ using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Extensions;
 using CncWallStation.Services;
 using CncWallStation.Services.Application;
+using CncWallStation.Services.Configs;
 using CncWallStation.Services.Mappings;
 using CncWallStation.ViewModels;
 using CncWallStation.Views;
@@ -89,6 +90,7 @@ namespace CncWallStation
                     //服务注册
                     services.AddTransient<MainWindow>();
                     services.AddTransient<BimJsonDeserializer>();
+                    services.AddSingleton<JsonKeyTranslationConfig>();
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
 
                     // MainPageViewModel 需单例，确保 MainViewModel 和 MainPage 共享同一实例
