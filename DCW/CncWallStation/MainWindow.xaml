@@ -8,7 +8,7 @@
     xmlns:vm="CncWallStationWPF.ViewModels"
     mc:Ignorable="d"
 
-    Title="CNC工站管理系统" Height="600" Width="1200">
+    Title="CNC工站管理系统" Height="791" Width="1280">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -20,6 +20,10 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="160"/>
             <!-- 侧边导航宽度 -->
@@ -28,7 +32,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- 左侧：HandyControl侧边菜单 -->
-        <hc:SideMenu Grid.Column="0" Background="{DynamicResource SecondaryRegionBrush}" Margin="0,30,0,0">
+        <hc:SideMenu Grid.Column="0" Grid.Row="0" Background="{DynamicResource SecondaryRegionBrush}" Margin="0,30,0,0">
             <hc:SideMenu.Items>
                 <hc:SideMenuItem 
                 Header="墙体清单" 
@@ -60,12 +64,22 @@
             </hc:SideMenu.Items>
         </hc:SideMenu>
 
-        <!-- 右侧：页面容器（Frame） -->
-        <Grid Grid.Column="1" Margin="10">
-            <Frame 
-            x:Name="MainFrame" 
-            NavigationUIVisibility="Hidden"
-            Background="{DynamicResource PrimaryRegionBrush}"/>
-        </Grid>
+        <!-- 右侧：选项卡页面容器（MainPage），通过 code-behind 注入 -->
+        <ContentControl x:Name="MainPageHost" Grid.Column="1" Grid.Row="0" Margin="10"/>
+
+        <!-- 底部状态栏 -->
+        <Border Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                Background="{DynamicResource SecondaryRegionBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="10,4">
+            <Grid>
+                <TextBlock Text="{Binding CurrentTime}"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Foreground="{DynamicResource PrimaryTextBrush}"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

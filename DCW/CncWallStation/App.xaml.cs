@@ -91,6 +91,9 @@ namespace CncWallStation
                     services.AddTransient<BimJsonDeserializer>();
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
 
+                    // MainPageViewModel 需单例，确保 MainViewModel 和 MainPage 共享同一实例
+                    services.AddSingleton<MainPageViewModel>();
+
                 })
                 .Build();
         }

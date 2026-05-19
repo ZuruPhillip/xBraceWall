@@ -1,61 +1,59 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace CncWallStation.ViewModels
 {
-    public class MainViewModel
+    public partial class MainViewModel : ObservableObject
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly MainPageViewModel _mainPageViewModel;
         private readonly ILogger<MainViewModel> _logger;
+        private readonly DispatcherTimer _timer;
 
-        private Frame? _mainFrame;
-
-        // 页面映射表
-        private readonly Dictionary<string, Type> _pageMap = new()
-        {
-            { "ControllerPage", typeof(Views.ControllerPage) },
-            { "BimDataRenderPage", typeof(Views.BimDataRenderPage) },
-            { "WallListPage", typeof(Views.WallListPage) }
-        };
+        [ObservableProperty]
+        private string _currentTime = string.Empty;
 
         public MainViewModel(
-            IServiceProvider serviceProvider,
+            MainPageViewModel mainPageViewModel,
             ILogger<MainViewModel> logger)
         {
-            _serviceProvider = serviceProvider;
+            _mainPageViewModel = mainPageViewModel;
             _logger = logger;
 
             NavigateCommand = new RelayCommand<string>(NavigateToPage);
-        }
 
-        public void SetFrame(Frame frame)
-        {
-            _mainFrame = frame;
+            // 定时器每秒更新当前时间
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _timer.Tick += (_, _) => UpdateTime();
         }
 
         public ICommand NavigateCommand { get; }
 
+        public void Initialize()
+        {
+            // 启动时间更新
+            UpdateTime();
+            _timer.Start();
+
+            // 默认打开墙体清单选项卡
+            NavigateToPage("WallListPage");
+
+            _logger.LogInformation("MainViewModel 初始化完成");
+        }
+
+        private void UpdateTime()
+        {
+            CurrentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
         private void NavigateToPage(string pageName)
         {
-            if (_mainFrame == null)
-            {
-                _logger.LogWarning("MainFrame 未初始化");
-                return;
-            }
-
-            if (!_pageMap.TryGetValue(pageName, out var pageType))
-            {
-                _logger.LogError("未找到页面: {PageName}", pageName);
-                return;
-            }
-
-            var page = _serviceProvider.GetRequiredService(pageType);
-            _mainFrame.Navigate(page);
-
-            _logger.LogInformation("导航到页面: {PageName}", pageName);
+            _mainPageViewModel.AddOrActivateTab(pageName);
         }
     }
 }
