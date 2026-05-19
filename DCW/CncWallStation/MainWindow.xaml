@@ -55,11 +55,15 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="JsonEditPage"/>
 
-
                 <hc:SideMenuItem 
                 Header="数据预检" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="DataCheckPage"/>
+
+                <hc:SideMenuItem 
+                Header="数据模拟" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="QualityControlPage"/>
                 
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 
@@ -73,7 +77,7 @@
                 CommandParameter="QualityControlPage"/>
                 
                 <hc:SideMenuItem 
-                Header="生产报表" 
+                Header="报表分析" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ReportPage"/>
 

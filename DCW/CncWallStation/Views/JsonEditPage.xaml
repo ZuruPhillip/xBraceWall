@@ -148,7 +148,7 @@
                     <TextBlock Text="墙体 ID:" VerticalAlignment="Center" Margin="0,0,6,0"
                                Style="{StaticResource BodyText}" />
                     <TextBox Text="{Binding WallId, UpdateSourceTrigger=PropertyChanged}"
-                             Width="160" Height="30" VerticalAlignment="Center"
+                             Width="300" Height="30" VerticalAlignment="Center"
                              Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,10,0"
                              x:Name="WallIdTextBox" />
                     <Button Content="加载" Command="{Binding LoadCommand}" Width="60" Height="30"
