@@ -99,7 +99,7 @@
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="导入" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}" Width="30"/>
                 <TextBlock Text="{Binding DetailImportTime}" Style="{StaticResource DetailValueText}"/>
             </StackPanel>
         </Border>

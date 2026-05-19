@@ -24,5 +24,8 @@ namespace CncWallStation.Models.Dtos
 
         /// <summary>最大预检数量（0 表示不限制）</summary>
         public int MaxCount { get; set; } = 0;
+
+        /// <summary>仅查询最新版本（默认 true）</summary>
+        public bool LatestOnly { get; set; } = true;
     }
 }

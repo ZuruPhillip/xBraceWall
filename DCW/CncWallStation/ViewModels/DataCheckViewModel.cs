@@ -136,13 +136,22 @@ namespace CncWallStation.ViewModels
         // ==================== 批量预检 ====================
 
         [ObservableProperty]
-        private bool _isBatchMode;
+        private bool _isBatchMode = true;
 
         [ObservableProperty]
         private string _batchFilterProjectNumber = string.Empty;
 
         [ObservableProperty]
         private int? _batchFilterFloor;
+
+        [ObservableProperty]
+        private bool _batchFilterLatestOnly = true;
+
+        [ObservableProperty]
+        private ObservableCollection<string> _batchFilterVersionOptions = new() { "最新版本", "全部版本" };
+
+        [ObservableProperty]
+        private string _batchFilterSelectedVersion = "最新版本";
 
         [ObservableProperty]
         private DateTime? _batchFilterStartTime;
@@ -351,6 +360,12 @@ namespace CncWallStation.ViewModels
 
         // ==================== 批量预检 ====================
 
+        /// <summary>版本选择变更时同步 LatestOnly</summary>
+        partial void OnBatchFilterSelectedVersionChanged(string value)
+        {
+            BatchFilterLatestOnly = value == "最新版本";
+        }
+
         [RelayCommand]
         private void ToggleBatchMode()
         {
@@ -370,7 +385,8 @@ namespace CncWallStation.ViewModels
                     Floor = BatchFilterFloor,
                     StartTime = BatchFilterStartTime,
                     EndTime = BatchFilterEndTime,
-                    PipelineStages = BatchFilterStages.Count > 0 ? BatchFilterStages.ToList() : null
+                    PipelineStages = BatchFilterStages.Count > 0 ? BatchFilterStages.ToList() : null,
+                    LatestOnly = BatchFilterLatestOnly
                 };
 
                 var progress = new Progress<(int Done, int Total, int Errors)>(p =>

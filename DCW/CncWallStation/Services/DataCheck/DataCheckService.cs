@@ -267,6 +267,15 @@ namespace CncWallStation.Services.DataCheck
             if (filter.PipelineStages != null && filter.PipelineStages.Count > 0)
                 query = query.Where(w => filter.PipelineStages.Contains(w.PipelineStage));
 
+            if (filter.LatestOnly)
+            {
+                var latestProjectIds = await db.Projects
+                    .Where(p => p.IsLatest)
+                    .Select(p => p.Id)
+                    .ToListAsync();
+                query = query.Where(w => latestProjectIds.Contains(w.ProjectId));
+            }
+
             // 跳过已经 Ready 或 Invalid 的墙体
             query = query.Where(w => w.PipelineStage != PipelineStage.Ready
                                   && w.PipelineStage != PipelineStage.BimInvalid
