@@ -15,6 +15,7 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<ProjectEntity> Projects => Set<ProjectEntity>();
         public DbSet<WallEntity> Walls => Set<WallEntity>();
         public DbSet<ValidationErrorEntity> ValidationErrors => Set<ValidationErrorEntity>();
+        public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -84,6 +85,11 @@ namespace CncWallStation.EntityFrameworkCore
                     .WithOne(e => e.Wall)
                     .HasForeignKey(e => e.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(w => w.DataCheckRecords)
+                    .WithOne(r => r.Wall)
+                    .HasForeignKey(r => r.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // ==================== ValidationError 表配置 ====================
@@ -98,6 +104,7 @@ namespace CncWallStation.EntityFrameworkCore
 
                 entity.HasIndex(e => e.WallId).HasDatabaseName("IX_ValidationError_WallId");
                 entity.HasIndex(e => e.GroupId).HasDatabaseName("IX_ValidationError_GroupId");
+                entity.HasIndex(e => e.DataCheckGroupId).HasDatabaseName("IX_ValidationError_DataCheckGroupId");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("timestamp")
@@ -106,6 +113,34 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.HasOne(e => e.Wall)
                     .WithMany(w => w.ValidationErrors)
                     .HasForeignKey(e => e.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.DataCheckRecord)
+                    .WithMany(r => r.Errors)
+                    .HasForeignKey(e => e.DataCheckGroupId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== DataCheckRecord 表配置 ====================
+            modelBuilder.Entity<DataCheckRecordEntity>(entity =>
+            {
+                entity.ToTable("DataCheckRecord");
+
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.Id)
+                    .HasMaxLength(64)
+                    .ValueGeneratedNever(); // GroupId 由应用生成
+
+                entity.HasIndex(r => r.WallId).HasDatabaseName("IX_DataCheckRecord_WallId");
+                entity.HasIndex(r => r.CheckTime).HasDatabaseName("IX_DataCheckRecord_CheckTime");
+
+                entity.Property(r => r.CheckTime)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(r => r.Wall)
+                    .WithMany(w => w.DataCheckRecords)
+                    .HasForeignKey(r => r.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

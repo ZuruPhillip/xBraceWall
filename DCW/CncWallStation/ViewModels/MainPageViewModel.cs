@@ -19,7 +19,8 @@ namespace CncWallStation.ViewModels
             { "BimDataRenderPage", ("BIM模型渲染", typeof(Views.BimDataRenderPage)) },
             { "MomDataRenderPage", ("MOM模型渲染", typeof(Views.MomDataRenderPage)) },
             { "ControllerPage", ("控制页面", typeof(Views.ControllerPage)) },
-            { "JsonEditPage", ("JSON编辑器", typeof(Views.JsonEditPage)) }
+            { "JsonEditPage", ("JSON编辑器", typeof(Views.JsonEditPage)) },
+            { "DataCheckPage", ("数据预检", typeof(Views.DataCheckPage)) }
         };
 
         public ObservableCollection<TabItemViewModel> Tabs { get; } = new();

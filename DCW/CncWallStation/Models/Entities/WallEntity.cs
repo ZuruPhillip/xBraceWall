@@ -94,6 +94,9 @@ namespace CncWallStation.Models.Entities
         /// <summary>校验/转换失败详情列表</summary>
         public ICollection<ValidationErrorEntity> ValidationErrors { get; private set; } = new List<ValidationErrorEntity>();
 
+        /// <summary>数据预检记录列表</summary>
+        public ICollection<DataCheckRecordEntity> DataCheckRecords { get; private set; } = new List<DataCheckRecordEntity>();
+
         // ==================== 领域方法 ====================
 
         /// <summary>更新管线阶段</summary>
