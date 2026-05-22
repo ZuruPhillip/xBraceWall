@@ -271,6 +271,7 @@
 				  Style="{StaticResource LightDataGridStyle}"
 				  CanUserSortColumns="False"
 				  PreviewKeyDown="DataGrid_PreviewKeyDown"
+				  PreviewMouseRightButtonDown="DataGrid_PreviewMouseRightButtonDown"
 				  SelectionChanged="DataGrid_SelectionChanged">
 
 			<DataGrid.ContextMenu>
@@ -281,7 +282,7 @@
 					<MenuItem Header="✏️ 修改墙体名称" Click="ContextMenu_RenameWall"
 							  Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
 					<Separator/>
-					<MenuItem Header="📄 查看详情" Click="ContextMenu_ViewDetail"/>
+					<MenuItem Header="🏗️ 查看BIM模型渲染" Click="ContextMenu_ViewDetail"/>
 					<MenuItem Header="📝 编辑 JSON" Click="ContextMenu_EditJson"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
@@ -362,7 +363,8 @@
 					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding WallId}" FontFamily="Consolas" FontSize="11"/>
+							<TextBlock Text="{Binding WallId}" FontFamily="Consolas" FontSize="11"
+									  ToolTip="{Binding WallId}" TextTrimming="CharacterEllipsis"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>

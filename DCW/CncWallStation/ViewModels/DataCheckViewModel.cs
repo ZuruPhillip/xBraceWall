@@ -27,12 +27,6 @@ namespace CncWallStation.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
         private string _searchWallId = string.Empty;
 
-        [ObservableProperty]
-        private string _selectedVersion = "latest";
-
-        [ObservableProperty]
-        private ObservableCollection<string> _versionOptions = new() { "latest" };
-
         // ==================== 墙体信息 ====================
 
         [ObservableProperty]
@@ -242,14 +236,6 @@ namespace CncWallStation.ViewModels
 
                 // 解析 BimJson 中的 schema 版本号
                 var resolvedVersion = BimDataVersionResolver.ResolveVersion(detail.BimJsonData);
-
-                // 更新版本下拉框：{ "最新版本(" + version + ")", version }
-                VersionOptions = new ObservableCollection<string>
-                {
-                    $"最新版本({resolvedVersion})",
-                    resolvedVersion
-                };
-                SelectedVersion = VersionOptions[0]; // 默认选"最新版本"
 
                 // 设置墙体详情行显示字段
                 DetailWallId = detail.WallId;

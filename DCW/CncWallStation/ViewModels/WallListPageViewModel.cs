@@ -143,15 +143,19 @@ namespace CncWallStation.ViewModels
             ILogger<WallListPageViewModel> logger,
             IWallAppService wallAppService,
             IProjectAppService projectAppService,
-            IPipelineService pipelineService)
+            IPipelineService pipelineService,
+            MainPageViewModel mainPageViewModel)
         {
             _logger = logger;
             _wallAppService = wallAppService;
             _projectAppService = projectAppService;
             _pipelineService = pipelineService;
+            _mainPageViewModel = mainPageViewModel;
 
             _ = LoadDataFromDbAsync();
         }
+
+        private readonly MainPageViewModel _mainPageViewModel;
 
         // ==================== 从数据库加载数据 ====================
         private async Task LoadDataFromDbAsync()
@@ -797,11 +801,10 @@ namespace CncWallStation.ViewModels
             var updatedBy = Environment.UserName;
             await _wallAppService.UpdateWallNameAsync(item.Id, newName, updatedBy);
 
-            item.WallName = newName;
-            item.UpdatedBy = updatedBy;
-            item.UpdatedAt = DateTime.Now;
-
             _logger.LogInformation("修改墙体名称: WallId={WallId}, NewName={WallName}", item.WallId, newName);
+
+            // 立刻刷新表格数据
+            await ApplyFiltersAsync();
         }
 
         // ==================== 命令：软删除 ====================
@@ -902,110 +905,37 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        // ==================== 命令：查看详情 ====================
+        // ==================== 命令：查看BIM模型渲染 ====================
         [RelayCommand]
         private void ViewDetail(WallListItem? item)
         {
             if (item == null) return;
 
-            try
+            _mainPageViewModel.AddOrActivateTab("BimDataRenderPage", onPageCreated: page =>
             {
-                var data = item.MomJsonData ?? item.MjsonData;
-                var formatted = JsonSerializer.Serialize(
-                    JsonSerializer.Deserialize<object>(data),
-                    new JsonSerializerOptions { WriteIndented = true });
+                if (page is Views.BimDataRenderPage bimPage && bimPage.DataContext is BimDataRenderViewModel vm)
+                {
+                    vm.SearchWallId = item.WallId;
+                    vm.SearchWallCommand.Execute(null);
+                }
+            });
 
-                var title = item.MomJsonData != null
-                    ? $"墙体详情 (MomJSON) - {item.WallId}"
-                    : $"墙体详情 (BimJSON) - {item.WallId}";
-
-                var message = formatted;
-                if (item.ValidationErrorSummary != null)
-                    message += $"\n\n--- 校验失败原因 ---\n{item.ValidationErrorSummary}";
-                if (item.PipelineStage != PipelineStage.Imported && item.PipelineStage != PipelineStage.Ready)
-                    message += $"\n\n管线阶段: {item.PipelineStageText}";
-
-                MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch
-            {
-                MessageBox.Show(item.MomJsonData ?? item.MjsonData,
-                    $"墙体详情 - {item.WallId}",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
+            _logger.LogInformation("跳转到BIM模型渲染: WallId={WallId}", item.WallId);
         }
 
-        // ==================== 命令：编辑 JSON 数据 ====================
+        // ==================== 命令：编辑 JSON 数据（跳转到 JSON 编辑器） ====================
         [RelayCommand]
-        private async Task EditJsonDataAsync(WallListItem? item)
+        private void EditJsonData(WallListItem? item)
         {
             if (item == null) return;
 
-            if (item.PipelineStage != PipelineStage.BimInvalid &&
-                item.PipelineStage != PipelineStage.ConversionFailed &&
-                item.PipelineStage != PipelineStage.MomInvalid)
+            _mainPageViewModel.AddOrActivateTab("JsonEditPage", onPageCreated: page =>
             {
-                MessageBox.Show("仅异常状态（BimInvalid/ConversionFailed/MomInvalid）的墙体支持编辑 JSON 数据。",
-                    "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+                if (page is Views.JsonEditPage jsonPage && jsonPage.DataContext is JsonEditPageViewModel vm)
+                    _ = vm.SetWallIdAsync(item.WallId);
+            });
 
-            bool editMom = item.PipelineStage == PipelineStage.MomInvalid ||
-                           item.PipelineStage == PipelineStage.ConversionFailed;
-
-            var currentJson = editMom ? item.MomJsonData ?? "" : item.MjsonData;
-            var title = editMom ? "编辑 MomJSON 数据" : "编辑 BimJSON 数据";
-
-            var inputWindow = new Window
-            {
-                Title = $"{title} - {item.WallId}",
-                Width = 800,
-                Height = 600,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Content = new System.Windows.Controls.TextBox
-                {
-                    Text = currentJson,
-                    AcceptsReturn = true,
-                    AcceptsTab = true,
-                    VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto,
-                    HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Auto,
-                    FontFamily = new System.Windows.Media.FontFamily("Consolas"),
-                    FontSize = 13,
-                    Margin = new System.Windows.Thickness(10)
-                }
-            };
-
-            inputWindow.ShowDialog();
-
-            if (inputWindow.Content is System.Windows.Controls.TextBox textBox &&
-                textBox.Text != currentJson)
-            {
-                var updatedBy = Environment.UserName;
-                string? newBim = null;
-                string? newMom = null;
-
-                if (editMom)
-                    newMom = textBox.Text;
-                else
-                    newBim = textBox.Text;
-
-                await _wallAppService.UpdateJsonDataAsync(item.Id, newBim, newMom, updatedBy);
-
-                if (editMom)
-                    item.MomJsonData = newMom;
-                else
-                    item.MjsonData = newBim!;
-
-                item.UpdatedBy = updatedBy;
-                item.UpdatedAt = DateTime.Now;
-
-                MessageBox.Show("JSON 数据已保存，可重新触发管线。", "保存成功",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-
-                _logger.LogInformation("手动编辑 JSON: {WallId}, 类型={Type}, 修改者={User}",
-                    item.WallId, editMom ? "MomJSON" : "BimJSON", updatedBy);
-            }
+            _logger.LogInformation("跳转到JSON编辑器: WallId={WallId}", item.WallId);
         }
 
         // ==================== 命令：搜索 ====================

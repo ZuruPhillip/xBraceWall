@@ -51,9 +51,6 @@
                              Width="280" Height="34" VerticalContentAlignment="Center"
                              Style="{StaticResource TextBoxExtend}"
                              hc:InfoElement.Placeholder="输入墙体Id"/>
-                    <TextBlock Text="版本" VerticalAlignment="Center" Margin="16,0,8,0" Foreground="#666"/>
-                    <ComboBox ItemsSource="{Binding VersionOptions}" SelectedItem="{Binding SelectedVersion}"
-                              Width="100" Height="34" Style="{StaticResource ComboBoxExtend}"/>
                     <Button Content="🔍 搜索" Command="{Binding SearchCommand}" Width="80" Height="34"
                             Margin="12,0,0,0" Style="{StaticResource ButtonPrimary}"/>
                 </StackPanel>

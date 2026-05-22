@@ -36,7 +36,7 @@ namespace CncWallStation.ViewModels
             _logger = logger;
         }
 
-        public void AddOrActivateTab(string pageKey)
+        public void AddOrActivateTab(string pageKey, Action<Page>? onPageCreated = null)
         {
             if (!_pageMap.TryGetValue(pageKey, out var pageInfo))
             {
@@ -50,12 +50,25 @@ namespace CncWallStation.ViewModels
             {
                 existingTab.IsSelected = true;
                 SelectedTab = existingTab;
+
+                // 对已有页面也触发回调（用于更新 WallId 等参数）
+                if (existingTab.Content is Frame { Content: Page existingPage })
+                    onPageCreated?.Invoke(existingPage);
+
                 _logger.LogInformation("激活已有选项卡: {PageKey}", pageKey);
                 return;
             }
 
             // 创建新选项卡
             var page = _serviceProvider.GetRequiredService(pageInfo.PageType) as Page;
+            if (page == null)
+            {
+                _logger.LogError("无法创建页面: {PageKey}", pageKey);
+                return;
+            }
+
+            onPageCreated?.Invoke(page);
+
             var frame = new Frame
             {
                 Content = page,

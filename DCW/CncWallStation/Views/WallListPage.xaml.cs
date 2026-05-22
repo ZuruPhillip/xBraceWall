@@ -77,6 +77,22 @@ namespace CncWallStation.Views
             }
         }
 
+        /// <summary>右键点击时，把目标单元格设为当前单元格（修复右键复制取不到正确值的问题）</summary>
+        private void DataGrid_PreviewMouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is not DataGrid dg) return;
+
+            // 命中测试找到点击的 DataGridCell
+            var hit = VisualTreeHelper.HitTest(dg, e.GetPosition(dg));
+            var cell = FindVisualParent<DataGridCell>(hit?.VisualHit as DependencyObject);
+            if (cell == null) return;
+
+            // 把点击的行设为选中行，单元格设为当前单元格
+            cell.Focus();
+            dg.CurrentCell = new DataGridCellInfo(cell);
+            e.Handled = true;
+        }
+
         /// <summary>从 DataGrid 单元格的视觉树中提取文本</summary>
         private static string ExtractTextFromCell(FrameworkElement element, DataGridColumn column)
         {
@@ -159,6 +175,18 @@ namespace CncWallStation.Views
                 var result = FindVisualChild<T>(child);
                 if (result != null)
                     return result;
+            }
+            return null;
+        }
+
+        /// <summary>在视觉树中向上查找指定类型的父元素</summary>
+        private static T? FindVisualParent<T>(DependencyObject? child) where T : DependencyObject
+        {
+            while (child != null)
+            {
+                if (child is T found)
+                    return found;
+                child = VisualTreeHelper.GetParent(child);
             }
             return null;
         }
