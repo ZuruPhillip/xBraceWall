@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:CncWallStation"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:vm="CncWallStationWPF.ViewModels"
+    xmlns:svg="http://sharpvectors.codeplex.com/svgc/"
     mc:Ignorable="d"
 
     Title="CNC工站管理系统" Height="791" Width="1280">
@@ -31,8 +32,25 @@
             <!-- 内容区宽度 -->
         </Grid.ColumnDefinitions>
 
-        <!-- 左侧：HandyControl侧边菜单 -->
-        <hc:SideMenu Grid.Column="0" Grid.Row="0" Background="{DynamicResource SecondaryRegionBrush}" Margin="0,30,0,0">
+        <!-- 左侧：Logo + 侧边导航菜单 -->
+        <Grid Grid.Column="0" Grid.Row="0" Background="{DynamicResource SecondaryRegionBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ZURU Tech Logo -->
+            <Border Grid.Row="0" Background="White">
+                <svg:SvgViewbox
+                        Source="/Resources/Images/ZURU_Tech_logo.svg"
+                        Height="52"
+                        Margin="12,15,12,12"/>
+            </Border>
+
+            <!-- HandyControl 侧边菜单 -->
+            <hc:SideMenu Grid.Row="1"
+                         Background="Transparent"
+                         Margin="0,0,0,0">
             <hc:SideMenu.Items>
                 <hc:SideMenuItem 
                 Header="墙体清单" 
@@ -88,6 +106,7 @@
                 CommandParameter="SettingPage"/>
             </hc:SideMenu.Items>
         </hc:SideMenu>
+        </Grid>
 
         <!-- 右侧：选项卡页面容器（MainPage），通过 code-behind 注入 -->
         <ContentControl x:Name="MainPageHost" Grid.Column="1" Grid.Row="0" Margin="10"/>
