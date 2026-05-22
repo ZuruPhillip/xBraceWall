@@ -35,20 +35,16 @@ namespace CncWallStation.Services.Application
 
             IQueryable<WallEntity> query = db.Walls.AsNoTracking();
 
-            // 仅查最新版本
-            if (input.LatestOnly)
-            {
-                var latestProjectIds = await db.Projects
-                    .Where(p => p.IsLatest)
-                    .Select(p => p.Id)
-                    .ToListAsync();
-
-                query = query.Where(w => latestProjectIds.Contains(w.ProjectId));
-            }
+            // 是否包含已删除数据
+            if (input.IncludeDeleted)
+                query = query.IgnoreQueryFilters();
 
             // LINQ 筛选条件
-            if (!string.IsNullOrWhiteSpace(input.ProjectNumber))
-                query = query.Where(w => w.ProjectNumber.Contains(input.ProjectNumber));
+            if (!string.IsNullOrWhiteSpace(input.ProjectName))
+                query = query.Where(w => w.ProjectName.Contains(input.ProjectName));
+
+            if (!string.IsNullOrWhiteSpace(input.WallName))
+                query = query.Where(w => w.WallName.Contains(input.WallName));
 
             if (input.Floor.HasValue)
                 query = query.Where(w => w.Floor == input.Floor.Value);
@@ -65,20 +61,26 @@ namespace CncWallStation.Services.Application
             if (input.PipelineStages is { Count: > 0 })
                 query = query.Where(w => input.PipelineStages.Contains(w.PipelineStage));
 
-            if (input.ImportTimeFrom.HasValue)
-                query = query.Where(w => w.ImportTime >= input.ImportTimeFrom.Value);
+            if (input.AuditStatuses is { Count: > 0 })
+                query = query.Where(w => input.AuditStatuses.Contains(w.AuditStatus));
 
-            if (input.ImportTimeTo.HasValue)
-                query = query.Where(w => w.ImportTime <= input.ImportTimeTo.Value.AddDays(1));
+            if (input.EndProductionTimeFrom.HasValue)
+                query = query.Where(w => w.EndProductionTime >= input.EndProductionTimeFrom.Value);
+
+            if (input.EndProductionTimeTo.HasValue)
+                query = query.Where(w => w.EndProductionTime <= input.EndProductionTimeTo.Value.AddDays(1));
 
             var totalCount = await query.CountAsync();
 
             // 排序
             query = input.SortField?.ToLower() switch
             {
-                "projectnumber" => input.SortAscending
-                    ? query.OrderBy(w => w.ProjectNumber)
-                    : query.OrderByDescending(w => w.ProjectNumber),
+                "projectname" => input.SortAscending
+                    ? query.OrderBy(w => w.ProjectName)
+                    : query.OrderByDescending(w => w.ProjectName),
+                "wallname" => input.SortAscending
+                    ? query.OrderBy(w => w.WallName)
+                    : query.OrderByDescending(w => w.WallName),
                 "floor" => input.SortAscending
                     ? query.OrderBy(w => w.Floor)
                     : query.OrderByDescending(w => w.Floor),
@@ -91,12 +93,15 @@ namespace CncWallStation.Services.Application
                 "status" => input.SortAscending
                     ? query.OrderBy(w => w.Status)
                     : query.OrderByDescending(w => w.Status),
+                "auditstatus" => input.SortAscending
+                    ? query.OrderBy(w => w.AuditStatus)
+                    : query.OrderByDescending(w => w.AuditStatus),
                 "pipelinestage" => input.SortAscending
                     ? query.OrderBy(w => w.PipelineStage)
                     : query.OrderByDescending(w => w.PipelineStage),
                 _ => input.SortAscending
-                    ? query.OrderByDescending(w => w.ImportTime)
-                    : query.OrderBy(w => w.ImportTime)
+                    ? query.OrderByDescending(w => w.EndProductionTime ?? DateTime.MinValue)
+                    : query.OrderBy(w => w.EndProductionTime ?? DateTime.MinValue)
             };
 
             // 分页 + Include 导航属性
@@ -151,7 +156,7 @@ namespace CncWallStation.Services.Application
 
         // ==================== 简单查询 ====================
 
-        public async Task<List<WallDto>> GetByProjectNumberAsync(string projectNumber)
+        public async Task<List<WallDto>> GetByProjectNameAsync(string projectName)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -159,26 +164,59 @@ namespace CncWallStation.Services.Application
                 .Include(w => w.Project)
                 .Include(w => w.ValidationErrors)
                 .AsNoTracking()
-                .Where(w => w.ProjectNumber == projectNumber)
+                .Where(w => w.ProjectName == projectName)
                 .ToListAsync();
 
             return _mapper.Map<List<WallDto>>(entities);
         }
 
-        public async Task<List<int>> GetAvailableFloorsAsync(string? projectNumber = null)
+        public async Task<List<int>> GetAvailableFloorsAsync(string? projectName = null)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             IQueryable<WallEntity> query = db.Walls.AsNoTracking();
 
-            if (!string.IsNullOrWhiteSpace(projectNumber))
-                query = query.Where(w => w.ProjectNumber.Contains(projectNumber));
+            if (!string.IsNullOrWhiteSpace(projectName))
+                query = query.Where(w => w.ProjectName.Contains(projectName));
 
             return await query
                 .Select(w => w.Floor)
                 .Distinct()
                 .OrderBy(f => f)
                 .ToListAsync();
+        }
+
+        // ==================== 存在性/审核检查 ====================
+
+        public async Task<bool> ExistsByWallIdAsync(string wallId)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            return await db.Walls.AnyAsync(w => w.WallId == wallId);
+        }
+
+        public async Task<HashSet<string>> GetAuditedWallIdsAsync(IEnumerable<string> wallIds)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var ids = await db.Walls
+                .Where(w => wallIds.Contains(w.WallId) && w.AuditStatus == (int)AuditStatus.已审核)
+                .Select(w => w.WallId)
+                .ToListAsync();
+
+            return new HashSet<string>(ids);
+        }
+
+        public async Task<HashSet<string>> GetExistingWallIdsAsync(IEnumerable<string> wallIds)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var ids = await db.Walls
+                .Where(w => wallIds.Contains(w.WallId))
+                .Select(w => w.WallId)
+                .ToListAsync();
+
+            return new HashSet<string>(ids);
         }
 
         // ==================== 新增 ====================
@@ -255,18 +293,137 @@ namespace CncWallStation.Services.Application
             _logger.LogInformation("手动编辑 JSON: WallId={WallId}", wallId);
         }
 
-        // ==================== 删除 ====================
+        public async Task UpdateWallNameAsync(long wallId, string wallName, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var wall = await db.Walls.FirstOrDefaultAsync(w => w.Id == wallId)
+                ?? throw new InvalidOperationException($"墙体不存在: Id={wallId}");
+
+            wall.UpdateWallName(wallName, updatedBy);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("更新墙体名称: WallId={WallId}, WallName={WallName}", wallId, wallName);
+        }
+
+        public async Task SyncBimDataAsync(long wallId, string bimJsonData, string schemaVersion, string wallName, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var wall = await db.Walls.FirstOrDefaultAsync(w => w.Id == wallId)
+                ?? throw new InvalidOperationException($"墙体不存在: Id={wallId}");
+
+            wall.SyncBimData(bimJsonData, schemaVersion, wallName, updatedBy);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("同步更新 BimData: WallId={WallId}, SchemaVer={SchemaVer}", wallId, schemaVersion);
+        }
+
+        public async Task SetAuditStatusAsync(long wallId, int auditStatus, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var wall = await db.Walls.FirstOrDefaultAsync(w => w.Id == wallId)
+                ?? throw new InvalidOperationException($"墙体不存在: Id={wallId}");
+
+            wall.SetAuditStatus(auditStatus, updatedBy);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("设置审核状态: WallId={WallId}, AuditStatus={AuditStatus}", wallId, auditStatus);
+        }
+
+        public async Task SetAuditStatusBatchAsync(List<long> wallIds, int auditStatus, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var walls = await db.Walls
+                .Where(w => wallIds.Contains(w.Id))
+                .ToListAsync();
+
+            foreach (var wall in walls)
+            {
+                wall.SetAuditStatus(auditStatus, updatedBy);
+            }
+
+            await db.SaveChangesAsync();
+            _logger.LogInformation("批量设置审核状态: {Count}条 → AuditStatus={AuditStatus}", walls.Count, auditStatus);
+        }
+
+        // ==================== 软删除 ====================
+
+        public async Task SoftDeleteAsync(long wallId, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var wall = await db.Walls.IgnoreQueryFilters().FirstOrDefaultAsync(w => w.Id == wallId)
+                ?? throw new InvalidOperationException($"墙体不存在: Id={wallId}");
+
+            wall.SoftDelete(updatedBy);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("软删除墙体: Id={WallId}", wallId);
+        }
+
+        public async Task SoftDeleteManyAsync(List<long> wallIds, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var walls = await db.Walls
+                .Where(w => wallIds.Contains(w.Id))
+                .ToListAsync();
+
+            foreach (var wall in walls)
+            {
+                wall.SoftDelete(updatedBy);
+            }
+
+            await db.SaveChangesAsync();
+            _logger.LogInformation("批量软删除墙体: {Count}条", walls.Count);
+        }
+
+        public async Task RestoreAsync(long wallId, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var wall = await db.Walls.IgnoreQueryFilters().FirstOrDefaultAsync(w => w.Id == wallId)
+                ?? throw new InvalidOperationException($"墙体不存在: Id={wallId}");
+
+            wall.Restore(updatedBy);
+            await db.SaveChangesAsync();
+
+            _logger.LogInformation("恢复墙体: Id={WallId}", wallId);
+        }
+
+        public async Task RestoreManyAsync(List<long> wallIds, string updatedBy)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var walls = await db.Walls
+                .IgnoreQueryFilters()
+                .Where(w => wallIds.Contains(w.Id))
+                .ToListAsync();
+
+            foreach (var wall in walls)
+            {
+                wall.Restore(updatedBy);
+            }
+
+            await db.SaveChangesAsync();
+            _logger.LogInformation("批量恢复墙体: {Count}条", walls.Count);
+        }
+
+        // ==================== 物理删除 ====================
 
         public async Task DeleteAsync(long wallId)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            // 用 ExecuteDeleteAsync 避免加载实体（EF Core 7+）
             var affected = await db.Walls
+                .IgnoreQueryFilters()
                 .Where(w => w.Id == wallId)
                 .ExecuteDeleteAsync();
 
-            _logger.LogInformation("直接删除墙体: Id={WallId}, Affected={Affected}", wallId, affected);
+            _logger.LogInformation("物理删除墙体: Id={WallId}, Affected={Affected}", wallId, affected);
         }
 
         public async Task DeleteManyAsync(List<long> wallIds)
@@ -274,10 +431,11 @@ namespace CncWallStation.Services.Application
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             var affected = await db.Walls
+                .IgnoreQueryFilters()
                 .Where(w => wallIds.Contains(w.Id))
                 .ExecuteDeleteAsync();
 
-            _logger.LogInformation("批量直接删除墙体: 请求 {Count} 条, 实际删除 {Affected} 条", wallIds.Count, affected);
+            _logger.LogInformation("批量物理删除墙体: 请求 {Count} 条, 实际删除 {Affected} 条", wallIds.Count, affected);
         }
     }
 }

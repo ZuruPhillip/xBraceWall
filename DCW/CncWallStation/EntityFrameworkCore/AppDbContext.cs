@@ -31,9 +31,7 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.Property(p => p.Id)
                     .ValueGeneratedOnAdd();
 
-                entity.HasIndex(p => new { p.ProjectNumber, p.Version }).IsUnique();
-                entity.HasIndex(p => p.ProjectNumber);
-                entity.HasIndex(p => p.IsLatest);
+                entity.HasIndex(p => p.ProjectName);
 
                 entity.Property(p => p.ImportTime)
                     .HasColumnType("timestamp")
@@ -45,6 +43,9 @@ namespace CncWallStation.EntityFrameworkCore
             {
                 entity.ToTable("Wall");
 
+                // 全局查询过滤器：默认不查询已软删除的数据
+                entity.HasQueryFilter(w => !w.IsDeleted);
+
                 // 主键自增
                 entity.HasKey(w => w.Id);
                 entity.Property(w => w.Id)
@@ -54,18 +55,27 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.HasIndex(w => new { w.ProjectId, w.WallId }).IsUnique();
 
                 // 查询索引
-                entity.HasIndex(w => w.ProjectNumber).HasDatabaseName("IX_Wall_ProjectNumber");
+                entity.HasIndex(w => w.ProjectName).HasDatabaseName("IX_Wall_ProjectName");
                 entity.HasIndex(w => w.Floor).HasDatabaseName("IX_Wall_Floor");
                 entity.HasIndex(w => w.Status).HasDatabaseName("IX_Wall_Status");
                 entity.HasIndex(w => w.Priority).HasDatabaseName("IX_Wall_Priority");
                 entity.HasIndex(w => w.ImportTime).HasDatabaseName("IX_Wall_ImportTime");
+                entity.HasIndex(w => w.EndProductionTime).HasDatabaseName("IX_Wall_EndProductionTime");
                 entity.HasIndex(w => w.PipelineStage).HasDatabaseName("IX_Wall_PipelineStage");
-                entity.HasIndex(w => new { w.ProjectNumber, w.Status, w.Floor })
-                    .HasDatabaseName("IX_Wall_ProjectNumber_Status_Floor");
+                entity.HasIndex(w => w.AuditStatus).HasDatabaseName("IX_Wall_AuditStatus");
+                entity.HasIndex(w => w.WallName).HasDatabaseName("IX_Wall_WallName");
+                entity.HasIndex(w => w.IsDeleted).HasDatabaseName("IX_Wall_IsDeleted");
+                entity.HasIndex(w => new { w.ProjectName, w.Status, w.Floor })
+                    .HasDatabaseName("IX_Wall_ProjectName_Status_Floor");
 
                 // MEDIUMTEXT 列
                 entity.Property(w => w.BimJsonData).HasColumnType("MEDIUMTEXT");
                 entity.Property(w => w.MomJsonData).HasColumnType("MEDIUMTEXT");
+
+                // 默认值
+                entity.Property(w => w.AuditStatus).HasDefaultValue(0);
+                entity.Property(w => w.SchemaVersion).HasMaxLength(64).HasDefaultValue("V0.0.0");
+                entity.Property(w => w.IsDeleted).HasDefaultValue(false);
 
                 // timestamp 列
                 entity.Property(w => w.ImportTime)

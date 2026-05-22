@@ -253,7 +253,7 @@ namespace CncWallStation.ViewModels
 
                 // 设置墙体详情行显示字段
                 DetailWallId = detail.WallId;
-                DetailProject = detail.ProjectNumber;
+                DetailProject = detail.ProjectName;
                 DetailFloor = $"楼层 {detail.Floor}";
                 DetailStage = detail.PipelineStage.ToDisplayText();
                 DetailVersion = $"v{resolvedVersion}";
@@ -381,12 +381,11 @@ namespace CncWallStation.ViewModels
 
                 var filter = new WallFilterDto
                 {
-                    ProjectNumber = string.IsNullOrWhiteSpace(BatchFilterProjectNumber) ? null : BatchFilterProjectNumber,
+                    //ProjectName = string.IsNullOrWhiteSpace(BatchFilterProjectName) ? null : BatchFilterProjectName,
                     Floor = BatchFilterFloor,
                     StartTime = BatchFilterStartTime,
                     EndTime = BatchFilterEndTime,
-                    PipelineStages = BatchFilterStages.Count > 0 ? BatchFilterStages.ToList() : null,
-                    LatestOnly = BatchFilterLatestOnly
+                    PipelineStages = BatchFilterStages.Count > 0 ? BatchFilterStages.ToList() : null
                 };
 
                 var progress = new Progress<(int Done, int Total, int Errors)>(p =>

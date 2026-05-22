@@ -7,13 +7,10 @@ namespace CncWallStation.Services.Application
     /// </summary>
     public interface IProjectAppService
     {
-        /// <summary>获取所有最新项目列表</summary>
-        Task<List<ProjectDto>> GetLatestProjectsAsync();
+        /// <summary>获取所有项目列表</summary>
+        Task<List<ProjectDto>> GetAllProjectsAsync();
 
         /// <summary>创建新导入批次</summary>
-        Task<int> CreateProjectAsync(string projectNumber, string sourceFolderPath, string hostName, string importedBy, int totalWalls);
-
-        /// <summary>归档旧版本（同一项目号）</summary>
-        Task ArchiveOldVersionsAsync(string projectNumber);
+        Task<int> CreateProjectAsync(string projectName, string sourceFolderPath, string hostName, string importedBy, int totalWalls);
     }
 }

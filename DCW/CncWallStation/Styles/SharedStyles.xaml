@@ -134,6 +134,58 @@
     </Style>
 
     <!-- ═══════════════════════════════════════════ -->
+    <!--  成功按钮样式（绿底白字·审核等正向操作）       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="#52C41A"/>
+        <Setter Property="BorderBrush" Value="#52C41A"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#73D13D"/>
+                <Setter Property="BorderBrush" Value="#73D13D"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#389E0D"/>
+                <Setter Property="BorderBrush" Value="#389E0D"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#D9D9D9"/>
+                <Setter Property="BorderBrush" Value="#D9D9D9"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  警告按钮样式（橙底白字·反审核等警示操作）     -->
+    <!-- ═══════════════════════════════════════════ -->
+    <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="Background" Value="#E67E22"/>
+        <Setter Property="BorderBrush" Value="#E67E22"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#F39C12"/>
+                <Setter Property="BorderBrush" Value="#F39C12"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#D35400"/>
+                <Setter Property="BorderBrush" Value="#D35400"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#D9D9D9"/>
+                <Setter Property="BorderBrush" Value="#D9D9D9"/>
+                <Setter Property="Foreground" Value="#FFFFFF"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════ -->
     <!--  危险按钮样式（红底白字）                     -->
     <!-- ═══════════════════════════════════════════ -->
     <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource BaseButtonStyle}">

@@ -10,11 +10,14 @@ namespace CncWallStation.Models.Dtos
         /// <summary>主键</summary>
         public long Id { get; set; }
 
-        /// <summary>项目号</summary>
-        public string ProjectNumber { get; set; } = string.Empty;
+        /// <summary>项目名称</summary>
+        public string ProjectName { get; set; } = string.Empty;
 
         /// <summary>墙体唯一标识</summary>
         public string WallId { get; set; } = string.Empty;
+
+        /// <summary>墙体名称</summary>
+        public string WallName { get; set; } = string.Empty;
 
         /// <summary>楼层</summary>
         public int Floor { get; set; }
@@ -25,26 +28,38 @@ namespace CncWallStation.Models.Dtos
         /// <summary>管线阶段中文显示文本</summary>
         public string PipelineStageText => PipelineStage.ToDisplayText();
 
-        /// <summary>加工优先级</summary>
+        /// <summary>加工优先级（int）</summary>
         public int Priority { get; set; }
 
-        /// <summary>加工状态</summary>
+        /// <summary>生产状态</summary>
         public int Status { get; set; }
 
-        /// <summary>版本号</summary>
-        public int Version { get; set; }
+        /// <summary>审核状态：0=未审核，1=已审核</summary>
+        public int AuditStatus { get; set; }
 
-        /// <summary>导入时间</summary>
-        public DateTime ImportTime { get; set; }
+        /// <summary>Schema 版本号（来自 BimJson）</summary>
+        public string SchemaVersion { get; set; } = "V0.0.0";
 
-        /// <summary>最后更新时间</summary>
-        public DateTime UpdatedAt { get; set; }
+		/// <summary>开始生产时间</summary>
+		public DateTime? StartProductionTime { get; set; }
+
+		/// <summary>结束生产时间</summary>
+		public DateTime? EndProductionTime { get; set; }
+
+		/// <summary>导入时间</summary>
+		public DateTime ImportTime { get; set; }
+
+		/// <summary>最后更新时间</summary>
+		public DateTime UpdatedAt { get; set; }
 
         /// <summary>最后修改人</summary>
         public string? UpdatedBy { get; set; }
 
         /// <summary>校验失败原因摘要</summary>
         public string? ValidationErrorSummary { get; set; }
+
+        /// <summary>软删除标记</summary>
+        public bool IsDeleted { get; set; }
     }
 
     /// <summary>

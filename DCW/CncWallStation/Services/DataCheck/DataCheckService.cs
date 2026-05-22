@@ -57,8 +57,8 @@ namespace CncWallStation.Services.DataCheck
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "版本解析失败，使用默认版本 0.0.0");
-                version = "0.0.0";
+                _logger.LogWarning(ex, "版本解析失败，使用默认版本 V0.0.0");
+                version = "V0.0.0";
             }
 
             // 2. 获取版本化校验器
@@ -252,8 +252,8 @@ namespace CncWallStation.Services.DataCheck
             await using var db = await _dbFactory.CreateDbContextAsync();
             var query = db.Walls.AsNoTracking().AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(filter.ProjectNumber))
-                query = query.Where(w => w.ProjectNumber == filter.ProjectNumber);
+            if (!string.IsNullOrWhiteSpace(filter.ProjectName))
+                query = query.Where(w => w.ProjectName == filter.ProjectName);
 
             if (filter.Floor.HasValue)
                 query = query.Where(w => w.Floor == filter.Floor.Value);
@@ -266,15 +266,6 @@ namespace CncWallStation.Services.DataCheck
 
             if (filter.PipelineStages != null && filter.PipelineStages.Count > 0)
                 query = query.Where(w => filter.PipelineStages.Contains(w.PipelineStage));
-
-            if (filter.LatestOnly)
-            {
-                var latestProjectIds = await db.Projects
-                    .Where(p => p.IsLatest)
-                    .Select(p => p.Id)
-                    .ToListAsync();
-                query = query.Where(w => latestProjectIds.Contains(w.ProjectId));
-            }
 
             // 跳过已经 Ready 或 Invalid 的墙体
             query = query.Where(w => w.PipelineStage != PipelineStage.Ready
@@ -339,7 +330,7 @@ namespace CncWallStation.Services.DataCheck
             }
             catch
             {
-                version = "0.0.0";
+                version = "V0.0.0";
             }
 
             var validator = _validatorFactory.GetValidator(version);

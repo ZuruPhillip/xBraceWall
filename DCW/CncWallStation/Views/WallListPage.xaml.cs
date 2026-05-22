@@ -80,7 +80,6 @@ namespace CncWallStation.Views
         /// <summary>从 DataGrid 单元格的视觉树中提取文本</summary>
         private static string ExtractTextFromCell(FrameworkElement element, DataGridColumn column)
         {
-            // 遍历视觉树找 TextBlock
             var textBlock = FindVisualChild<TextBlock>(element);
             if (textBlock != null)
                 return textBlock.Text ?? string.Empty;
@@ -102,7 +101,6 @@ namespace CncWallStation.Views
             var text = ExtractTextFromCell(element, cell.Column);
             if (string.IsNullOrEmpty(text)) return;
 
-            // ContextMenu 打开期间剪贴板被 WPF 锁定，延迟到菜单关闭后再写入
             var capturedText = text;
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -112,6 +110,42 @@ namespace CncWallStation.Views
                     // 剪贴板被其他进程占用，静默忽略
                 }
             }), DispatcherPriority.Background);
+        }
+
+        /// <summary>右键菜单 → 修改墙体名称</summary>
+        private void ContextMenu_RenameWall(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+                return;
+
+            if (dg.CurrentItem is WallListItem item)
+            {
+                _viewModel.RenameWallCommand.Execute(item);
+            }
+        }
+
+        /// <summary>右键菜单 → 查看详情</summary>
+        private void ContextMenu_ViewDetail(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+                return;
+
+            if (dg.CurrentItem is WallListItem item)
+            {
+                _viewModel.ViewDetailCommand.Execute(item);
+            }
+        }
+
+        /// <summary>右键菜单 → 编辑 JSON</summary>
+        private void ContextMenu_EditJson(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+                return;
+
+            if (dg.CurrentItem is WallListItem item)
+            {
+                _viewModel.EditJsonDataCommand.Execute(item);
+            }
         }
 
         /// <summary>在视觉树中查找指定类型的子元素</summary>
@@ -147,8 +181,20 @@ namespace CncWallStation.Views
             _viewModel.SearchCommand.Execute(null);
         }
 
+        /// <summary>审核状态 ComboBox 变更 → 自动搜索</summary>
+        private void AuditStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.SearchCommand.Execute(null);
+        }
+
         /// <summary>版本筛选 ComboBox 变更 → 自动搜索</summary>
         private void IsLatestComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.SearchCommand.Execute(null);
+        }
+
+        /// <summary>含已删除 CheckBox 变更 → 自动搜索</summary>
+        private void IncludeDeleted_Changed(object sender, RoutedEventArgs e)
         {
             _viewModel.SearchCommand.Execute(null);
         }
@@ -181,12 +227,18 @@ namespace CncWallStation.Views
 
     #region Converter 实现
 
-    /// <summary>优先级 → 画刷</summary>
+    /// <summary>优先级 → 画刷（根据 int 值范围着色）</summary>
     public class PriorityToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is ProcessPriority p ? p switch
+            if (value is int p)
+            {
+                if (p >= 2) return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")); // 高
+                if (p >= 1) return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F39C12")); // 中
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")); // 低
+            }
+            return value is ProcessPriority ep ? ep switch
             {
                 ProcessPriority.高 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
                 ProcessPriority.中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F39C12")),
@@ -199,7 +251,25 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>优先级 → 中文</summary>
+    /// <summary>int 优先级 → 中文显示</summary>
+    public class PriorityIntToTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int p)
+            {
+                if (p >= 2) return "高";
+                if (p >= 1) return "中";
+                return "低";
+            }
+            return value?.ToString() ?? "—";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>优先级枚举 → 中文</summary>
     public class PriorityToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -229,6 +299,7 @@ namespace CncWallStation.Views
                 ProcessStatus.加工中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498DB")),
                 ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")),
                 ProcessStatus.异常 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+                ProcessStatus.已质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1890FF")),
                 _ => new SolidColorBrush(Colors.Gray)
             } : new SolidColorBrush(Colors.Gray);
         }
@@ -249,6 +320,7 @@ namespace CncWallStation.Views
                 ProcessStatus.加工中 => "加工中",
                 ProcessStatus.已完成 => "已完成",
                 ProcessStatus.异常 => "异常",
+                ProcessStatus.已质检 => "已质检",
                 _ => "未知"
             } : "未知";
         }
@@ -289,6 +361,39 @@ namespace CncWallStation.Views
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value is PipelineStage s ? s.ToDisplayText() : "未知";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>审核状态(int) → 画刷</summary>
+    public class AuditStatusToBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is int s ? s switch
+            {
+                1 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")), // 已审核 - 红色
+                _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60"))  // 未审核 - 绿色
+            } : new SolidColorBrush(Colors.Gray);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>审核状态 → 中文</summary>
+    public class AuditStatusToTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is AuditStatus s ? s switch
+            {
+                AuditStatus.已审核 => "已审核",
+                AuditStatus.未审核 => "未审核",
+                _ => "未知"
+            } : value is int i ? AuditStatusExtensions.FromInt(i).ToDisplayText() : "未知";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

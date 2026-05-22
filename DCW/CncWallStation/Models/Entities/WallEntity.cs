@@ -20,18 +20,24 @@ namespace CncWallStation.Models.Entities
         public WallEntity(
             int projectId,
             string wallId,
-            string projectNumber,
+            string projectName,
             int floor,
-            string bimJsonData)
+            string bimJsonData,
+            string wallName = "",
+            string schemaVersion = "V0.0.0")
         {
             ProjectId = projectId;
             WallId = wallId ?? throw new ArgumentNullException(nameof(wallId));
-            ProjectNumber = projectNumber ?? throw new ArgumentNullException(nameof(projectNumber));
+            ProjectName = projectName ?? throw new ArgumentNullException(nameof(projectName));
             Floor = floor;
             BimJsonData = bimJsonData ?? throw new ArgumentNullException(nameof(bimJsonData));
+            WallName = wallName;
+            SchemaVersion = schemaVersion;
             PipelineStage = PipelineStage.Imported;
-            Priority = 1;
+            Priority = 0;
             Status = 0;
+            AuditStatus = (int)Enums.AuditStatus.未审核;
+            IsDeleted = false;
             ImportTime = DateTime.Now;
             UpdatedAt = DateTime.Now;
         }
@@ -47,13 +53,17 @@ namespace CncWallStation.Models.Entities
         [MaxLength(256)]
         public string WallId { get; private set; } = string.Empty;
 
-        /// <summary>项目号（冗余加速查询）</summary>
+        /// <summary>项目名称（冗余加速查询）</summary>
         [Required]
         [MaxLength(256)]
-        public string ProjectNumber { get; private set; } = string.Empty;
+        public string ProjectName { get; private set; } = string.Empty;
 
         /// <summary>楼层</summary>
         public int Floor { get; private set; }
+
+        /// <summary>墙体名称</summary>
+        [MaxLength(256)]
+        public string WallName { get; private set; } = string.Empty;
 
         /// <summary>原始 BimJSON 数据（最大 16MB）</summary>
         [Required]
@@ -67,15 +77,31 @@ namespace CncWallStation.Models.Entities
         [Column(TypeName = "MEDIUMTEXT")]
         public string? MomJsonData { get; private set; }
 
-        /// <summary>加工优先级枚举值</summary>
-        public int Priority { get; private set; } = 1;
+        /// <summary>加工优先级（int，数值越大优先级越高）</summary>
+        public int Priority { get; private set; } = 0;
 
-        /// <summary>加工状态（仅 Ready 后为待加工）</summary>
+        /// <summary>生产状态（ProcessStatus 映射）</summary>
         public int Status { get; private set; } = 0;
 
-        /// <summary>导入时间</summary>
-        [Required]
-        public DateTime ImportTime { get; private set; } = DateTime.Now;
+        /// <summary>审核状态：0=未审核，1=已审核</summary>
+        public int AuditStatus { get; private set; } = 0;
+
+        /// <summary>Schema版本号（来自 BimJson schema 字段）</summary>
+        [MaxLength(64)]
+        public string SchemaVersion { get; private set; } = "V0.0.0";
+
+		/// <summary>软删除标记</summary>
+		public bool IsDeleted { get; private set; } = false;
+
+		/// <summary>开始生产时间</summary>
+		public DateTime? StartProductionTime { get; private set; }
+
+		/// <summary>结束生产时间</summary>
+		public DateTime? EndProductionTime { get; private set; }
+
+		/// <summary>导入时间</summary>
+		[Required]
+		public DateTime ImportTime { get; private set; } = DateTime.Now;
 
         /// <summary>最后更新时间</summary>
         [Required]
@@ -114,7 +140,7 @@ namespace CncWallStation.Models.Entities
             UpdatedAt = DateTime.Now;
         }
 
-        /// <summary>更新加工状态</summary>
+        /// <summary>更新生产状态</summary>
         public void UpdateStatus(int status, string updatedBy)
         {
             Status = status;
@@ -146,5 +172,73 @@ namespace CncWallStation.Models.Entities
             Project = project ?? throw new ArgumentNullException(nameof(project));
             ProjectId = project.Id;
         }
-    }
+
+        /// <summary>更新墙体名称</summary>
+        public void UpdateWallName(string wallName, string updatedBy)
+        {
+            WallName = wallName ?? string.Empty;
+            UpdatedBy = updatedBy;
+            UpdatedAt = DateTime.Now;
+        }
+
+        /// <summary>设置 Schema 版本号</summary>
+        public void SetSchemaVersion(string schemaVersion)
+        {
+            SchemaVersion = schemaVersion ?? "V0.0.0";
+            UpdatedAt = DateTime.Now;
+        }
+
+        /// <summary>设置审核状态</summary>
+        public void SetAuditStatus(int auditStatus, string updatedBy)
+        {
+            AuditStatus = auditStatus;
+            UpdatedBy = updatedBy;
+            UpdatedAt = DateTime.Now;
+        }
+
+        /// <summary>
+        /// 同步更新 BimData（仅未审核状态可调用）。
+        /// 替换 BimJsonData，清空 MomJsonData，重置 PipelineStage=Imported，Status=待校验。
+        /// </summary>
+        public void SyncBimData(string bimJsonData, string schemaVersion, string wallName, string updatedBy)
+        {
+            if (AuditStatus == (int)Enums.AuditStatus.已审核)
+                throw new InvalidOperationException($"墙体 {WallId} 已审核，不允许同步更新 BimData。请先执行反审核操作。");
+
+            BimJsonData = bimJsonData ?? throw new ArgumentNullException(nameof(bimJsonData));
+            SchemaVersion = schemaVersion ?? "V0.0.0";
+            WallName = wallName ?? string.Empty;
+            MomJsonData = null;
+            PipelineStage = PipelineStage.Imported;
+            Status = (int)ProcessStatus.待校验;
+            UpdatedBy = updatedBy;
+            UpdatedAt = DateTime.Now;
+            ImportTime = DateTime.Now;
+        }
+
+        /// <summary>软删除</summary>
+        public void SoftDelete(string updatedBy)
+        {
+            IsDeleted = true;
+            UpdatedBy = updatedBy;
+            UpdatedAt = DateTime.Now;
+        }
+
+		/// <summary>恢复已删除数据</summary>
+		public void Restore(string updatedBy)
+		{
+			IsDeleted = false;
+			UpdatedBy = updatedBy;
+			UpdatedAt = DateTime.Now;
+		}
+
+		/// <summary>设置生产时间</summary>
+		public void SetProductionTime(DateTime? startTime, DateTime? endTime, string updatedBy)
+		{
+			StartProductionTime = startTime;
+			EndProductionTime = endTime;
+			UpdatedBy = updatedBy;
+			UpdatedAt = DateTime.Now;
+		}
+	}
 }

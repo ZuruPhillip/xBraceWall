@@ -28,13 +28,12 @@ namespace CncWallStation.Services.Application
 
         // ==================== 查询 ====================
 
-        public async Task<List<ProjectDto>> GetLatestProjectsAsync()
+        public async Task<List<ProjectDto>> GetAllProjectsAsync()
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             var entities = await db.Projects
                 .AsNoTracking()
-                .Where(p => p.IsLatest)
                 .OrderByDescending(p => p.ImportTime)
                 .ToListAsync();
 
@@ -44,7 +43,7 @@ namespace CncWallStation.Services.Application
         // ==================== 新增 ====================
 
         public async Task<int> CreateProjectAsync(
-            string projectNumber,
+            string projectName,
             string sourceFolderPath,
             string hostName,
             string importedBy,
@@ -52,14 +51,8 @@ namespace CncWallStation.Services.Application
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            // 获取当前最大版本号
-            var maxVersion = await db.Projects
-                .Where(p => p.ProjectNumber == projectNumber)
-                .MaxAsync(p => (int?)p.Version) ?? 0;
-
             var project = new ProjectEntity(
-                projectNumber,
-                maxVersion + 1,
+                projectName,
                 sourceFolderPath,
                 hostName,
                 importedBy,
@@ -69,33 +62,10 @@ namespace CncWallStation.Services.Application
             await db.SaveChangesAsync();
 
             _logger.LogInformation(
-                "创建项目批次: {ProjectNumber} v{Version}, 共 {Total} 面墙",
-                projectNumber, project.Version, totalWalls);
+                "创建项目批次: {ProjectName}, 共 {Total} 面墙",
+                projectName, totalWalls);
 
             return project.Id;
-        }
-
-        public async Task ArchiveOldVersionsAsync(string projectNumber)
-        {
-            await using var db = await _dbFactory.CreateDbContextAsync();
-
-            var oldProjects = await db.Projects
-                .Where(p => p.ProjectNumber == projectNumber && p.IsLatest)
-                .ToListAsync();
-
-            if (oldProjects.Count == 0)
-                return;
-
-            foreach (var p in oldProjects)
-            {
-                p.Archive();
-            }
-
-            await db.SaveChangesAsync();
-
-            _logger.LogInformation(
-                "归档旧版本: {ProjectNumber}, {Count} 个版本",
-                projectNumber, oldProjects.Count);
         }
     }
 }

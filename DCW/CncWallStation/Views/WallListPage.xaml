@@ -6,18 +6,21 @@
       xmlns:local="clr-namespace:CncWallStation.Views"
       xmlns:models="clr-namespace:CncWallStation.Models"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="1400"
+      d:DesignHeight="800" d:DesignWidth="1600"
       Title="墙体清单"
       FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
 	<Page.Resources>
 		<!-- 页面专用转换器 -->
 		<local:PriorityToBrushConverter x:Key="PriorityToBrushConverter"/>
+		<local:PriorityIntToTextConverter x:Key="PriorityIntToTextConverter"/>
 		<local:PriorityToTextConverter x:Key="PriorityToTextConverter"/>
 		<local:StatusToBrushConverter x:Key="StatusToBrushConverter"/>
 		<local:StatusToTextConverter x:Key="StatusToTextConverter"/>
 		<local:PipelineStageToBrushConverter x:Key="PipelineStageToBrushConverter"/>
 		<local:PipelineStageToTextConverter x:Key="PipelineStageToTextConverter"/>
+		<local:AuditStatusToBrushConverter x:Key="AuditStatusToBrushConverter"/>
+		<local:AuditStatusToTextConverter x:Key="AuditStatusToTextConverter"/>
 		<local:IsLatestToTextConverter x:Key="IsLatestToTextConverter"/>
 		<local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
 		<local:BoolInvertConverter x:Key="BoolInvertConverter"/>
@@ -26,7 +29,7 @@
 		<DataTemplate x:Key="PriorityTagTemplate">
 			<Border CornerRadius="3" Margin="2" Padding="6,2"
 					Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}">
-				<TextBlock Text="{Binding Priority, Converter={StaticResource PriorityToTextConverter}}"
+				<TextBlock Text="{Binding Priority, Converter={StaticResource PriorityIntToTextConverter}}"
 						   Foreground="White"
 						   FontSize="12" FontWeight="SemiBold"
 						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -54,6 +57,17 @@
 						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Border>
 		</DataTemplate>
+
+		<!-- 审核状态 Tag 模板 -->
+		<DataTemplate x:Key="AuditStatusTagTemplate">
+			<Border CornerRadius="3" Margin="2" Padding="6,2"
+					Background="{Binding AuditStatus, Converter={StaticResource AuditStatusToBrushConverter}}">
+				<TextBlock Text="{Binding AuditStatusText}"
+						   Foreground="White"
+						   FontSize="12" FontWeight="SemiBold"
+						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+		</DataTemplate>
 	</Page.Resources>
 
 	<Grid Background="#F5F5F5">
@@ -70,28 +84,66 @@
 		<Border Grid.Row="0" Padding="12,10" Background="#FFFFFF"
 				BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
 			<Grid>
-				<StackPanel Orientation="Horizontal">
-
+				<WrapPanel>
+					<!-- 导入 -->
 					<Button Content="📂 批量导入"
 							Command="{Binding ImportCommand}"
 							Style="{StaticResource BaseButtonStyle}"
-							Width="110" Margin="0,0,8,0"
-							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"/>
-
-					<Button Content="🚀 执行管线"
-							Command="{Binding ExecutePipelineCommand}"
-							Style="{StaticResource BaseButtonStyle}"
-							Width="110" Margin="0,0,8,0"
+							Width="100" Margin="0,0,4,2"
 							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
-							ToolTip="对选中墙体依次执行 校验Bim→转换→校验Mom，全部通过后进入待加工状态"/>
+							ToolTip="批量导入文件夹中的墙体 .mjson 文件"/>
+
+					<Button Content="📄 单墙导入"
+							Command="{Binding ImportSingleWallCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="100" Margin="0,0,4,2"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
+							ToolTip="导入单面墙体的 .mjson 文件"/>
 
 					<Separator Style="{x:Null}" Width="1" Height="20" Background="#F0F0F0" Margin="4,0"/>
 
-					<Button Content="🗑 删除"
-							Command="{Binding DeleteSelectedCommand}"
-							Style="{StaticResource DangerButtonStyle}"
-							Width="100" Margin="8,0,4,0"/>
-				</StackPanel>
+					<!-- 管线 -->
+					<Button Content="🚀 执行管线"
+							Command="{Binding ExecutePipelineCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="100" Margin="0,0,4,2"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
+							ToolTip="对选中墙体执行完整管线：校验Bim→转换→校验Mom"/>
+
+					<Separator Style="{x:Null}" Width="1" Height="20" Background="#F0F0F0" Margin="4,0"/>
+
+					<!-- 审核 -->
+					<Button Content="✅ 审核"
+							Command="{Binding AuditSelectedCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="80" Margin="0,0,4,2"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
+							ToolTip="审核选中的墙体，锁定数据不可覆盖导入"/>
+
+					<Button Content="↩ 反审核"
+							Command="{Binding UnauditSelectedCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="80" Margin="0,0,4,2"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
+							ToolTip="反审核选中的墙体，允许重新导入 BimData 测试"/>
+
+					<Separator Style="{x:Null}" Width="1" Height="20" Background="#F0F0F0" Margin="4,0"/>
+
+					<!-- 优先级 -->
+					<Button Content="▲ 提高"
+							Command="{Binding IncreasePriorityCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="70" Margin="0,0,2,2"
+							FontSize="11"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"/>
+
+					<Button Content="▼ 降低"
+							Command="{Binding DecreasePriorityCommand}"
+							Style="{StaticResource BaseButtonStyle}"
+							Width="70" Margin="0,0,4,2"
+							FontSize="11"
+							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"/>
+				</WrapPanel>
 
 				<!-- 加载指示器 -->
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
@@ -109,11 +161,11 @@
 				BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
 			<WrapPanel>
 
-				<!-- 项目号 -->
+				<!-- 项目名称 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="项目号:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
-					<TextBox Text="{Binding SearchHouseNumber, UpdateSourceTrigger=PropertyChanged}"
-							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="120"/>
+					<TextBlock Text="项目:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
+					<TextBox Text="{Binding SearchProjectName, UpdateSourceTrigger=PropertyChanged}"
+							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="110"/>
 				</StackPanel>
 
 				<!-- 楼层 -->
@@ -121,22 +173,29 @@
 					<TextBlock Text="楼层:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
 					<ComboBox ItemsSource="{Binding AvailableFloors}"
 							  SelectedValue="{Binding FilterFloor}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="80"/>
+							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="70"/>
 				</StackPanel>
 
 				<!-- 墙体ID -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
 					<TextBlock Text="墙体ID:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
 					<TextBox Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
-							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="140"/>
+							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="130"/>
 				</StackPanel>
 
-				<!-- 加工状态 -->
+				<!-- 墙体名称 -->
+				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
+					<TextBlock Text="墙体名称:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
+					<TextBox Text="{Binding SearchWallName, UpdateSourceTrigger=PropertyChanged}"
+							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="110"/>
+				</StackPanel>
+
+				<!-- 生产状态 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
 					<TextBlock Text="状态:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
 					<ComboBox ItemsSource="{Binding AllStatuses}"
 							  SelectedValue="{Binding FilterStatus}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="110"
+							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="100"
 							  SelectionChanged="StatusComboBox_SelectionChanged">
 						<ComboBox.ItemTemplate>
 							<DataTemplate>
@@ -151,7 +210,7 @@
 					<TextBlock Text="优先级:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
 					<ComboBox ItemsSource="{Binding AllPriorities}"
 							  SelectedValue="{Binding FilterPriority}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="90"
+							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="80"
 							  SelectionChanged="PriorityComboBox_SelectionChanged">
 						<ComboBox.ItemTemplate>
 							<DataTemplate>
@@ -161,42 +220,31 @@
 					</ComboBox>
 				</StackPanel>
 
-				<!-- 管线状态 -->
+
+
+				<!-- 审核状态 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="管线状态:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
-					<ComboBox ItemsSource="{Binding AllPipelineStages}"
-							  SelectedValue="{Binding FilterPipelineStage}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="120"
-							  SelectionChanged="PipelineStageComboBox_SelectionChanged">
+					<TextBlock Text="审核:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
+					<ComboBox ItemsSource="{Binding AllAuditStatuses}"
+							  SelectedValue="{Binding FilterAuditStatus}"
+							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="90"
+							  SelectionChanged="AuditStatusComboBox_SelectionChanged">
 						<ComboBox.ItemTemplate>
 							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource PipelineStageToTextConverter}}" FontSize="11"/>
+								<TextBlock Text="{Binding Converter={StaticResource AuditStatusToTextConverter}}" FontSize="11"/>
 							</DataTemplate>
 						</ComboBox.ItemTemplate>
 					</ComboBox>
 				</StackPanel>
 
-				<!-- 版本筛选 -->
-				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="版本:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
-					<ComboBox ItemsSource="{Binding IsLatestOptions}"
-							  SelectedValue="{Binding FilterIsLatest}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="110"
-							  SelectionChanged="IsLatestComboBox_SelectionChanged">
-						<ComboBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource IsLatestToTextConverter}}" FontSize="12"/>
-							</DataTemplate>
-						</ComboBox.ItemTemplate>
-					</ComboBox>
-				</StackPanel>
 
-				<!-- 时间范围 -->
+
+				<!-- 生产结束时间范围 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="时间:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
-					<DatePicker SelectedDate="{Binding FilterDateFrom}" Width="120" Height="28"/>
+					<TextBlock Text="生产结束时间:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
+					<DatePicker SelectedDate="{Binding FilterDateFrom}" Width="110" Height="28"/>
 					<TextBlock Text="—" VerticalAlignment="Center" Margin="4,0" FontSize="12" Foreground="#8C8C8C"/>
-					<DatePicker SelectedDate="{Binding FilterDateTo}" Width="120" Height="28"/>
+					<DatePicker SelectedDate="{Binding FilterDateTo}" Width="110" Height="28"/>
 				</StackPanel>
 
 				<!-- 搜索/重置 -->
@@ -204,11 +252,11 @@
 					<Button Content="🔍 搜索"
 							Command="{Binding SearchCommand}"
 							Style="{StaticResource PrimaryButtonStyle}"
-							Height="28" Width="90" Margin="0,0,4,0"/>
+							Height="28" Width="80" Margin="0,0,4,0"/>
 					<Button Content="↺ 重置"
 							Command="{Binding ResetFilterCommand}"
 							Style="{StaticResource BaseButtonStyle}"
-							Height="28" Width="90"/>
+							Height="28" Width="80"/>
 				</StackPanel>
 			</WrapPanel>
 		</Border>
@@ -229,6 +277,12 @@
 				<ContextMenu>
 					<MenuItem Header="📋 复制" Click="ContextMenu_CopyCell"
 							  InputGestureText="Ctrl+C"/>
+					<Separator/>
+					<MenuItem Header="✏️ 修改墙体名称" Click="ContextMenu_RenameWall"
+							  Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+					<Separator/>
+					<MenuItem Header="📄 查看详情" Click="ContextMenu_ViewDetail"/>
+					<MenuItem Header="📝 编辑 JSON" Click="ContextMenu_EditJson"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 
@@ -255,30 +309,30 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 项目号 -->
-				<DataGridTemplateColumn Header="项目号" Width="100">
+				<!-- 项目名称 -->
+				<DataGridTemplateColumn Header="项目名称" Width="100">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="项目号 ▾" Background="Transparent" BorderThickness="0"
+							<Button Content="项目名称 ▾" Background="Transparent" BorderThickness="0"
 									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="HouseNumber"
+									CommandParameter="ProjectName"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
 									Foreground="#262626"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding HouseNumber}"
+							<TextBlock Text="{Binding ProjectName}"
 									  Foreground="#1677FF"
 									  FontSize="13"
 									  VerticalAlignment="Center"
-									  ToolTip="{Binding HouseNumber}"/>
+									  ToolTip="{Binding ProjectName}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
 				<!-- 楼层 -->
-				<DataGridTemplateColumn Header="楼层" Width="80">
+				<DataGridTemplateColumn Header="楼层" Width="100">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
 							<Button Content="楼层 ▾" Background="Transparent" BorderThickness="0"
@@ -296,7 +350,7 @@
 				</DataGridTemplateColumn>
 
 				<!-- 墙体ID -->
-				<DataGridTemplateColumn Header="墙体ID" Width="250">
+				<DataGridTemplateColumn Header="墙体ID" Width="150">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
 							<Button Content="墙体ID ▾" Background="Transparent" BorderThickness="0"
@@ -313,45 +367,58 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 版本号 -->
-				<DataGridTemplateColumn Header="版本号" Width="120">
+				<!-- 墙体名称 -->
+				<DataGridTemplateColumn Header="墙体名称" Width="150">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="版本号 ▾" Background="Transparent" BorderThickness="0"
+							<Button Content="墙体名称 ▾" Background="Transparent" BorderThickness="0"
 									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="Version"
+									CommandParameter="WallName"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
 									Foreground="#262626"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding Version}" HorizontalAlignment="Center"
-									  FontSize="12" FontWeight="SemiBold"/>
+							<TextBlock Text="{Binding WallName}" FontSize="13"
+									  VerticalAlignment="Center"
+									  TextTrimming="CharacterEllipsis"
+									  ToolTip="{Binding WallName}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 导入时间 -->
-				<DataGridTemplateColumn Header="导入时间" Width="160">
+				<!-- 开始生产时间 -->
+                <DataGridTemplateColumn Header="生产开始时间" Width="100">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding StartProductionTime, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+									  FontSize="11" HorizontalAlignment="Center"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 结束生产时间 -->
+                <DataGridTemplateColumn Header="生产结束时间" Width="100">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="导入时间 ▾" Background="Transparent" BorderThickness="0"
+							<Button Content="生产结束时间 ▾" Background="Transparent" BorderThickness="0"
 									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="ImportTime"
+									CommandParameter="EndProductionTime"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
 									Foreground="#262626"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.HeaderTemplate>
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<TextBlock Text="{Binding ImportTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" FontSize="11"/>
+							<TextBlock Text="{Binding EndProductionTime, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+									  FontSize="11" HorizontalAlignment="Center"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
 				<!-- 加工优先级 -->
-				<DataGridTemplateColumn Header="优先级" Width="90">
+				<DataGridTemplateColumn Header="优先级" Width="100">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
 							<Button Content="优先级 ▾" Background="Transparent" BorderThickness="0"
@@ -368,38 +435,13 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 管线状态 -->
-				<DataGridTemplateColumn Header="管线状态" Width="130">
-					<DataGridTemplateColumn.HeaderTemplate>
-						<DataTemplate>
-							<Button Content="管线状态 ▾" Background="Transparent" BorderThickness="0"
-									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="PipelineStage"
-									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
-									Foreground="#262626"/>
-						</DataTemplate>
-					</DataGridTemplateColumn.HeaderTemplate>
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<StackPanel>
-								<ContentPresenter ContentTemplate="{StaticResource PipelineStageTagTemplate}"/>
-								<TextBlock Text="{Binding ValidationErrorSummary}"
-										   FontSize="9" Foreground="#E74C3C"
-										   TextTrimming="CharacterEllipsis"
-										   MaxWidth="120"
-										   Visibility="{Binding ValidationErrorSummary, Converter={StaticResource BoolToVisConverter}}"
-										   ToolTip="{Binding ValidationErrorSummary}"
-										   Margin="2,0,0,0"/>
-							</StackPanel>
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
 
-				<!-- 加工状态 -->
-				<DataGridTemplateColumn Header="状态" Width="90">
+
+				<!-- 生产状态 -->
+				<DataGridTemplateColumn Header="生产状态" Width="100">
 					<DataGridTemplateColumn.HeaderTemplate>
 						<DataTemplate>
-							<Button Content="状态 ▾" Background="Transparent" BorderThickness="0"
+							<Button Content="生产状态 ▾" Background="Transparent" BorderThickness="0"
 									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
 									CommandParameter="Status"
 									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
@@ -409,6 +451,24 @@
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<ContentPresenter ContentTemplate="{StaticResource StatusTagTemplate}"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+
+				<!-- 审核状态 -->
+				<DataGridTemplateColumn Header="审核" Width="100">
+					<DataGridTemplateColumn.HeaderTemplate>
+						<DataTemplate>
+							<Button Content="审核 ▾" Background="Transparent" BorderThickness="0"
+									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+									CommandParameter="AuditStatus"
+									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
+									Foreground="#262626"/>
+						</DataTemplate>
+					</DataGridTemplateColumn.HeaderTemplate>
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<ContentPresenter ContentTemplate="{StaticResource AuditStatusTagTemplate}"/>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
@@ -493,7 +553,7 @@
 					Width="400" Height="160" HorizontalAlignment="Center" VerticalAlignment="Center"
 					BorderBrush="#F0F0F0" BorderThickness="1">
 				<StackPanel VerticalAlignment="Center" Margin="30">
-					<TextBlock Text="📂 批量导入" FontSize="16" FontWeight="Bold" Foreground="#262626"
+					<TextBlock Text="📂 处理中" FontSize="16" FontWeight="Bold" Foreground="#262626"
 							   HorizontalAlignment="Center" Margin="0,0,0,10"/>
 					<TextBlock Text="{Binding ImportProgressMessage}" FontSize="12" Foreground="#8C8C8C"
 							   HorizontalAlignment="Center" Margin="0,0,0,12"

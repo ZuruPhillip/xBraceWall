@@ -356,10 +356,10 @@ namespace CncWallStation.ViewModels
             }
 
             DetailWallId = FoundWall.WallId;
-            DetailProject = FoundWall.ProjectNumber;
+            DetailProject = FoundWall.ProjectName;
             DetailFloor = $"楼层 {FoundWall.Floor}";
             DetailStage = FoundWall.PipelineStageText;
-            DetailVersion = $"v{FoundWall.Version}";
+            DetailVersion = $"v{FoundWall.SchemaVersion}";
             DetailImportTime = FoundWall.ImportTime.ToString("yyyy-MM-dd HH:mm");
         }
 

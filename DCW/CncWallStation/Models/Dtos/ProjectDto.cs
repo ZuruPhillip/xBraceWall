@@ -8,16 +8,10 @@ namespace CncWallStation.Models.Dtos
         /// <summary>主键</summary>
         public int Id { get; set; }
 
-        /// <summary>项目号</summary>
-        public string ProjectNumber { get; set; } = string.Empty;
+        /// <summary>项目名称</summary>
+        public string ProjectName { get; set; } = string.Empty;
 
-        /// <summary>版本号</summary>
-        public int Version { get; set; }
-
-        /// <summary>是否最新版本</summary>
-        public bool IsLatest { get; set; }
-
-        /// <summary>源文件夹路径</summary>
+		/// <summary>源文件夹路径</summary>
         public string? SourceFolderPath { get; set; }
 
         /// <summary>导入主机名</summary>

@@ -4,13 +4,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace CncWallStation.Models
 {
 	/// <summary>
-	/// 加工优先级
+	/// 加工优先级（值越大优先级越高）
 	/// </summary>
 	public enum ProcessPriority
 	{
-		高 = 0,
+		低 = 0,
 		中 = 1,
-		低 = 2
+		高 = 2
 	}
 
 	/// <summary>
@@ -22,7 +22,8 @@ namespace CncWallStation.Models
 		待加工 = 1,
 		加工中 = 2,
 		已完成 = 3,
-		异常 = 4
+		异常 = 4,
+		已质检 = 5
 	}
 
 	/// <summary>
@@ -33,14 +34,17 @@ namespace CncWallStation.Models
 		/// <summary>数据库主键（隐藏列，用于更新/删除操作）</summary>
 		public long Id { get; set; }
 
-		/// <summary>房屋编号 / 项目号</summary>
-		public string HouseNumber { get; set; } = string.Empty;
+		/// <summary>项目名称</summary>
+		public string ProjectName { get; set; } = string.Empty;
 
 		/// <summary>楼层</summary>
 		public int Floor { get; set; }
 
 		/// <summary>墙体ID（唯一标识）</summary>
 		public string WallId { get; set; } = string.Empty;
+
+		/// <summary>墙体名称</summary>
+		public string WallName { get; set; } = string.Empty;
 
 		/// <summary>导入时间</summary>
 		public DateTime ImportTime { get; set; } = DateTime.Now;
@@ -57,14 +61,29 @@ namespace CncWallStation.Models
 		/// <summary>管线阶段显示文本</summary>
 		public string PipelineStageText => PipelineStage.ToDisplayText();
 
-		/// <summary>加工优先级</summary>
-		public ProcessPriority Priority { get; set; } = ProcessPriority.中;
+		/// <summary>加工优先级（int，数值越大优先级越高）</summary>
+		public int Priority { get; set; } = 0;
 
-		/// <summary>加工状态</summary>
+		/// <summary>生产状态</summary>
 		public ProcessStatus Status { get; set; } = ProcessStatus.待校验;
 
-		/// <summary>版本号（来自所属项目批次）</summary>
-		public int Version { get; set; }
+		/// <summary>审核状态：0=未审核，1=已审核</summary>
+		public int AuditStatus { get; set; } = 0;
+
+		/// <summary>审核状态显示文本</summary>
+		public string AuditStatusText => AuditStatusExtensions.FromInt(AuditStatus).ToDisplayText();
+
+		/// <summary>Schema 版本号（来自 BimJson schema 字段）</summary>
+		public string SchemaVersion { get; set; } = "V0.0.0";
+
+		/// <summary>开始生产时间</summary>
+		public DateTime? StartProductionTime { get; set; }
+
+		/// <summary>结束生产时间</summary>
+		public DateTime? EndProductionTime { get; set; }
+
+		/// <summary>软删除标记</summary>
+		public bool IsDeleted { get; set; }
 
 		/// <summary>最后更新时间</summary>
 		public DateTime UpdatedAt { get; set; } = DateTime.Now;

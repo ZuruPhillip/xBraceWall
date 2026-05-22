@@ -185,7 +185,7 @@ public partial class JsonEditPageViewModel : ObservableObject
             {
                 ParseAndBuildTree(JsonText);
                 FormatJson();
-                SetStatus($"加载成功 - {_wallDetail.ProjectNumber ?? "未知项目"} / 楼层 {_wallDetail.Floor}", "#4CAF50");
+                SetStatus($"加载成功 - {_wallDetail.ProjectName ?? "未知项目"} / 楼层 {_wallDetail.Floor}", "#4CAF50");
             }
 
             HasChanges = false;

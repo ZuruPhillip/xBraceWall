@@ -13,8 +13,12 @@ namespace CncWallStation.Services.Mappings
         {
             // ==================== WallEntity → WallDto（列表项） ====================
             CreateMap<WallEntity, WallDto>()
-                .ForMember(d => d.Version,
-                    opt => opt.MapFrom(s => s.Project != null ? s.Project.Version : 0))
+                .ForMember(d => d.SchemaVersion,
+                    opt => opt.MapFrom(s => s.SchemaVersion ?? "V0.0.0"))
+                .ForMember(d => d.StartProductionTime,
+                    opt => opt.MapFrom(s => s.StartProductionTime))
+                .ForMember(d => d.EndProductionTime,
+                    opt => opt.MapFrom(s => s.EndProductionTime))
                 .ForMember(d => d.ValidationErrorSummary,
                     opt => opt.MapFrom(s => MapValidationErrorsToSummary(s.ValidationErrors)));
 
@@ -32,16 +36,20 @@ namespace CncWallStation.Services.Mappings
 
             // ==================== WallEntity → WallListItem（兼容现有 MVVM 展示层） ====================
             CreateMap<WallEntity, Models.WallListItem>()
-                .ForMember(d => d.HouseNumber,
-                    opt => opt.MapFrom(s => s.ProjectNumber))
+                .ForMember(d => d.ProjectName,
+                    opt => opt.MapFrom(s => s.ProjectName))
+                .ForMember(d => d.WallName,
+                    opt => opt.MapFrom(s => s.WallName))
                 .ForMember(d => d.MjsonData,
                     opt => opt.MapFrom(s => s.BimJsonData))
                 .ForMember(d => d.Priority,
-                    opt => opt.MapFrom(s => (Models.ProcessPriority)s.Priority))
+                    opt => opt.MapFrom(s => s.Priority))
                 .ForMember(d => d.Status,
                     opt => opt.MapFrom(s => (Models.ProcessStatus)s.Status))
-                .ForMember(d => d.Version,
-                    opt => opt.MapFrom(s => s.Project != null ? s.Project.Version : 0))
+                .ForMember(d => d.AuditStatus,
+                    opt => opt.MapFrom(s => s.AuditStatus))
+                .ForMember(d => d.SchemaVersion,
+                    opt => opt.MapFrom(s => s.SchemaVersion ?? "V0.0.0"))
                 .ForMember(d => d.ValidationErrorSummary,
                     opt => opt.MapFrom(s => MapValidationErrorsToSummary(s.ValidationErrors)))
                 .ForMember(d => d.IsSelected, opt => opt.Ignore());
