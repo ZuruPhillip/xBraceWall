@@ -163,7 +163,7 @@
 
 				<!-- 项目名称 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="项目:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
+                    <TextBlock Text="项目名称:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
 					<TextBox Text="{Binding SearchProjectName, UpdateSourceTrigger=PropertyChanged}"
 							 Style="{StaticResource BaseTextBoxStyle}" Height="28" Width="110"/>
 				</StackPanel>
