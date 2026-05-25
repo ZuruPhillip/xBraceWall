@@ -79,9 +79,9 @@
                 CommandParameter="DataCheckPage"/>
 
                 <hc:SideMenuItem 
-                Header="数据模拟" 
+                Header="PLC指令单元" 
                 Command="{Binding NavigateCommand}"
-                CommandParameter="QualityControlPage"/>
+                CommandParameter="PlcDataPage"/>
                 
                 <!-- 控制页面 -->
                 <hc:SideMenuItem 

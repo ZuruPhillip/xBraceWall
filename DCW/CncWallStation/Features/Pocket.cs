@@ -26,6 +26,7 @@ namespace CncWallStation.Features
             CornerRadius = cornerRadius;
         }
 
+        public Pocket() : base() { }
         public override string GetInfo() =>
             $"[Pocket {Id}] Side={CurrentSide,-6} " +
             $"Center={LocalPos} " +

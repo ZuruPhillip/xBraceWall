@@ -9,93 +9,144 @@ namespace CncWallStation.Plcs
 {
     public static class WallPlcConverter
     {
-        public static List<PlcInstruction> Convert(MomWall wall, PlcConvertContext ctx)
+        /// <summary>
+        /// 按 Handler 分组生成 PLC 指令，返回分组结果
+        /// 与 Convert 方法逻辑一致，但额外按 Handler 调用顺序划分分组
+        /// </summary>
+        public static List<PlcFeatureGroup> ConvertGrouped(MomWall wall)
         {
+            var ctx = new PlcConvertContext();
+            var groups = new List<PlcFeatureGroup>();
+
+            // ========== 1. 墙定义 ==========
+            int before = ctx.Output.Count;
             WallHandler.Handle(wall, ctx);
+            AddGroupIfNotEmpty(groups, "WallHandler", "墙定义", ctx.Output, before);
 
-            // 2. XPS 偏移（若存在，紧跟墙定义）
-            //if (ctx.HasXps) EmitXpsOffset(ctx);
-
-            // 3. 收集所有 Hole，统一批量处理（合并复制）
+            // 收集 Features 按类型分发
             var holes = new List<Hole>();
             var grooves = new List<Groove>();
             var rebarSlots = new List<RebarSlot>();
             var cableSlots = new List<MepSlot>();
 
-            // 4. 遍历 Features，按类型分发
             foreach (var f in wall.Features)
             {
                 switch (f)
                 {
-                    case Groove g:grooves.Add(g);break;
+                    case Groove g: grooves.Add(g); break;
                     case Hole h: holes.Add(h); break;
-                    case Pocket p: BoxHandler.Handle(p, ctx); break;
+                    case Pocket p:
+                        before = ctx.Output.Count;
+                        BoxHandler.Handle(p, ctx);
+                        AddGroupIfNotEmpty(groups, "BoxHandler", "开关盒", ctx.Output, before);
+                        break;
                     case RebarSlot r: rebarSlots.Add(r); break;
-                    case Window w: WindowHandler.Handle(w, ctx); break;
+                    case Window w:
+                        before = ctx.Output.Count;
+                        WindowHandler.Handle(w, ctx);
+                        AddGroupIfNotEmpty(groups, "WindowHandler", "窗户", ctx.Output, before);
+                        break;
                     case MepSlot m: cableSlots.Add(m); break;
-                    case Propping pr: ProppingHandler.Handle(pr, ctx); break;
+                    case Propping pr:
+                        before = ctx.Output.Count;
+                        ProppingHandler.Handle(pr, ctx);
+                        AddGroupIfNotEmpty(groups, "ProppingHandler", "斜撑", ctx.Output, before);
+                        break;
                     default: throw new NotSupportedException(f.GetType().Name);
                 }
             }
 
-            // 5. 批量处理 Hole & BendingKey（自动合并等间距共线孔）
+            // ========== 批量处理 ==========
+
+            // 普通孔（圆形孔）
             var circleHoles = holes.Where(h => h.Shape == HoleShape.Round).ToList();
-            var slotHoles = holes.Where(h => h.Shape == HoleShape.Slotted).ToList();
             if (circleHoles.Count > 0)
+            {
+                before = ctx.Output.Count;
                 HoleHandler.HandleBatch(circleHoles, ctx, wall);
+                AddGroupIfNotEmpty(groups, "HoleHandler", "普通孔", ctx.Output, before);
+            }
 
+            // 定位孔（条形孔）
+            var slotHoles = holes.Where(h => h.Shape == HoleShape.Slotted).ToList();
             if (slotHoles.Count > 0)
+            {
+                before = ctx.Output.Count;
                 BendingKeyHandler.HandleBatch(slotHoles, ctx, wall);
-            
+                AddGroupIfNotEmpty(groups, "BendingKeyHandler", "定位孔", ctx.Output, before);
+            }
+
+            // 钢筋槽
             if (rebarSlots.Count > 0)
+            {
+                before = ctx.Output.Count;
                 RebarSlotHandler.HandleBatch(rebarSlots, ctx, wall);
+                AddGroupIfNotEmpty(groups, "RebarSlotHandler", "钢筋槽", ctx.Output, before);
+            }
 
+            // 电缆槽
             if (cableSlots.Count > 0)
+            {
+                before = ctx.Output.Count;
                 CableHandler.HandleBatch(cableSlots, ctx);
+                AddGroupIfNotEmpty(groups, "CableHandler", "电缆槽", ctx.Output, before);
+            }
 
-            //6.批量处理 Step（自动合并等间距共线孔）
+            // 台阶
             var stepGrooves = grooves.Where(
                 g => g.GrooveType == GrooveType.SteelColumn
                 || g.GrooveType == GrooveType.BaseBracket
                 || g.GrooveType == GrooveType.TopBracket)
                 .ToList();
-            foreach ( var step in stepGrooves )
+            foreach (var step in stepGrooves)
             {
+                before = ctx.Output.Count;
                 StepHandler.Handle(step, ctx, wall);
-            }//
-            
+                AddGroupIfNotEmpty(groups, "StepHandler", "台阶", ctx.Output, before);
+            }
+
+            // 密封条
             var glueSealGrooves = grooves.Where(g => g.GrooveType == GrooveType.GlueSeal).ToList();
             foreach (var glueSeal in glueSealGrooves)
             {
+                before = ctx.Output.Count;
                 GlueSealHandler.Handle(glueSeal, ctx, wall);
+                AddGroupIfNotEmpty(groups, "GlueSealHandler", "密封条", ctx.Output, before);
             }
 
+            // X 斜槽
             var xBraceGrooves = grooves.Where(g => g.GrooveType == GrooveType.XBraceSteel).ToList();
             foreach (var xBrace in xBraceGrooves)
             {
+                before = ctx.Output.Count;
                 XBraceHandler.Handle(xBrace, ctx, wall);
+                AddGroupIfNotEmpty(groups, "XBraceHandler", "X斜槽", ctx.Output, before);
             }
 
-            return ctx.Output;
+            return groups;
         }
 
-        
-
-        // ────────── XPS 偏移 ──────────
-        private static void EmitXpsOffset(PlcConvertContext ctx)
+        /// <summary>
+        /// 若 before → after 之间有新指令，则添加一个分组
+        /// </summary>
+        private static void AddGroupIfNotEmpty(
+            List<PlcFeatureGroup> groups,
+            string handlerName,
+            string featureName,
+            List<PlcInstruction> allInstructions,
+            int before)
         {
-            ctx.Emit(new PlcInstruction
+            int after = allInstructions.Count;
+            if (after > before)
             {
-                T = PlcTool.XpsOffset,
-                F = PlcFeatureCode.XpsOffset,
-                D = 0,
-                X0 = ctx.XpsLeftOffset,
-                Y0 = ctx.XpsYExpand,
-                Z0 = ctx.XpsZOverCut,
-                X1 = ctx.XpsLeftOffset + ctx.XpsRightOffset + ctx.TargetLength - ctx.TargetLength,
-                Y1 = ctx.XpsYExpand,
-                Z1 = 0
-            });
+                var instructions = allInstructions.Skip(before).Take(after - before).ToList();
+                groups.Add(new PlcFeatureGroup
+                {
+                    HandlerName = handlerName,
+                    FeatureName = featureName,
+                    Instructions = instructions
+                });
+            }
         }
     }
 }

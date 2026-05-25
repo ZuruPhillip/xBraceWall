@@ -31,7 +31,7 @@ namespace CncWallStation.Features
         public string FeatureTypeName => Type.ToString();   // 新增：类型名称字符串
 
         /// <summary>特征类型</summary>
-        public FeatureType Type { get; }
+        public FeatureType Type { get; set; }
 
         /// <summary>特征在局部坐标系中的位置（俯视图）</summary>
         public Vec2 LocalPos { get; set; }
@@ -41,7 +41,7 @@ namespace CncWallStation.Features
 
         /// <summary>加工面（含法向量，旋转/翻面后自动更新）</summary>
         [JsonIgnore]
-        public MachineFace Face { get; }
+        public MachineFace Face { get; private set; }
 
         /// <summary>备注</summary>
         public string Remark { get; set; } = string.Empty;
@@ -49,8 +49,9 @@ namespace CncWallStation.Features
         // ── 快捷属性 ──────────────────────────────────────────
 
         /// <summary>初始加工面枚举</summary>
+        //public MachineSide InitialSide => Face.InitialSide;
         [JsonPropertyName("initialSide")]
-        public MachineSide InitialSide => Face.InitialSide;
+        public MachineSide InitialSide { get; set; }   // ★ 改成真字段
 
         /// <summary>当前加工面（旋转/翻面后变化）</summary>
         [JsonPropertyName("currentSide")]
@@ -67,6 +68,7 @@ namespace CncWallStation.Features
         {
             Id = id;
             Type = type;
+            InitialSide = side;
             Face = new MachineFace(side);
             LocalPos = localPos;
             Depth = depth;
@@ -82,7 +84,17 @@ namespace CncWallStation.Features
             Depth = depth;
         }
 
+        protected Feature()
+        {
+            Id = string.Empty;
+            Face = new MachineFace(MachineSide.Top);
+        }
         // ── 内部更新（由 Wall 统一调用）──────────────────────
+
+        public void RestoreFaceFromInitialSide()
+        {
+            Face = new MachineFace(InitialSide);
+        }
 
         /// <summary>应用四元数旋转（更新加工面法向量）</summary>
         internal void ApplyRotation(Quaternion rotation)

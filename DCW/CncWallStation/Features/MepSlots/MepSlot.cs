@@ -74,6 +74,7 @@ namespace CncWallStation.Features.MepSlots
             Width = width;
         }
 
+        public MepSlot() : base() { }
         // ══════════════════════════════════════════════════
         // 段管理（链式调用）
         // ══════════════════════════════════════════════════

@@ -16,10 +16,37 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<WallEntity> Walls => Set<WallEntity>();
         public DbSet<ValidationErrorEntity> ValidationErrors => Set<ValidationErrorEntity>();
         public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
+        public DbSet<PlcInstructionEntity> PlcInstructions => Set<PlcInstructionEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // ==================== PlcInstruction 表配置 ====================
+            modelBuilder.Entity<PlcInstructionEntity>(entity =>
+            {
+                entity.ToTable("PlcInstruction");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_PlcInstruction_WallId");
+                entity.HasIndex(e => new { e.WallId, e.SortOrder }).HasDatabaseName("IX_PlcInstruction_WallId_SortOrder");
+
+                entity.Property(e => e.HandlerName).HasMaxLength(64);
+                entity.Property(e => e.FeatureName).HasMaxLength(64);
+                entity.Property(e => e.UpdatedBy).HasMaxLength(64).IsRequired(false);
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(e => e.Wall)
+                    .WithMany()
+                    .HasForeignKey(e => e.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             // ==================== Project 表配置 ====================
             modelBuilder.Entity<ProjectEntity>(entity =>

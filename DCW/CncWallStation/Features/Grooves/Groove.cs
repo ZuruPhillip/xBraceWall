@@ -103,6 +103,8 @@ namespace CncWallStation.Features.Grooves
             GrooveType = grooveType;
         }
 
+        public Groove() : base() { }
+
         // ══════════════════════════════════════════════════════
         // 几何查询
         // ══════════════════════════════════════════════════════

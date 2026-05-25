@@ -111,6 +111,31 @@ namespace CncWallStation
                 var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
                 using var db = factory.CreateDbContext();
                 db.Database.EnsureCreated();
+
+                // EnsureCreated 在 DB 已存在时不会新增表，手动补建 PlcInstruction 表
+                db.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS PlcInstruction (
+                        Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        WallId BIGINT NOT NULL,
+                        T INT NOT NULL,
+                        F INT NOT NULL,
+                        D INT NOT NULL,
+                        X0 FLOAT NOT NULL,
+                        Y0 FLOAT NOT NULL,
+                        Z0 FLOAT NOT NULL,
+                        X1 FLOAT NOT NULL,
+                        Y1 FLOAT NOT NULL,
+                        Z1 FLOAT NOT NULL,
+                        SortOrder INT NOT NULL,
+                        HandlerName VARCHAR(64) NOT NULL,
+                        FeatureName VARCHAR(64) NOT NULL,
+                        UpdatedBy VARCHAR(64) NULL,
+                        UpdatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        INDEX IX_PlcInstruction_WallId (WallId),
+                        INDEX IX_PlcInstruction_WallId_SortOrder (WallId, SortOrder),
+                        CONSTRAINT FK_PlcInstruction_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
+                    );
+                ");
             }
 
             var mainWindow = HostApp.Services.GetRequiredService<MainWindow>();

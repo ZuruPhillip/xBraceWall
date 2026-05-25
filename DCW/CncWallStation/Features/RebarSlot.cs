@@ -84,6 +84,8 @@ namespace CncWallStation.Features
             Direction = direction;
         }
 
+        public RebarSlot() : base() { }
+
         // ──────────────────────────────────────────────
         // 翻面处理：除了 LocalPos（基类已处理），还需翻 EndPos
         // ──────────────────────────────────────────────

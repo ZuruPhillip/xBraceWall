@@ -31,7 +31,7 @@ namespace CncWallStation.MomWallData
         // 几何定义
         // ══════════════════════════════════════════════
 
-        public List<Vec2> Outline { get; private set; }
+        public List<Vec2> Outline { get; set; }
         public float Thickness { get; set; }
         public float BaseElevation { get; set; }
 
@@ -40,20 +40,20 @@ namespace CncWallStation.MomWallData
         // ══════════════════════════════════════════════
 
         /// <summary>轮廓 X 方向跨度（AABB，mm）</summary>
-        public float Length { get; private set; }
+        public float Length { get; set; }
 
         /// <summary>轮廓 Y 方向跨度（AABB，mm）</summary>
-        public float Width { get; private set; }
+        public float Width { get; set; }
 
         /// <summary>OBB 长轴长度（mm）</summary>
         [JsonIgnore]
-        public float ObbLength { get; private set; }
+        public float ObbLength { get; set; }
         [JsonIgnore]
         /// <summary>OBB 短轴长度（mm）</summary>
-        public float ObbWidth { get; private set; }
+        public float ObbWidth { get; set; }
         [JsonIgnore]
         /// <summary>OBB 长轴与 X 轴夹角（度）</summary>
-        public float ObbAngleDeg { get; private set; }
+        public float ObbAngleDeg { get; set; }
 
         // ══════════════════════════════════════════════
         // 【新增】实际尺寸
@@ -160,21 +160,21 @@ namespace CncWallStation.MomWallData
         // 加工特征
         // ══════════════════════════════════════════════
 
-        public List<Feature> Features { get; private set; } = new List<Feature>();
+        public List<Feature> Features { get; set; } = new List<Feature>();
 
         // ══════════════════════════════════════════════
         // 空间变换
         // ══════════════════════════════════════════════
 
-        public Transform3D Transform { get; private set; } = new Transform3D();
+        public Transform3D Transform { get; set; } = new Transform3D();
         private readonly Stack<Transform3D> _transformHistory = new Stack<Transform3D>();
 
         // ══════════════════════════════════════════════
         // 翻面状态
         // ══════════════════════════════════════════════
 
-        public Vec2 MachineOrigin { get; private set; } = Vec2.Zero;
-        public int FlipCount { get; private set; } = 0;
+        public Vec2 MachineOrigin { get; set; } = Vec2.Zero;
+        public int FlipCount { get; set; } = 0;
         private readonly Stack<FlipSnapshot> _flipHistory = new Stack<FlipSnapshot>();
 
         // ══════════════════════════════════════════════
@@ -208,6 +208,9 @@ namespace CncWallStation.MomWallData
             // 计算 AABB / OBB 尺寸（同时为 PivotPoint 默认值做准备）
             RecalculateDimensions();
         }
+
+        public MomWall() { }
+
 
         // ══════════════════════════════════════════════
         // 尺寸计算

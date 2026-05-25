@@ -2,8 +2,11 @@ using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Models;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
+using CncWallStation.VersionMappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Services
 {
@@ -42,13 +45,16 @@ namespace CncWallStation.Services
     public class PipelineService : IPipelineService
     {
         private readonly IDbContextFactory<AppDbContext> _dbFactory;
+        private readonly BimWallMapperFactory _mapperFactory;
         private readonly ILogger<PipelineService> _logger;
 
         public PipelineService(
             IDbContextFactory<AppDbContext> dbFactory,
+            BimWallMapperFactory mapperFactory,
             ILogger<PipelineService> logger)
         {
             _dbFactory = dbFactory;
+            _mapperFactory = mapperFactory;
             _logger = logger;
         }
 
@@ -315,77 +321,54 @@ namespace CncWallStation.Services
             return errors;
         }
 
-        // ==================== BimJSON → MomJSON 转换（纯函数，不变） ====================
+        // ==================== BimJSON → MomJSON 转换（版本控制） ====================
 
+        /// <summary>
+        /// BimJSON → MomJSON 转换（版本控制）
+        /// 参考 ControllerPageViewModel.ConvertToMom 实现逻辑：
+        /// 1. BimDataVersionResolver.ResolveVersion 解析版本
+        /// 2. BimWallMapperFactory.GetMapper 获取对应版本 Mapper
+        /// 3. mapper.Map 执行转换
+        /// </summary>
         private (bool Success, string? MomJsonData, string? ErrorMessage) ConvertToMom(string bimJsonData)
         {
             try
             {
-                using var doc = System.Text.Json.JsonDocument.Parse(bimJsonData);
-                var root = doc.RootElement;
+                // 1. 解析版本
+                string version = BimDataVersionResolver.ResolveVersion(bimJsonData);
+                _logger.LogInformation("检测到 BimData 版本：v{Version}", version);
 
-                var momObj = new Dictionary<string, object?>();
+                // 2. 获取对应版本的 Mapper
+                IBimWallMapper mapper = _mapperFactory.GetMapper(version);
 
-                if (root.TryGetProperty("id", out var idProp))
-                    momObj["id"] = idProp.GetString() ?? string.Empty;
-                else if (root.TryGetProperty("wallId", out var wallIdProp))
-                    momObj["id"] = wallIdProp.GetString() ?? string.Empty;
-                else
-                    momObj["id"] = "unknown";
+                // 3. 转换 BimJson → MomWall 领域对象
+                var momWall = mapper.Map(bimJsonData);
 
-                if (root.TryGetProperty("houseNumber", out var hn))
-                    momObj["houseNumber"] = hn.GetString() ?? string.Empty;
-                if (root.TryGetProperty("floor", out var fl))
-                    momObj["floor"] = fl.GetInt32();
-
-                if (root.TryGetProperty("features", out var features) &&
-                    features.ValueKind == System.Text.Json.JsonValueKind.Array)
+                // 4. 序列化 MomWall → MomJSON 字符串
+                //    ★ 用 System.Text.Json，使 Feature 上的 [JsonPolymorphic] 生效，
+                //    输出的 JSON 会带 "$type": "Groove" 之类的鉴别字段
+                var options = new JsonSerializerOptions
                 {
-                    var momFeatures = new List<Dictionary<string, object?>>();
-                    foreach (var feature in features.EnumerateArray())
-                    {
-                        var momFeature = new Dictionary<string, object?>();
-                        foreach (var prop in feature.EnumerateObject())
-                        {
-                            momFeature[prop.Name] = ConvertJsonElement(prop.Value);
-                        }
-                        momFeatures.Add(momFeature);
-                    }
-                    momObj["momFeatures"] = momFeatures;
-                }
-                else
-                {
-                    momObj["momFeatures"] = new List<object>();
-                }
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    WriteIndented = false,
+                    // 如需 camelCase 命名，可放开下面这行（与读取侧保持一致即可）
+                    // PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
 
-                momObj["convertedAt"] = DateTime.Now.ToString("o");
-                momObj["sourceVersion"] = "1.0";
+                var momJson = JsonSerializer.Serialize(momWall, options);
 
-                var momJson = System.Text.Json.JsonSerializer.Serialize(momObj);
                 return (true, momJson, null);
+            }
+            catch (NotSupportedException ex)
+            {
+                _logger.LogError(ex, "不支持的 BimData 版本");
+                return (false, null, $"不支持的 BimData 版本：{ex.Message}");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "BimJSON → MomJSON 版本控制转换异常");
                 return (false, null, $"转换异常: {ex.Message}");
             }
-        }
-
-        private static object? ConvertJsonElement(System.Text.Json.JsonElement element)
-        {
-            return element.ValueKind switch
-            {
-                System.Text.Json.JsonValueKind.String => element.GetString(),
-                System.Text.Json.JsonValueKind.Number => element.TryGetInt32(out var i) ? i
-                    : element.TryGetInt64(out var l) ? l
-                    : element.GetDouble(),
-                System.Text.Json.JsonValueKind.True => true,
-                System.Text.Json.JsonValueKind.False => false,
-                System.Text.Json.JsonValueKind.Null => null,
-                System.Text.Json.JsonValueKind.Array => element.EnumerateArray().Select(ConvertJsonElement).ToList(),
-                System.Text.Json.JsonValueKind.Object => element.EnumerateObject()
-                    .ToDictionary(p => p.Name, p => ConvertJsonElement(p.Value)),
-                _ => element.GetRawText()
-            };
         }
 
         // ==================== MomJSON 校验（纯函数，不变） ====================

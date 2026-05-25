@@ -80,6 +80,7 @@ public class Hole : Feature
         ThroughHole = throughHole;
     }
 
+    public Hole() : base() { }
     // ── 静态工厂方法（更语义化）──────────────────────────────
 
     /// <summary>创建圆形孔</summary>

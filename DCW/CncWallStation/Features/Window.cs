@@ -74,7 +74,7 @@ namespace CncWallStation.Features
         // ──────────────────────────────────────────────
         // 翻面：轮廓点 + LocalPos 重新计算
         // ──────────────────────────────────────────────
-
+        public Window() : base() { }
         internal override void ApplyFlip(
             FlipAxis axis,
             (float minX, float minY, float maxX, float maxY) bounds)

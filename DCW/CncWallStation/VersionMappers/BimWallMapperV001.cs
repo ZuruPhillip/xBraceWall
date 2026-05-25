@@ -268,7 +268,7 @@ namespace CncWallStation.VersionMappers
 
                 var slottedHole = Hole.CreateSlotted(
                 id: id,
-                side: MachineSide.Bottom,
+                side: MachineSide.Back,
                 center: center,                                          // 腰孔几何中心
                 radius: WallConstants.BendingKeyHoleRadius,              // 端部半圆半径
                 depth: WallConstants.BendingKeyHoleDepth,                // 孔加工深度
