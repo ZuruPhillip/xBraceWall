@@ -26,8 +26,9 @@
         <!-- ══════════════════════════════════════════ -->
         <!--  Row 0 · 标题 + 搜索栏（合并）                -->
         <!-- ══════════════════════════════════════════ -->
-        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#F0F0F0"
-                BorderThickness="0,0,0,1" Padding="16,10">
+        <Border Grid.Row="0" Margin="8,8,8,6" Padding="16,10"
+                Background="White" CornerRadius="4"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -37,18 +38,17 @@
 
                 <!-- 左侧：标题 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
-                    <TextBlock Text="&#x25A0;" FontSize="18" Foreground="#E60012"
-                               VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <TextBlock Text="BIM 数据渲染" Style="{StaticResource TitleText}" VerticalAlignment="Center"/>
+                    <Border Width="4" Height="20" Background="#1890FF" CornerRadius="2" Margin="0,0,10,0"/>
+                    <TextBlock Text="BIM 数据渲染" FontSize="18" FontWeight="Bold"
+                               Foreground="#333" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- 右侧：搜索控件 -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="墙体ID"
-                               FontSize="13" Foreground="#262626" FontWeight="SemiBold"
-                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                               FontSize="13" Foreground="#666" VerticalAlignment="Center" Margin="0,0,8,0"/>
 
-                    <TextBox Width="360"
+                    <TextBox Width="300"
                              Style="{StaticResource BaseTextBoxStyle}"
                              Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
                              VerticalAlignment="Center"
@@ -58,7 +58,7 @@
                         </TextBox.InputBindings>
                     </TextBox>
 
-                    <Button Content="&#x1F50D; 搜索"
+                    <Button Content="搜索"
                             Style="{StaticResource PrimaryButtonStyle}"
                             Command="{Binding SearchWallCommand}"
                             Margin="8,0,0,0"/>
@@ -80,17 +80,17 @@
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
                 <TextBlock Text="项目" Style="{StaticResource DetailLabelText}" Width="30"/>
-                <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="80"/>
+                <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="60"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
                 <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}" Width="30"/>
-                <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="80"/>
+                <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="60"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
                 <TextBlock Text="阶段" Style="{StaticResource DetailLabelText}" Width="30"/>
-                <TextBlock Text="{Binding DetailStage}" Style="{StaticResource DetailValueText}" Width="80"/>
+                <TextBlock Text="{Binding DetailStage}" Style="{StaticResource DetailValueText}" Width="100"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
@@ -99,7 +99,7 @@
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}" Width="50"/>
                 <TextBlock Text="{Binding DetailImportTime}" Style="{StaticResource DetailValueText}"/>
             </StackPanel>
         </Border>

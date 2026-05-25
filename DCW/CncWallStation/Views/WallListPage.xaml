@@ -72,6 +72,7 @@
 
 	<Grid Background="#F5F5F5">
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>  <!-- 标题栏 -->
 			<RowDefinition Height="Auto"/>  <!-- 工具栏 -->
 			<RowDefinition Height="Auto"/>  <!-- 筛选栏 -->
 			<RowDefinition Height="*"/>     <!-- 数据表格 -->
@@ -79,12 +80,25 @@
 		</Grid.RowDefinitions>
 
 		<!-- ══════════════════════════════════════════ -->
+		<!--  标题栏                                     -->
+		<!-- ══════════════════════════════════════════ -->
+		<Border Grid.Row="0" Margin="8,8,8,6" Padding="12,10"
+				Background="White" CornerRadius="4"
+				BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<Border Width="4" Height="20" Background="#1890FF" CornerRadius="2" Margin="0,0,10,0" />
+				<TextBlock Text="墙体清单" FontSize="18" FontWeight="Bold"
+						   Foreground="#333" VerticalAlignment="Center" />
+			</StackPanel>
+		</Border>
+
+		<!-- ══════════════════════════════════════════ -->
 		<!--  工具栏                                     -->
 		<!-- ══════════════════════════════════════════ -->
-		<Border Grid.Row="0" Padding="12,10" Background="#FFFFFF"
+		<Border Grid.Row="1" Padding="12,10" Background="#FFFFFF"
 				BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
 			<Grid>
-				<WrapPanel>
+				<WrapPanel Cursor="">
 					<!-- 导入 -->
 					<Button Content="📂 批量导入"
 							Command="{Binding ImportCommand}"
@@ -157,7 +171,7 @@
 		<!-- ══════════════════════════════════════════ -->
 		<!--  筛选栏                                     -->
 		<!-- ══════════════════════════════════════════ -->
-		<Border Grid.Row="1" Padding="12,10" Background="#FAFAFA"
+		<Border Grid.Row="2" Padding="12,10" Background="#FAFAFA"
 				BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
 			<WrapPanel>
 
@@ -249,7 +263,7 @@
 
 				<!-- 搜索/重置 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,0,4" VerticalAlignment="Center">
-					<Button Content="🔍 搜索"
+					<Button Content="搜索"
 							Command="{Binding SearchCommand}"
 							Style="{StaticResource PrimaryButtonStyle}"
 							Height="28" Width="80" Margin="0,0,4,0"/>
@@ -264,7 +278,7 @@
 		<!-- ══════════════════════════════════════════ -->
 		<!--  数据表格                                   -->
 		<!-- ══════════════════════════════════════════ -->
-		<DataGrid Grid.Row="2"
+		<DataGrid Grid.Row="3"
 				  x:Name="WallDataGrid"
 				  ItemsSource="{Binding DisplayItems}"
 				  AutoGenerateColumns="False"
@@ -480,7 +494,7 @@
 		<!-- ══════════════════════════════════════════ -->
 		<!--  空状态                                     -->
 		<!-- ══════════════════════════════════════════ -->
-		<Border Grid.Row="2" Background="#FAFAFA"
+		<Border Grid.Row="3" Background="#FAFAFA"
 				Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisConverter}}">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,60,0,0">
 				<TextBlock Text="📭" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
@@ -493,7 +507,7 @@
 		<!-- ══════════════════════════════════════════ -->
 		<!--  分页栏                                     -->
 		<!-- ══════════════════════════════════════════ -->
-		<Border Grid.Row="3" Padding="12,8" Background="#FFFFFF"
+		<Border Grid.Row="4" Padding="12,8" Background="#FFFFFF"
 				BorderBrush="#F0F0F0" BorderThickness="0,1,0,0">
 			<Grid>
 				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -549,7 +563,7 @@
 		<!-- ══════════════════════════════════════════ -->
 		<!--  导入进度覆盖层                               -->
 		<!-- ══════════════════════════════════════════ -->
-        <Border Grid.RowSpan="4" Background="#80000000"
+        <Border Grid.RowSpan="5" Background="#80000000"
 				Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}">
 			<Border Background="#FFFFFF" CornerRadius="8"
 					Width="400" Height="160" HorizontalAlignment="Center" VerticalAlignment="Center"

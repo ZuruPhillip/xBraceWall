@@ -128,11 +128,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ==================== 工具栏 ==================== -->
+        <!-- ==================== Row0: 加载栏 ==================== -->
         <Border Grid.Row="0" Background="{StaticResource BgLightGray}"
                 BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1"
                 Padding="12,8">
@@ -143,24 +144,16 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- 左侧：墙体信息 + 操作按钮 -->
+                <!-- 左侧：墙体信息 + 加载按钮 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="墙体 ID:" VerticalAlignment="Center" Margin="0,0,6,0"
                                Style="{StaticResource BodyText}" />
                     <TextBox Text="{Binding WallId, UpdateSourceTrigger=PropertyChanged}"
-                             Width="200" Height="30" VerticalAlignment="Center"
+                             Width="300" Height="30" VerticalAlignment="Center"
                              Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,10,0"
                              x:Name="WallIdTextBox" />
                     <Button Content="加载" Command="{Binding LoadCommand}" Width="60" Height="30"
                             Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" />
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
-                               Margin="4,2" />
-                    <Button Content="保存" Command="{Binding SaveCommand}" Width="60" Height="30"
-                            Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" />
-                    <Button Content="格式化" Command="{Binding FormatJsonCommand}" Width="60" Height="30"
-                            Style="{StaticResource BaseButtonStyle}" Margin="0,0,6,0" />
-                    <Button Content="刷新树" Command="{Binding RefreshTreeCommand}" Width="60" Height="30"
-                            Style="{StaticResource BaseButtonStyle}" />
                 </StackPanel>
 
                 <!-- 中间：搜索框 -->
@@ -213,8 +206,22 @@
             </Grid>
         </Border>
 
-        <!-- ==================== 主内容区（左右分栏） ==================== -->
-        <Grid Grid.Row="1">
+        <!-- ==================== Row1: 操作按钮 ==================== -->
+        <Border Grid.Row="1" Background="{StaticResource BgLightGray}"
+                BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1"
+                Padding="12,6">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="保存" Command="{Binding SaveCommand}" Width="60" Height="30"
+                        Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" />
+                <Button Content="格式化" Command="{Binding FormatJsonCommand}" Width="60" Height="30"
+                        Style="{StaticResource BaseButtonStyle}" Margin="0,0,6,0" />
+                <Button Content="刷新树" Command="{Binding RefreshTreeCommand}" Width="60" Height="30"
+                        Style="{StaticResource BaseButtonStyle}" />
+            </StackPanel>
+        </Border>
+
+        <!-- ==================== Row2: 主内容区（左右分栏） ==================== -->
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" MinWidth="280" />
                 <ColumnDefinition Width="5" />
@@ -349,7 +356,7 @@
         </Grid>
 
         <!-- ==================== 底部状态栏 ==================== -->
-        <Border Grid.Row="2" Background="{StaticResource BgLightGray}"
+        <Border Grid.Row="3" Background="{StaticResource BgLightGray}"
                 BorderBrush="{StaticResource BorderLight}" BorderThickness="0,1,0,0"
                 Padding="12,6">
             <Grid>
