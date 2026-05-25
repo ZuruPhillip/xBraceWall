@@ -40,6 +40,9 @@
 		<Content Include="Resources\Htmls\BimWall3D.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<Content Include="Resources\Htmls\MomWall3D.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Resources\PlcRender.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

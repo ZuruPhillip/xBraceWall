@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AAC 墙体 CSG 渲染器</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: #e2e8f0; }
+    #app { width: 100vw; height: 100vh; position: relative; }
+
+
+
+    /* ══ 加载遮罩 ══ */
+    #loading {
+      position: absolute; inset: 0; z-index: 150;
+      background: rgba(15,23,42,.92); backdrop-filter: blur(6px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity .4s, visibility .4s;
+    }
+    #loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .spinner { width: 52px; height: 52px; border: 3px solid #1e293b;
+      border-top-color: #38bdf8; border-radius: 50%;
+      animation: spin .75s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-text { color: #94a3b8; font-size: 13px; letter-spacing: 1px; }
+
+    /* ══ 通用面板 ══ */
+    .panel {
+      background: rgba(10,18,35,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(148,163,184,.12); border-radius: 14px;
+      padding: 14px 16px; position: relative;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .panel-title {
+      font-size: 10px; font-weight: 700; color: #38bdf8;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    }
+    .panel-title::before { content: ''; display: block;
+      width: 3px; height: 12px; background: #38bdf8; border-radius: 2px; }
+
+    /* ══ 左侧面板 ══ */
+    #left-panels {
+      position: absolute; left: 14px; top: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: calc(100vh - 28px); overflow-y: auto; z-index: 10;
+      scrollbar-width: none;
+    }
+    #left-panels::-webkit-scrollbar { display: none; }
+
+    #wall-info-panel { min-width: 220px; }
+    .dim-visual {
+      background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.1);
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-around; gap: 6px;
+    }
+    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .dim-box-icon { font-size: 10px; color: #475569; letter-spacing: .5px; text-transform: uppercase; }
+    .dim-box-val { font-size: 15px; font-weight: 800; color: #e2e8f0;
+      font-variant-numeric: tabular-nums; line-height: 1; }
+    .dim-box-unit { font-size: 9px; color: #475569; }
+    .dim-sep { width: 1px; height: 32px; background: rgba(148,163,184,.1); }
+    .param-row {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06);
+    }
+    .param-row:last-child { border-bottom: none; }
+    .param-lbl { color: #64748b; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+    .param-lbl .plbl-icon { font-size: 12px; }
+    .param-val { color: #e2e8f0; font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .param-val.highlight { color: #38bdf8; }
+    .param-val.warn { color: #fbbf24; }
+    .groove-dist { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,.08); }
+    .groove-dist-title { font-size: 10px; color: #475569; margin-bottom: 7px; letter-spacing: .5px; }
+    .groove-bar-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .groove-bar-label { font-size: 10px; color: #64748b; width: 58px; flex-shrink: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .groove-bar-track { flex: 1; height: 5px; background: rgba(148,163,184,.1); border-radius: 3px; }
+    .groove-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+    .groove-bar-count { font-size: 10px; color: #475569; width: 16px; text-align: right; flex-shrink: 0; }
+
+    #legend-panel { min-width: 220px; }
+    .legend-item { display: flex; align-items: center; gap: 8px;
+      padding: 4px 0; cursor: pointer; transition: opacity .18s; }
+    .legend-item:hover { opacity: .72; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .legend-label { color: #cbd5e1; font-size: 11.5px; line-height: 1.4; }
+    .legend-count { margin-left: auto; color: #475569; font-size: 10px;
+      background: rgba(148,163,184,.08); border-radius: 4px; padding: 1px 6px; }
+
+    /* ══════════════════════════════════════
+       ★★★ 新增：特征属性面板样式 ★★★
+       ══════════════════════════════════════ */
+    #feature-attr-panel {
+      min-width: 240px;
+      display: none;
+      border-color: rgba(56,189,248,.35) !important;
+      box-shadow: 0 0 24px rgba(56,189,248,.12);
+      animation: fadeInPanel .22s ease;
+    }
+    #feature-attr-panel.visible { display: block; }
+    #feature-attr-panel.mep-mode {
+      border-color: rgba(251,191,36,.45) !important;
+      box-shadow: 0 0 24px rgba(251,191,36,.14);
+    }
+    #feature-attr-panel.mep-mode .panel-title { color: #fbbf24; }
+    #feature-attr-panel.mep-mode .panel-title::before { background: #fbbf24; }
+    @keyframes fadeInPanel {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .fa-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 9px;
+      background: rgba(56,189,248,.06); margin-bottom: 10px;
+      border: 1px solid rgba(56,189,248,.12);
+    }
+    .fa-header.mep { background: rgba(251,191,36,.06); border-color: rgba(251,191,36,.14); }
+    .fa-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .fa-title { flex: 1; font-size: 12px; font-weight: 700; color: #e2e8f0; letter-spacing: .3px; }
+    .fa-id { font-size: 9.5px; color: #475569; font-family: monospace; }
+    .fa-dims {
+      display: flex; gap: 0; margin-bottom: 10px;
+      background: rgba(148,163,184,.04);
+      border-radius: 9px; overflow: hidden;
+      border: 1px solid rgba(148,163,184,.08);
+    }
+    .fa-dim-cell {
+      flex: 1; padding: 8px 4px; text-align: center;
+      border-right: 1px solid rgba(148,163,184,.08);
+    }
+    .fa-dim-cell:last-child { border-right: none; }
+    .fa-dim-lbl { font-size: 9px; color: #475569; letter-spacing: .6px; margin-bottom: 3px; text-transform: uppercase; }
+    .fa-dim-val { font-size: 13px; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; line-height: 1; }
+    .fa-dim-unit { font-size: 8.5px; color: #334155; margin-top: 2px; }
+    .fa-section-title {
+      font-size: 9px; color: #475569; letter-spacing: 1px; text-transform: uppercase;
+      margin: 10px 0 6px; display: flex; align-items: center; gap: 5px;
+    }
+    .fa-section-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); order: 2; }
+    .fa-section-title::after  { content:''; flex:0 0 8px; }
+    .fa-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.2);
+      border-radius: 5px; padding: 2px 7px; font-size: 10px;
+      color: #7dd3fc; font-family: monospace;
+    }
+    .fa-badge.mep { background: rgba(251,191,36,.09); border-color: rgba(251,191,36,.22); color: #fde68a; }
+    .fa-seg-mini {
+      background: rgba(251,191,36,.04); border: 1px solid rgba(251,191,36,.1);
+      border-radius: 6px; padding: 5px 8px; margin-bottom: 4px;
+      font-size: 10px;
+    }
+    .fa-seg-mini.current { border-color: rgba(251,191,36,.45); background: rgba(251,191,36,.1); }
+    .fa-seg-mini-head { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .fa-seg-mini-idx { color: #57534e; font-size: 9px; }
+    .fa-seg-mini-type {
+      padding: 1px 5px; border-radius: 3px; font-size: 8.5px;
+      font-weight: 700; letter-spacing: .5px;
+    }
+    .fa-seg-mini-type.line { background: rgba(56,189,248,.15); color: #7dd3fc; }
+    .fa-seg-mini-type.arc  { background: rgba(167,139,250,.15); color: #c4b5fd; }
+    .fa-seg-mini-cur { margin-left: auto; font-size: 8.5px; color: #fbbf24; }
+    .fa-seg-mini-body { color: #a8a29e; font-family: monospace; line-height: 1.5; }
+    .fa-empty-hint {
+      padding: 10px; text-align: center; font-size: 10.5px;
+      color: #334155; font-style: italic;
+    }
+
+    /* ══ 右侧面板 ══ */
+    #right-panels {
+      position: absolute; right: 14px; top: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+      align-items: stretch; min-width: 150px;
+      max-height: calc(100vh - 28px); overflow-y: auto; z-index: 10;
+      scrollbar-width: none;
+    }
+    #right-panels::-webkit-scrollbar { display: none; }
+
+    #view-panel { }
+    .view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .vbtn-full { grid-column: span 2; }
+    .vbtn2 {
+      padding: 7px 6px; border-radius: 8px; cursor: pointer;
+      border: 1px solid rgba(148,163,184,.13); background: rgba(255,255,255,.025);
+      color: #94a3b8; font-size: 11px; font-weight: 600; text-align: center;
+      transition: all .18s; user-select: none;
+    }
+    .vbtn2:hover { background: rgba(56,189,248,.11); border-color: #38bdf8; color: #7dd3fc; }
+    .vbtn2.active { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
+
+    #layer-panel { }
+    .layer-row { display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-label { font-size: 11px; color: #64748b; }
+    .toggle-switch { position: relative; width: 32px; height: 17px; cursor: pointer; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track { position: absolute; inset: 0; background: rgba(148,163,184,.14);
+      border-radius: 17px; transition: background .2s; border: 1px solid rgba(148,163,184,.14); }
+    .toggle-switch input:checked + .toggle-track { background: rgba(56,189,248,.34); border-color: #38bdf8; }
+    .toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: #64748b; transition: transform .2s, background .2s; }
+    .toggle-switch input:checked + .toggle-track::after { transform: translateX(15px); background: #38bdf8; }
+
+    /* ══ 顶部快切 ══ */
+    #toggle-bar {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 6px; z-index: 10;
+    }
+    .tbtn {
+      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
+      border: 1px solid rgba(148,163,184,.14); color: #475569;
+      padding: 7px 16px; border-radius: 8px; cursor: pointer;
+      font-size: 11px; transition: all .18s; font-weight: 600; user-select: none;
+    }
+    .tbtn.on { background: rgba(56,189,248,.12); border-color: #38bdf8; color: #38bdf8; }
+    .tbtn:hover:not(.on) { background: rgba(148,163,184,.07); color: #94a3b8; }
+
+    /* ══ 底部标题 ══ */
+    #title-bar {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
+      border: 1px solid rgba(56,189,248,.16); border-radius: 24px;
+      padding: 7px 22px; color: #38bdf8; font-size: 11.5px;
+      font-weight: 700; letter-spacing: 2px; white-space: nowrap; z-index: 10;
+    }
+    #hint {
+      color: #475569; font-size: 10.5px; line-height: 2;
+    }
+    #hint b { color: #64748b; }
+
+    /* ══ 错误 ══ */
+    #error-toast {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      background: rgba(127,29,29,.96); border: 1px solid #ef4444;
+      border-radius: 12px; padding: 18px 26px; color: #fca5a5;
+      font-size: 13px; z-index: 300; text-align: center;
+      display: none; max-width: 380px; line-height: 1.6;
+    }
+    #error-toast.show { display: block; animation: fadeIn .3s; }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translate(-50%,-60%); }
+      to   { opacity:1; transform:translate(-50%,-50%); }
+    }
+
+    /* ══ 凹槽悬浮信息卡 ══ */
+    #groove-card {
+      position: absolute; z-index: 100; pointer-events: none;
+      width: 268px;
+      background: rgba(8,15,30,.96); backdrop-filter: blur(20px);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(148,163,184,.1);
+      opacity: 0; transform: translateY(6px) scale(.97);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    #groove-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .gc-header {
+      padding: 10px 14px 9px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .gc-type-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .gc-type-name { font-size: 12px; font-weight: 700; color: #f1f5f9; flex: 1; letter-spacing: .3px; }
+    .gc-id { font-size: 10px; color: #475569; font-family: monospace; }
+    .gc-dims {
+      display: flex; gap: 0;
+      border-top: 1px solid rgba(148,163,184,.07);
+      border-bottom: 1px solid rgba(148,163,184,.07);
+    }
+    .gc-dim-cell { flex: 1; padding: 9px 6px; text-align: center; border-right: 1px solid rgba(148,163,184,.07); }
+    .gc-dim-cell:last-child { border-right: none; }
+    .gc-dim-label { font-size: 9px; color: #475569; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
+    .gc-dim-value { font-size: 14px; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; line-height: 1; }
+    .gc-dim-unit  { font-size: 9px; color: #334155; margin-top: 2px; }
+    .gc-body { padding: 8px 14px 10px; }
+    .gc-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(148,163,184,.05);
+    }
+    .gc-row:last-child { border-bottom: none; }
+    .gc-row-label { font-size: 10.5px; color: #475569; }
+    .gc-row-val   { font-size: 10.5px; color: #cbd5e1; font-weight: 600;
+      font-family: monospace; text-align: right; max-width: 160px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gc-pts-section { padding: 0 14px 12px; }
+    .gc-pts-title {
+      font-size: 9px; color: #334155; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .gc-pts-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); }
+    .gc-pts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 120px; overflow-y: auto; }
+    .gc-pt { background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.08); border-radius: 6px; padding: 5px 7px; }
+    .gc-pt-idx  { font-size: 9px; color: #334155; margin-bottom: 2px; }
+    .gc-pt-xyz  { font-size: 10px; color: #7dd3fc; font-family: monospace; line-height: 1.6; }
+    .gc-normal-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(56,189,248,.08); border: 1px solid rgba(56,189,248,.15);
+      border-radius: 6px; padding: 3px 8px; font-size: 10px;
+      color: #7dd3fc; font-family: monospace; margin-top: 4px;
+    }
+
+    /* ══ MepSlot 悬浮信息卡 ══ */
+    #mep-card {
+      position: absolute; z-index: 101; pointer-events: none;
+      width: 300px;
+      background: rgba(8,15,30,.97); backdrop-filter: blur(20px);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(251,191,36,.18);
+      opacity: 0; transform: translateY(6px) scale(.97);
+      transition: opacity .18s ease, transform .18s ease;
+      display: none;
+    }
+    #mep-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .mc-header {
+      padding: 10px 14px 9px;
+      background: linear-gradient(135deg, rgba(251,191,36,.08), rgba(245,158,11,.04));
+      display: flex; align-items: center; gap: 9px;
+      border-bottom: 1px solid rgba(251,191,36,.12);
+    }
+    .mc-icon { font-size: 16px; }
+    .mc-title { font-size: 12px; font-weight: 700; color: #fde68a; flex: 1; letter-spacing: .3px; }
+    .mc-id { font-size: 10px; color: #78716c; font-family: monospace; }
+    .mc-meta {
+      display: flex; gap: 0;
+      border-bottom: 1px solid rgba(148,163,184,.07);
+    }
+    .mc-meta-cell { flex: 1; padding: 8px 6px; text-align: center; border-right: 1px solid rgba(148,163,184,.07); }
+    .mc-meta-cell:last-child { border-right: none; }
+    .mc-meta-label { font-size: 9px; color: #475569; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
+    .mc-meta-value { font-size: 13px; font-weight: 800; color: #fde68a; font-variant-numeric: tabular-nums; line-height: 1; }
+    .mc-meta-unit  { font-size: 9px; color: #44403c; margin-top: 2px; }
+    .mc-body { padding: 8px 14px 6px; }
+    .mc-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(148,163,184,.05);
+    }
+    .mc-row:last-child { border-bottom: none; }
+    .mc-row-label { font-size: 10.5px; color: #57534e; }
+    .mc-row-val   { font-size: 10.5px; color: #d6d3d1; font-weight: 600; font-family: monospace; }
+    .mc-segs { padding: 0 14px 12px; }
+    .mc-segs-title {
+      font-size: 9px; color: #44403c; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+    }
+    .mc-segs-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); }
+    .mc-seg-item {
+      background: rgba(251,191,36,.04); border: 1px solid rgba(251,191,36,.1);
+      border-radius: 7px; padding: 6px 9px; margin-bottom: 5px;
+    }
+    .mc-seg-item:last-child { margin-bottom: 0; }
+    .mc-seg-type {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 4px; margin-bottom: 5px;
+    }
+    .mc-seg-type.line { background: rgba(56,189,248,.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,.2); }
+    .mc-seg-type.arc  { background: rgba(167,139,250,.12); color: #c4b5fd; border: 1px solid rgba(167,139,250,.2); }
+    .mc-seg-props { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
+    .mc-seg-prop { font-size: 10px; color: #78716c; }
+    .mc-seg-prop span { color: #d6d3d1; font-weight: 600; font-family: monospace; }
+    .mc-segs-scroll { max-height: 220px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(251,191,36,.2) transparent; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- 加载 -->
+  <div id="loading" class="hidden">
+    <div class="spinner"></div>
+    <div id="loading-text">解析 JSON 数据...</div>
+  </div>
+
+  <!-- 错误 -->
+  <div id="error-toast"></div>
+
+  <!-- 凹槽悬浮信息卡 -->
+  <div id="groove-card">
+    <div class="gc-header">
+      <div class="gc-type-dot" id="gc-dot"></div>
+      <span class="gc-type-name" id="gc-type"></span>
+      <span class="gc-id" id="gc-id"></span>
+    </div>
+    <div class="gc-dims">
+      <div class="gc-dim-cell"><div class="gc-dim-label">长度</div><div class="gc-dim-value" id="gc-len">—</div><div class="gc-dim-unit">mm</div></div>
+      <div class="gc-dim-cell"><div class="gc-dim-label">宽度</div><div class="gc-dim-value" id="gc-wid">—</div><div class="gc-dim-unit">mm</div></div>
+      <div class="gc-dim-cell"><div class="gc-dim-label">深度</div><div class="gc-dim-value" id="gc-dep">—</div><div class="gc-dim-unit">mm</div></div>
+    </div>
+    <div class="gc-body" id="gc-body"></div>
+    <div class="gc-pts-section" id="gc-pts-section"></div>
+  </div>
+
+  <!-- MepSlot 悬浮信息卡 -->
+  <div id="mep-card">
+    <div class="mc-header">
+      <span class="mc-icon">🔌</span>
+      <span class="mc-title" id="mc-title">MepSlot</span>
+      <span class="mc-id" id="mc-id"></span>
+    </div>
+    <div class="mc-meta">
+      <div class="mc-meta-cell"><div class="mc-meta-label">总长</div><div class="mc-meta-value" id="mc-totlen">—</div><div class="mc-meta-unit">mm</div></div>
+      <div class="mc-meta-cell"><div class="mc-meta-label">默认宽</div><div class="mc-meta-value" id="mc-width">—</div><div class="mc-meta-unit">mm</div></div>
+      <div class="mc-meta-cell"><div class="mc-meta-label">分段数</div><div class="mc-meta-value" id="mc-segcnt">—</div><div class="mc-meta-unit">segs</div></div>
+    </div>
+    <div class="mc-body" id="mc-body"></div>
+    <div class="mc-segs">
+      <div class="mc-segs-title">SEGMENTS</div>
+      <div class="mc-segs-scroll" id="mc-segs-list"></div>
+    </div>
+  </div>
+
+  <!-- 3D UI -->
+  <div id="panel3d" style="display:none">
+    <div id="toggle-bar">
+      <div class="tbtn on"  id="btn-wall"   onclick="toggleLayer('wall')">🧱 墙体</div>
+      <div class="tbtn on"  id="btn-groove" onclick="toggleLayer('groove')">🕳 腔体</div>
+      <div class="tbtn on"  id="btn-mep"    onclick="toggleLayer('mep')">🔌 MEP槽</div>
+      <div class="tbtn on"  id="btn-dim"    onclick="toggleLayer('dim')">📏 标注</div>
+    </div>
+
+    <div id="left-panels">
+      <!-- ★★★ 新增：特征属性面板（悬停时显示） ★★★ -->
+      <div class="panel" id="feature-attr-panel">
+        <div class="panel-title" id="fa-panel-title">特征属性</div>
+        <div id="fa-content"></div>
+      </div>
+
+      <div class="panel" id="wall-info-panel">
+        <div class="panel-title">墙体信息</div>
+        <div class="dim-visual">
+          <div class="dim-box">
+            <span class="dim-box-icon">L 长度</span>
+            <span class="dim-box-val" id="dv-length">—</span>
+            <span class="dim-box-unit">mm</span>
+          </div>
+          <div class="dim-sep"></div>
+          <div class="dim-box">
+            <span class="dim-box-icon">H 高度</span>
+            <span class="dim-box-val" id="dv-height">—</span>
+            <span class="dim-box-unit">mm</span>
+          </div>
+          <div class="dim-sep"></div>
+          <div class="dim-box">
+            <span class="dim-box-icon">T 厚度</span>
+            <span class="dim-box-val" id="dv-thick">—</span>
+            <span class="dim-box-unit">mm</span>
+          </div>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+          <span class="param-val" id="d-material">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
+          <span class="param-val highlight" id="d-volume">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
+          <span class="param-val" id="d-area-front">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
+          <span class="param-val" id="d-area-top">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">⚖️</span>估算重量</span>
+          <span class="param-val warn" id="d-weight">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🕳</span>凹槽总数</span>
+          <span class="param-val" id="d-groove-count">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🔢</span>凹槽类型</span>
+          <span class="param-val" id="d-groove-types">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🔌</span>MEP槽数</span>
+          <span class="param-val" id="d-mep-count">—</span>
+        </div>
+        <div class="groove-dist" id="groove-dist-section">
+          <div class="groove-dist-title">GROOVE DISTRIBUTION</div>
+          <div id="groove-dist-bars"></div>
+        </div>
+      </div>
+      <div class="panel" id="legend-panel">
+        <div class="panel-title">图 例</div>
+        <div id="legend-items"></div>
+      </div>
+    </div>
+
+    <div id="right-panels">
+      <div class="panel" id="view-panel">
+        <div class="panel-title">视角切换</div>
+        <div class="view-grid">
+          <div class="vbtn2 vbtn-full active" id="vbtn-iso"   onclick="setView2('iso')">⬡ 等轴测</div>
+          <div class="vbtn2" id="vbtn-front" onclick="setView2('front')">▣ 正视</div>
+          <div class="vbtn2" id="vbtn-back"  onclick="setView2('back')">▣ 背视</div>
+          <div class="vbtn2" id="vbtn-side"  onclick="setView2('side')">▣ 侧视</div>
+          <div class="vbtn2" id="vbtn-top"   onclick="setView2('top')">▣ 顶视</div>
+        </div>
+      </div>
+      <div class="panel" id="layer-panel">
+        <div class="panel-title">图层控制</div>
+        <div class="layer-row">
+          <span class="layer-label">墙体主体</span>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="sw-wall"   onchange="toggleLayerSwitch('wall',  this.checked)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">切削腔体</span>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="sw-groove" onchange="toggleLayerSwitch('groove',this.checked)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">MEP 管槽</span>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="sw-mep"    onchange="toggleLayerSwitch('mep',   this.checked)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="layer-row">
+          <span class="layer-label">尺寸标注</span>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="sw-dim"    onchange="toggleLayerSwitch('dim',   this.checked)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+      </div>
+      <div class="panel" id="hint">
+        <b>左键</b> 旋转 &nbsp;<b>右键</b> 平移<br>
+        <b>滚轮</b> 缩放 &nbsp;<b>双击</b> 重置视角<br>
+        <b>悬停腔体/MEP槽</b> 查看属性
+      </div>
+    </div>
+
+    <div id="title-bar">🧱 AAC · CSG 切削渲染器</div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three":          "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+    "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.8/build/index.module.js",
+    "three-bvh-csg":  "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SUBTRACTION, Brush, Evaluator } from 'three-bvh-csg';
+
+// ══════════════════════════════════════════════════
+//  常量
+// ══════════════════════════════════════════════════
+const S           = 0.001;
+const AAC_DENSITY = 650;
+
+const GROOVE_COLORS = {
+  steelColumn : { hex: 0xef5350, label: '钢柱槽',   css: '#ef5350' },
+  topBracket  : { hex: 0x42a5f5, label: '顶部托架', css: '#42a5f5' },
+  baseBracket : { hex: 0x66bb6a, label: '底部托架', css: '#66bb6a' },
+  topPlate    : { hex: 0xffa726, label: '顶板槽',   css: '#ffa726' },
+  glueSeal    : { hex: 0xf06292, label: '密封胶槽', css: '#f06292' },
+  default     : { hex: 0xce93d8, label: '其他凹槽', css: '#ce93d8' },
+};
+
+const MEP_COLOR_SHALLOW = new THREE.Color(0xfbbf24);
+const MEP_COLOR_DEEP    = new THREE.Color(0xf97316);
+const MEP_ARC_COLOR     = new THREE.Color(0xa78bfa);
+
+// ══════════════════════════════════════════════════
+//  Three.js 场景
+// ══════════════════════════════════════════════════
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+const canvas = renderer.domElement;
+canvas.style.cssText = 'position:absolute;inset:0;z-index:0;display:block;transform:translate(-100px,-50px);';
+document.getElementById('app').appendChild(canvas);
+
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x0f172a);
+scene.fog = new THREE.FogExp2(0x0f172a, 0.036);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.001, 100);
+camera.position.set(3, 2, 4);
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.055;
+controls.minDistance   = 0.1;  controls.maxDistance   = 30;
+canvas.addEventListener('dblclick', () => setView2('iso'));
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+const keyLight = new THREE.DirectionalLight(0xfff8f0, 1.1);
+keyLight.position.set(4, 6, 5); keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048); keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xa0c8ff, 0.4);
+fillLight.position.set(-4, 2, -4); scene.add(fillLight);
+const rimLight = new THREE.PointLight(0x38bdf8, 0.6, 25);
+scene.add(rimLight);
+
+const grid = new THREE.GridHelper(40, 50, 0x1e293b, 0x1e293b);
+grid.position.y = -0.001; scene.add(grid);
+
+(function loop() {
+  requestAnimationFrame(loop);
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ══════════════════════════════════════════════════
+//  图层管理
+// ══════════════════════════════════════════════════
+const layers     = { wall: null, groove: null, edge: null, mep: null, dim: null };
+const layerState = { wall: true, groove: true, edge: false, mep: true, dim: true };
+
+window.toggleLayer       = k      => setLayerVisible(k, !layerState[k]);
+window.toggleLayerSwitch = (k, v) => setLayerVisible(k, v);
+
+function setLayerVisible(key, val) {
+  layerState[key] = val;
+  const btn = document.getElementById('btn-'  + key); if (btn) btn.classList.toggle('on', val);
+  const sw  = document.getElementById('sw-'   + key); if (sw)  sw.checked = val;
+  if (layers[key]) layers[key].visible = val;
+}
+function clearScene() {
+  Object.keys(layers).forEach(k => { if (layers[k]) { scene.remove(layers[k]); layers[k] = null; } });
+}
+
+let _WL=1.4, _WH=2.695, _WT=0.298, _cx=0.7, _cy=1.35, _cz=0.149;
+
+window.setView2 = function(name) {
+  ['iso','front','back','side','top'].forEach(v => {
+    const el = document.getElementById('vbtn-'+v); if (el) el.classList.toggle('active', v===name);
+  });
+  const d = Math.max(_WL,_WH,_WT)*1.5;
+  const V = {
+    iso  : [_cx+d*.65, _cy+d*.3,  _cz+d],
+    front: [_cx,        _cy,       _cz+d*1.4],
+    back : [_cx,        _cy,       _cz-d*1.4],
+    side : [_cx+d*1.4,  _cy,       _cz],
+    top  : [_cx,        _cy+d*1.4, _cz+0.001],
+  };
+  animCam(V[name]??V.iso, [_cx,_cy,_cz]);
+};
+window.setView = window.setView2;
+
+function animCam(pos, tgt) {
+  const s=camera.position.clone(), t0=performance.now(), dur=680;
+  (function step(now){
+    const tt=Math.min((now-t0)/dur,1), e=tt<.5?2*tt*tt:-1+(4-2*tt)*tt;
+    camera.position.lerpVectors(s, new THREE.Vector3(...pos), e);
+    controls.target.set(...tgt); controls.update();
+    if(tt<1) requestAnimationFrame(step);
+  })(t0);
+}
+
+// ══════════════════════════════════════════════════
+//  凹槽解析
+// ══════════════════════════════════════════════════
+function parseGrooveBox(f, WL, WH, WT) {
+  const n  = f.currentNormal ?? {x:0,y:0,z:1};
+  const nx = Math.round(n.x), ny=Math.round(n.y), nz=Math.round(n.z);
+  const depth = Math.max((f.depth ??50)*S, 0.001);
+  const width = Math.max((f.width??100)*S, 0.001);
+  const sp={x:(f.startPt?.x??0)*S, y:(f.startPt?.y??0)*S, z:(f.startPt?.z??0)*S};
+  const ep={x:(f.endPt?.x??0)*S,   y:(f.endPt?.y??0)*S,   z:(f.endPt?.z??0)*S};
+  let cx,cy,cz,gx,gy,gz;
+  const fn=new THREE.Vector3(0,0,1);
+
+  if (nz!==0&&nx===0&&ny===0) {
+    if (f.grooveType==='steelColumn') {
+      gx=width; gy=Math.max(Math.abs(ep.y-sp.y),(f.length??0)*S,0.001); gz=depth;
+      cx=sp.x; cy=(sp.y+ep.y)/2;
+    } else {
+      gx=Math.max(Math.abs(ep.x-sp.x),(f.length??0)*S,0.001); gy=width; gz=depth;
+      cx=(sp.x+ep.x)/2; cy=sp.y;
+    }
+    cz=nz>0?WT-gz/2:gz/2; fn.set(0,0,nz);
+  } else if (ny!==0&&nx===0&&nz===0) {
+    const x0=Math.min(sp.x,ep.x),x1=Math.max(sp.x,ep.x);
+    const z0=Math.min(sp.y,ep.y),z1=Math.max(sp.y,ep.y);
+    gx=Math.max(x1-x0,width,0.001); gz=Math.max(z1-z0,width,0.001); gy=depth;
+    cx=(x0+x1)/2||sp.x; cz=(z0+z1)/2||sp.y;
+    cy=ny>0?WH-gy/2:gy/2; fn.set(0,ny,0);
+  } else if (nx!==0&&ny===0&&nz===0) {
+    const y0=Math.min(sp.y,ep.y),y1=Math.max(sp.y,ep.y);
+    const z0=Math.min(sp.z??0,ep.z??0),z1=Math.max(sp.z??0,ep.z??0);
+    gx=depth; gy=Math.max(y1-y0,width,0.001); gz=Math.max(z1-z0,width,0.001);
+    cy=(y0+y1)/2||sp.y; cz=(z0+z1)/2||WT/2;
+    cx=nx>0?WL-gx/2:gx/2; fn.set(nx,0,0);
+  } else {
+    gx=Math.max(width,0.001); gy=Math.max(Math.abs(ep.y-sp.y),width,0.001); gz=Math.max(depth,0.001);
+    cx=(sp.x+ep.x)/2; cy=(sp.y+ep.y)/2; cz=WT-gz/2; fn.set(0,0,1);
+  }
+  return { cx,cy,cz,gx,gy,gz, floorNormal:fn };
+}
+
+// ══════════════════════════════════════════════════
+//  MepSlot 渲染（原样保留）
+// ══════════════════════════════════════════════════
+function mepLocalToWorld(px, py, normal, WL, WH, WT) {
+  const nx = Math.round(normal.x??0);
+  const ny = Math.round(normal.y??0);
+  const nz = Math.round(normal.z??0);
+  if (nz !== 0) return new THREE.Vector3(px*S, py*S, nz>0?WT:0);
+  if (ny !== 0) return new THREE.Vector3(px*S, ny>0?WH:0, py*S);
+  if (nx !== 0) return new THREE.Vector3(nx>0?WL:0, px*S, py*S);
+  return new THREE.Vector3(px*S, py*S, WT);
+}
+
+function mepDepthOffset(depth, normal) {
+  const nx = Math.round(normal.x??0);
+  const ny = Math.round(normal.y??0);
+  const nz = Math.round(normal.z??0);
+  const d  = depth * S;
+  if (nz > 0) return new THREE.Vector3(0, 0, -d * 0.5);
+  if (nz < 0) return new THREE.Vector3(0, 0,  d * 0.5);
+  if (ny > 0) return new THREE.Vector3(0, -d * 0.5, 0);
+  if (ny < 0) return new THREE.Vector3(0,  d * 0.5, 0);
+  if (nx > 0) return new THREE.Vector3(-d * 0.5, 0, 0);
+  if (nx < 0) return new THREE.Vector3( d * 0.5, 0, 0);
+  return new THREE.Vector3(0, 0, -d * 0.5);
+}
+
+function depthToColor(depth, maxDepth) {
+  const t = Math.min(depth / Math.max(maxDepth, 1), 1);
+  return new THREE.Color().lerpColors(MEP_COLOR_SHALLOW, MEP_COLOR_DEEP, t);
+}
+
+function buildLineSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth) {
+  const normal = mepFeature.currentNormal ?? {x:0,y:0,z:1};
+  const w  = (seg.overrideWidth != null ? seg.overrideWidth : (mepFeature.width ?? 30)) * S;
+  const d  = seg.depth * S;
+  const sp = seg.startPoint;
+  const ep = seg.endPoint;
+
+  const p0 = mepLocalToWorld(sp.x, sp.y, normal, WL, WH, WT);
+  const p1 = mepLocalToWorld(ep.x, ep.y, normal, WL, WH, WT);
+
+  const dir  = new THREE.Vector3().subVectors(p1, p0);
+  const len  = dir.length();
+  if (len < 1e-6) return null;
+
+  const depOff = mepDepthOffset(seg.depth, normal);
+  const center = new THREE.Vector3()
+    .addVectors(p0, p1).multiplyScalar(0.5)
+    .add(depOff);
+
+  const nx = Math.round((normal.x??0));
+  const ny = Math.round((normal.y??0));
+  const nz = Math.round((normal.z??0));
+
+  const color = depthToColor(seg.depth, maxDepth);
+
+  let bx, by, bz;
+  if (nz !== 0) {
+    const dx = Math.abs(ep.x - sp.x), dy = Math.abs(ep.y - sp.y);
+    if (dy > dx) { bx = w; by = len; bz = d; } else { bx = len; by = w; bz = d; }
+  } else if (ny !== 0) {
+    const dx = Math.abs(ep.x - sp.x), dz = Math.abs(ep.y - sp.y);
+    if (dz > dx) { bx = w; by = d; bz = len; } else { bx = len; by = d; bz = w; }
+  } else {
+    const dy = Math.abs(ep.x - sp.x), dz = Math.abs(ep.y - sp.y);
+    if (dz > dy) { bx = d; by = w; bz = len; } else { bx = d; by = len; bz = w; }
+  }
+
+  const geo = new THREE.BoxGeometry(Math.max(bx,0.001), Math.max(by,0.001), Math.max(bz,0.001));
+  const mat = new THREE.MeshStandardMaterial({
+    color, roughness: 0.35, metalness: 0.15,
+    transparent: true, opacity: 0.72, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(center);
+  mesh.userData.origOpacity = 0.72;
+  mesh.userData.origColor   = color.clone();
+
+  const lineMat = new THREE.LineBasicMaterial({ color: color.clone().addScalar(0.2), transparent: true, opacity: 0.9 });
+  const lineGeo = new THREE.BufferGeometry().setFromPoints([p0.clone().add(depOff), p1.clone().add(depOff)]);
+  const line    = new THREE.Line(lineGeo, lineMat);
+
+  const edgeMat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.55 });
+  const edgeGeo = new THREE.EdgesGeometry(geo);
+  const edge    = new THREE.LineSegments(edgeGeo, edgeMat);
+  edge.position.copy(center);
+
+  return { mesh, line, edge };
+}
+
+function buildArcSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth) {
+  const normal = mepFeature.currentNormal ?? {x:0,y:0,z:1};
+  const w     = (seg.overrideWidth != null ? seg.overrideWidth : (mepFeature.width ?? 30)) * S;
+  const cx2d  = seg.center.x;
+  const cy2d  = seg.center.y;
+  const startDeg = seg.StartAngleDeg;
+  const endDeg   = seg.EndAngleDeg;
+  const cw       = seg.isClockwise;
+
+  const STEPS = Math.max(12, Math.round(Math.abs(endDeg - startDeg) / 5));
+  let angles = [];
+  if (!cw) {
+    let delta = endDeg - startDeg; if (delta < 0) delta += 360;
+    for (let i = 0; i <= STEPS; i++) angles.push(startDeg + (delta * i / STEPS));
+  } else {
+    let delta = startDeg - endDeg; if (delta < 0) delta += 360;
+    for (let i = 0; i <= STEPS; i++) angles.push(startDeg - (delta * i / STEPS));
+  }
+
+  const depOff = mepDepthOffset(seg.depth, normal);
+  const pts3d  = angles.map(deg => {
+    const rad = deg * Math.PI / 180;
+    const lx  = cx2d + seg.radius * Math.cos(rad);
+    const ly  = cy2d + seg.radius * Math.sin(rad);
+    return mepLocalToWorld(lx, ly, normal, WL, WH, WT).add(depOff);
+  });
+
+  if (pts3d.length < 2) return null;
+
+  const curve = new THREE.CatmullRomCurve3(pts3d);
+  const tubeR = Math.max(w / 2, 0.002);
+  const tubeGeo = new THREE.TubeGeometry(curve, STEPS * 2, tubeR, 6, false);
+  const color   = MEP_ARC_COLOR.clone();
+  const mat = new THREE.MeshStandardMaterial({
+    color, roughness: 0.35, metalness: 0.1,
+    transparent: true, opacity: 0.7, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(tubeGeo, mat);
+  mesh.userData.origOpacity = 0.7;
+  mesh.userData.origColor   = color.clone();
+
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xc4b5fd, transparent: true, opacity: 0.85 });
+  const lineGeo = new THREE.BufferGeometry().setFromPoints(pts3d);
+  const line    = new THREE.Line(lineGeo, lineMat);
+
+  return { mesh, line };
+}
+
+function makeLabel(text, pos, color='#38bdf8') {
+  const cv=document.createElement('canvas'); cv.width=320; cv.height=72;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='rgba(10,18,35,0.9)';
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(3,3,314,66,10);ctx.fill();}
+  else ctx.fillRect(3,3,314,66);
+  ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.strokeRect(4,4,312,64);
+  ctx.fillStyle=color; ctx.font='bold 26px Arial,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(text,160,36);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({
+    map:new THREE.CanvasTexture(cv), transparent:true, depthTest:false,
+  }));
+  sp.scale.set(0.46,0.1,1); sp.position.copy(pos); return sp;
+}
+function dimLine(p1,p2,color=0x38bdf8){
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...p1),new THREE.Vector3(...p2)]),
+    new THREE.LineBasicMaterial({color,depthTest:false})
+  );
+}
+
+// ══════════════════════════════════════════════════
+//  悬浮信息 & 属性面板
+// ══════════════════════════════════════════════════
+const grooveCard  = document.getElementById('groove-card');
+const mepCard     = document.getElementById('mep-card');
+const raycaster   = new THREE.Raycaster();
+const mouse       = new THREE.Vector2(-9,-9);
+
+const meshFeatureMap = new WeakMap();
+const meshMepMap     = new WeakMap();
+let   grooveMeshes   = [];
+let   mepSegMeshes   = [];
+let   hoveredMesh    = null;
+let   hoveredMepMesh = null;
+
+// ★★★ 新增：左侧特征属性面板引用 ★★★
+const featureAttrPanel = document.getElementById('feature-attr-panel');
+const faPanelTitle     = document.getElementById('fa-panel-title');
+const faContent        = document.getElementById('fa-content');
+
+function normalLabel(n) {
+  const nx=Math.round(n.x??0), ny=Math.round(n.y??0), nz=Math.round(n.z??0);
+  if (nz> 0) return '正面 (+Z)';
+  if (nz< 0) return '背面 (−Z)';
+  if (ny> 0) return '顶面 (+Y)';
+  if (ny< 0) return '底面 (−Y)';
+  if (nx> 0) return '右侧 (+X)';
+  if (nx< 0) return '左侧 (−X)';
+  return `(${nx},${ny},${nz})`;
+}
+function fmt(v, unit='mm') {
+  if (v==null) return '—';
+  const n = typeof v==='number' ? v : parseFloat(v);
+  return isNaN(n) ? String(v) : `${Math.round(n*10)/10} ${unit}`;
+}
+
+function positionCard(card, mouseX, mouseY) {
+  card.style.display = 'block';
+  const cw = card.offsetWidth, ch = card.offsetHeight;
+  const vw = innerWidth, vh = innerHeight;
+  const MARGIN = 16, ox = 18, oy = 12;
+  let left = mouseX + ox, top = mouseY + oy;
+  if (left + cw + MARGIN > vw) left = mouseX - cw - ox;
+  if (top  + ch + MARGIN > vh) top  = mouseY - ch - oy;
+  card.style.left = Math.max(MARGIN, left) + 'px';
+  card.style.top  = Math.max(MARGIN, top)  + 'px';
+}
+
+// ══════════════════════════════════════════════════
+//  ★★★ 新增：左侧特征属性面板 填充/隐藏 ★★★
+// ══════════════════════════════════════════════════
+
+function showGrooveAttrPanel(mesh) {
+  const { f, box } = meshFeatureMap.get(mesh);
+  const typeKey = f.grooveType ?? 'default';
+  const cfg     = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
+
+  featureAttrPanel.classList.remove('mep-mode');
+  faPanelTitle.textContent = '凹槽属性';
+
+  const n    = f.currentNormal ?? {x:0,y:0,z:1};
+  const len  = f.length != null ? Math.round(f.length) : Math.round(box.gx/S);
+  const wid  = f.width  != null ? Math.round(f.width)  : Math.round(box.gy/S);
+  const dep  = f.depth  != null ? Math.round(f.depth)  : Math.round(box.gz/S);
+
+  const rows = [
+    ['切削面',      normalLabel(n)],
+    ['切削深度',    fmt(f.depth)],
+    ['槽宽',        fmt(f.width)],
+    ['槽长',        f.length!=null ? fmt(f.length) : '—'],
+    ['起点 X/Y',    f.startPt ? `${Math.round(f.startPt.x??0)}, ${Math.round(f.startPt.y??0)}` : '—'],
+    ['终点 X/Y',    f.endPt   ? `${Math.round(f.endPt.x??0)}, ${Math.round(f.endPt.y??0)}`     : '—'],
+    ['初始面',      f.initialSide ?? '—'],
+    ['当前面',      f.currentSide ?? '—'],
+  ].filter(([,v])=>v&&v!=='—');
+
+  const pts = f.outlinePoints ?? f.points ?? f.contour ?? [];
+
+  let html = `
+    <div class="fa-header">
+      <div class="fa-dot" style="background:${cfg.css}"></div>
+      <div class="fa-title">${cfg.label}</div>
+      <div class="fa-id">${f.id ? '#'+f.id : ''}</div>
+    </div>
+    <div class="fa-dims">
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">长度</div><div class="fa-dim-val">${len}</div><div class="fa-dim-unit">mm</div></div>
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">宽度</div><div class="fa-dim-val">${wid}</div><div class="fa-dim-unit">mm</div></div>
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">深度</div><div class="fa-dim-val">${dep}</div><div class="fa-dim-unit">mm</div></div>
+    </div>
+    <div class="fa-section-title">BASIC INFO</div>
+    ${rows.map(([l,v])=>`<div class="param-row"><span class="param-lbl">${l}</span><span class="param-val">${v}</span></div>`).join('')}
+    <div style="margin-top:8px;text-align:center">
+      <span class="fa-badge">⊥ normal (${+(n.x??0).toFixed(0)}, ${+(n.y??0).toFixed(0)}, ${+(n.z??0).toFixed(0)})</span>
+    </div>
+  `;
+
+  if (pts.length) {
+    html += `
+      <div class="fa-section-title">OUTLINE · ${pts.length}pts</div>
+      <div class="gc-pts-grid" style="max-height:140px">
+        ${pts.map((p,i)=>`
+          <div class="gc-pt">
+            <div class="gc-pt-idx">PT ${i}</div>
+            <div class="gc-pt-xyz">X ${Math.round(p.x??0)}<br>Y ${Math.round(p.y??0)}${p.z!=null?`<br>Z ${Math.round(p.z)}`:''}</div>
+          </div>`).join('')}
+      </div>
+    `;
+  }
+
+  faContent.innerHTML = html;
+  featureAttrPanel.classList.add('visible');
+}
+
+function showMepAttrPanel(mesh) {
+  const { mepFeature, seg, segIndex } = meshMepMap.get(mesh);
+  const f = mepFeature;
+
+  featureAttrPanel.classList.add('mep-mode');
+  faPanelTitle.textContent = 'MEP 管槽属性';
+
+  const n = f.currentNormal ?? {x:0,y:0,z:1};
+  const totLen = f.totalLength != null ? Math.round(f.totalLength) : '—';
+  const width  = f.width ?? '—';
+  const segCnt = f.segmentCount ?? (f.segments?.length ?? '—');
+
+  const baseRows = [
+    ['所在面',     normalLabel(n)],
+    ['路径起点',   f.pathStart ? `(${Math.round(f.pathStart.x)}, ${Math.round(f.pathStart.y)})` : '—'],
+    ['路径终点',   f.pathEnd   ? `(${Math.round(f.pathEnd.x)}, ${Math.round(f.pathEnd.y)})`     : '—'],
+    ['均匀深度',   f.isUniformDepth ? '✓ 是' : '✗ 否'],
+    ['初始面',     f.initialSide ?? '—'],
+    ['当前面',     f.currentSide ?? '—'],
+    ['当前悬浮段', `第 ${segIndex + 1} 段 / 共 ${f.segments?.length ?? 1} 段`],
+  ].filter(([,v])=>v&&v!=='—');
+
+  const segs = f.segments ?? [];
+
+  let html = `
+    <div class="fa-header mep">
+      <div class="fa-dot" style="background:#fbbf24"></div>
+      <div class="fa-title">🔌 MepSlot ${f.id ?? ''}</div>
+      <div class="fa-id">${f.id ? '#'+f.id : ''}</div>
+    </div>
+    <div class="fa-dims">
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">总长</div><div class="fa-dim-val" style="color:#fde68a">${totLen}</div><div class="fa-dim-unit">mm</div></div>
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">默认宽</div><div class="fa-dim-val" style="color:#fde68a">${width}</div><div class="fa-dim-unit">mm</div></div>
+      <div class="fa-dim-cell"><div class="fa-dim-lbl">段数</div><div class="fa-dim-val" style="color:#fde68a">${segCnt}</div><div class="fa-dim-unit">segs</div></div>
+    </div>
+    <div class="fa-section-title">BASIC INFO</div>
+    ${baseRows.map(([l,v])=>`<div class="param-row"><span class="param-lbl">${l}</span><span class="param-val">${v}</span></div>`).join('')}
+    <div style="margin-top:8px;text-align:center">
+      <span class="fa-badge mep">⊥ normal (${+(n.x??0).toFixed(0)}, ${+(n.y??0).toFixed(0)}, ${+(n.z??0).toFixed(0)})</span>
+    </div>
+    <div class="fa-section-title">SEGMENTS · ${segs.length}</div>
+    <div style="max-height:200px;overflow-y:auto">
+  `;
+
+  segs.forEach((s, i) => {
+    const isCurrent = (i === segIndex);
+    const segType   = (s.$segmentType ?? s.type ?? 'line').toLowerCase();
+    const w         = s.overrideWidth != null ? s.overrideWidth : (f.width ?? 30);
+    let body = '';
+    if (segType === 'arc') {
+      body = `
+        圆心 (${Math.round(s.center?.x??0)}, ${Math.round(s.center?.y??0)}) · R=${Math.round(s.radius??0)}<br>
+        角度 ${s.StartAngleDeg}° → ${s.EndAngleDeg}° · ${s.isClockwise?'顺':'逆'}<br>
+        深度 ${s.depth}mm · 宽 ${w}mm`;
+    } else {
+      body = `
+        起 (${Math.round(s.startPoint?.x??0)}, ${Math.round(s.startPoint?.y??0)})<br>
+        终 (${Math.round(s.endPoint?.x??0)}, ${Math.round(s.endPoint?.y??0)})<br>
+        长 ${Math.round(s.length??0)}mm · 深 ${s.depth}mm · 宽 ${w}mm`;
+    }
+    html += `
+      <div class="fa-seg-mini ${isCurrent?'current':''}">
+        <div class="fa-seg-mini-head">
+          <span class="fa-seg-mini-idx">#${i+1}</span>
+          <span class="fa-seg-mini-type ${segType==='arc'?'arc':'line'}">${segType==='arc'?'⌒ ARC':'— LINE'}</span>
+          ${isCurrent?'<span class="fa-seg-mini-cur">◀ 当前</span>':''}
+        </div>
+        <div class="fa-seg-mini-body">${body}</div>
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  faContent.innerHTML = html;
+  featureAttrPanel.classList.add('visible');
+}
+
+function hideFeatureAttrPanel() {
+  featureAttrPanel.classList.remove('visible');
+  featureAttrPanel.classList.remove('mep-mode');
+}
+
+// ══════════════════════════════════════════════════
+//  凹槽信息卡（浮动卡片，保持原样）
+// ══════════════════════════════════════════════════
+function showGrooveCard(mesh, mouseX, mouseY) {
+  const { f, box } = meshFeatureMap.get(mesh);
+  const typeKey = f.grooveType ?? 'default';
+  const cfg     = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
+  document.getElementById('gc-dot').style.background  = cfg.css;
+  document.getElementById('gc-type').textContent      = cfg.label;
+  document.getElementById('gc-id').textContent        = f.id ? `#${f.id}` : '';
+  document.getElementById('gc-len').textContent = f.length != null ? Math.round(f.length) : Math.round(box.gx/S);
+  document.getElementById('gc-wid').textContent = f.width  != null ? Math.round(f.width)  : Math.round(box.gy/S);
+  document.getElementById('gc-dep').textContent = f.depth  != null ? Math.round(f.depth)  : Math.round(box.gz/S);
+  const n    = f.currentNormal ?? {x:0,y:0,z:1};
+  const rows = [
+    ['切削面', normalLabel(n)],
+    ['切削深度', fmt(f.depth)],
+    ['槽宽',     fmt(f.width)],
+    ['槽长',     f.length!=null ? fmt(f.length) : '—'],
+    ['起点 X/Y', f.startPt ? `${Math.round(f.startPt.x??0)}, ${Math.round(f.startPt.y??0)}` : '—'],
+    ['终点 X/Y', f.endPt   ? `${Math.round(f.endPt.x??0)}, ${Math.round(f.endPt.y??0)}`     : '—'],
+    ['初始面',   f.initialSide ?? '—'],
+    ['当前面',   f.currentSide ?? '—'],
+  ].filter(([,v])=>v&&v!=='—');
+  const bodyEl = document.getElementById('gc-body');
+  bodyEl.innerHTML = rows.map(([l,v])=>`
+    <div class="gc-row"><span class="gc-row-label">${l}</span><span class="gc-row-val">${v}</span></div>`).join('');
+  bodyEl.insertAdjacentHTML('beforeend',`
+    <div style="margin-top:6px">
+      <span class="gc-normal-badge">⊥ normal (${+(n.x??0).toFixed(0)}, ${+(n.y??0).toFixed(0)}, ${+(n.z??0).toFixed(0)})</span>
+    </div>`);
+  const ptsEl = document.getElementById('gc-pts-section');
+  const pts   = f.outlinePoints ?? f.points ?? f.contour ?? [];
+  if (pts.length) {
+    ptsEl.innerHTML = `<div class="gc-pts-title">OUTLINE POINTS · ${pts.length}pts</div>
+      <div class="gc-pts-grid">${pts.map((p,i)=>`
+        <div class="gc-pt"><div class="gc-pt-idx">PT ${i}</div>
+        <div class="gc-pt-xyz">X ${Math.round(p.x??0)}<br>Y ${Math.round(p.y??0)}${p.z!=null?`<br>Z ${Math.round(p.z)}`:''}</div></div>`).join('')}</div>`;
+  } else ptsEl.innerHTML='';
+  grooveCard.classList.remove('visible'); grooveCard.style.display='block';
+  positionCard(grooveCard, mouseX, mouseY);
+  requestAnimationFrame(() => grooveCard.classList.add('visible'));
+}
+function hideGrooveCard() {
+  grooveCard.classList.remove('visible');
+  setTimeout(() => { grooveCard.style.display='none'; }, 200);
+}
+
+function showMepCard(mesh, mouseX, mouseY) {
+  const { mepFeature, seg, segIndex } = meshMepMap.get(mesh);
+  const f = mepFeature;
+
+  document.getElementById('mc-title').textContent  = `MepSlot · ${f.id ?? ''}`;
+  document.getElementById('mc-id').textContent     = f.id ? `#${f.id}` : '';
+  document.getElementById('mc-totlen').textContent = f.totalLength != null ? Math.round(f.totalLength) : '—';
+  document.getElementById('mc-width').textContent  = f.width ?? '—';
+  document.getElementById('mc-segcnt').textContent = f.segmentCount ?? (f.segments?.length ?? '—');
+
+  const n = f.currentNormal ?? {x:0,y:0,z:1};
+  const rows = [
+    ['所在面',    normalLabel(n)],
+    ['路径起点',  f.pathStart ? `(${Math.round(f.pathStart.x)}, ${Math.round(f.pathStart.y)})` : '—'],
+    ['路径终点',  f.pathEnd   ? `(${Math.round(f.pathEnd.x)},   ${Math.round(f.pathEnd.y)})`   : '—'],
+    ['均匀深度',  f.isUniformDepth ? '✓ 是' : '✗ 否'],
+    ['初始面',    f.initialSide ?? '—'],
+    ['当前面',    f.currentSide ?? '—'],
+    ['当前悬浮段', `第 ${segIndex + 1} 段 / 共 ${f.segments?.length ?? 1} 段`],
+  ];
+  document.getElementById('mc-body').innerHTML = rows
+    .filter(([,v])=>v&&v!=='—')
+    .map(([l,v])=>`<div class="mc-row"><span class="mc-row-label">${l}</span><span class="mc-row-val">${v}</span></div>`)
+    .join('');
+
+  const segs = f.segments ?? [];
+  document.getElementById('mc-segs-list').innerHTML = segs.map((s, i) => {
+    const isCurrentSeg = (i === segIndex);
+    const segType = (s.$segmentType ?? s.type ?? 'line').toLowerCase();
+    const w = s.overrideWidth != null ? s.overrideWidth : (f.width ?? 30);
+    let props = '';
+    if (segType === 'line') {
+      props = `
+        <div class="mc-seg-prop">起点 <span>(${Math.round(s.startPoint?.x??0)}, ${Math.round(s.startPoint?.y??0)})</span></div>
+        <div class="mc-seg-prop">终点 <span>(${Math.round(s.endPoint?.x??0)}, ${Math.round(s.endPoint?.y??0)})</span></div>
+        <div class="mc-seg-prop">长度 <span>${Math.round(s.length ?? 0)} mm</span></div>
+        <div class="mc-seg-prop">深度 <span>${s.depth} mm</span></div>
+        <div class="mc-seg-prop">宽度 <span>${w} mm</span></div>
+        ${s.overrideWidth != null ? '<div class="mc-seg-prop" style="grid-column:span 2;color:#fbbf24;font-size:9px">⚠ 覆盖宽度</div>' : ''}
+      `;
+    } else {
+      props = `
+        <div class="mc-seg-prop">圆心 <span>(${Math.round(s.center?.x??0)}, ${Math.round(s.center?.y??0)})</span></div>
+        <div class="mc-seg-prop">半径 <span>${Math.round(s.radius ?? 0)} mm</span></div>
+        <div class="mc-seg-prop">起角 <span>${s.StartAngleDeg}°</span></div>
+        <div class="mc-seg-prop">终角 <span>${s.EndAngleDeg}°</span></div>
+        <div class="mc-seg-prop">深度 <span>${s.depth} mm</span></div>
+        <div class="mc-seg-prop">方向 <span>${s.isClockwise ? '顺时针' : '逆时针'}</span></div>
+        <div class="mc-seg-prop">宽度 <span>${w} mm</span></div>
+      `;
+    }
+    return `
+      <div class="mc-seg-item" style="${isCurrentSeg ? 'border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.08)' : ''}">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span style="font-size:9px;color:#57534e">#${i+1}</span>
+          <div class="mc-seg-type ${segType === 'arc' ? 'arc' : 'line'}">${segType === 'arc' ? '⌒ Arc' : '— Line'}</div>
+          ${isCurrentSeg ? '<span style="font-size:9px;color:#fbbf24;margin-left:auto">◀ 当前</span>' : ''}
+        </div>
+        <div class="mc-seg-props">${props}</div>
+      </div>`;
+  }).join('');
+
+  mepCard.classList.remove('visible'); mepCard.style.display='block';
+  positionCard(mepCard, mouseX, mouseY);
+  requestAnimationFrame(() => mepCard.classList.add('visible'));
+}
+function hideMepCard() {
+  mepCard.classList.remove('visible');
+  setTimeout(() => { mepCard.style.display='none'; }, 200);
+}
+
+// ══════════════════════════════════════════════════
+//  高亮逻辑
+// ══════════════════════════════════════════════════
+function highlightGrooveMesh(mesh) {
+  if (hoveredMesh === mesh) return;
+  unhighlightAll();
+  hoveredMesh = mesh;
+  if (mesh.material) {
+    mesh.material.opacity           = Math.min(mesh.material.opacity * 2.2, 0.85);
+    mesh.material.emissive          = new THREE.Color(mesh.material.color);
+    mesh.material.emissiveIntensity = 0.35;
+  }
+  canvas.style.cursor = 'crosshair';
+}
+function highlightMepMesh(mesh) {
+  if (hoveredMepMesh === mesh) return;
+  unhighlightAll();
+  hoveredMepMesh = mesh;
+  if (mesh.material) {
+    mesh.material.opacity           = Math.min((mesh.userData.origOpacity ?? 0.7) * 1.8, 0.95);
+    mesh.material.emissive          = new THREE.Color(mesh.userData.origColor ?? 0xfbbf24);
+    mesh.material.emissiveIntensity = 0.45;
+  }
+  canvas.style.cursor = 'crosshair';
+}
+function unhighlightAll() {
+  if (hoveredMesh) {
+    if (hoveredMesh.material) {
+      hoveredMesh.material.opacity           = hoveredMesh.userData.origOpacity ?? 0.38;
+      hoveredMesh.material.emissiveIntensity = 0;
+    }
+    hoveredMesh = null;
+  }
+  if (hoveredMepMesh) {
+    if (hoveredMepMesh.material) {
+      hoveredMepMesh.material.opacity           = hoveredMepMesh.userData.origOpacity ?? 0.7;
+      hoveredMepMesh.material.emissiveIntensity = 0;
+    }
+    hoveredMepMesh = null;
+  }
+  canvas.style.cursor = '';
+}
+
+// ══════════════════════════════════════════════════
+//  ★★★ 改进：mousemove 同时更新属性面板 ★★★
+// ══════════════════════════════════════════════════
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const allPickable = [
+    ...(layerState.groove ? grooveMeshes : []),
+    ...(layerState.mep    ? mepSegMeshes : []),
+  ];
+  if (!allPickable.length) {
+    unhighlightAll();
+    hideGrooveCard();
+    hideMepCard();
+    hideFeatureAttrPanel();          // ★ 新增
+    return;
+  }
+
+  const hits = raycaster.intersectObjects(allPickable, false);
+  if (hits.length) {
+    const hit = hits[0].object;
+    if (meshFeatureMap.has(hit)) {
+      if (hoveredMepMesh) { unhighlightAll(); hideMepCard(); }
+      highlightGrooveMesh(hit);
+      if (hoveredMesh === hit) {
+        positionCard(grooveCard, e.clientX, e.clientY);
+      } else {
+        showGrooveCard(hit, e.clientX, e.clientY);
+        showGrooveAttrPanel(hit);    // ★ 新增：同步更新左侧面板
+      }
+    } else if (meshMepMap.has(hit)) {
+      if (hoveredMesh) { unhighlightAll(); hideGrooveCard(); }
+      highlightMepMesh(hit);
+      if (hoveredMepMesh === hit) {
+        positionCard(mepCard, e.clientX, e.clientY);
+      } else {
+        showMepCard(hit, e.clientX, e.clientY);
+        showMepAttrPanel(hit);       // ★ 新增：同步更新左侧面板
+      }
+    }
+  } else {
+    unhighlightAll();
+    hideGrooveCard();
+    hideMepCard();
+    hideFeatureAttrPanel();          // ★ 新增
+  }
+});
+
+canvas.addEventListener('mouseleave', () => {
+  unhighlightAll();
+  hideGrooveCard();
+  hideMepCard();
+  hideFeatureAttrPanel();            // ★ 新增
+});
+
+// ══════════════════════════════════════════════════
+//  信息面板（墙体信息，原样保留）
+// ══════════════════════════════════════════════════
+function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots) {
+  document.getElementById('dv-length').textContent = Math.round(WL/S);
+  document.getElementById('dv-height').textContent = Math.round(WH/S);
+  document.getElementById('dv-thick').textContent  = Math.round(WT/S);
+  document.getElementById('d-material').textContent = data.material ?? 'AAC';
+  const volM3=WL*WH*WT, volCm3=volM3*1e6;
+  document.getElementById('d-volume').textContent =
+    volCm3>=1e6?(volM3*1e3).toFixed(2)+' dm³':Math.round(volCm3).toLocaleString()+' cm³';
+  const aF=WL*WH*1e4, aT=WL*WT*1e4;
+  document.getElementById('d-area-front').textContent = aF>=10000?(aF/10000).toFixed(2)+' m²':Math.round(aF)+' cm²';
+  document.getElementById('d-area-top').textContent   = aT>=10000?(aT/10000).toFixed(2)+' m²':Math.round(aT)+' cm²';
+  const wKg=volM3*AAC_DENSITY;
+  document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(2)+' t':Math.round(wKg)+' kg';
+  document.getElementById('d-groove-count').textContent = grooves.length+' 个';
+  document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length+' 种';
+  document.getElementById('d-mep-count').textContent = mepSlots.length+' 条';
+  const barsEl=document.getElementById('groove-dist-bars'); barsEl.innerHTML='';
+  const maxC=Math.max(...Object.values(typeCount),1);
+  Object.entries(typeCount).forEach(([k,c])=>{
+    const cfg=GROOVE_COLORS[k]??GROOVE_COLORS.default;
+    const pct=(c/maxC*100).toFixed(1);
+    const row=document.createElement('div'); row.className='groove-bar-row';
+    row.innerHTML=`<span class="groove-bar-label">${cfg.label}</span>
+      <div class="groove-bar-track"><div class="groove-bar-fill" style="width:${pct}%;background:${cfg.css}"></div></div>
+      <span class="groove-bar-count">${c}</span>`;
+    barsEl.appendChild(row);
+  });
+  document.getElementById('groove-dist-section').style.display = Object.keys(typeCount).length?'':'none';
+}
+
+function fillLegend(usedTypes, typeCount, hasMep) {
+  const el=document.getElementById('legend-items'); el.innerHTML='';
+  const items = [
+    {label:'AAC 墙体主体', css:'#c8d0d8', count:1},
+    ...[...usedTypes].map(k=>({
+      label:(GROOVE_COLORS[k]??GROOVE_COLORS.default).label,
+      css  :(GROOVE_COLORS[k]??GROOVE_COLORS.default).css,
+      count:typeCount[k]??0,
+    })),
+  ];
+  if (hasMep) {
+    items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0});
+    items.push({label:'MEP 弧槽 (Arc)',  css:'#a78bfa', count:0});
+  }
+  items.forEach(({label,css,count})=>{
+    const d=document.createElement('div'); d.className='legend-item';
+    d.innerHTML=`<div class="legend-dot" style="background:${css}"></div>
+      <span class="legend-label">${label}</span>
+      ${count>1?`<span class="legend-count">×${count}</span>`:''}`;
+    el.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  主构建（保持原样）
+// ══════════════════════════════════════════════════
+async function buildWall(data) {
+  clearScene();
+  grooveMeshes = [];
+  mepSegMeshes = [];
+  unhighlightAll();
+  hideGrooveCard();
+  hideMepCard();
+  hideFeatureAttrPanel();            // ★ 新增
+
+  const WL=((data.actualLength??data.obbLength??data.length??1400))*S;
+  const WH=((data.actualWidth??data.obbWidth??data.height??data.width??2695))*S;
+  const WT=((data.actualThickness??data.thickness??298))*S;
+
+  if(WL<0.01||WH<0.01||WT<0.005)
+    throw new Error(`墙体尺寸异常: L=${(WL/S).toFixed(0)} H=${(WH/S).toFixed(0)} T=${(WT/S).toFixed(0)}`);
+
+  _WL=WL; _WH=WH; _WT=WT; _cx=WL/2; _cy=WH/2; _cz=WT/2;
+  rimLight.position.set(WL/2, WH+0.8, WT+0.5);
+
+  const allFeatures = data.features ?? [];
+  const grooves = allFeatures.filter(f =>
+    f.featureType==='Groove' || f.$type==='Groove' || f.type==='groove'
+  );
+  const mepSlots = allFeatures.filter(f =>
+    f.featureType==='MepSlot' || f.$type==='MepSlot' || f.type==='mepSlot'
+  );
+  const typeCount={};
+  grooves.forEach(f=>{ const k=f.grooveType??'default'; typeCount[k]=(typeCount[k]??0)+1; });
+
+  setLoadingText(`CSG 布尔运算（${grooves.length} 个凹槽）...`);
+  await tick();
+
+  // ── 墙体 CSG ──
+  const wallMat=new THREE.MeshStandardMaterial({color:0xc8d0d8,roughness:0.88,metalness:0.03});
+  let wallBrush=new Brush(new THREE.BoxGeometry(WL,WH,WT),wallMat);
+  wallBrush.position.set(WL/2,WH/2,WT/2); wallBrush.updateMatrixWorld(true);
+
+  const evaluator=new Evaluator(); evaluator.useGroups=false;
+  const grooveBoxes=[]; let failN=0;
+
+  for(let i=0;i<grooves.length;i++){
+    const f=grooves[i]; let box;
+    try { box=parseGrooveBox(f,WL,WH,WT); } catch(e){ console.warn(`[parse] #${i}`,e); continue; }
+    if(box.gx<1e-5||box.gy<1e-5||box.gz<1e-5){ console.warn(`[buildWall] #${i} 零尺寸跳过`); continue; }
+    grooveBoxes.push({f,box});
+    const cb=new Brush(new THREE.BoxGeometry(box.gx+0.001,box.gy+0.001,box.gz+0.001),wallMat);
+    cb.position.set(box.cx,box.cy,box.cz); cb.updateMatrixWorld(true);
+    try {
+      const r=evaluator.evaluate(wallBrush,cb,SUBTRACTION);
+      r.position.set(0,0,0); r.updateMatrixWorld(true); wallBrush=r;
+    } catch(e){ failN++; console.warn(`[CSG] #${i}`,e.message); }
+    if(i%5===4){ setLoadingText(`CSG ${i+1}/${grooves.length}...`); await tick(); }
+  }
+
+  // 墙体主体
+  const wallGroup=new THREE.Group();
+  wallGroup.add(new THREE.Mesh(wallBrush.geometry, wallMat));
+  scene.add(wallGroup); layers.wall=wallGroup;
+
+  // 切削腔体可视化
+  const grooveGroup=new THREE.Group();
+  const usedTypes=new Set();
+
+  for(const {f,box} of grooveBoxes){
+    const {cx,cy,cz,gx,gy,gz,floorNormal}=box;
+    const typeKey=f.grooveType??'default';
+    const cfg=GROOVE_COLORS[typeKey]??GROOVE_COLORS.default;
+    usedTypes.add(typeKey);
+
+    const cavGeo=new THREE.BoxGeometry(gx,gy,gz);
+    const cavMat=new THREE.MeshStandardMaterial({
+      color:cfg.hex, roughness:0.4, metalness:0.1,
+      transparent:true, opacity:0.38, depthWrite:false, side:THREE.DoubleSide,
+    });
+    const cavMesh=new THREE.Mesh(cavGeo,cavMat);
+    cavMesh.position.set(cx,cy,cz);
+    cavMesh.userData.origOpacity=0.38;
+    meshFeatureMap.set(cavMesh,{f,box});
+    grooveMeshes.push(cavMesh);
+    grooveGroup.add(cavMesh);
+
+    // 底面贴片
+    let fW,fH;
+    if(Math.abs(floorNormal.z)>0.5){fW=gx;fH=gy;}
+    else if(Math.abs(floorNormal.y)>0.5){fW=gx;fH=gz;}
+    else{fW=gy;fH=gz;}
+    const floorMesh=new THREE.Mesh(
+      new THREE.PlaneGeometry(fW,fH),
+      new THREE.MeshStandardMaterial({color:cfg.hex,roughness:0.55,transparent:true,opacity:0.62,depthWrite:false,side:THREE.DoubleSide})
+    );
+    if(Math.abs(floorNormal.y)>0.5) floorMesh.rotation.x=floorNormal.y>0?-Math.PI/2:Math.PI/2;
+    else if(Math.abs(floorNormal.x)>0.5) floorMesh.rotation.y=floorNormal.x>0?Math.PI/2:-Math.PI/2;
+    floorMesh.position.set(cx-floorNormal.x*(gx/2-0.0003),cy-floorNormal.y*(gy/2-0.0003),cz-floorNormal.z*(gz/2-0.0003));
+    grooveGroup.add(floorMesh);
+
+    const el=new THREE.LineSegments(new THREE.EdgesGeometry(cavGeo),
+      new THREE.LineBasicMaterial({color:cfg.hex,transparent:true,opacity:0.88}));
+    el.position.set(cx,cy,cz); grooveGroup.add(el);
+  }
+  scene.add(grooveGroup); layers.groove=grooveGroup;
+
+  // ── MepSlot 渲染 ──
+  setLoadingText(`渲染 MepSlot（${mepSlots.length} 条）...`);
+  await tick();
+
+  const mepGroup = new THREE.Group();
+
+  for (const mepFeature of mepSlots) {
+    const segs = mepFeature.segments ?? [];
+    const maxDepth = segs.reduce((m, s) => Math.max(m, s.depth ?? 0), 0);
+
+    for (let si = 0; si < segs.length; si++) {
+      const seg     = segs[si];
+      const segType = (seg.$segmentType ?? seg.type ?? 'line').toLowerCase();
+
+      let result = null;
+      if (segType === 'line') {
+        result = buildLineSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth);
+      } else if (segType === 'arc') {
+        result = buildArcSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth);
+      }
+
+      if (!result) continue;
+
+      const { mesh, line, edge } = result;
+
+      meshMepMap.set(mesh, { mepFeature, seg, segIndex: si });
+      mepSegMeshes.push(mesh);
+      mepGroup.add(mesh);
+      if (line) mepGroup.add(line);
+      if (edge) mepGroup.add(edge);
+    }
+  }
+
+  scene.add(mepGroup); layers.mep = mepGroup;
+
+  // 尺寸标注
+  const dimGroup=new THREE.Group();
+  const off=0.14;
+  dimGroup.add(dimLine([-off,0,WT/2],[-off,WH,WT/2]));
+  dimGroup.add(makeLabel(`H  ${Math.round(WH/S)} mm`,new THREE.Vector3(-off-0.26,WH/2,WT/2)));
+  dimGroup.add(dimLine([0,-off,WT/2],[WL,-off,WT/2]));
+  dimGroup.add(makeLabel(`L  ${Math.round(WL/S)} mm`,new THREE.Vector3(WL/2,-off-0.10,WT/2)));
+  dimGroup.add(dimLine([WL+off,WH/2,0],[WL+off,WH/2,WT]));
+  dimGroup.add(makeLabel(`T  ${Math.round(WT/S)} mm`,new THREE.Vector3(WL+off+0.26,WH/2,WT/2)));
+  scene.add(dimGroup); layers.dim=dimGroup;
+
+  fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots);
+  fillLegend(usedTypes, typeCount, mepSlots.length > 0);
+
+  ['wall','groove','mep','dim'].forEach(k=>setLayerVisible(k,true));
+  setLayerVisible('edge',false);
+  setView2('iso');
+}
+
+// ══════════════════════════════════════════════════
+//  工具
+// ══════════════════════════════════════════════════
+function tick(){ return new Promise(r=>setTimeout(r,16)); }
+function setLoadingText(t){ const e=document.getElementById('loading-text'); if(e) e.textContent=t; }
+function showError(msg){
+  const el=document.getElementById('error-toast');
+  el.textContent='❌ '+msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+// ══════════════════════════════════════════════════
+//  ★★★ 对外 API（供 C# 通过 WebView2 ExecuteScriptAsync 调用）★★★
+// ══════════════════════════════════════════════════
+
+/// <summary>
+/// 从 C# 注入数据直接渲染（跳过上传界面）
+/// 调用方式（C#）：await ExecuteScriptAsync($"loadWallData('{escapedJson}')");
+/// </summary>
+window.loadWallData = async function(jsonStr) {
+  try {
+    var data = JSON.parse(jsonStr);
+    if (!data) throw new Error('JSON 解析结果为空');
+
+    // 显示加载遮罩
+    document.getElementById('loading').classList.remove('hidden');
+    setLoadingText('正在从服务器加载数据...');
+    await tick();
+
+    // 确保 features 字段存在
+    if (!Array.isArray(data.features)) {
+      data.features = [];
+    }
+
+    // 调用现有 buildWall 引擎
+    await buildWall(data);
+
+    // 隐藏加载遮罩、显示 3D UI
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('panel3d').style.display = 'block';
+  } catch(e) {
+    console.error('[loadWallData]', e);
+    document.getElementById('loading').classList.add('hidden');
+    showError('C# 数据注入失败：' + e.message);
+  }
+};
+
+/// <summary>
+/// 重置摄像机视角
+/// 调用方式（C#）：await ExecuteScriptAsync("resetCamera()");
+/// </summary>
+window.resetCamera = function() {
+  try {
+    setView2('iso');
+    // 通过 postMessage 回传状态给 WPF
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage('status:视角已重置');
+    }
+  } catch(e) {
+    console.warn('[resetCamera]', e);
+  }
+};
+
+/// <summary>
+/// 重置所有图层为可见状态（用于初始化时调用）
+/// </summary>
+window.resetAllLayers = function() {
+  ['wall','groove','mep','dim'].forEach(function(k) {
+    setLayerVisible(k, true);
+  });
+};
+
+
+</script>
+</body>
+</html>
