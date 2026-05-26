@@ -152,6 +152,18 @@ namespace CncWallStation.Views
             }
         }
 
+        /// <summary>右键菜单 → 查看MOM模型渲染</summary>
+        private void ContextMenu_ViewMomRender(object sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem { Parent: ContextMenu cm } || cm.PlacementTarget is not DataGrid dg)
+                return;
+
+            if (dg.CurrentItem is WallListItem item)
+            {
+                _viewModel.ViewMomRenderCommand.Execute(item);
+            }
+        }
+
         /// <summary>右键菜单 → 编辑 JSON</summary>
         private void ContextMenu_EditJson(object sender, RoutedEventArgs e)
         {

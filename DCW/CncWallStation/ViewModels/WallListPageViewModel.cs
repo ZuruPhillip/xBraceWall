@@ -915,12 +915,28 @@ namespace CncWallStation.ViewModels
             {
                 if (page is Views.BimDataRenderPage bimPage && bimPage.DataContext is BimDataRenderViewModel vm)
                 {
-                    vm.SearchWallId = item.WallId;
-                    vm.SearchWallCommand.Execute(null);
+                    _ = vm.SearchAndLoadAsync(item.WallId);
                 }
             });
 
             _logger.LogInformation("跳转到BIM模型渲染: WallId={WallId}", item.WallId);
+        }
+
+        // ==================== 命令：查看MOM模型渲染 ====================
+        [RelayCommand]
+        private void ViewMomRender(WallListItem? item)
+        {
+            if (item == null) return;
+
+            _mainPageViewModel.AddOrActivateTab("MomDataRenderPage", onPageCreated: page =>
+            {
+                if (page is Views.MomDataRenderPage momPage && momPage.DataContext is MomDataRenderViewModel vm)
+                {
+                    _ = vm.SearchAndLoadAsync(item.WallId);
+                }
+            });
+
+            _logger.LogInformation("跳转到MOM模型渲染: WallId={WallId}", item.WallId);
         }
 
         // ==================== 命令：编辑 JSON 数据（跳转到 JSON 编辑器） ====================

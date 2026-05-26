@@ -265,7 +265,7 @@ namespace CncWallStation.ViewModels
         // ──────────────────────────────────────────
 
         public Func<string, Task>? ExecuteScriptAsync { get; set; }
-        public Action? NavigateToHtml { get; set; }
+        public Func<Task>? NavigateToHtml { get; set; }
 
         // ══════════════════════════════════════════
         //  初始化命令
@@ -410,7 +410,8 @@ namespace CncWallStation.ViewModels
                 MapToDObject(dto);
 
                 IsRendering = true;
-                NavigateToHtml?.Invoke();
+                if (NavigateToHtml != null)
+                    await NavigateToHtml();
 
                 StatusMessage = $"🔄 正在注入渲染数据 (v{version})...";
             }
@@ -420,6 +421,56 @@ namespace CncWallStation.ViewModels
                 StatusMessage = $"❌ 加载失败: {ex.Message}";
                 IsLoading = false;
                 IsRendering = false;
+            }
+        }
+
+        /// <summary>
+        /// 供外部调用：通过 wallId 搜索墙体并自动加载渲染（无需手动点"加载渲染"按钮）
+        /// </summary>
+        public async Task SearchAndLoadAsync(string wallId)
+        {
+            if (string.IsNullOrWhiteSpace(wallId)) return;
+
+            SearchWallId = wallId;
+            IsLoading = true;
+            FoundWall = null;
+            StatusMessage = "🔍 正在搜索墙体...";
+
+            try
+            {
+                var input = new WallQueryInput
+                {
+                    WallId = wallId.Trim(),
+                    Page = 1,
+                    PageSize = 1,
+                    LatestOnly = true
+                };
+                var result = await _wallAppService.QueryWallsAsync(input);
+
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    if (result.TotalCount > 0 && result.Items.Count > 0)
+                    {
+                        FoundWall = result.Items[0];
+                        StatusMessage = $"✅ 找到墙体: {FoundWall.WallId}";
+                    }
+                    else
+                    {
+                        StatusMessage = "⚠️ 未匹配到墙体记录";
+                        IsLoading = false;
+                    }
+                });
+
+                if (FoundWall != null)
+                {
+                    LoadRenderCommand.Execute(null);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "搜索并加载墙体失败");
+                StatusMessage = $"❌ 搜索失败: {ex.Message}";
+                IsLoading = false;
             }
         }
 

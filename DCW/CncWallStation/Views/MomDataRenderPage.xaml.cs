@@ -27,17 +27,22 @@ namespace CncWallStation.Views
 
             // ── 向 ViewModel 注入 WebView2 功能委托 ──
 
-            // 注入：导航到 HTML 文件
-            _viewModel.NavigateToHtml = () =>
+            // 注入：导航到 HTML 文件（等待 CoreWebView2 就绪）
+            _viewModel.NavigateToHtml = async () =>
             {
+                // 确保 CoreWebView2 已初始化
+                try
+                {
+                    await MomWebView.EnsureCoreWebView2Async(null);
+                }
+                catch (Exception ex)
+                {
+                    _viewModel.OnPageFailed($"WebView2 初始化失败: {ex.Message}");
+                    return;
+                }
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (MomWebView.CoreWebView2 == null)
-                    {
-                        _viewModel.StatusMessage = "⚠️ WebView2 尚未初始化完成，请稍后再试";
-                        _viewModel.IsLoading = false;
-                        return;
-                    }
                     var uri = new Uri(_viewModel.HtmlFilePath);
                     MomWebView.CoreWebView2.Navigate(uri.AbsoluteUri);
                 });

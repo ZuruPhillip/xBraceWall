@@ -297,6 +297,7 @@
 							  Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
 					<Separator/>
 					<MenuItem Header="🏗️ 查看BIM模型渲染" Click="ContextMenu_ViewDetail"/>
+					<MenuItem Header="🧱 查看MOM模型渲染" Click="ContextMenu_ViewMomRender"/>
 					<MenuItem Header="📝 编辑 JSON" Click="ContextMenu_EditJson"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
