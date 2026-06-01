@@ -5,6 +5,9 @@ using CncWallStation.MomWallData;
 using CncWallStation.Plcs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CncWallStation.Services.Application
 {
@@ -71,15 +74,19 @@ namespace CncWallStation.Services.Application
                     "请先在 WallListPage 中对该墙体【执行管线】操作，完成 BimJSON → MomJSON 转换后再试。");
 
             // ★ 用 System.Text.Json，匹配 Feature 基类上的 [JsonPolymorphic] / [JsonDerivedType]
-            var options = new System.Text.Json.JsonSerializerOptions
+            var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true
+                WriteIndented = true,               // 格式化缩进
+                Encoder = JavaScriptEncoder   // 保留中文，不转义
+                                         .UnsafeRelaxedJsonEscaping,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
 
             MomWall? momWall;
             try
             {
-                momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(wall.MomJsonData, options);
+                momWall = JsonSerializer.Deserialize<MomWall>(wall.MomJsonData, options);
 
                 if (momWall != null)
                 {
@@ -87,7 +94,7 @@ namespace CncWallStation.Services.Application
                         f.RestoreFaceFromInitialSide();
                 }
             }
-            catch (System.Text.Json.JsonException ex)
+            catch (JsonException ex)
             {
                 throw new InvalidOperationException(
                     $"MomJsonData 反序列化失败，可能存在数据损坏。请重新执行管线操作。\n\n详情：{ex.Message}", ex);

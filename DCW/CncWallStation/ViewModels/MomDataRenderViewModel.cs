@@ -364,10 +364,11 @@ namespace CncWallStation.ViewModels
 
                 StatusMessage = "🔄 正在解析 MomJSON 数据...";
 
-                // 反序列化 MomWall
+                // 反序列化 MomWall（需与序列化侧保持一致，枚举字段用字符串形式）
                 var options = new System.Text.Json.JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
                 };
 
                 var momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(detail.MomJsonData, options);
@@ -378,6 +379,10 @@ namespace CncWallStation.ViewModels
                     IsLoading = false;
                     return;
                 }
+
+                // ★ 反序列化后恢复 Face：Face 标记为 [JsonIgnore]，需从 InitialSide 重建
+                foreach (var f in momWall.Features)
+                    f.RestoreFaceFromInitialSide();
 
                 StatusMessage = "🔄 MomJSON 解析成功，正在映射渲染数据...";
 
@@ -507,7 +512,7 @@ namespace CncWallStation.ViewModels
             float actualWidth = momWall.ActualWidth;
             float actualThickness = momWall.ActualThickness;
 
-            // 提取特征（仅 Groove 和 MepSlot）
+            // 提取特征: Groove、MepSlot、Pocket
             var features = new List<object>();
 
             foreach (var feature in momWall.Features)
@@ -519,6 +524,10 @@ namespace CncWallStation.ViewModels
                 else if (feature is MepSlot mepSlot)
                 {
                     features.Add(SerializeMepSlot(mepSlot));
+                }
+                else if (feature is Pocket pocket)
+                {
+                    features.Add(SerializePocket(pocket));
                 }
             }
 
@@ -596,7 +605,7 @@ namespace CncWallStation.ViewModels
                 {
                     return (object)new
                     {
-                        segmentType = "Line",
+                        type = "Line",                // HTML 用 seg.type 判断段类型
                         startPoint = new { x = line.StartPoint.X, y = line.StartPoint.Y },
                         endPoint = new { x = line.EndPoint.X, y = line.EndPoint.Y },
                         depth = line.Depth,
@@ -608,7 +617,7 @@ namespace CncWallStation.ViewModels
                 {
                     return (object)new
                     {
-                        segmentType = "Arc",
+                        type = "Arc",                 // HTML 用 seg.type 判断段类型
                         center = new { x = arc.Center.X, y = arc.Center.Y },
                         radius = arc.Radius,
                         StartAngleDeg = arc.StartAngleDeg,
@@ -641,6 +650,36 @@ namespace CncWallStation.ViewModels
                     ? new { x = mepSlot.PathEnd.Value.X, y = mepSlot.PathEnd.Value.Y }
                     : null,
                 segments
+            };
+        }
+
+        /// <summary>
+        /// 将 Pocket 特征序列化为 Groove 格式（与 HTML Groove 渲染引擎兼容）
+        /// Pocket 矩形区域沿 Length 方向映射为 Groove 的起终点，Width 作为槽宽
+        /// </summary>
+        private static object SerializePocket(Pocket pocket)
+        {
+            var normal = pocket.CurrentNormal;
+            float halfLen = pocket.Length / 2f;
+
+            // Pocket 中心在 LocalPos，沿 X 展开为起终点
+            var startPt = new { x = pocket.LocalPos.X - halfLen, y = pocket.LocalPos.Y };
+            var endPt = new { x = pocket.LocalPos.X + halfLen, y = pocket.LocalPos.Y };
+
+            return new
+            {
+                id = pocket.Id,
+                featureType = "Groove",           // 复用 Groove 渲染管线
+                grooveType = "pocket",            // 图例颜色 key
+                startPt,
+                endPt,
+                width = pocket.Width,
+                depth = pocket.Depth,
+                length = pocket.Length,
+                currentNormal = new { x = normal.X, y = normal.Y, z = normal.Z },
+                initialSide = pocket.InitialSide.ToString(),
+                currentSide = pocket.CurrentSide.ToString(),
+                outlinePoints = (object?)null       // Pocket 暂不提供角点
             };
         }
 

@@ -42,9 +42,21 @@ namespace CncWallStation.Features.Grooves
             (EndPt - StartPt).Length();
 
 
-        /// <summary>总槽宽（只读）= LeftWidth + RightWidth</summary>
+        /// <summary>总槽宽 = LeftWidth + RightWidth</summary>
+        /// <remarks>
+        /// 设置器用于 System.Text.Json 反序列化：将 width 值均分到 LeftWidth / RightWidth。
+        /// 构造时直接设定 LeftWidth / RightWidth 不受影响（它们会被 JSON 反序列化之后的 Width setter 覆盖）。
+        /// </remarks>
         [JsonPropertyName("width")]
-        public float Width => LeftWidth + RightWidth;
+        public float Width
+        {
+            get => LeftWidth + RightWidth;
+            set
+            {
+                LeftWidth = value / 2f;
+                RightWidth = value / 2f;
+            }
+        }
 
         /// <summary>是否对称槽（左右宽相等）</summary>
         [JsonPropertyName("isSymmetric")]

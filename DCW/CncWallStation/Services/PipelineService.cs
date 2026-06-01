@@ -5,6 +5,7 @@ using CncWallStation.Models.Enums;
 using CncWallStation.VersionMappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -344,16 +345,18 @@ namespace CncWallStation.Services
                 // 3. 转换 BimJson → MomWall 领域对象
                 var momWall = mapper.Map(bimJsonData);
 
-                // 4. 序列化 MomWall → MomJSON 字符串
-                //    ★ 用 System.Text.Json，使 Feature 上的 [JsonPolymorphic] 生效，
-                //    输出的 JSON 会带 "$type": "Groove" 之类的鉴别字段
+                // ── 3. 序列化 ─────────────────────────────────────────
                 var options = new JsonSerializerOptions
                 {
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                    WriteIndented = false,
-                    // 如需 camelCase 命名，可放开下面这行（与读取侧保持一致即可）
-                    // PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = true,               // 格式化缩进
+                    Encoder = JavaScriptEncoder   // 保留中文，不转义
+                                         .UnsafeRelaxedJsonEscaping,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
                 };
+
+
+                string momWallJson = JsonSerializer.Serialize(momWall, options);
 
                 var momJson = JsonSerializer.Serialize(momWall, options);
 

@@ -12,8 +12,8 @@ namespace CncWallStation.Features.MepSlots
         // ── 属性 ─────────────────────────────────────────────
 
         public SegmentType Type => SegmentType.Line;
-        public Vec2 StartPoint { get; private set; }
-        public Vec2 EndPoint { get; private set; }
+        public Vec2 StartPoint { get; set; }
+        public Vec2 EndPoint { get; set; }
         public float Depth { get; set; }
 
         /// <summary>方向向量（单位向量）</summary>

@@ -94,6 +94,7 @@ namespace CncWallStation.Features.MepSlots
 
         public ArcSegment() { }
 
+        [JsonConstructor]
         public ArcSegment(Vec2 center,
                           float radius,
                           float startAngleDeg,

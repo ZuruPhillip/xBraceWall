@@ -22,8 +22,7 @@ namespace CncWallStation.Features.MepSlots
         public float Width { get; set; }
 
         /// <summary>路径段列表（有序，首尾相连）</summary>
-        public List<ISegment> Segments { get; private set; }
-            = new List<ISegment>();
+        public List<ISegment> Segments { get; set; } = new List<ISegment>();
 
         // ── 派生属性 ──────────────────────────────────────
 
