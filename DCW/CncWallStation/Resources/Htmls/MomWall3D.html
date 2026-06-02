@@ -83,8 +83,11 @@
 
     #legend-panel { min-width: 220px; }
     .legend-item { display: flex; align-items: center; gap: 8px;
-      padding: 4px 0; cursor: pointer; transition: opacity .18s; }
-    .legend-item:hover { opacity: .72; }
+      padding: 4px 0; cursor: pointer; transition: opacity .18s;
+      user-select: none; border-radius: 6px; padding: 4px 6px; }
+    .legend-item:hover { opacity: .72; background: rgba(148,163,184,.04); }
+    .legend-item.off { opacity: .38; text-decoration: line-through; text-decoration-color: rgba(148,163,184,.35); }
+    .legend-item.off .legend-dot { filter: grayscale(60%); }
     .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
     .legend-label { color: #cbd5e1; font-size: 11.5px; line-height: 1.4; }
     .legend-count { margin-left: auto; color: #475569; font-size: 10px;
@@ -269,6 +272,21 @@
     }
     #mom-tooltip.mom-mep .mttitle { color: #fbbf24; border-bottom-color: rgba(251,191,36,0.15); }
     #mom-tooltip.mom-mep .mtval.highlight { color: #fbbf24; }
+
+    /* Hole 特征卡片特殊配色 */
+    #mom-tooltip.mom-hole-round {
+      border-color: #22d3ee;
+      box-shadow: 0 4px 20px rgba(34,211,238,0.20);
+    }
+    #mom-tooltip.mom-hole-round .mttitle { color: #22d3ee; border-bottom-color: rgba(34,211,238,0.15); }
+    #mom-tooltip.mom-hole-round .mtval.highlight { color: #22d3ee; }
+
+    #mom-tooltip.mom-hole-slotted {
+      border-color: #f472b6;
+      box-shadow: 0 4px 20px rgba(244,114,182,0.20);
+    }
+    #mom-tooltip.mom-hole-slotted .mttitle { color: #f472b6; border-bottom-color: rgba(244,114,182,0.15); }
+    #mom-tooltip.mom-hole-slotted .mtval.highlight { color: #f472b6; }
   </style>
 </head>
 <body>
@@ -334,6 +352,11 @@
     <div class="mtrow" id="mtt-radius-row" style="display:none"><span class="mtkey">圆角半径</span><span class="mtval" id="mtt-radius">—</span></div>
     <div class="mtrow" id="mtt-arc-row1" style="display:none"><span class="mtkey">圆心</span><span class="mtval" id="mtt-arc-center">—</span></div>
     <div class="mtrow" id="mtt-arc-row2" style="display:none"><span class="mtkey">半径</span><span class="mtval" id="mtt-arc-radius">—</span></div>
+    <div class="mtrow" id="mtt-hole-radius-row" style="display:none"><span class="mtkey">孔半径</span><span class="mtval highlight" id="mtt-hole-radius">—</span></div>
+    <div class="mtrow" id="mtt-hole-diameter-row" style="display:none"><span class="mtkey">孔直径</span><span class="mtval" id="mtt-hole-diameter">—</span></div>
+    <div class="mtrow" id="mtt-hole-slotlen-row" style="display:none"><span class="mtkey">腰孔长度</span><span class="mtval" id="mtt-hole-slotlen">—</span></div>
+    <div class="mtrow" id="mtt-hole-slotangle-row" style="display:none"><span class="mtkey">腰孔角度</span><span class="mtval" id="mtt-hole-slotangle">—</span></div>
+    <div class="mtrow" id="mtt-hole-shape-row" style="display:none"><span class="mtkey">孔形状</span><span class="mtval" id="mtt-hole-shape">—</span></div>
     <div class="mtsub" id="mtt-sub"></div>
   </div>
 
@@ -394,6 +417,14 @@
           <span class="param-lbl"><span class="plbl-icon">🔌</span>MEP槽数</span>
           <span class="param-val" id="d-mep-count">—</span>
         </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🕳</span>圆孔数</span>
+          <span class="param-val" id="d-round-hole-count">—</span>
+        </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">📍</span>定位孔数</span>
+          <span class="param-val" id="d-slotted-hole-count">—</span>
+        </div>
       </div>
     </div>
 
@@ -445,6 +476,9 @@ const GROOVE_COLORS = {
   pocket      : { hex: 0xAB47BC, label: '开关盒坑', css: '#AB47BC' },
   default     : { hex: 0xce93d8, label: '其他凹槽', css: '#ce93d8' },
 };
+
+const HOLE_COLOR_ROUND   = new THREE.Color(0x22d3ee); // 青色 — 圆孔
+const HOLE_COLOR_SLOTTED = new THREE.Color(0xf472b6); // 粉色 — 腰孔
 
 const MEP_COLOR_SHALLOW = new THREE.Color(0xfbbf24);
 const MEP_COLOR_DEEP    = new THREE.Color(0xf97316);
@@ -503,8 +537,8 @@ window.addEventListener('resize', () => {
 // ══════════════════════════════════════════════════
 //  图层管理
 // ══════════════════════════════════════════════════
-const layers     = { wall: null, groove: null, edge: null, mep: null, dim: null };
-const layerState = { wall: true, groove: true, edge: false, mep: true, dim: true };
+const layers     = { wall: null, groove: null, edge: null, mep: null, holeRound: null, holeSlotted: null, dim: null };
+const layerState = { wall: true, groove: true, edge: false, mep: true, holeRound: true, holeSlotted: true, dim: true };
 
 window.toggleLayer       = k      => setLayerVisible(k, !layerState[k]);
 window.toggleLayerSwitch = (k, v) => setLayerVisible(k, v);
@@ -514,6 +548,28 @@ function setLayerVisible(key, val) {
   const btn = document.getElementById('btn-'  + key); if (btn) btn.classList.toggle('on', val);
   const sw  = document.getElementById('sw-'   + key); if (sw)  sw.checked = val;
   if (layers[key]) layers[key].visible = val;
+
+  // 同步图例项的 .off 样式
+  const legendItem = document.querySelector(`.legend-item[data-layer="${key}"]`);
+  if (legendItem) legendItem.classList.toggle('off', !val);
+
+  // ★ 腔体开关联动：当 holeRound / holeSlotted 切换时，墙体也需要同步恢复/显示孔洞
+  if (key === 'holeRound' || key === 'holeSlotted') {
+    updateWallHoleDisplay();
+  }
+}
+
+/// 根据 holeRound / holeSlotted 图层状态，同步墙体 mesh 的 geometry（有孔 / 无孔）
+function updateWallHoleDisplay() {
+  if (!layers.wall) return;
+  const wallMesh = layers.wall.children[0];
+  if (!wallMesh) return;
+  const pre  = wallMesh.userData.geoPreHole;
+  const post = wallMesh.userData.geoPostHole;
+  if (!pre || !post) return;
+
+  const showHoles = layerState.holeRound || layerState.holeSlotted;
+  wallMesh.geometry = showHoles ? post : pre;
 }
 function clearScene() {
   Object.keys(layers).forEach(k => { if (layers[k]) { scene.remove(layers[k]); layers[k] = null; } });
@@ -618,6 +674,79 @@ function mepDepthOffset(depth, normal) {
 function depthToColor(depth, maxDepth) {
   const t = Math.min(depth / Math.max(maxDepth, 1), 1);
   return new THREE.Color().lerpColors(MEP_COLOR_SHALLOW, MEP_COLOR_DEEP, t);
+}
+
+// ══════════════════════════════════════════════════
+//  Hole 渲染辅助函数
+// ══════════════════════════════════════════════════
+
+/// 判断孔是否为圆孔（兼容 camelCase 序列化的 "round"/"slotted" 及 PascalCase 的 "Round"/"Slotted"）
+function isHoleRound(shapeVal) {
+  if (shapeVal == null) return true; // 默认圆孔
+  const s = String(shapeVal);
+  return s === 'Round' || s === 'round';
+}
+/// 判断孔是否为腰孔
+function isHoleSlotted(shapeVal) {
+  if (shapeVal == null) return false;
+  const s = String(shapeVal);
+  return s === 'Slotted' || s === 'slotted';
+}
+
+/// 将孔从 2D 局部坐标映射到 3D 世界位置（复用 mep 的坐标系映射逻辑）
+function holePosToWorld(holeFeature, WL, WH, WT) {
+  const normal = holeFeature.currentNormal ?? {x:0,y:0,z:1};
+  const px = holeFeature.localPos?.x ?? 0;
+  const py = holeFeature.localPos?.y ?? 0;
+  return mepLocalToWorld(px, py, normal, WL, WH, WT);
+}
+
+/// 孔深度偏移方向向量
+function holeDepthDir(holeFeature, WL, WH, WT) {
+  const normal = holeFeature.currentNormal ?? {x:0,y:0,z:1};
+  return mepDepthOffset(holeFeature.depth ?? 50, normal);
+}
+
+/// 计算孔在墙面法向上的单位方向向量（指向墙体内部）
+function holeInwardNormal(holeFeature) {
+  const n = holeFeature.currentNormal ?? {x:0,y:0,z:1};
+  const nx = Math.round(n.x??0), ny = Math.round(n.y??0), nz = Math.round(n.z??0);
+  // 法向量指向墙体外部，因此钻孔方向是 -normal
+  if (nz !== 0) return new THREE.Vector3(0, 0, -nz);
+  if (ny !== 0) return new THREE.Vector3(0, -ny, 0);
+  if (nx !== 0) return new THREE.Vector3(-nx, 0, 0);
+  return new THREE.Vector3(0, 0, -1);
+}
+
+/// 为 CylinderGeometry 构造世界空间变换（位置 + 旋转，使圆柱体沿墙面法向）
+function makeHoleCylinderTransform(worldPos, inwardNormal, depthMeters, radiusMeters) {
+  const quat = new THREE.Quaternion();
+  // 默认 CylinderGeometry 沿 Y 轴，需旋转到 inwardNormal 方向
+  quat.setFromUnitVectors(new THREE.Vector3(0, 1, 0), inwardNormal.clone().normalize());
+
+  const center = worldPos.clone()
+    .add(inwardNormal.clone().multiplyScalar(depthMeters * 0.5));
+
+  return { position: center, quaternion: quat };
+}
+
+/// 生成腰孔的两个半圆圆心世界坐标
+function slottedEndCentersWorld(holeFeature, WL, WH, WT) {
+  const normal = holeFeature.currentNormal ?? {x:0,y:0,z:1};
+  const r = (holeFeature.radius ?? 25) * S;
+  const halfLen = (holeFeature.slotLength ?? 0) * S * 0.5;
+  const angleRad = (holeFeature.slotAngleDeg ?? 0) * Math.PI / 180;
+
+  const cx = holeFeature.localPos?.x ?? 0;
+  const cy = holeFeature.localPos?.y ?? 0;
+
+  const offsetX = Math.cos(angleRad) * halfLen;
+  const offsetY = Math.sin(angleRad) * halfLen;
+
+  const p0 = mepLocalToWorld(cx - offsetX, cy - offsetY, normal, WL, WH, WT);
+  const p1 = mepLocalToWorld(cx + offsetX, cy + offsetY, normal, WL, WH, WT);
+
+  return { p0, p1, radiusMeters: r };
 }
 
 function buildLineSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth) {
@@ -758,10 +887,13 @@ const mouse       = new THREE.Vector2(-9,-9);
 
 const meshFeatureMap = new WeakMap();
 const meshMepMap     = new WeakMap();
+const meshHoleMap    = new WeakMap(); // hole cavity mesh → { holeFeature }
 let   grooveMeshes   = [];
 let   mepSegMeshes   = [];
+let   holeMeshes     = [];
 let   hoveredMesh    = null;
 let   hoveredMepMesh = null;
+let   hoveredHoleMesh = null;
 
 function normalLabel(n) {
   const nx=Math.round(n.x??0), ny=Math.round(n.y??0), nz=Math.round(n.z??0);
@@ -803,15 +935,27 @@ function showMomTooltip(mesh, mouseX, mouseY) {
   if (!data) return;
   const { feature, featureType, extra } = data;
 
-  const typeKey = (featureType === 'Groove')
-    ? (feature.grooveType ?? 'default')
-    : 'mep';
-  const cfg = (featureType === 'Groove')
-    ? (GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default)
-    : { css: '#fbbf24', label: 'MepSlot' };
+  let typeKey, cfg;
+  if (featureType === 'Groove') {
+    typeKey = feature.grooveType ?? 'default';
+    cfg = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
+  } else if (featureType === 'Hole') {
+    const isRound = isHoleRound(feature.shape);
+    cfg = isRound ? { css: '#22d3ee', label: '圆孔 (Hole)' } : { css: '#f472b6', label: '腰孔 (Slotted)' };
+    typeKey = isRound ? 'hole-round' : 'hole-slotted';
+  } else {
+    typeKey = 'mep';
+    cfg = { css: '#fbbf24', label: 'MepSlot' };
+  }
 
   // 配色模式切换
-  momTooltip.classList.toggle('mom-mep', featureType === 'MepSlot');
+  momTooltip.classList.remove('mom-mep', 'mom-hole-round', 'mom-hole-slotted');
+  if (featureType === 'MepSlot') {
+    momTooltip.classList.add('mom-mep');
+  } else if (featureType === 'Hole') {
+    const isRound = isHoleRound(feature.shape);
+    momTooltip.classList.add(isRound ? 'mom-hole-round' : 'mom-hole-slotted');
+  }
   document.getElementById('mtt-dot').style.background = cfg.css;
   document.getElementById('mtt-type').textContent = cfg.label;
 
@@ -851,6 +995,12 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     // 隐藏圆弧专属行
     document.getElementById('mtt-arc-row1').style.display = 'none';
     document.getElementById('mtt-arc-row2').style.display = 'none';
+    // 隐藏孔专属行
+    document.getElementById('mtt-hole-shape-row').style.display = 'none';
+    document.getElementById('mtt-hole-radius-row').style.display = 'none';
+    document.getElementById('mtt-hole-diameter-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
   } else if (featureType === 'MepSlot') {
     const seg = extra.seg;
     const segType = (seg.$segmentType ?? seg.type ?? 'line').toLowerCase();
@@ -888,6 +1038,57 @@ function showMomTooltip(mesh, mouseX, mouseY) {
       document.getElementById('mtt-startpt').textContent = seg.startPoint ? `(${(+(seg.startPoint.x??0)).toFixed(1)}, ${(+(seg.startPoint.y??0)).toFixed(1)})` : '—';
       document.getElementById('mtt-endpt').textContent   = seg.endPoint   ? `(${(+(seg.endPoint.x??0)).toFixed(1)}, ${(+(seg.endPoint.y??0)).toFixed(1)})` : '—';
     }
+    // 隐藏孔专属行
+    document.getElementById('mtt-hole-shape-row').style.display = 'none';
+    document.getElementById('mtt-hole-radius-row').style.display = 'none';
+    document.getElementById('mtt-hole-diameter-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
+  } else if (featureType === 'Hole') {
+    const isSlotted = isHoleSlotted(feature.shape);
+    const isRound = !isSlotted;
+
+    document.getElementById('mtt-ftype').textContent = isRound ? '圆孔 (Hole)' : '腰孔 (Slotted Hole)';
+    document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
+    document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+
+    // 直径 / 半径
+    const r = feature.radius != null ? (+feature.radius) : null;
+    const d = r != null ? (r * 2) : (feature.diameter != null ? (+feature.diameter) : null);
+    document.getElementById('mtt-len').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
+    document.getElementById('mtt-wid').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
+    document.getElementById('mtt-dep').textContent = feature.depth != null ? (+feature.depth).toFixed(1) + ' mm' : '—';
+
+    // 孔专属行
+    document.getElementById('mtt-hole-shape').textContent = isRound ? '圆形' : '腰形';
+    document.getElementById('mtt-hole-radius').textContent = r != null ? r.toFixed(1) + ' mm' : '—';
+    document.getElementById('mtt-hole-diameter').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
+
+    if (isSlotted) {
+      document.getElementById('mtt-hole-slotlen').textContent = feature.slotLength != null ? (+feature.slotLength).toFixed(1) + ' mm' : '—';
+      document.getElementById('mtt-hole-slotangle').textContent = feature.slotAngleDeg != null ? (+feature.slotAngleDeg).toFixed(1) + '°' : '—';
+    }
+
+    // 显示/隐藏行
+    document.getElementById('mtt-startpt').parentElement.style.display = '';
+    document.getElementById('mtt-endpt').parentElement.style.display = '';
+    document.getElementById('mtt-center-row').style.display = 'none';
+    document.getElementById('mtt-radius-row').style.display = 'none';
+    document.getElementById('mtt-arc-row1').style.display = 'none';
+    document.getElementById('mtt-arc-row2').style.display = 'none';
+
+    // 孔专属行
+    document.getElementById('mtt-hole-shape-row').style.display = '';
+    document.getElementById('mtt-hole-radius-row').style.display = '';
+    document.getElementById('mtt-hole-diameter-row').style.display = '';
+    document.getElementById('mtt-hole-slotlen-row').style.display = isRound ? 'none' : '';
+    document.getElementById('mtt-hole-slotangle-row').style.display = isRound ? 'none' : '';
+
+    // 起点显示孔位置
+    const lp = feature.localPos;
+    document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
+    document.getElementById('mtt-endpt').textContent = feature.throughHole ? '✓ 通孔' : '✗ 盲孔';
+    document.getElementById('mtt-sub').textContent = '';
   }
 
   if (!momTooltipShown) {
@@ -1062,6 +1263,17 @@ function highlightMepMesh(mesh) {
   }
   canvas.style.cursor = 'crosshair';
 }
+function highlightHoleMesh(mesh) {
+  if (hoveredHoleMesh === mesh) return;
+  unhighlightAll();
+  hoveredHoleMesh = mesh;
+  if (mesh.material) {
+    mesh.material.opacity           = Math.min((mesh.userData.origOpacity ?? 0.42) * 1.8, 0.92);
+    mesh.material.emissive          = new THREE.Color(mesh.userData.origColor ?? 0x22d3ee);
+    mesh.material.emissiveIntensity = 0.45;
+  }
+  canvas.style.cursor = 'crosshair';
+}
 function unhighlightAll() {
   if (hoveredMesh) {
     if (hoveredMesh.material) {
@@ -1076,6 +1288,13 @@ function unhighlightAll() {
       hoveredMepMesh.material.emissiveIntensity = 0;
     }
     hoveredMepMesh = null;
+  }
+  if (hoveredHoleMesh) {
+    if (hoveredHoleMesh.material) {
+      hoveredHoleMesh.material.opacity           = hoveredHoleMesh.userData.origOpacity ?? 0.42;
+      hoveredHoleMesh.material.emissiveIntensity = 0;
+    }
+    hoveredHoleMesh = null;
   }
   canvas.style.cursor = '';
 }
@@ -1093,6 +1312,7 @@ canvas.addEventListener('mousemove', e => {
   const allPickable = [
     ...(layerState.groove ? grooveMeshes : []),
     ...(layerState.mep    ? mepSegMeshes : []),
+    ...(layerState.holeRound || layerState.holeSlotted ? holeMeshes : []),
   ];
   if (!allPickable.length) {
     unhighlightAll();
@@ -1104,12 +1324,16 @@ canvas.addEventListener('mousemove', e => {
   if (hits.length) {
     const hit = hits[0].object;
     if (meshFeatureMap.has(hit)) {
-      if (hoveredMepMesh) { unhighlightAll(); }
+      if (hoveredMepMesh || hoveredHoleMesh) { unhighlightAll(); }
       highlightGrooveMesh(hit);
       showMomTooltip(hit, e.clientX, e.clientY);
     } else if (meshMepMap.has(hit)) {
-      if (hoveredMesh) { unhighlightAll(); }
+      if (hoveredMesh || hoveredHoleMesh) { unhighlightAll(); }
       highlightMepMesh(hit);
+      showMomTooltip(hit, e.clientX, e.clientY);
+    } else if (meshHoleMap.has(hit)) {
+      if (hoveredMesh || hoveredMepMesh) { unhighlightAll(); }
+      highlightHoleMesh(hit);
       showMomTooltip(hit, e.clientX, e.clientY);
     }
   } else {
@@ -1126,7 +1350,7 @@ canvas.addEventListener('mouseleave', () => {
 // ══════════════════════════════════════════════════
 //  信息面板（墙体信息，原样保留）
 // ══════════════════════════════════════════════════
-function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots) {
+function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes) {
   document.getElementById('dv-length').textContent = (WL/S).toFixed(1);
   document.getElementById('dv-height').textContent = (WH/S).toFixed(1);
   document.getElementById('dv-thick').textContent  = (WT/S).toFixed(1);
@@ -1141,24 +1365,55 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots) {
   document.getElementById('d-groove-count').textContent = grooves.length+' 个';
   document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length+' 种';
   document.getElementById('d-mep-count').textContent = mepSlots.length+' 条';
+  // 孔统计（兼容 holes 为 null/undefined 的情况）
+  const holeArr = Array.isArray(holes) ? holes : [];
+  console.log('[fillInfoPanel] holes count:', holeArr.length, 'shapes:', holeArr.map(h => h.shape));
+  const roundHoles = holeArr.filter(h => isHoleRound(h.shape));
+  const slottedHoles = holeArr.filter(h => isHoleSlotted(h.shape));
+  console.log('[fillInfoPanel] roundHoles:', roundHoles.length, 'slottedHoles:', slottedHoles.length);
+  document.getElementById('d-round-hole-count').textContent = roundHoles.length > 0 ? `${roundHoles.length} 个` : '—';
+  document.getElementById('d-slotted-hole-count').textContent = slottedHoles.length > 0 ? `${slottedHoles.length} 个` : '—';
 }
 
-function fillLegend(usedTypes, typeCount, hasMep) {
+function fillLegend(usedTypes, typeCount, hasMep, holes) {
   const el=document.getElementById('legend-items'); el.innerHTML='';
   const items = [
-    {label:'AAC 墙体主体', css:'#c8d0d8', count:1},
+    {label:'AAC 墙体主体', css:'#c8d0d8', count:1, key:'wall'},
     ...[...usedTypes].map(k=>({
       label:(GROOVE_COLORS[k]??GROOVE_COLORS.default).label,
       css  :(GROOVE_COLORS[k]??GROOVE_COLORS.default).css,
       count:typeCount[k]??0,
+      key:'groove',
     })),
   ];
-  if (hasMep) {
-    items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0});
-    items.push({label:'MEP 弧槽 (Arc)',  css:'#a78bfa', count:0});
+  // 孔特征图例（兼容 holes 为 null/undefined 的情况）
+  const holeArr = Array.isArray(holes) ? holes : [];
+  const roundHoles = holeArr.filter(h => isHoleRound(h.shape));
+  const slottedHoles = holeArr.filter(h => isHoleSlotted(h.shape));
+  if (roundHoles.length > 0) {
+    items.push({label:'圆孔 (Hole)', css:'#22d3ee', count:roundHoles.length, key:'holeRound'});
   }
-  items.forEach(({label,css,count})=>{
+  if (slottedHoles.length > 0) {
+    items.push({label:'腰孔 (Slotted)', css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
+  }
+  if (hasMep) {
+    items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0, key:'mep'});
+    items.push({label:'MEP 弧槽 (Arc)',  css:'#a78bfa', count:0, key:'mep'});
+  }
+  items.forEach(({label,css,count,key})=>{
     const d=document.createElement('div'); d.className='legend-item';
+    if (key) {
+      d.setAttribute('data-layer', key);
+      d.title = `点击切换 ${label} 显示/隐藏`;
+      d.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.toggleLayerSwitch(key, !layerState[key]);
+        // 切换 off 样式
+        d.classList.toggle('off', !layerState[key]);
+      });
+      // 初始状态同步
+      if (!layerState[key]) d.classList.add('off');
+    }
     d.innerHTML=`<div class="legend-dot" style="background:${css}"></div>
       <span class="legend-label">${label}</span>
       ${count>1?`<span class="legend-count">×${count}</span>`:''}`;
@@ -1173,6 +1428,7 @@ async function buildWall(data) {
   clearScene();
   grooveMeshes = [];
   mepSegMeshes = [];
+  holeMeshes   = [];
   unhighlightAll();
   hideMomTooltip();
 
@@ -1221,9 +1477,15 @@ async function buildWall(data) {
     if(i%5===4){ setLoadingText(`CSG ${i+1}/${grooves.length}...`); await tick(); }
   }
 
+  // ★ 保存仅含凹槽、不含孔的墙体 geometry（用于腔体开关联动）
+  const wallGeoPreHole = wallBrush.geometry.clone();
+
   // 墙体主体
   const wallGroup=new THREE.Group();
-  wallGroup.add(new THREE.Mesh(wallBrush.geometry, wallMat));
+  const wallMesh = new THREE.Mesh(wallBrush.geometry, wallMat);
+  wallMesh.userData.geoPreHole  = wallGeoPreHole;   // 待后续存储有孔版本后使用
+  wallMesh.userData.geoPostHole = null;              // hole CSG 完成后填充
+  wallGroup.add(wallMesh);
   scene.add(wallGroup); layers.wall=wallGroup;
 
   // 切削腔体可视化
@@ -1268,6 +1530,231 @@ async function buildWall(data) {
     el.position.set(cx,cy,cz); grooveGroup.add(el);
   }
   scene.add(grooveGroup); layers.groove=grooveGroup;
+
+  // ── Hole 特征 CSG 布尔减法 ──
+  const holes = allFeatures.filter(f =>
+    f.featureType === 'Hole' || f.$type === 'Hole'
+  );
+  console.log('[buildWall] holes filtered:', holes.length, 'shapes:', holes.map(h => ({ id: h.id, shape: h.shape, featureType: h.featureType, $type: h.$type })));
+  let holeFailN = 0;
+  const holeDataList = []; // 记录每个孔的变换信息，供后续腔体可视化用
+
+  if (holes.length > 0) {
+    setLoadingText(`CSG 布尔运算（${holes.length} 个孔）...`);
+    await tick();
+  }
+
+  for (let hi = 0; hi < holes.length; hi++) {
+    const hf = holes[hi];
+    const isSlotted = isHoleSlotted(hf.shape);
+    const shape = isSlotted ? 'Slotted' : 'Round';
+    const radius = (hf.radius ?? 25) * S;
+    const depth  = (hf.depth  ?? 50) * S;
+    const inward = holeInwardNormal(hf);
+    const worldPos = holePosToWorld(hf, WL, WH, WT);
+    console.log(`[Hole] #${hi} id=${hf.id} shape=${shape} radius=${(radius/S).toFixed(1)}mm depth=${(depth/S).toFixed(1)}mm worldPos=(${(worldPos.x/S).toFixed(1)},${(worldPos.y/S).toFixed(1)},${(worldPos.z/S).toFixed(1)}) inward=(${inward.x.toFixed(2)},${inward.y.toFixed(2)},${inward.z.toFixed(2)})`);
+
+    if (radius < 1e-5 || depth < 1e-5) {
+      console.warn(`[Hole] #${hi} 零尺寸跳过`);
+      continue;
+    }
+
+    try {
+      if (shape === 'Round') {
+        // 圆孔：用 CylinderGeometry 做 CSG 减法
+        const t = makeHoleCylinderTransform(worldPos, inward, depth, radius);
+        const cylGeo = new THREE.CylinderGeometry(radius + 0.0005, radius + 0.0005, depth + 0.001, 32);
+        const cb = new Brush(cylGeo, wallMat);
+        cb.position.copy(t.position);
+        cb.quaternion.copy(t.quaternion);
+        cb.updateMatrixWorld(true);
+        const r = evaluator.evaluate(wallBrush, cb, SUBTRACTION);
+        r.position.set(0, 0, 0); r.updateMatrixWorld(true); wallBrush = r;
+
+        holeDataList.push({ hf, shape, worldPos, inward, radiusMeters: radius, depthMeters: depth, transform: t });
+      } else {
+        // 腰孔：BoxGeometry + 两个 CylinderGeometry 组合做 CSG 减法
+        const slotLen = (hf.slotLength ?? 0) * S;
+        const angleRad = (hf.slotAngleDeg ?? 0) * Math.PI / 180;
+        console.log(`[Hole] #${hi} slotted: slotLen=${(slotLen/S).toFixed(1)}mm angleDeg=${hf.slotAngleDeg ?? 0}`);
+
+        // 先做中间矩形体减法
+        if (slotLen > 1e-5) {
+          const n = hf.currentNormal ?? {x:0,y:0,z:1};
+          const nx = Math.round(n.x??0), ny = Math.round(n.y??0), nz = Math.round(n.z??0);
+
+          let bx, by, bz;
+          // ★ 关键：quat.setFromUnitVectors((0,1,0), inward) 会将 Y 轴旋转到 inward 方向，
+          // 因此 by 必须始终是 depth（沿 inward 方向的切削深度）
+          // bx / bz 是在垂直于 inward 平面内的两个正交尺寸
+          by = depth;
+          const cosLen = Math.abs(Math.cos(angleRad)) * slotLen;
+          const sinLen = Math.abs(Math.sin(angleRad)) * slotLen;
+          bx = cosLen > 1e-5 ? slotLen : radius * 2;
+          bz = sinLen > 1e-5 ? slotLen : radius * 2;
+
+          const boxGeo = new THREE.BoxGeometry(
+            Math.max(bx, 0.001) + 0.001,
+            Math.max(by, 0.001) + 0.001,
+            Math.max(bz, 0.001) + 0.001
+          );
+          const boxBrush = new Brush(boxGeo, wallMat);
+          boxBrush.position.copy(worldPos.clone().add(inward.clone().multiplyScalar(depth * 0.5)));
+          // 旋转 Box 使其长度方向与 slotAngle 对齐
+          const quat = new THREE.Quaternion();
+          quat.setFromUnitVectors(new THREE.Vector3(0, 1, 0), inward.clone().normalize());
+          boxBrush.quaternion.copy(quat);
+          // 还需绕 inward 轴旋转 slotAngle
+          const slotQuat = new THREE.Quaternion().setFromAxisAngle(inward.clone().normalize(), angleRad);
+          boxBrush.quaternion.premultiply(slotQuat);
+          boxBrush.updateMatrixWorld(true);
+          const r = evaluator.evaluate(wallBrush, boxBrush, SUBTRACTION);
+          r.position.set(0, 0, 0); r.updateMatrixWorld(true); wallBrush = r;
+          console.log(`[Hole] #${hi} box CSG done, bx=${(bx/S).toFixed(1)} by=${(by/S).toFixed(1)} bz=${(bz/S).toFixed(1)}`);
+        }
+
+        // 两端半圆减法
+        const { p0, p1 } = slottedEndCentersWorld(hf, WL, WH, WT);
+        console.log(`[Hole] #${hi} endCylinders: p0=(${(p0.x/S).toFixed(1)},${(p0.y/S).toFixed(1)},${(p0.z/S).toFixed(1)}) p1=(${(p1.x/S).toFixed(1)},${(p1.y/S).toFixed(1)},${(p1.z/S).toFixed(1)})`);
+        for (const endPos of [p0, p1]) {
+          const t2 = makeHoleCylinderTransform(endPos, inward, depth, radius);
+          const cylGeo = new THREE.CylinderGeometry(radius + 0.0005, radius + 0.0005, depth + 0.001, 32);
+          const cb = new Brush(cylGeo, wallMat);
+          cb.position.copy(t2.position);
+          cb.quaternion.copy(t2.quaternion);
+          cb.updateMatrixWorld(true);
+          const r = evaluator.evaluate(wallBrush, cb, SUBTRACTION);
+          r.position.set(0, 0, 0); r.updateMatrixWorld(true); wallBrush = r;
+        }
+
+        holeDataList.push({ hf, shape, worldPos, inward, radiusMeters: radius, depthMeters: depth, slotLength: slotLen, slotAngleDeg: hf.slotAngleDeg ?? 0 });
+      }
+    } catch(e) {
+      holeFailN++;
+      console.warn(`[Hole CSG] #${hi}`, e.message);
+    }
+
+    if (hi % 5 === 4) { setLoadingText(`Hole CSG ${hi + 1}/${holes.length}...`); await tick(); }
+  }
+
+  console.log('[buildWall] Hole CSG done. holeDataList:', holeDataList.length, 'holes array:', holes.length, 'failures:', holeFailN);
+
+  // ★ 保存含孔的墙体 geometry，并更新墙体的显示 geometry
+  wallMesh.userData.geoPostHole = wallBrush.geometry.clone();
+  // 更新墙体 mesh 为有孔版本（初始状态）
+  wallMesh.geometry = wallBrush.geometry;
+
+  // ── Hole 腔体可视化（拆分为圆孔 / 腰孔两个独立图层） ──
+  const holeRoundGroup   = new THREE.Group();
+  const holeSlottedGroup = new THREE.Group();
+
+  for (const hd of holeDataList) {
+    const { hf, shape, worldPos, inward, radiusMeters, depthMeters } = hd;
+    const isRound = shape === 'Round';
+    const color = isRound ? HOLE_COLOR_ROUND : HOLE_COLOR_SLOTTED;
+    const targetGroup = isRound ? holeRoundGroup : holeSlottedGroup;
+
+    if (isRound) {
+      // 圆孔腔体
+      const cavGeo = new THREE.CylinderGeometry(radiusMeters, radiusMeters, depthMeters, 32);
+      const cavMat = new THREE.MeshStandardMaterial({
+        color, roughness: 0.35, metalness: 0.1,
+        transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide,
+      });
+      const cavMesh = new THREE.Mesh(cavGeo, cavMat);
+      cavMesh.position.copy(worldPos.clone().add(inward.clone().multiplyScalar(depthMeters * 0.5)));
+      const quat = new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0), inward.clone().normalize()
+      );
+      cavMesh.quaternion.copy(quat);
+      cavMesh.userData.origOpacity = 0.42;
+      cavMesh.userData.origColor = color.clone();
+      meshHoleMap.set(cavMesh, { holeFeature: hf });
+      meshMomDataMap.set(cavMesh, { feature: hf, featureType: 'Hole', extra: { shape, radiusMeters, depthMeters } });
+      holeMeshes.push(cavMesh);
+      targetGroup.add(cavMesh);
+
+      // 边缘线框
+      const edgeGeo = new THREE.EdgesGeometry(cavGeo);
+      const edgeMat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75 });
+      const edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
+      edgeLine.position.copy(cavMesh.position);
+      edgeLine.quaternion.copy(cavMesh.quaternion);
+      targetGroup.add(edgeLine);
+    } else {
+      // 腰孔腔体
+      const slotLen = hd.slotLength ?? 0;
+      const angleRad = (hd.slotAngleDeg ?? 0) * Math.PI / 180;
+
+      // 中间矩形腔体
+      if (slotLen > 1e-5) {
+        const n = hf.currentNormal ?? {x:0,y:0,z:1};
+        let bx, by, bz;
+        // by 必须为 depth（Y 轴旋转后映射到 inward 方向）
+        by = depthMeters;
+        const cosLen2 = Math.abs(Math.cos(angleRad)) * slotLen;
+        const sinLen2 = Math.abs(Math.sin(angleRad)) * slotLen;
+        bx = cosLen2 > 1e-5 ? slotLen : radiusMeters * 2;
+        bz = sinLen2 > 1e-5 ? slotLen : radiusMeters * 2;
+        const boxGeo = new THREE.BoxGeometry(
+          Math.max(bx, 0.001), Math.max(by, 0.001), Math.max(bz, 0.001)
+        );
+        const boxMat = new THREE.MeshStandardMaterial({
+          color, roughness: 0.35, metalness: 0.1,
+          transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide,
+        });
+        const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+        boxMesh.position.copy(worldPos.clone().add(inward.clone().multiplyScalar(depthMeters * 0.5)));
+        const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), inward.clone().normalize());
+        boxMesh.quaternion.copy(q);
+        const slotQuat = new THREE.Quaternion().setFromAxisAngle(inward.clone().normalize(), angleRad);
+        boxMesh.quaternion.premultiply(slotQuat);
+        boxMesh.userData.origOpacity = 0.42;
+        boxMesh.userData.origColor = color.clone();
+        meshHoleMap.set(boxMesh, { holeFeature: hf });
+        meshMomDataMap.set(boxMesh, { feature: hf, featureType: 'Hole', extra: { shape, radiusMeters, depthMeters, slotLength: slotLen, slotAngleDeg: hd.slotAngleDeg } });
+        holeMeshes.push(boxMesh);
+        targetGroup.add(boxMesh);
+
+        const edgeGeo2 = new THREE.EdgesGeometry(boxGeo);
+        const edgeMat2 = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75 });
+        const edgeLine2 = new THREE.LineSegments(edgeGeo2, edgeMat2);
+        edgeLine2.position.copy(boxMesh.position);
+        edgeLine2.quaternion.copy(boxMesh.quaternion);
+        targetGroup.add(edgeLine2);
+      }
+
+      // 两端半圆腔体
+      const { p0, p1 } = slottedEndCentersWorld(hf, WL, WH, WT);
+      for (const endPos of [p0, p1]) {
+        const cavGeo = new THREE.CylinderGeometry(radiusMeters, radiusMeters, depthMeters, 32);
+        const cavMat = new THREE.MeshStandardMaterial({
+          color, roughness: 0.35, metalness: 0.1,
+          transparent: true, opacity: 0.42, depthWrite: false, side: THREE.DoubleSide,
+        });
+        const cavMesh = new THREE.Mesh(cavGeo, cavMat);
+        cavMesh.position.copy(endPos.clone().add(inward.clone().multiplyScalar(depthMeters * 0.5)));
+        const q2 = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), inward.clone().normalize());
+        cavMesh.quaternion.copy(q2);
+        cavMesh.userData.origOpacity = 0.42;
+        cavMesh.userData.origColor = color.clone();
+        meshHoleMap.set(cavMesh, { holeFeature: hf });
+        meshMomDataMap.set(cavMesh, { feature: hf, featureType: 'Hole', extra: { shape, radiusMeters, depthMeters, slotLength: slotLen, slotAngleDeg: hd.slotAngleDeg } });
+        holeMeshes.push(cavMesh);
+        targetGroup.add(cavMesh);
+
+        const edgeGeo3 = new THREE.EdgesGeometry(cavGeo);
+        const edgeMat3 = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.75 });
+        const edgeLine3 = new THREE.LineSegments(edgeGeo3, edgeMat3);
+        edgeLine3.position.copy(cavMesh.position);
+        edgeLine3.quaternion.copy(cavMesh.quaternion);
+        targetGroup.add(edgeLine3);
+      }
+    }
+  }
+
+  scene.add(holeRoundGroup);   layers.holeRound   = holeRoundGroup;
+  scene.add(holeSlottedGroup); layers.holeSlotted = holeSlottedGroup;
 
   // ── MepSlot 渲染 ──
   setLoadingText(`渲染 MepSlot（${mepSlots.length} 条）...`);
@@ -1316,10 +1803,10 @@ async function buildWall(data) {
   dimGroup.add(makeLabel(`T  ${(WT/S).toFixed(1)} mm`,new THREE.Vector3(WL+off+0.26,WH/2,WT/2)));
   scene.add(dimGroup); layers.dim=dimGroup;
 
-  fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots);
-  fillLegend(usedTypes, typeCount, mepSlots.length > 0);
+  fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes);
+  fillLegend(usedTypes, typeCount, mepSlots.length > 0, holes);
 
-  ['wall','groove','mep','dim'].forEach(k=>setLayerVisible(k,true));
+  ['wall','groove','mep','holeRound','holeSlotted','dim'].forEach(k=>setLayerVisible(k,true));
   setLayerVisible('edge',false);
   setView2('iso');
 }
@@ -1391,7 +1878,7 @@ window.resetCamera = function() {
 /// 重置所有图层为可见状态（用于初始化时调用）
 /// </summary>
 window.resetAllLayers = function() {
-  ['wall','groove','mep','dim'].forEach(function(k) {
+  ['wall','groove','mep','holeRound','holeSlotted','dim'].forEach(function(k) {
     setLayerVisible(k, true);
   });
 };

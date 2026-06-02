@@ -512,7 +512,7 @@ namespace CncWallStation.ViewModels
             float actualWidth = momWall.ActualWidth;
             float actualThickness = momWall.ActualThickness;
 
-            // 提取特征: Groove、MepSlot、Pocket
+            // 提取特征: Groove、MepSlot、Pocket、Hole
             var features = new List<object>();
 
             foreach (var feature in momWall.Features)
@@ -528,6 +528,10 @@ namespace CncWallStation.ViewModels
                 else if (feature is Pocket pocket)
                 {
                     features.Add(SerializePocket(pocket));
+                }
+                else if (feature is Hole hole)
+                {
+                    features.Add(SerializeHole(hole));
                 }
             }
 
@@ -650,6 +654,32 @@ namespace CncWallStation.ViewModels
                     ? new { x = mepSlot.PathEnd.Value.X, y = mepSlot.PathEnd.Value.Y }
                     : null,
                 segments
+            };
+        }
+
+        /// <summary>
+        /// 将 Hole 特征序列化为 HTML 渲染引擎可识别的格式。
+        /// HTML 端通过 featureType==='Hole' 筛选孔特征，
+        /// 通过 shape==='Round'/'Slotted' 区分圆孔/腰孔。
+        /// </summary>
+        private static object SerializeHole(Hole hole)
+        {
+            var normal = hole.CurrentNormal;
+
+            return new
+            {
+                id = hole.Id,
+                featureType = "Hole",
+                shape = hole.Shape.ToString(),           // "Round" / "Slotted"
+                radius = hole.Radius,
+                depth = hole.Depth,
+                slotLength = hole.SlotLength,
+                slotAngleDeg = hole.SlotAngleDeg,
+                throughHole = hole.ThroughHole,
+                localPos = new { x = hole.LocalPos.X, y = hole.LocalPos.Y },
+                currentNormal = new { x = normal.X, y = normal.Y, z = normal.Z },
+                initialSide = hole.InitialSide.ToString(),
+                currentSide = hole.CurrentSide.ToString()
             };
         }
 
