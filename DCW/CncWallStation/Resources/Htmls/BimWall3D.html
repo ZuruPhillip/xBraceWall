@@ -8,41 +8,56 @@
     body { background:#0d0d1c; font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; overflow:hidden; }
     canvas { display:block; }
 
-    /* ── 信息面板（左上·透明·不阻挡操作） ── */
-    #info-panel {
-      position:fixed; top:16px; left:16px;
-      background:rgba(13,13,28,0.30); backdrop-filter:blur(3px);
-      border:1px solid rgba(97,218,251,0.20); border-radius:10px;
-      padding:12px 16px; color:#fff; min-width:200px; z-index:100;
-      pointer-events:none;
-      display:none;
+    /* ── 通用面板 ── */
+    .panel {
+      background: rgba(10,18,35,.88); backdrop-filter: blur(20px);
+      border: 1px solid rgba(148,163,184,.12); border-radius: 14px;
+      padding: 14px 16px; position: relative;
+      transition: border-color .25s, box-shadow .25s;
     }
-    #info-panel h3 {
-      font-size:11px; font-weight:700; color:#61dafb;
-      margin-bottom:8px; padding-bottom:6px;
-      border-bottom:1px solid rgba(97,218,251,0.15);
-      letter-spacing:1px;
+    .panel-title {
+      font-size: 10px; font-weight: 700; color: #38bdf8;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
     }
-    #info-panel .row { display:flex; justify-content:space-between; margin-bottom:5px; font-size:11px; }
-    #info-panel .lbl { color:#aaaacc; }
-    #info-panel .val { color:#fff; font-weight:600; }
+    .panel-title::before { content: ''; display: block;
+      width: 3px; height: 12px; background: #38bdf8; border-radius: 2px; }
 
-    /* ── 图例（右上·透明·不阻挡操作） ── */
+    /* ── 左侧信息面板（左上·与 MomWall3D 统一） ── */
+    #info-panel {
+      position: fixed; top: 14px; left: 14px;
+      min-width: 220px; z-index: 100;
+      pointer-events: none; display: none;
+    }
+    .param-val.highlight { color: #38bdf8; }
+    .param-val.warn { color: #fbbf24; }
+    .dim-visual {
+      background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.1);
+      border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-around; gap: 6px;
+    }
+    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .dim-box-icon { font-size: 10px; color: #475569; letter-spacing: .5px; text-transform: uppercase; }
+    .dim-box-val { font-size: 15px; font-weight: 800; color: #e2e8f0;
+      font-variant-numeric: tabular-nums; line-height: 1; }
+    .dim-box-unit { font-size: 9px; color: #475569; }
+    .dim-sep { width: 1px; height: 32px; background: rgba(148,163,184,.1); }
+    .param-row {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06);
+    }
+    .param-row:last-child { border-bottom: none; }
+    .param-lbl { color: #64748b; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+    .param-lbl .plbl-icon { font-size: 12px; }
+    .param-val { color: #e2e8f0; font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+
+    /* ── 图例（右上·与 MomWall3D 统一） ── */
     #legend {
-      position:fixed; top:16px; right:16px;
-      background:rgba(13,13,28,0.30); backdrop-filter:blur(3px);
-      border:1px solid rgba(97,218,251,0.20); border-radius:10px;
-      padding:12px 16px; color:#fff; min-width:170px; z-index:100;
-      pointer-events:none;
-      display:none;
+      position:fixed; top:14px; right:14px;
+      min-width: 220px; z-index: 100;
+      pointer-events: none; display: none;
     }
-    #legend h3 {
-      font-size:11px; font-weight:700; color:#61dafb;
-      margin-bottom:8px; padding-bottom:6px;
-      border-bottom:1px solid rgba(97,218,251,0.15);
-      letter-spacing:1px;
-    }
-    #legend .item { display:flex; align-items:center; margin-bottom:6px; font-size:11px; color:#ccccdd; }
+    #legend .item { display:flex; align-items:center; margin-bottom:6px; font-size:11px; color:#cbd5e1; }
     #legend .dot { width:12px; height:12px; border-radius:2px; margin-right:9px; flex-shrink:0; border:1px solid rgba(255,255,255,0.10); }
 
     /* ── 砖块悬浮面板 ── */
@@ -78,21 +93,59 @@
 </head>
 <body>
 
-<div id="info-panel">
-  <h3>📐 墙体参数</h3>
-  <div class="row"><span class="lbl"><span style="color:#ff5555">■</span> X 宽度</span><span class="val" id="v-x">—</span></div>
-  <div class="row"><span class="lbl"><span style="color:#55ff88">■</span> Y 高度</span><span class="val" id="v-y">—</span></div>
-  <div class="row"><span class="lbl"><span style="color:#5588ff">■</span> Z 厚度</span><span class="val" id="v-z">—</span></div>
-  <div class="row"><span class="lbl">砖块分片</span><span class="val" id="v-slc">—</span></div>
-  <div class="row"><span class="lbl">轮廓顶点</span><span class="val" id="v-ver">—</span></div>
+<div class="panel" id="info-panel">
+  <div class="panel-title">墙体信息</div>
+  <div class="dim-visual">
+    <div class="dim-box">
+      <span class="dim-box-icon">L 长度</span>
+      <span class="dim-box-val" id="v-x">—</span>
+      <span class="dim-box-unit">mm</span>
+    </div>
+    <div class="dim-sep"></div>
+    <div class="dim-box">
+      <span class="dim-box-icon">H 高度</span>
+      <span class="dim-box-val" id="v-y">—</span>
+      <span class="dim-box-unit">mm</span>
+    </div>
+    <div class="dim-sep"></div>
+    <div class="dim-box">
+      <span class="dim-box-icon">T 厚度</span>
+      <span class="dim-box-val" id="v-z">—</span>
+      <span class="dim-box-unit">mm</span>
+    </div>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+    <span class="param-val" id="v-material">—</span>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
+    <span class="param-val highlight" id="v-volume">—</span>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
+    <span class="param-val" id="v-area-front">—</span>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
+    <span class="param-val" id="v-area-top">—</span>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">🧱</span>砖块分片</span>
+    <span class="param-val" id="v-slc">—</span>
+  </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">📐</span>轮廓顶点</span>
+    <span class="param-val" id="v-ver">—</span>
+  </div>
 </div>
 
-<div id="legend">
-  <h3>🎨 图例</h3>
-  <div class="item"><div class="dot" style="background:#c8a87a;opacity:.45;"></div>AAC 整体墙体</div>
-  <div class="item"><div class="dot" style="background:#e8c97a;"></div>砖块 · 列 0</div>
-  <div class="item"><div class="dot" style="background:#d4a856;"></div>砖块 · 列 1</div>
-  <div class="item"><div class="dot" style="background:#bf8c3c;"></div>砖块 · 列 2</div>
+<div class="panel" id="legend">
+  <div class="panel-title">图例</div>
+  <div class="item"><div class="dot" style="background:#c8d0d8;opacity:.45;"></div>AAC 整体墙体</div>
+  <div class="item"><div class="dot" style="background:#d5d5d5;"></div>砖块 · 列 0</div>
+  <div class="item"><div class="dot" style="background:#c8c8c8;"></div>砖块 · 列 1</div>
+  <div class="item"><div class="dot" style="background:#bbbbbb;"></div>砖块 · 列 2</div>
   <div class="item"><div class="dot" style="background:#ff6060;height:3px;border-radius:1px;"></div>竖向胶缝</div>
   <div class="item"><div class="dot" style="background:#ffd700;"></div>尺寸标注</div>
   <div class="item"><div class="dot" style="background:#00ffcc;"></div>悬停高亮边</div>
@@ -131,9 +184,9 @@
   var hovBrick = null;
   var defaultPos, defaultTarget;
   var BRICK_COLORS = [
-    { face: 0xe8c97a, side: 0xd0b060 },
-    { face: 0xd4a856, side: 0xbc9040 },
-    { face: 0xbf8c3c, side: 0xa87428 }
+    { face: 0xd5d5d5, side: 0xbfbfbf },
+    { face: 0xc8c8c8, side: 0xb0b0b0 },
+    { face: 0xbbbbbb, side: 0xa3a3a3 }
   ];
   var animateId = null;
 
@@ -281,9 +334,37 @@
       }
     });
 
-    document.getElementById('v-x').textContent = Math.round(W) + ' mm';
-    document.getElementById('v-y').textContent = Math.round(H) + ' mm';
-    document.getElementById('v-z').textContent = Math.round(TH) + ' mm';
+    document.getElementById('v-x').textContent = (W).toFixed(1);
+    document.getElementById('v-y').textContent = (H).toFixed(1);
+    document.getElementById('v-z').textContent = (TH).toFixed(1);
+
+    // 材质
+    document.getElementById('v-material').textContent = D.material || 'AAC';
+
+    // 毛体积 (mm³ → dm³ 或 cm³)
+    var volMm3 = W * H * TH;
+    var volCm3 = volMm3 * 1e-3; // mm³ → cm³ (实际上 mm³/1000 = cm³? 需要看单位)
+    // 实际：1 mm = 0.001 m，所以 W*H*TH 单位是 mm³，1 cm³ = 1000 mm³
+    var volCm3Real = volMm3 / 1000;
+    document.getElementById('v-volume').textContent =
+      volCm3Real >= 1e6 ? (volCm3Real / 1e6).toFixed(1) + ' m³'
+      : volCm3Real >= 1000 ? (volCm3Real / 1000).toFixed(1) + ' dm³'
+      : (+volCm3Real).toFixed(1) + ' cm³';
+
+    // 正面面积 (W * H，单位 mm²)
+    var areaFrontMm2 = W * H;
+    var areaFrontCm2 = areaFrontMm2 / 100; // mm² → cm²
+    document.getElementById('v-area-front').textContent =
+      areaFrontCm2 >= 10000 ? (areaFrontCm2 / 10000).toFixed(1) + ' m²'
+      : (+areaFrontCm2).toFixed(1) + ' cm²';
+
+    // 顶面面积 (W * TH，单位 mm²)
+    var areaTopMm2 = W * TH;
+    var areaTopCm2 = areaTopMm2 / 100;
+    document.getElementById('v-area-top').textContent =
+      areaTopCm2 >= 10000 ? (areaTopCm2 / 10000).toFixed(1) + ' m²'
+      : (+areaTopCm2).toFixed(1) + ' cm²';
+
     document.getElementById('v-slc').textContent = D.slices.length + ' 块';
     document.getElementById('v-ver').textContent = D.wallContour.length + ' 个';
 
@@ -308,13 +389,13 @@
     }
     function v3(x, y, z) { return new THREE.Vector3(x, y, z); }
 
-    // 整体墙体
+    // 整体墙体（颜色与 MomDataRenderPage 保持一致）
     var wFaceMat = new THREE.MeshStandardMaterial({
-      color: 0xc8a87a, roughness: 0.82, metalness: 0.01,
-      transparent: true, opacity: 0.12, side: THREE.DoubleSide
+      color: 0xc8d0d8, roughness: 0.88, metalness: 0.03,
+      transparent: true, opacity: 0.22, side: THREE.DoubleSide
     });
     var wSideMat = new THREE.MeshStandardMaterial({
-      color: 0xaa8855, roughness: 0.85, metalness: 0.01, transparent: true, opacity: 0.12
+      color: 0xb0b8c0, roughness: 0.88, metalness: 0.03, transparent: true, opacity: 0.22
     });
     layers.wall.add(extrude(makeShape(D.wallContour), TH, [wFaceMat, wSideMat]));
 
@@ -434,7 +515,7 @@
       var A = v3(CR[a].x, CR[a].y, CR[a].z), B = v3(CR[b].x, CR[b].y, CR[b].z);
       return { A: A, B: B, type: type, len: A.distanceTo(B) };
     }
-    var bW = Math.round(xMaxW - xMinW), bH = Math.round(yMaxW - yMinW), bT = Math.round(TH);
+    var bW = (+(xMaxW - xMinW)).toFixed(1), bH = (+(yMaxW - yMinW)).toFixed(1), bT = (+TH).toFixed(1);
     EDGES = [
       mkE(0, 1, '宽度边 X=' + bW + 'mm'), mkE(1, 2, '高度边 Y=' + bH + 'mm'),
       mkE(2, 3, '宽度边 X=' + bW + 'mm'), mkE(3, 0, '高度边 Y=' + bH + 'mm'),
@@ -542,9 +623,9 @@
         hlBrick(hits[0].object);
         // 仅首次显示时设置位置，之后不再跳动
         document.getElementById('bt-col').textContent = '第 ' + ud.col + ' 列';
-        document.getElementById('bt-w').textContent = fmt(ud.brickW) + ' mm';
-        document.getElementById('bt-h').textContent = fmt(ud.brickH) + ' mm';
-        document.getElementById('bt-t').textContent = fmt(ud.brickT) + ' mm';
+        document.getElementById('bt-w').textContent = (+ud.brickW).toFixed(1) + ' mm';
+        document.getElementById('bt-h').textContent = (+ud.brickH).toFixed(1) + ' mm';
+        document.getElementById('bt-t').textContent = (+ud.brickT).toFixed(1) + ' mm';
         document.getElementById('bt-glue').textContent = ud.hasGlue ? '✅ 有 (pn:' + ud.gluePn + ')' : '❌ 无';
         document.getElementById('bt-pn').textContent = ud.pn || '—';
         if (!tipBShown) {

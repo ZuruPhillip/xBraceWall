@@ -49,6 +49,15 @@
     }
     #left-panels::-webkit-scrollbar { display: none; }
 
+    /* ══ 右侧面板 ══ */
+    #right-panels {
+      position: absolute; right: 14px; top: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: calc(100vh - 28px); overflow-y: auto; z-index: 10;
+      scrollbar-width: none;
+    }
+    #right-panels::-webkit-scrollbar { display: none; }
+
     #wall-info-panel { min-width: 220px; }
     .dim-visual {
       background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.1);
@@ -71,14 +80,6 @@
     .param-val { color: #e2e8f0; font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
     .param-val.highlight { color: #38bdf8; }
     .param-val.warn { color: #fbbf24; }
-    .groove-dist { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,.08); }
-    .groove-dist-title { font-size: 10px; color: #475569; margin-bottom: 7px; letter-spacing: .5px; }
-    .groove-bar-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-    .groove-bar-label { font-size: 10px; color: #64748b; width: 58px; flex-shrink: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .groove-bar-track { flex: 1; height: 5px; background: rgba(148,163,184,.1); border-radius: 3px; }
-    .groove-bar-fill { height: 100%; border-radius: 3px; transition: width .4s; }
-    .groove-bar-count { font-size: 10px; color: #475569; width: 16px; text-align: right; flex-shrink: 0; }
 
     #legend-panel { min-width: 220px; }
     .legend-item { display: flex; align-items: center; gap: 8px;
@@ -89,164 +90,21 @@
     .legend-count { margin-left: auto; color: #475569; font-size: 10px;
       background: rgba(148,163,184,.08); border-radius: 4px; padding: 1px 6px; }
 
-    /* ══════════════════════════════════════
-       ★★★ 新增：特征属性面板样式 ★★★
-       ══════════════════════════════════════ */
-    #feature-attr-panel {
-      width: 268px;
-      display: none;
-      border-color: rgba(56,189,248,.35) !important;
-      box-shadow: 0 0 24px rgba(56,189,248,.12);
-      animation: fadeInPanel .22s ease;
-    }
-    #feature-attr-panel.visible { display: block; }
-    #feature-attr-panel.pinned { display: block !important; }
-    #feature-attr-panel.mep-mode {
-      border-color: rgba(251,191,36,.45) !important;
-      box-shadow: 0 0 24px rgba(251,191,36,.14);
-    }
-    #feature-attr-panel.mep-mode .panel-title { color: #fbbf24; }
-    #feature-attr-panel.mep-mode .panel-title::before { background: #fbbf24; }
 
-    /* 钉住按钮 */
-    .pin-btn {
-      margin-left: auto; width: 24px; height: 24px;
-      border-radius: 5px; border: 1px solid rgba(148,163,184,.15);
-      background: transparent; color: #475569;
-      font-size: 13px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center;
-      transition: all .18s; flex-shrink: 0;
-      line-height: 1; padding: 0; user-select: none;
-    }
-    .pin-btn:hover { background: rgba(56,189,248,.12); border-color: #38bdf8; color: #38bdf8; }
-    .pin-btn.pinned { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
-    .mep-mode .pin-btn:hover { background: rgba(251,191,36,.12); border-color: #fbbf24; color: #fbbf24; }
-    .mep-mode .pin-btn.pinned { background: rgba(251,191,36,.18); border-color: #fbbf24; color: #fbbf24; }
-    @keyframes fadeInPanel {
-      from { opacity: 0; transform: translateX(-8px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    .fa-header {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 10px; border-radius: 9px;
-      background: rgba(56,189,248,.06); margin-bottom: 10px;
-      border: 1px solid rgba(56,189,248,.12);
-    }
-    .fa-header.mep { background: rgba(251,191,36,.06); border-color: rgba(251,191,36,.14); }
-    .fa-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .fa-title { flex: 1; font-size: 12px; font-weight: 700; color: #e2e8f0; letter-spacing: .3px; }
-    .fa-id { font-size: 9.5px; color: #475569; font-family: monospace; }
-    .fa-dims {
-      display: flex; gap: 0; margin-bottom: 10px;
-      background: rgba(148,163,184,.04);
-      border-radius: 9px; overflow: hidden;
-      border: 1px solid rgba(148,163,184,.08);
-    }
-    .fa-dim-cell {
-      flex: 1; padding: 8px 4px; text-align: center;
-      border-right: 1px solid rgba(148,163,184,.08);
-    }
-    .fa-dim-cell:last-child { border-right: none; }
-    .fa-dim-lbl { font-size: 9px; color: #475569; letter-spacing: .6px; margin-bottom: 3px; text-transform: uppercase; }
-    .fa-dim-val { font-size: 13px; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; line-height: 1; }
-    .fa-dim-unit { font-size: 8.5px; color: #334155; margin-top: 2px; }
-    .fa-section-title {
-      font-size: 9px; color: #475569; letter-spacing: 1px; text-transform: uppercase;
-      margin: 10px 0 6px; display: flex; align-items: center; gap: 5px;
-    }
-    .fa-section-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); order: 2; }
-    .fa-section-title::after  { content:''; flex:0 0 8px; }
-    .fa-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(56,189,248,.09); border: 1px solid rgba(56,189,248,.2);
-      border-radius: 5px; padding: 2px 7px; font-size: 10px;
-      color: #7dd3fc; font-family: monospace;
-    }
-    .fa-badge.mep { background: rgba(251,191,36,.09); border-color: rgba(251,191,36,.22); color: #fde68a; }
-    .fa-seg-mini {
-      background: rgba(251,191,36,.04); border: 1px solid rgba(251,191,36,.1);
-      border-radius: 6px; padding: 5px 8px; margin-bottom: 4px;
-      font-size: 10px;
-    }
-    .fa-seg-mini.current { border-color: rgba(251,191,36,.45); background: rgba(251,191,36,.1); }
-    .fa-seg-mini-head { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
-    .fa-seg-mini-idx { color: #57534e; font-size: 9px; }
-    .fa-seg-mini-type {
-      padding: 1px 5px; border-radius: 3px; font-size: 8.5px;
-      font-weight: 700; letter-spacing: .5px;
-    }
-    .fa-seg-mini-type.line { background: rgba(56,189,248,.15); color: #7dd3fc; }
-    .fa-seg-mini-type.arc  { background: rgba(167,139,250,.15); color: #c4b5fd; }
-    .fa-seg-mini-cur { margin-left: auto; font-size: 8.5px; color: #fbbf24; }
-    .fa-seg-mini-body { color: #a8a29e; font-family: monospace; line-height: 1.5; }
-    .fa-empty-hint {
-      padding: 10px; text-align: center; font-size: 10.5px;
-      color: #334155; font-style: italic;
-    }
-
-    /* ══ 右侧面板 ══ */
-    #right-panels {
-      position: absolute; right: 14px; top: 14px;
-      display: flex; flex-direction: column; gap: 10px;
-      align-items: stretch; min-width: 150px;
-      max-height: calc(100vh - 28px); overflow-y: auto; z-index: 10;
-      scrollbar-width: none;
-    }
-    #right-panels::-webkit-scrollbar { display: none; }
-
-    #view-panel { }
-    .view-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-    .vbtn-full { grid-column: span 2; }
-    .vbtn2 {
-      padding: 7px 6px; border-radius: 8px; cursor: pointer;
-      border: 1px solid rgba(148,163,184,.13); background: rgba(255,255,255,.025);
-      color: #94a3b8; font-size: 11px; font-weight: 600; text-align: center;
-      transition: all .18s; user-select: none;
-    }
-    .vbtn2:hover { background: rgba(56,189,248,.11); border-color: #38bdf8; color: #7dd3fc; }
-    .vbtn2.active { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
-
-    #layer-panel { }
-    .layer-row { display: flex; align-items: center; justify-content: space-between;
-      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06); }
-    .layer-row:last-child { border-bottom: none; }
-    .layer-label { font-size: 11px; color: #64748b; }
-    .toggle-switch { position: relative; width: 32px; height: 17px; cursor: pointer; flex-shrink: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-    .toggle-track { position: absolute; inset: 0; background: rgba(148,163,184,.14);
-      border-radius: 17px; transition: background .2s; border: 1px solid rgba(148,163,184,.14); }
-    .toggle-switch input:checked + .toggle-track { background: rgba(56,189,248,.34); border-color: #38bdf8; }
-    .toggle-track::after { content: ''; position: absolute; top: 2px; left: 2px;
-      width: 11px; height: 11px; border-radius: 50%;
-      background: #64748b; transition: transform .2s, background .2s; }
-    .toggle-switch input:checked + .toggle-track::after { transform: translateX(15px); background: #38bdf8; }
-
-    /* ══ 顶部快切 ══ */
-    #toggle-bar {
-      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 6px; z-index: 10;
-    }
-    .tbtn {
-      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
-      border: 1px solid rgba(148,163,184,.14); color: #475569;
-      padding: 7px 16px; border-radius: 8px; cursor: pointer;
-      font-size: 11px; transition: all .18s; font-weight: 600; user-select: none;
-    }
-    .tbtn.on { background: rgba(56,189,248,.12); border-color: #38bdf8; color: #38bdf8; }
-    .tbtn:hover:not(.on) { background: rgba(148,163,184,.07); color: #94a3b8; }
-
-    /* ══ 底部标题 ══ */
-    #title-bar {
-      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
-      border: 1px solid rgba(56,189,248,.16); border-radius: 24px;
-      padding: 7px 22px; color: #38bdf8; font-size: 11.5px;
-      font-weight: 700; letter-spacing: 2px; white-space: nowrap; z-index: 10;
-    }
     #hint {
       color: #475569; font-size: 10.5px; line-height: 2;
     }
     #hint b { color: #64748b; }
+
+    /* ══ 底部操作提示栏 ══ */
+    #hint-bar {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
+      border: 1px solid rgba(148,163,184,.12); border-radius: 24px;
+      padding: 7px 22px; display: flex; gap: 12px;
+      color: #64748b; font-size: 10.5px; z-index: 10; white-space: nowrap;
+    }
+    #hint-bar b { color: #94a3b8; margin-right: 2px; }
 
     /* ══ 错误 ══ */
     #error-toast {
@@ -470,24 +328,18 @@
     <div class="mtrow"><span class="mtkey">深度 (D)</span><span class="mtval" id="mtt-dep">—</span></div>
     <div class="mtrow"><span class="mtkey">切削面</span><span class="mtval highlight" id="mtt-face">—</span></div>
     <div class="mtrow"><span class="mtkey">所在面</span><span class="mtval" id="mtt-side">—</span></div>
+    <div class="mtrow"><span class="mtkey">起点</span><span class="mtval" id="mtt-startpt">—</span></div>
+    <div class="mtrow"><span class="mtkey">终点</span><span class="mtval" id="mtt-endpt">—</span></div>
+    <div class="mtrow" id="mtt-center-row" style="display:none"><span class="mtkey">中心点</span><span class="mtval highlight" id="mtt-centerpt">—</span></div>
+    <div class="mtrow" id="mtt-radius-row" style="display:none"><span class="mtkey">圆角半径</span><span class="mtval" id="mtt-radius">—</span></div>
+    <div class="mtrow" id="mtt-arc-row1" style="display:none"><span class="mtkey">圆心</span><span class="mtval" id="mtt-arc-center">—</span></div>
+    <div class="mtrow" id="mtt-arc-row2" style="display:none"><span class="mtkey">半径</span><span class="mtval" id="mtt-arc-radius">—</span></div>
     <div class="mtsub" id="mtt-sub"></div>
   </div>
 
   <!-- 3D UI -->
   <div id="panel3d" style="display:none">
-    <div id="toggle-bar">
-      <div class="tbtn on"  id="btn-wall"   onclick="toggleLayer('wall')">🧱 墙体</div>
-      <div class="tbtn on"  id="btn-groove" onclick="toggleLayer('groove')">🕳 腔体</div>
-      <div class="tbtn on"  id="btn-mep"    onclick="toggleLayer('mep')">🔌 MEP槽</div>
-      <div class="tbtn on"  id="btn-dim"    onclick="toggleLayer('dim')">📏 标注</div>
-    </div>
-
     <div id="left-panels">
-      <!-- ★★★ 特征属性面板（悬停时显示 / 可钉住） ★★★ -->
-      <div class="panel" id="feature-attr-panel">
-        <div class="panel-title" id="fa-panel-title" style="display:flex;align-items:center;"><span id="fa-title-text">特征属性</span><button class="pin-btn" id="pin-btn" title="钉住面板" onclick="togglePinPanel()">📌</button></div>
-        <div id="fa-content"></div>
-      </div>
 
       <div class="panel" id="wall-info-panel">
         <div class="panel-title">墙体信息</div>
@@ -542,67 +394,23 @@
           <span class="param-lbl"><span class="plbl-icon">🔌</span>MEP槽数</span>
           <span class="param-val" id="d-mep-count">—</span>
         </div>
-        <div class="groove-dist" id="groove-dist-section">
-          <div class="groove-dist-title">GROOVE DISTRIBUTION</div>
-          <div id="groove-dist-bars"></div>
-        </div>
       </div>
+    </div>
+
+    <div id="right-panels">
       <div class="panel" id="legend-panel">
         <div class="panel-title">图 例</div>
         <div id="legend-items"></div>
       </div>
     </div>
 
-    <div id="right-panels">
-      <div class="panel" id="view-panel">
-        <div class="panel-title">视角切换</div>
-        <div class="view-grid">
-          <div class="vbtn2 vbtn-full active" id="vbtn-iso"   onclick="setView2('iso')">⬡ 等轴测</div>
-          <div class="vbtn2" id="vbtn-front" onclick="setView2('front')">▣ 正视</div>
-          <div class="vbtn2" id="vbtn-back"  onclick="setView2('back')">▣ 背视</div>
-          <div class="vbtn2" id="vbtn-side"  onclick="setView2('side')">▣ 侧视</div>
-          <div class="vbtn2" id="vbtn-top"   onclick="setView2('top')">▣ 顶视</div>
-        </div>
-      </div>
-      <div class="panel" id="layer-panel">
-        <div class="panel-title">图层控制</div>
-        <div class="layer-row">
-          <span class="layer-label">墙体主体</span>
-          <label class="toggle-switch">
-            <input type="checkbox" checked id="sw-wall"   onchange="toggleLayerSwitch('wall',  this.checked)">
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="layer-row">
-          <span class="layer-label">切削腔体</span>
-          <label class="toggle-switch">
-            <input type="checkbox" checked id="sw-groove" onchange="toggleLayerSwitch('groove',this.checked)">
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="layer-row">
-          <span class="layer-label">MEP 管槽</span>
-          <label class="toggle-switch">
-            <input type="checkbox" checked id="sw-mep"    onchange="toggleLayerSwitch('mep',   this.checked)">
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-        <div class="layer-row">
-          <span class="layer-label">尺寸标注</span>
-          <label class="toggle-switch">
-            <input type="checkbox" checked id="sw-dim"    onchange="toggleLayerSwitch('dim',   this.checked)">
-            <div class="toggle-track"></div>
-          </label>
-        </div>
-      </div>
-      <div class="panel" id="hint">
-        <b>左键</b> 旋转 &nbsp;<b>右键</b> 平移<br>
-        <b>滚轮</b> 缩放 &nbsp;<b>双击</b> 重置视角<br>
-        <b>悬停腔体/MEP槽</b> 查看属性
-      </div>
+    <div id="hint-bar">
+      <span><b>左键</b> 旋转</span>
+      <span><b>右键</b> 平移</span>
+      <span><b>滚轮</b> 缩放</span>
+      <span><b>双击</b> 复位视角</span>
+      <span><b>悬停特征</b> 查看属性</span>
     </div>
-
-    <div id="title-bar">🧱 AAC · CSG 切削渲染器</div>
   </div>
 </div>
 
@@ -955,11 +763,6 @@ let   mepSegMeshes   = [];
 let   hoveredMesh    = null;
 let   hoveredMepMesh = null;
 
-// ★★★ 新增：左侧特征属性面板引用 ★★★
-const featureAttrPanel = document.getElementById('feature-attr-panel');
-const faPanelTitle     = document.getElementById('fa-panel-title');
-const faContent        = document.getElementById('fa-content');
-
 function normalLabel(n) {
   const nx=Math.round(n.x??0), ny=Math.round(n.y??0), nz=Math.round(n.z??0);
   if (nz> 0) return '正面 (+Z)';
@@ -989,180 +792,6 @@ function positionCard(card, mouseX, mouseY) {
 }
 
 // ══════════════════════════════════════════════════
-//  ★★★ 新增：左侧特征属性面板 填充/隐藏 ★★★
-// ══════════════════════════════════════════════════
-
-function showGrooveAttrPanel(mesh) {
-  const { f, box } = meshFeatureMap.get(mesh);
-  const typeKey = f.grooveType ?? 'default';
-  const cfg     = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
-
-  featureAttrPanel.classList.remove('mep-mode');
-  document.getElementById('fa-title-text').textContent = '凹槽属性';
-
-  const n    = f.currentNormal ?? {x:0,y:0,z:1};
-  const len  = f.length != null ? Math.round(f.length) : Math.round(box.gx/S);
-  const wid  = f.width  != null ? Math.round(f.width)  : Math.round(box.gy/S);
-  const dep  = f.depth  != null ? Math.round(f.depth)  : Math.round(box.gz/S);
-
-  const rows = [
-    ['切削面',      normalLabel(n)],
-    ['切削深度',    fmt(f.depth)],
-    ['槽宽',        fmt(f.width)],
-    ['槽长',        f.length!=null ? fmt(f.length) : '—'],
-    ['起点 X/Y',    f.startPt ? `${Math.round(f.startPt.x??0)}, ${Math.round(f.startPt.y??0)}` : '—'],
-    ['终点 X/Y',    f.endPt   ? `${Math.round(f.endPt.x??0)}, ${Math.round(f.endPt.y??0)}`     : '—'],
-    ['初始面',      f.initialSide ?? '—'],
-    ['当前面',      f.currentSide ?? '—'],
-  ].filter(([,v])=>v&&v!=='—');
-
-  const pts = f.outlinePoints ?? f.points ?? f.contour ?? [];
-
-  let html = `
-    <div class="fa-header">
-      <div class="fa-dot" style="background:${cfg.css}"></div>
-      <div class="fa-title">${cfg.label}</div>
-      <div class="fa-id">${f.id ? '#'+f.id : ''}</div>
-    </div>
-    <div class="fa-dims">
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">长度</div><div class="fa-dim-val">${len}</div><div class="fa-dim-unit">mm</div></div>
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">宽度</div><div class="fa-dim-val">${wid}</div><div class="fa-dim-unit">mm</div></div>
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">深度</div><div class="fa-dim-val">${dep}</div><div class="fa-dim-unit">mm</div></div>
-    </div>
-    <div class="fa-section-title">BASIC INFO</div>
-    ${rows.map(([l,v])=>`<div class="param-row"><span class="param-lbl">${l}</span><span class="param-val">${v}</span></div>`).join('')}
-    <div style="margin-top:8px;text-align:center">
-      <span class="fa-badge">⊥ normal (${+(n.x??0).toFixed(0)}, ${+(n.y??0).toFixed(0)}, ${+(n.z??0).toFixed(0)})</span>
-    </div>
-  `;
-
-  if (pts.length) {
-    html += `
-      <div class="fa-section-title">OUTLINE · ${pts.length}pts</div>
-      <div class="gc-pts-grid" style="max-height:140px">
-        ${pts.map((p,i)=>`
-          <div class="gc-pt">
-            <div class="gc-pt-idx">PT ${i}</div>
-            <div class="gc-pt-xyz">X ${Math.round(p.x??0)}<br>Y ${Math.round(p.y??0)}${p.z!=null?`<br>Z ${Math.round(p.z)}`:''}</div>
-          </div>`).join('')}
-      </div>
-    `;
-  }
-
-  faContent.innerHTML = html;
-  featureAttrPanel.classList.add('visible');
-}
-
-function showMepAttrPanel(mesh) {
-  const { mepFeature, seg, segIndex } = meshMepMap.get(mesh);
-  const f = mepFeature;
-
-  featureAttrPanel.classList.add('mep-mode');
-  document.getElementById('fa-title-text').textContent = 'MEP 管槽属性';
-
-  const n = f.currentNormal ?? {x:0,y:0,z:1};
-  const totLen = f.totalLength != null ? Math.round(f.totalLength) : '—';
-  const width  = f.width ?? '—';
-  const segCnt = f.segmentCount ?? (f.segments?.length ?? '—');
-
-  const baseRows = [
-    ['所在面',     normalLabel(n)],
-    ['路径起点',   f.pathStart ? `(${Math.round(f.pathStart.x)}, ${Math.round(f.pathStart.y)})` : '—'],
-    ['路径终点',   f.pathEnd   ? `(${Math.round(f.pathEnd.x)}, ${Math.round(f.pathEnd.y)})`     : '—'],
-    ['均匀深度',   f.isUniformDepth ? '✓ 是' : '✗ 否'],
-    ['初始面',     f.initialSide ?? '—'],
-    ['当前面',     f.currentSide ?? '—'],
-    ['当前悬浮段', `第 ${segIndex + 1} 段 / 共 ${f.segments?.length ?? 1} 段`],
-  ].filter(([,v])=>v&&v!=='—');
-
-  const segs = f.segments ?? [];
-
-  let html = `
-    <div class="fa-header mep">
-      <div class="fa-dot" style="background:#fbbf24"></div>
-      <div class="fa-title">🔌 MepSlot ${f.id ?? ''}</div>
-      <div class="fa-id">${f.id ? '#'+f.id : ''}</div>
-    </div>
-    <div class="fa-dims">
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">总长</div><div class="fa-dim-val" style="color:#fde68a">${totLen}</div><div class="fa-dim-unit">mm</div></div>
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">默认宽</div><div class="fa-dim-val" style="color:#fde68a">${width}</div><div class="fa-dim-unit">mm</div></div>
-      <div class="fa-dim-cell"><div class="fa-dim-lbl">段数</div><div class="fa-dim-val" style="color:#fde68a">${segCnt}</div><div class="fa-dim-unit">segs</div></div>
-    </div>
-    <div class="fa-section-title">BASIC INFO</div>
-    ${baseRows.map(([l,v])=>`<div class="param-row"><span class="param-lbl">${l}</span><span class="param-val">${v}</span></div>`).join('')}
-    <div style="margin-top:8px;text-align:center">
-      <span class="fa-badge mep">⊥ normal (${+(n.x??0).toFixed(0)}, ${+(n.y??0).toFixed(0)}, ${+(n.z??0).toFixed(0)})</span>
-    </div>
-    <div class="fa-section-title">SEGMENTS · ${segs.length}</div>
-    <div style="max-height:200px;overflow-y:auto">
-  `;
-
-  segs.forEach((s, i) => {
-    const isCurrent = (i === segIndex);
-    const segType   = (s.$segmentType ?? s.type ?? 'line').toLowerCase();
-    const w         = s.overrideWidth != null ? s.overrideWidth : (f.width ?? 30);
-    let body = '';
-    if (segType === 'arc') {
-      body = `
-        圆心 (${Math.round(s.center?.x??0)}, ${Math.round(s.center?.y??0)}) · R=${Math.round(s.radius??0)}<br>
-        角度 ${s.StartAngleDeg}° → ${s.EndAngleDeg}° · ${s.isClockwise?'顺':'逆'}<br>
-        深度 ${s.depth}mm · 宽 ${w}mm`;
-    } else {
-      body = `
-        起 (${Math.round(s.startPoint?.x??0)}, ${Math.round(s.startPoint?.y??0)})<br>
-        终 (${Math.round(s.endPoint?.x??0)}, ${Math.round(s.endPoint?.y??0)})<br>
-        长 ${Math.round(s.length??0)}mm · 深 ${s.depth}mm · 宽 ${w}mm`;
-    }
-    html += `
-      <div class="fa-seg-mini ${isCurrent?'current':''}">
-        <div class="fa-seg-mini-head">
-          <span class="fa-seg-mini-idx">#${i+1}</span>
-          <span class="fa-seg-mini-type ${segType==='arc'?'arc':'line'}">${segType==='arc'?'⌒ ARC':'— LINE'}</span>
-          ${isCurrent?'<span class="fa-seg-mini-cur">◀ 当前</span>':''}
-        </div>
-        <div class="fa-seg-mini-body">${body}</div>
-      </div>`;
-  });
-
-  html += `</div>`;
-
-  faContent.innerHTML = html;
-  featureAttrPanel.classList.add('visible');
-}
-
-function hideFeatureAttrPanel() {
-  if (pinned) return;   // ★ 钉住时不隐藏
-  featureAttrPanel.classList.remove('visible');
-  featureAttrPanel.classList.remove('mep-mode');
-}
-
-// ══════════════════════════════════════════════════
-//  ★★★ 钉住面板功能 ★★★
-// ══════════════════════════════════════════════════
-let pinned = false;
-
-window.togglePinPanel = function() {
-  pinned = !pinned;
-  const btn = document.getElementById('pin-btn');
-  if (pinned) {
-    btn.classList.add('pinned');
-    btn.textContent = '📍';
-    btn.title = '取消钉住';
-    featureAttrPanel.classList.add('pinned', 'visible');
-  } else {
-    btn.classList.remove('pinned');
-    btn.textContent = '📌';
-    btn.title = '钉住面板';
-    featureAttrPanel.classList.remove('pinned');
-    // 取消钉住后，如果鼠标不在特征上则隐藏面板
-    if (!hoveredMesh && !hoveredMepMesh) {
-      featureAttrPanel.classList.remove('visible');
-      featureAttrPanel.classList.remove('mep-mode');
-    }
-  }
-};
-
-// ══════════════════════════════════════════════════
 //  ★★★ MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip）★★★
 // ══════════════════════════════════════════════════
 const momTooltip      = document.getElementById('mom-tooltip');
@@ -1190,22 +819,75 @@ function showMomTooltip(mesh, mouseX, mouseY) {
 
   if (featureType === 'Groove') {
     const box = extra.box;
+    const isPocket = (feature.grooveType === 'pocket');
     document.getElementById('mtt-ftype').textContent = '凹槽 (Groove)';
-    document.getElementById('mtt-len').textContent  = feature.length != null ? Math.round(feature.length) : Math.round(box.gx / S);
-    document.getElementById('mtt-wid').textContent  = feature.width  != null ? Math.round(feature.width)  : Math.round(box.gy / S);
-    document.getElementById('mtt-dep').textContent  = feature.depth  != null ? Math.round(feature.depth)  : Math.round(box.gz / S);
+    document.getElementById('mtt-len').textContent  = feature.length != null ? (+feature.length).toFixed(1) : (+box.gx / S).toFixed(1);
+    document.getElementById('mtt-wid').textContent  = feature.width  != null ? (+feature.width).toFixed(1)  : (+box.gy / S).toFixed(1);
+    document.getElementById('mtt-dep').textContent  = feature.depth  != null ? (+feature.depth).toFixed(1)  : (+box.gz / S).toFixed(1);
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+    // 起点/终点坐标（pocket 类型隐藏，改为中心点）
+    const sp = feature.startPt;
+    const ep = feature.endPt;
+    if (isPocket) {
+      document.getElementById('mtt-startpt').parentElement.style.display = 'none';
+      document.getElementById('mtt-endpt').parentElement.style.display = 'none';
+      // 中心点坐标（只表达 X, Y，从 box.cx/cy 换算为 mm）
+      document.getElementById('mtt-center-row').style.display = '';
+      document.getElementById('mtt-centerpt').textContent = `(${(+box.cx / S).toFixed(1)}, ${(+box.cy / S).toFixed(1)}) mm`;
+      // 圆角半径特征数据（优先取 cornerRadius）
+      const radius = feature.cornerRadius ?? feature.radius ?? feature.filletRadius ?? '—';
+      document.getElementById('mtt-radius-row').style.display = '';
+      document.getElementById('mtt-radius').textContent = radius !== '—' ? (+radius).toFixed(1) + ' mm' : '—';
+    } else {
+      document.getElementById('mtt-startpt').parentElement.style.display = '';
+      document.getElementById('mtt-endpt').parentElement.style.display = '';
+      document.getElementById('mtt-startpt').textContent = sp ? `(${(+(sp.x??0)).toFixed(1)}, ${(+(sp.y??0)).toFixed(1)}${sp.z!=null ? ', ' + (+sp.z).toFixed(1) : ''})` : '—';
+      document.getElementById('mtt-endpt').textContent   = ep ? `(${(+(ep.x??0)).toFixed(1)}, ${(+(ep.y??0)).toFixed(1)}${ep.z!=null ? ', ' + (+ep.z).toFixed(1) : ''})` : '—';
+      document.getElementById('mtt-center-row').style.display = 'none';
+      document.getElementById('mtt-radius-row').style.display = 'none';
+    }
     document.getElementById('mtt-sub').textContent = '';
+    // 隐藏圆弧专属行
+    document.getElementById('mtt-arc-row1').style.display = 'none';
+    document.getElementById('mtt-arc-row2').style.display = 'none';
   } else if (featureType === 'MepSlot') {
     const seg = extra.seg;
+    const segType = (seg.$segmentType ?? seg.type ?? 'line').toLowerCase();
     document.getElementById('mtt-ftype').textContent = 'MepSlot 管槽';
-    document.getElementById('mtt-len').textContent  = feature.totalLength != null ? Math.round(feature.totalLength) : '—';
-    document.getElementById('mtt-wid').textContent  = seg.overrideWidth ?? feature.width ?? '—';
-    document.getElementById('mtt-dep').textContent  = seg.depth ?? '—';
+    document.getElementById('mtt-len').textContent  = feature.totalLength != null ? (+feature.totalLength).toFixed(1) : '—';
+    document.getElementById('mtt-wid').textContent  = (seg.overrideWidth ?? feature.width) != null ? (+(seg.overrideWidth ?? feature.width)).toFixed(1) : '—';
+    document.getElementById('mtt-dep').textContent  = seg.depth != null ? (+seg.depth).toFixed(1) : '—';
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
     document.getElementById('mtt-sub').textContent = `段 #${extra.segIndex + 1} / ${feature.segments?.length ?? 1} · ${(seg.$segmentType ?? seg.type ?? 'line').toUpperCase()}`;
+    // 恢复起点/终点显示，隐藏 pocket 专属行
+    document.getElementById('mtt-startpt').parentElement.style.display = '';
+    document.getElementById('mtt-endpt').parentElement.style.display = '';
+    document.getElementById('mtt-center-row').style.display = 'none';
+    document.getElementById('mtt-radius-row').style.display = 'none';
+    // 起点/终点：line 用 segment 坐标，arc 用 feature 整体端点
+    if (segType === 'arc') {
+      if (seg.center) {
+        document.getElementById('mtt-arc-center').textContent = `(${(+(seg.center.x??0)).toFixed(1)}, ${(+(seg.center.y??0)).toFixed(1)})`;
+        document.getElementById('mtt-arc-radius').textContent = (+(seg.radius ?? 0)).toFixed(1) + ' mm';
+        document.getElementById('mtt-arc-row1').style.display = '';
+        document.getElementById('mtt-arc-row2').style.display = '';
+      } else {
+        document.getElementById('mtt-arc-row1').style.display = 'none';
+        document.getElementById('mtt-arc-row2').style.display = 'none';
+      }
+      // arc 的起点/终点显示 feature 整体路径端点
+      const ps = feature.pathStart;
+      const pe = feature.pathEnd;
+      document.getElementById('mtt-startpt').textContent = ps ? `(${(+(ps.x??0)).toFixed(1)}, ${(+(ps.y??0)).toFixed(1)})` : '—';
+      document.getElementById('mtt-endpt').textContent   = pe ? `(${(+(pe.x??0)).toFixed(1)}, ${(+(pe.y??0)).toFixed(1)})` : '—';
+    } else {
+      document.getElementById('mtt-arc-row1').style.display = 'none';
+      document.getElementById('mtt-arc-row2').style.display = 'none';
+      document.getElementById('mtt-startpt').textContent = seg.startPoint ? `(${(+(seg.startPoint.x??0)).toFixed(1)}, ${(+(seg.startPoint.y??0)).toFixed(1)})` : '—';
+      document.getElementById('mtt-endpt').textContent   = seg.endPoint   ? `(${(+(seg.endPoint.x??0)).toFixed(1)}, ${(+(seg.endPoint.y??0)).toFixed(1)})` : '—';
+    }
   }
 
   if (!momTooltipShown) {
@@ -1246,17 +928,17 @@ function showGrooveCard(mesh, mouseX, mouseY) {
   document.getElementById('gc-dot').style.background  = cfg.css;
   document.getElementById('gc-type').textContent      = cfg.label;
   document.getElementById('gc-id').textContent        = f.id ? `#${f.id}` : '';
-  document.getElementById('gc-len').textContent = f.length != null ? Math.round(f.length) : Math.round(box.gx/S);
-  document.getElementById('gc-wid').textContent = f.width  != null ? Math.round(f.width)  : Math.round(box.gy/S);
-  document.getElementById('gc-dep').textContent = f.depth  != null ? Math.round(f.depth)  : Math.round(box.gz/S);
+  document.getElementById('gc-len').textContent = f.length != null ? (+f.length).toFixed(1) : (+box.gx/S).toFixed(1);
+  document.getElementById('gc-wid').textContent = f.width  != null ? (+f.width).toFixed(1)  : (+box.gy/S).toFixed(1);
+  document.getElementById('gc-dep').textContent = f.depth  != null ? (+f.depth).toFixed(1)  : (+box.gz/S).toFixed(1);
   const n    = f.currentNormal ?? {x:0,y:0,z:1};
   const rows = [
     ['切削面', normalLabel(n)],
     ['切削深度', fmt(f.depth)],
     ['槽宽',     fmt(f.width)],
     ['槽长',     f.length!=null ? fmt(f.length) : '—'],
-    ['起点 X/Y', f.startPt ? `${Math.round(f.startPt.x??0)}, ${Math.round(f.startPt.y??0)}` : '—'],
-    ['终点 X/Y', f.endPt   ? `${Math.round(f.endPt.x??0)}, ${Math.round(f.endPt.y??0)}`     : '—'],
+    ['起点 X/Y', f.startPt ? `${(+(f.startPt.x??0)).toFixed(1)}, ${(+(f.startPt.y??0)).toFixed(1)}` : '—'],
+    ['终点 X/Y', f.endPt   ? `${(+(f.endPt.x??0)).toFixed(1)}, ${(+(f.endPt.y??0)).toFixed(1)}`     : '—'],
     ['初始面',   f.initialSide ?? '—'],
     ['当前面',   f.currentSide ?? '—'],
   ].filter(([,v])=>v&&v!=='—');
@@ -1273,7 +955,7 @@ function showGrooveCard(mesh, mouseX, mouseY) {
     ptsEl.innerHTML = `<div class="gc-pts-title">OUTLINE POINTS · ${pts.length}pts</div>
       <div class="gc-pts-grid">${pts.map((p,i)=>`
         <div class="gc-pt"><div class="gc-pt-idx">PT ${i}</div>
-        <div class="gc-pt-xyz">X ${Math.round(p.x??0)}<br>Y ${Math.round(p.y??0)}${p.z!=null?`<br>Z ${Math.round(p.z)}`:''}</div></div>`).join('')}</div>`;
+        <div class="gc-pt-xyz">X ${(+(p.x??0)).toFixed(1)}<br>Y ${(+(p.y??0)).toFixed(1)}${p.z!=null?`<br>Z ${(+p.z).toFixed(1)}`:''}</div></div>`).join('')}</div>`;
   } else ptsEl.innerHTML='';
   grooveCard.classList.remove('visible'); grooveCard.style.display='block';
   positionCard(grooveCard, mouseX, mouseY);
@@ -1290,15 +972,15 @@ function showMepCard(mesh, mouseX, mouseY) {
 
   document.getElementById('mc-title').textContent  = `MepSlot · ${f.id ?? ''}`;
   document.getElementById('mc-id').textContent     = f.id ? `#${f.id}` : '';
-  document.getElementById('mc-totlen').textContent = f.totalLength != null ? Math.round(f.totalLength) : '—';
+  document.getElementById('mc-totlen').textContent = f.totalLength != null ? (+f.totalLength).toFixed(1) : '—';
   document.getElementById('mc-width').textContent  = f.width ?? '—';
   document.getElementById('mc-segcnt').textContent = f.segmentCount ?? (f.segments?.length ?? '—');
 
   const n = f.currentNormal ?? {x:0,y:0,z:1};
   const rows = [
     ['所在面',    normalLabel(n)],
-    ['路径起点',  f.pathStart ? `(${Math.round(f.pathStart.x)}, ${Math.round(f.pathStart.y)})` : '—'],
-    ['路径终点',  f.pathEnd   ? `(${Math.round(f.pathEnd.x)},   ${Math.round(f.pathEnd.y)})`   : '—'],
+    ['路径起点',  f.pathStart ? `(${(+(f.pathStart.x)).toFixed(1)}, ${(+(f.pathStart.y)).toFixed(1)})` : '—'],
+    ['路径终点',  f.pathEnd   ? `(${(+(f.pathEnd.x)).toFixed(1)},   ${(+(f.pathEnd.y)).toFixed(1)})`   : '—'],
     ['均匀深度',  f.isUniformDepth ? '✓ 是' : '✗ 否'],
     ['初始面',    f.initialSide ?? '—'],
     ['当前面',    f.currentSide ?? '—'],
@@ -1317,22 +999,22 @@ function showMepCard(mesh, mouseX, mouseY) {
     let props = '';
     if (segType === 'line') {
       props = `
-        <div class="mc-seg-prop">起点 <span>(${Math.round(s.startPoint?.x??0)}, ${Math.round(s.startPoint?.y??0)})</span></div>
-        <div class="mc-seg-prop">终点 <span>(${Math.round(s.endPoint?.x??0)}, ${Math.round(s.endPoint?.y??0)})</span></div>
-        <div class="mc-seg-prop">长度 <span>${Math.round(s.length ?? 0)} mm</span></div>
-        <div class="mc-seg-prop">深度 <span>${s.depth} mm</span></div>
-        <div class="mc-seg-prop">宽度 <span>${w} mm</span></div>
+        <div class="mc-seg-prop">起点 <span>(${(+(s.startPoint?.x??0)).toFixed(1)}, ${(+(s.startPoint?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">终点 <span>(${(+(s.endPoint?.x??0)).toFixed(1)}, ${(+(s.endPoint?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">长度 <span>${(+s.length).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">深度 <span>${(+s.depth).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">宽度 <span>${(+w).toFixed(1)} mm</span></div>
         ${s.overrideWidth != null ? '<div class="mc-seg-prop" style="grid-column:span 2;color:#fbbf24;font-size:9px">⚠ 覆盖宽度</div>' : ''}
       `;
     } else {
       props = `
-        <div class="mc-seg-prop">圆心 <span>(${Math.round(s.center?.x??0)}, ${Math.round(s.center?.y??0)})</span></div>
-        <div class="mc-seg-prop">半径 <span>${Math.round(s.radius ?? 0)} mm</span></div>
+        <div class="mc-seg-prop">圆心 <span>(${(+(s.center?.x??0)).toFixed(1)}, ${(+(s.center?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">半径 <span>${(+(s.radius ?? 0)).toFixed(1)} mm</span></div>
         <div class="mc-seg-prop">起角 <span>${s.StartAngleDeg}°</span></div>
         <div class="mc-seg-prop">终角 <span>${s.EndAngleDeg}°</span></div>
-        <div class="mc-seg-prop">深度 <span>${s.depth} mm</span></div>
+        <div class="mc-seg-prop">深度 <span>${(+s.depth).toFixed(1)} mm</span></div>
         <div class="mc-seg-prop">方向 <span>${s.isClockwise ? '顺时针' : '逆时针'}</span></div>
-        <div class="mc-seg-prop">宽度 <span>${w} mm</span></div>
+        <div class="mc-seg-prop">宽度 <span>${(+w).toFixed(1)} mm</span></div>
       `;
     }
     return `
@@ -1399,7 +1081,7 @@ function unhighlightAll() {
 }
 
 // ══════════════════════════════════════════════════
-//  ★★★ mousemove：仅左侧特征属性面板（隐藏中间浮动卡片）★★★
+//  ★★★ mousemove：使用 mom-tooltip 悬浮面板 ★★★
 // ══════════════════════════════════════════════════
 canvas.addEventListener('mousemove', e => {
   const rect = canvas.getBoundingClientRect();
@@ -1414,7 +1096,7 @@ canvas.addEventListener('mousemove', e => {
   ];
   if (!allPickable.length) {
     unhighlightAll();
-    hideFeatureAttrPanel();
+    hideMomTooltip();
     return;
   }
 
@@ -1423,63 +1105,42 @@ canvas.addEventListener('mousemove', e => {
     const hit = hits[0].object;
     if (meshFeatureMap.has(hit)) {
       if (hoveredMepMesh) { unhighlightAll(); }
-      const isNew = hoveredMesh !== hit;
       highlightGrooveMesh(hit);
-
-      if (isNew) {
-        showGrooveAttrPanel(hit);
-      }
+      showMomTooltip(hit, e.clientX, e.clientY);
     } else if (meshMepMap.has(hit)) {
       if (hoveredMesh) { unhighlightAll(); }
-      const isNew = hoveredMepMesh !== hit;
       highlightMepMesh(hit);
-
-      if (isNew) {
-        showMepAttrPanel(hit);
-      }
+      showMomTooltip(hit, e.clientX, e.clientY);
     }
   } else {
     unhighlightAll();
-    hideFeatureAttrPanel();
+    hideMomTooltip();
   }
 });
 
 canvas.addEventListener('mouseleave', () => {
   unhighlightAll();
-  hideFeatureAttrPanel();
+  hideMomTooltip();
 });
 
 // ══════════════════════════════════════════════════
 //  信息面板（墙体信息，原样保留）
 // ══════════════════════════════════════════════════
 function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots) {
-  document.getElementById('dv-length').textContent = Math.round(WL/S);
-  document.getElementById('dv-height').textContent = Math.round(WH/S);
-  document.getElementById('dv-thick').textContent  = Math.round(WT/S);
+  document.getElementById('dv-length').textContent = (WL/S).toFixed(1);
+  document.getElementById('dv-height').textContent = (WH/S).toFixed(1);
+  document.getElementById('dv-thick').textContent  = (WT/S).toFixed(1);
   document.getElementById('d-material').textContent = data.material ?? 'AAC';
-  const volM3=WL*WH*WT, volCm3=volM3*1e6;
-  document.getElementById('d-volume').textContent =
-    volCm3>=1e6?(volM3*1e3).toFixed(2)+' dm³':Math.round(volCm3).toLocaleString()+' cm³';
-  const aF=WL*WH*1e4, aT=WL*WT*1e4;
-  document.getElementById('d-area-front').textContent = aF>=10000?(aF/10000).toFixed(2)+' m²':Math.round(aF)+' cm²';
-  document.getElementById('d-area-top').textContent   = aT>=10000?(aT/10000).toFixed(2)+' m²':Math.round(aT)+' cm²';
+  const volM3=WL*WH*WT;
+  document.getElementById('d-volume').textContent = volM3.toFixed(1) + ' m³';
+  const aF=WL*WH, aT=WL*WT;
+  document.getElementById('d-area-front').textContent = aF.toFixed(1) + ' m²';
+  document.getElementById('d-area-top').textContent   = aT.toFixed(1) + ' m²';
   const wKg=volM3*AAC_DENSITY;
-  document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(2)+' t':Math.round(wKg)+' kg';
+  document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(1)+' t':wKg.toFixed(1)+' kg';
   document.getElementById('d-groove-count').textContent = grooves.length+' 个';
   document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length+' 种';
   document.getElementById('d-mep-count').textContent = mepSlots.length+' 条';
-  const barsEl=document.getElementById('groove-dist-bars'); barsEl.innerHTML='';
-  const maxC=Math.max(...Object.values(typeCount),1);
-  Object.entries(typeCount).forEach(([k,c])=>{
-    const cfg=GROOVE_COLORS[k]??GROOVE_COLORS.default;
-    const pct=(c/maxC*100).toFixed(1);
-    const row=document.createElement('div'); row.className='groove-bar-row';
-    row.innerHTML=`<span class="groove-bar-label">${cfg.label}</span>
-      <div class="groove-bar-track"><div class="groove-bar-fill" style="width:${pct}%;background:${cfg.css}"></div></div>
-      <span class="groove-bar-count">${c}</span>`;
-    barsEl.appendChild(row);
-  });
-  document.getElementById('groove-dist-section').style.display = Object.keys(typeCount).length?'':'none';
 }
 
 function fillLegend(usedTypes, typeCount, hasMep) {
@@ -1513,7 +1174,7 @@ async function buildWall(data) {
   grooveMeshes = [];
   mepSegMeshes = [];
   unhighlightAll();
-  hideFeatureAttrPanel();
+  hideMomTooltip();
 
   const WL=((data.actualLength??data.obbLength??data.length??1400))*S;
   const WH=((data.actualWidth??data.obbWidth??data.height??data.width??2695))*S;
@@ -1648,11 +1309,11 @@ async function buildWall(data) {
   const dimGroup=new THREE.Group();
   const off=0.14;
   dimGroup.add(dimLine([-off,0,WT/2],[-off,WH,WT/2]));
-  dimGroup.add(makeLabel(`H  ${Math.round(WH/S)} mm`,new THREE.Vector3(-off-0.26,WH/2,WT/2)));
+  dimGroup.add(makeLabel(`H  ${(WH/S).toFixed(1)} mm`,new THREE.Vector3(-off-0.26,WH/2,WT/2)));
   dimGroup.add(dimLine([0,-off,WT/2],[WL,-off,WT/2]));
-  dimGroup.add(makeLabel(`L  ${Math.round(WL/S)} mm`,new THREE.Vector3(WL/2,-off-0.10,WT/2)));
+  dimGroup.add(makeLabel(`L  ${(WL/S).toFixed(1)} mm`,new THREE.Vector3(WL/2,-off-0.10,WT/2)));
   dimGroup.add(dimLine([WL+off,WH/2,0],[WL+off,WH/2,WT]));
-  dimGroup.add(makeLabel(`T  ${Math.round(WT/S)} mm`,new THREE.Vector3(WL+off+0.26,WH/2,WT/2)));
+  dimGroup.add(makeLabel(`T  ${(WT/S).toFixed(1)} mm`,new THREE.Vector3(WL+off+0.26,WH/2,WT/2)));
   scene.add(dimGroup); layers.dim=dimGroup;
 
   fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots);

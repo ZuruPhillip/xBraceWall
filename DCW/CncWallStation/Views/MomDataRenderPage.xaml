@@ -150,14 +150,6 @@
                         ToolTip="重置摄像机到默认视角"
                         Margin="0,0,4,0"/>
 
-                <Button Content="&#x21E9; 导出"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding ExportCommand}"
-                        ToolTip="导出当前渲染截图"/>
-
-                <TextBlock Text="左键旋转 · 右键平移 · 滚轮缩放 · 双击复位 · 悬停腔体/MEP槽查看属性"
-                           Style="{StaticResource AuxiliaryText}"
-                           VerticalAlignment="Center" Margin="24,0,0,0"/>
             </StackPanel>
         </Border>
 
