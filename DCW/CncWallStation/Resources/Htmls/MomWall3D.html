@@ -93,19 +93,35 @@
        ★★★ 新增：特征属性面板样式 ★★★
        ══════════════════════════════════════ */
     #feature-attr-panel {
-      min-width: 240px;
+      width: 268px;
       display: none;
       border-color: rgba(56,189,248,.35) !important;
       box-shadow: 0 0 24px rgba(56,189,248,.12);
       animation: fadeInPanel .22s ease;
     }
     #feature-attr-panel.visible { display: block; }
+    #feature-attr-panel.pinned { display: block !important; }
     #feature-attr-panel.mep-mode {
       border-color: rgba(251,191,36,.45) !important;
       box-shadow: 0 0 24px rgba(251,191,36,.14);
     }
     #feature-attr-panel.mep-mode .panel-title { color: #fbbf24; }
     #feature-attr-panel.mep-mode .panel-title::before { background: #fbbf24; }
+
+    /* 钉住按钮 */
+    .pin-btn {
+      margin-left: auto; width: 24px; height: 24px;
+      border-radius: 5px; border: 1px solid rgba(148,163,184,.15);
+      background: transparent; color: #475569;
+      font-size: 13px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: all .18s; flex-shrink: 0;
+      line-height: 1; padding: 0; user-select: none;
+    }
+    .pin-btn:hover { background: rgba(56,189,248,.12); border-color: #38bdf8; color: #38bdf8; }
+    .pin-btn.pinned { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
+    .mep-mode .pin-btn:hover { background: rgba(251,191,36,.12); border-color: #fbbf24; color: #fbbf24; }
+    .mep-mode .pin-btn.pinned { background: rgba(251,191,36,.18); border-color: #fbbf24; color: #fbbf24; }
     @keyframes fadeInPanel {
       from { opacity: 0; transform: translateX(-8px); }
       to   { opacity: 1; transform: translateX(0); }
@@ -305,7 +321,7 @@
     /* ══ MepSlot 悬浮信息卡 ══ */
     #mep-card {
       position: absolute; z-index: 101; pointer-events: none;
-      width: 300px;
+      width: 268px;
       background: rgba(8,15,30,.97); backdrop-filter: blur(20px);
       border-radius: 14px; overflow: hidden;
       box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(251,191,36,.18);
@@ -362,6 +378,39 @@
     .mc-seg-prop { font-size: 10px; color: #78716c; }
     .mc-seg-prop span { color: #d6d3d1; font-weight: 600; font-family: monospace; }
     .mc-segs-scroll { max-height: 220px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(251,191,36,.2) transparent; }
+
+    /* ══ MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip 样式） ══ */
+    #mom-tooltip {
+      position: fixed;
+      background: rgba(8,8,28,0.95); backdrop-filter: blur(8px);
+      border: 1px solid #61dafb; border-radius: 10px;
+      padding: 10px 14px; color: #fff;
+      pointer-events: none; z-index: 350; display: none;
+      width: 268px;
+      box-shadow: 0 4px 20px rgba(97,218,251,0.20);
+    }
+    #mom-tooltip .mttitle {
+      color: #61dafb; font-weight: 700; font-size: 10px;
+      letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 6px;
+      border-bottom: 1px solid rgba(97,218,251,0.15);
+      display: flex; align-items: center; gap: 6px;
+    }
+    #mom-tooltip .mttitle-dot {
+      width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+    }
+    #mom-tooltip .mtrow { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 4px; font-size: 11.5px; }
+    #mom-tooltip .mtkey { color: #8899bb; font-size: 10.5px; }
+    #mom-tooltip .mtval { color: #e2e8f0; font-weight: 600; font-size: 11px; font-family: monospace; }
+    #mom-tooltip .mtval.highlight { color: #61dafb; }
+    #mom-tooltip .mtsub { font-size: 9px; color: #556688; margin-top: 2px; }
+
+    /* MepSlot 特征卡片特殊配色 */
+    #mom-tooltip.mom-mep {
+      border-color: #fbbf24;
+      box-shadow: 0 4px 20px rgba(251,191,36,0.20);
+    }
+    #mom-tooltip.mom-mep .mttitle { color: #fbbf24; border-bottom-color: rgba(251,191,36,0.15); }
+    #mom-tooltip.mom-mep .mtval.highlight { color: #fbbf24; }
   </style>
 </head>
 <body>
@@ -411,6 +460,19 @@
     </div>
   </div>
 
+  <!-- MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip 样式） -->
+  <div id="mom-tooltip">
+    <div class="mttitle"><span class="mttitle-dot" id="mtt-dot"></span><span id="mtt-type">特征信息</span></div>
+    <div class="mtrow"><span class="mtkey">特征 ID</span><span class="mtval" id="mtt-id">—</span></div>
+    <div class="mtrow"><span class="mtkey">类型</span><span class="mtval" id="mtt-ftype">—</span></div>
+    <div class="mtrow"><span class="mtkey">长度 (L)</span><span class="mtval" id="mtt-len">—</span></div>
+    <div class="mtrow"><span class="mtkey">宽度 (W)</span><span class="mtval" id="mtt-wid">—</span></div>
+    <div class="mtrow"><span class="mtkey">深度 (D)</span><span class="mtval" id="mtt-dep">—</span></div>
+    <div class="mtrow"><span class="mtkey">切削面</span><span class="mtval highlight" id="mtt-face">—</span></div>
+    <div class="mtrow"><span class="mtkey">所在面</span><span class="mtval" id="mtt-side">—</span></div>
+    <div class="mtsub" id="mtt-sub"></div>
+  </div>
+
   <!-- 3D UI -->
   <div id="panel3d" style="display:none">
     <div id="toggle-bar">
@@ -421,9 +483,9 @@
     </div>
 
     <div id="left-panels">
-      <!-- ★★★ 新增：特征属性面板（悬停时显示） ★★★ -->
+      <!-- ★★★ 特征属性面板（悬停时显示 / 可钉住） ★★★ -->
       <div class="panel" id="feature-attr-panel">
-        <div class="panel-title" id="fa-panel-title">特征属性</div>
+        <div class="panel-title" id="fa-panel-title" style="display:flex;align-items:center;"><span id="fa-title-text">特征属性</span><button class="pin-btn" id="pin-btn" title="钉住面板" onclick="togglePinPanel()">📌</button></div>
         <div id="fa-content"></div>
       </div>
 
@@ -936,7 +998,7 @@ function showGrooveAttrPanel(mesh) {
   const cfg     = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
 
   featureAttrPanel.classList.remove('mep-mode');
-  faPanelTitle.textContent = '凹槽属性';
+  document.getElementById('fa-title-text').textContent = '凹槽属性';
 
   const n    = f.currentNormal ?? {x:0,y:0,z:1};
   const len  = f.length != null ? Math.round(f.length) : Math.round(box.gx/S);
@@ -996,7 +1058,7 @@ function showMepAttrPanel(mesh) {
   const f = mepFeature;
 
   featureAttrPanel.classList.add('mep-mode');
-  faPanelTitle.textContent = 'MEP 管槽属性';
+  document.getElementById('fa-title-text').textContent = 'MEP 管槽属性';
 
   const n = f.currentNormal ?? {x:0,y:0,z:1};
   const totLen = f.totalLength != null ? Math.round(f.totalLength) : '—';
@@ -1069,8 +1131,109 @@ function showMepAttrPanel(mesh) {
 }
 
 function hideFeatureAttrPanel() {
+  if (pinned) return;   // ★ 钉住时不隐藏
   featureAttrPanel.classList.remove('visible');
   featureAttrPanel.classList.remove('mep-mode');
+}
+
+// ══════════════════════════════════════════════════
+//  ★★★ 钉住面板功能 ★★★
+// ══════════════════════════════════════════════════
+let pinned = false;
+
+window.togglePinPanel = function() {
+  pinned = !pinned;
+  const btn = document.getElementById('pin-btn');
+  if (pinned) {
+    btn.classList.add('pinned');
+    btn.textContent = '📍';
+    btn.title = '取消钉住';
+    featureAttrPanel.classList.add('pinned', 'visible');
+  } else {
+    btn.classList.remove('pinned');
+    btn.textContent = '📌';
+    btn.title = '钉住面板';
+    featureAttrPanel.classList.remove('pinned');
+    // 取消钉住后，如果鼠标不在特征上则隐藏面板
+    if (!hoveredMesh && !hoveredMepMesh) {
+      featureAttrPanel.classList.remove('visible');
+      featureAttrPanel.classList.remove('mep-mode');
+    }
+  }
+};
+
+// ══════════════════════════════════════════════════
+//  ★★★ MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip）★★★
+// ══════════════════════════════════════════════════
+const momTooltip      = document.getElementById('mom-tooltip');
+const meshMomDataMap  = new WeakMap();  // mesh → { feature, featureType, extra }
+let   momTooltipShown = false;
+
+function showMomTooltip(mesh, mouseX, mouseY) {
+  const data = meshMomDataMap.get(mesh);
+  if (!data) return;
+  const { feature, featureType, extra } = data;
+
+  const typeKey = (featureType === 'Groove')
+    ? (feature.grooveType ?? 'default')
+    : 'mep';
+  const cfg = (featureType === 'Groove')
+    ? (GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default)
+    : { css: '#fbbf24', label: 'MepSlot' };
+
+  // 配色模式切换
+  momTooltip.classList.toggle('mom-mep', featureType === 'MepSlot');
+  document.getElementById('mtt-dot').style.background = cfg.css;
+  document.getElementById('mtt-type').textContent = cfg.label;
+
+  document.getElementById('mtt-id').textContent = feature.id ? `#${feature.id}` : '—';
+
+  if (featureType === 'Groove') {
+    const box = extra.box;
+    document.getElementById('mtt-ftype').textContent = '凹槽 (Groove)';
+    document.getElementById('mtt-len').textContent  = feature.length != null ? Math.round(feature.length) : Math.round(box.gx / S);
+    document.getElementById('mtt-wid').textContent  = feature.width  != null ? Math.round(feature.width)  : Math.round(box.gy / S);
+    document.getElementById('mtt-dep').textContent  = feature.depth  != null ? Math.round(feature.depth)  : Math.round(box.gz / S);
+    document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
+    document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+    document.getElementById('mtt-sub').textContent = '';
+  } else if (featureType === 'MepSlot') {
+    const seg = extra.seg;
+    document.getElementById('mtt-ftype').textContent = 'MepSlot 管槽';
+    document.getElementById('mtt-len').textContent  = feature.totalLength != null ? Math.round(feature.totalLength) : '—';
+    document.getElementById('mtt-wid').textContent  = seg.overrideWidth ?? feature.width ?? '—';
+    document.getElementById('mtt-dep').textContent  = seg.depth ?? '—';
+    document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
+    document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+    document.getElementById('mtt-sub').textContent = `段 #${extra.segIndex + 1} / ${feature.segments?.length ?? 1} · ${(seg.$segmentType ?? seg.type ?? 'line').toUpperCase()}`;
+  }
+
+  if (!momTooltipShown) {
+    momTooltip.style.display = 'block';
+    momTooltipShown = true;
+  }
+  // 更新位置：抑制频繁跳动，偏移较大时才移动
+  const curLeft = parseFloat(momTooltip.style.left) || 0;
+  const curTop  = parseFloat(momTooltip.style.top)  || 0;
+  if (Math.abs(mouseX + 18 - curLeft) > 40 || Math.abs(mouseY + 18 - curTop) > 40) {
+    placeMomTooltip(momTooltip, mouseX, mouseY);
+  }
+}
+
+function placeMomTooltip(el, mx, my) {
+  const tw = el.offsetWidth || 210, th = el.offsetHeight || 140;
+  let tx = mx + 18, ty = my + 18;
+  if (tx + tw > innerWidth)  tx = mx - tw - 12;
+  if (ty + th > innerHeight) ty = my - th - 12;
+  el.style.left = tx + 'px';
+  el.style.top  = ty + 'px';
+}
+
+function hideMomTooltip() {
+  if (momTooltipShown) {
+    momTooltip.style.display = 'none';
+    momTooltipShown = false;
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -1236,7 +1399,7 @@ function unhighlightAll() {
 }
 
 // ══════════════════════════════════════════════════
-//  ★★★ 改进：mousemove 同时更新属性面板 ★★★
+//  ★★★ mousemove：仅左侧特征属性面板（隐藏中间浮动卡片）★★★
 // ══════════════════════════════════════════════════
 canvas.addEventListener('mousemove', e => {
   const rect = canvas.getBoundingClientRect();
@@ -1251,9 +1414,7 @@ canvas.addEventListener('mousemove', e => {
   ];
   if (!allPickable.length) {
     unhighlightAll();
-    hideGrooveCard();
-    hideMepCard();
-    hideFeatureAttrPanel();          // ★ 新增
+    hideFeatureAttrPanel();
     return;
   }
 
@@ -1261,37 +1422,31 @@ canvas.addEventListener('mousemove', e => {
   if (hits.length) {
     const hit = hits[0].object;
     if (meshFeatureMap.has(hit)) {
-      if (hoveredMepMesh) { unhighlightAll(); hideMepCard(); }
+      if (hoveredMepMesh) { unhighlightAll(); }
+      const isNew = hoveredMesh !== hit;
       highlightGrooveMesh(hit);
-      if (hoveredMesh === hit) {
-        positionCard(grooveCard, e.clientX, e.clientY);
-      } else {
-        showGrooveCard(hit, e.clientX, e.clientY);
-        showGrooveAttrPanel(hit);    // ★ 新增：同步更新左侧面板
+
+      if (isNew) {
+        showGrooveAttrPanel(hit);
       }
     } else if (meshMepMap.has(hit)) {
-      if (hoveredMesh) { unhighlightAll(); hideGrooveCard(); }
+      if (hoveredMesh) { unhighlightAll(); }
+      const isNew = hoveredMepMesh !== hit;
       highlightMepMesh(hit);
-      if (hoveredMepMesh === hit) {
-        positionCard(mepCard, e.clientX, e.clientY);
-      } else {
-        showMepCard(hit, e.clientX, e.clientY);
-        showMepAttrPanel(hit);       // ★ 新增：同步更新左侧面板
+
+      if (isNew) {
+        showMepAttrPanel(hit);
       }
     }
   } else {
     unhighlightAll();
-    hideGrooveCard();
-    hideMepCard();
-    hideFeatureAttrPanel();          // ★ 新增
+    hideFeatureAttrPanel();
   }
 });
 
 canvas.addEventListener('mouseleave', () => {
   unhighlightAll();
-  hideGrooveCard();
-  hideMepCard();
-  hideFeatureAttrPanel();            // ★ 新增
+  hideFeatureAttrPanel();
 });
 
 // ══════════════════════════════════════════════════
@@ -1358,9 +1513,7 @@ async function buildWall(data) {
   grooveMeshes = [];
   mepSegMeshes = [];
   unhighlightAll();
-  hideGrooveCard();
-  hideMepCard();
-  hideFeatureAttrPanel();            // ★ 新增
+  hideFeatureAttrPanel();
 
   const WL=((data.actualLength??data.obbLength??data.length??1400))*S;
   const WH=((data.actualWidth??data.obbWidth??data.height??data.width??2695))*S;
@@ -1431,6 +1584,7 @@ async function buildWall(data) {
     cavMesh.position.set(cx,cy,cz);
     cavMesh.userData.origOpacity=0.38;
     meshFeatureMap.set(cavMesh,{f,box});
+    meshMomDataMap.set(cavMesh, { feature: f, featureType: 'Groove', extra: { box } });  // ★ MOM 悬浮面板
     grooveMeshes.push(cavMesh);
     grooveGroup.add(cavMesh);
 
@@ -1480,6 +1634,7 @@ async function buildWall(data) {
       const { mesh, line, edge } = result;
 
       meshMepMap.set(mesh, { mepFeature, seg, segIndex: si });
+      meshMomDataMap.set(mesh, { feature: mepFeature, featureType: 'MepSlot', extra: { seg, segIndex: si } });  // ★ MOM 悬浮面板
       mepSegMeshes.push(mesh);
       mepGroup.add(mesh);
       if (line) mepGroup.add(line);
