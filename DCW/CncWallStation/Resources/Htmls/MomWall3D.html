@@ -422,7 +422,7 @@
           <span class="param-val" id="d-round-hole-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📍</span>定位孔数</span>
+          <span class="param-lbl"><span class="plbl-icon">📍</span>剪力钉孔数</span>
           <span class="param-val" id="d-slotted-hole-count">—</span>
         </div>
       </div>
@@ -1048,14 +1048,17 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     const isSlotted = isHoleSlotted(feature.shape);
     const isRound = !isSlotted;
 
-    document.getElementById('mtt-ftype').textContent = isRound ? '圆孔 (Hole)' : '腰孔 (Slotted Hole)';
+    document.getElementById('mtt-ftype').textContent = isRound ? '圆孔 (Hole)' : '剪力钉孔';
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
 
     // 直径 / 半径
     const r = feature.radius != null ? (+feature.radius) : null;
     const d = r != null ? (r * 2) : (feature.diameter != null ? (+feature.diameter) : null);
-    document.getElementById('mtt-len').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
+    // 长度值取自 SlotLength（剪力钉孔）/ 直径（圆孔）
+    document.getElementById('mtt-len').textContent = isSlotted
+      ? (feature.slotLength != null ? (+feature.slotLength).toFixed(1) + ' mm' : '—')
+      : (d != null ? d.toFixed(1) + ' mm' : '—');
     document.getElementById('mtt-wid').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
     document.getElementById('mtt-dep').textContent = feature.depth != null ? (+feature.depth).toFixed(1) + ' mm' : '—';
 
@@ -1064,15 +1067,10 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-hole-radius').textContent = r != null ? r.toFixed(1) + ' mm' : '—';
     document.getElementById('mtt-hole-diameter').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
 
-    if (isSlotted) {
-      document.getElementById('mtt-hole-slotlen').textContent = feature.slotLength != null ? (+feature.slotLength).toFixed(1) + ' mm' : '—';
-      document.getElementById('mtt-hole-slotangle').textContent = feature.slotAngleDeg != null ? (+feature.slotAngleDeg).toFixed(1) + '°' : '—';
-    }
-
     // 显示/隐藏行
-    document.getElementById('mtt-startpt').parentElement.style.display = '';
-    document.getElementById('mtt-endpt').parentElement.style.display = '';
-    document.getElementById('mtt-center-row').style.display = 'none';
+    document.getElementById('mtt-startpt').parentElement.style.display = isSlotted ? 'none' : '';
+    document.getElementById('mtt-endpt').parentElement.style.display = isSlotted ? 'none' : '';
+    document.getElementById('mtt-center-row').style.display = isSlotted ? '' : 'none';
     document.getElementById('mtt-radius-row').style.display = 'none';
     document.getElementById('mtt-arc-row1').style.display = 'none';
     document.getElementById('mtt-arc-row2').style.display = 'none';
@@ -1081,13 +1079,18 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-hole-shape-row').style.display = '';
     document.getElementById('mtt-hole-radius-row').style.display = '';
     document.getElementById('mtt-hole-diameter-row').style.display = '';
-    document.getElementById('mtt-hole-slotlen-row').style.display = isRound ? 'none' : '';
-    document.getElementById('mtt-hole-slotangle-row').style.display = isRound ? 'none' : '';
+    document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
 
-    // 起点显示孔位置
-    const lp = feature.localPos;
-    document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
-    document.getElementById('mtt-endpt').textContent = feature.throughHole ? '✓ 通孔' : '✗ 盲孔';
+    // 剪力钉孔显示中心点（取自 localPos），圆孔显示起点/终点
+    if (isSlotted) {
+      const lp = feature.localPos;
+      document.getElementById('mtt-centerpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
+    } else {
+      const lp = feature.localPos;
+      document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
+      document.getElementById('mtt-endpt').textContent = feature.throughHole ? '✓ 通孔' : '✗ 盲孔';
+    }
     document.getElementById('mtt-sub').textContent = '';
   }
 
@@ -1394,7 +1397,7 @@ function fillLegend(usedTypes, typeCount, hasMep, holes) {
     items.push({label:'圆孔 (Hole)', css:'#22d3ee', count:roundHoles.length, key:'holeRound'});
   }
   if (slottedHoles.length > 0) {
-    items.push({label:'腰孔 (Slotted)', css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
+    items.push({label:'剪力钉孔', css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
   }
   if (hasMep) {
     items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0, key:'mep'});
