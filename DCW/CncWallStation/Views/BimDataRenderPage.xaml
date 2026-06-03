@@ -141,6 +141,11 @@
                               Style="{StaticResource LayerToggleStyle}"
                               IsChecked="{Binding IsDimVisible}"
                               ToolTip="切换标注图层"
+                              Margin="2,0,2,0"/>
+                <ToggleButton Content="钢筋"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsRebarVisible}"
+                              ToolTip="切换钢筋槽图层"
                               Margin="2,0,0,0"/>
 
                 <Separator Width="1" Height="20" Background="#F0F0F0"

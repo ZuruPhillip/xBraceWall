@@ -215,6 +215,17 @@ namespace CncWallStation.ViewModels
             }
         }
 
+        private bool _isRebarVisible = true;
+        public bool IsRebarVisible
+        {
+            get => _isRebarVisible;
+            set
+            {
+                if (SetProperty(ref _isRebarVisible, value))
+                    ExecuteLayerToggle("rebars", value);
+            }
+        }
+
         // ──────────────────────────────────────────
         //  悬停浮窗数据（边缘测量）
         // ──────────────────────────────────────────
@@ -554,11 +565,35 @@ namespace CncWallStation.ViewModels
                 }
             }
 
+            var rebarSlots = new List<object>();
+            if (dto is BimWallDtoV000 vRebar && vRebar.Rebars?.Rods != null)
+            {
+                var rebar = vRebar.Rebars;
+                foreach (var rod in rebar.Rods)
+                {
+                    if (rod.StartPoint == null || rod.EndPoint == null) continue;
+                    rebarSlots.Add(new
+                    {
+                        startX = rod.StartPoint.X,
+                        startY = rod.StartPoint.Y,
+                        startZ = rod.StartPoint.Z,
+                        endX = rod.EndPoint.X,
+                        endY = rod.EndPoint.Y,
+                        endZ = rod.EndPoint.Z,
+                        diameter = rebar.Diameter,
+                        horizontalDepth = rebar.HorizontalDepth,
+                        verticalDepth = rebar.VerticalDepth,
+                        pn = rebar.Pn
+                    });
+                }
+            }
+
             var dObject = new
             {
                 wallContour = contour,
                 thickness = dto.CoreThickness,
-                slices = slices
+                slices = slices,
+                rebarSlots = rebarSlots
             };
 
             _cachedDObjectJson = JsonConvert.SerializeObject(dObject, Formatting.None);

@@ -79,6 +79,25 @@
     #brick-tooltip .bkey { color:#ccaa66; }
     #brick-tooltip .bval { color:#fff; font-weight:600; font-size:11px; }
 
+    /* ── 钢筋槽悬浮面板 ── */
+    #rebar-tooltip {
+      position:fixed;
+      background:rgba(8,8,28,0.95); backdrop-filter:blur(8px);
+      border:1px solid #ff8c42; border-radius:10px;
+      padding:10px 14px; color:#fff;
+      pointer-events:none; z-index:300; display:none;
+      min-width:220px;
+      box-shadow:0 4px 20px rgba(255,140,66,0.25);
+    }
+    #rebar-tooltip .rtitle {
+      color:#ff8c42; font-weight:700; font-size:10px;
+      letter-spacing:1.5px; margin-bottom:7px;
+      text-transform:uppercase;
+    }
+    #rebar-tooltip .rrow { display:flex; justify-content:space-between; gap:14px; margin-bottom:3px; font-size:12px; }
+    #rebar-tooltip .rkey { color:#cc8844; }
+    #rebar-tooltip .rval { color:#fff; font-weight:600; font-size:11px; }
+
     /* ── 底部提示 ── */
     #hint-bar {
       position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
@@ -138,6 +157,10 @@
     <span class="param-lbl"><span class="plbl-icon">📐</span>轮廓顶点</span>
     <span class="param-val" id="v-ver">—</span>
   </div>
+  <div class="param-row">
+    <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽</span>
+    <span class="param-val" id="v-rebar">—</span>
+  </div>
 </div>
 
 <div class="panel" id="legend">
@@ -149,6 +172,7 @@
   <div class="item"><div class="dot" style="background:#ff6060;height:3px;border-radius:1px;"></div>竖向胶缝</div>
   <div class="item"><div class="dot" style="background:#ffd700;"></div>尺寸标注</div>
   <div class="item"><div class="dot" style="background:#00ffcc;"></div>悬停高亮边</div>
+  <div class="item"><div class="dot" style="background:#ff8c42;"></div>钢筋槽</div>
 </div>
 
 <div id="brick-tooltip">
@@ -161,9 +185,20 @@
   <div class="brow"><span class="bkey">零件号</span><span class="bval" id="bt-pn">—</span></div>
 </div>
 
+<div id="rebar-tooltip">
+  <div class="rtitle">🔩 钢筋槽信息</div>
+  <div class="rrow"><span class="rkey">方向</span><span class="rval" id="rt-dir">—</span></div>
+  <div class="rrow"><span class="rkey">直径</span><span class="rval" id="rt-dia">—</span></div>
+  <div class="rrow"><span class="rkey">长度</span><span class="rval" id="rt-len">—</span></div>
+  <div class="rrow"><span class="rkey">深度</span><span class="rval" id="rt-dep">—</span></div>
+  <div class="rrow"><span class="rkey">零件号</span><span class="rval" id="rt-pn">—</span></div>
+  <div class="rrow"><span class="rkey">起点</span><span class="rval" id="rt-start">—</span></div>
+  <div class="rrow"><span class="rkey">终点</span><span class="rval" id="rt-end">—</span></div>
+</div>
+
 <div id="hint-bar">
   <span><b>左键</b>旋转</span><span><b>右键</b>平移</span><span><b>滚轮</b>缩放</span><span><b>双击</b>复位</span>
-  <span><b>悬停墙边</b>测量</span><span><b>悬停砖块</b>信息</span>
+  <span><b>悬停墙边</b>测量</span><span><b>悬停砖块</b>信息</span><span><b>悬停钢筋槽</b>信息</span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
@@ -179,6 +214,8 @@
   var renderer, scene, camera, controls;
   var layers = {};
   var brickMeshes = [];
+  var rebarMeshes = [];
+  var rebarHitMeshes = [];
   var EDGES = [];
   var hlLine;
   var hovBrick = null;
@@ -367,8 +404,9 @@
 
     document.getElementById('v-slc').textContent = D.slices.length + ' 块';
     document.getElementById('v-ver').textContent = D.wallContour.length + ' 个';
+    document.getElementById('v-rebar').textContent = (D.rebarSlots && D.rebarSlots.length || 0) + ' 条';
 
-    layers = { wall: new THREE.Group(), slices: new THREE.Group(), joints: new THREE.Group(), dim: new THREE.Group() };
+    layers = { wall: new THREE.Group(), slices: new THREE.Group(), joints: new THREE.Group(), dim: new THREE.Group(), rebars: new THREE.Group() };
     for (var k in layers) scene.add(layers[k]);
 
     function makeShape(pts) {
@@ -495,6 +533,74 @@
       addLine([v3(xMaxS, yMinW, 0), v3(xMaxS, yOff, 0)], dashMat, layers.dim);
     });
 
+    // 钢筋槽（Groove 切除效果）
+    if (D.rebarSlots && D.rebarSlots.length > 0) {
+      var grooveMat = new THREE.MeshStandardMaterial({
+        color: 0x2a2a2a, roughness: 0.85, metalness: 0.1
+      });
+      var edgeMat = new THREE.LineBasicMaterial({
+        color: 0x666666, linewidth: 1
+      });
+              rebarMeshes = [];
+      rebarHitMeshes = [];
+      var HIT_PAD = 5; // 钢筋槽命中容差 (mm)
+      D.rebarSlots.forEach(function (sl) {
+        var dx = Math.abs(sl.endX - sl.startX);
+        var dz = Math.abs(sl.endZ - sl.startZ);
+        var isHoriz = dx >= dz;
+        var bx, by, bz;
+        if (isHoriz) {
+          // 水平槽：沿 X 方向（BIM X → Three.js X）
+          bx = dx;
+          by = sl.diameter;
+          bz = sl.horizontalDepth || sl.diameter;
+        } else {
+          // 垂直槽：沿 Z 方向（BIM Z → Three.js Y）
+          bx = sl.diameter;
+          by = dz;
+          bz = sl.verticalDepth || sl.diameter;
+        }
+        // 深色槽体
+        var geo = new THREE.BoxGeometry(bx, by, bz);
+        var mesh = new THREE.Mesh(geo, grooveMat);
+        mesh.position.set(
+          (sl.startX + sl.endX) / 2,
+          (sl.startZ + sl.endZ) / 2,
+          -bz / 2
+        );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        mesh.userData = {
+          direction: isHoriz ? '水平槽 (X)' : '垂直槽 (Z)',
+          diameter: sl.diameter,
+          length: isHoriz ? dx : dz,
+          depth: isHoriz ? (sl.horizontalDepth || sl.diameter) : (sl.verticalDepth || sl.diameter),
+          pn: sl.pn || '',
+          startX: sl.startX, startY: sl.startZ, startZ: sl.startZ,
+          endX: sl.endX, endY: sl.endZ, endZ: sl.endZ
+        };
+        layers.rebars.add(mesh);
+        rebarMeshes.push(mesh);
+        // 不可见的扩大命中区域，提升悬停体验
+        var hitGeo = new THREE.BoxGeometry(
+          isHoriz ? bx : bx + HIT_PAD * 2,
+          isHoriz ? by + HIT_PAD * 2 : by,
+          bz + HIT_PAD * 2
+        );
+        var hitMesh = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
+        hitMesh.position.copy(mesh.position);
+        hitMesh.userData = mesh.userData;
+        layers.rebars.add(hitMesh);
+        rebarHitMeshes.push(hitMesh);
+        // 槽口边缘线
+        var edgeGeo = new THREE.EdgesGeometry(geo);
+        var edgeLine = new THREE.LineSegments(edgeGeo, edgeMat);
+        edgeLine.position.copy(mesh.position);
+        layers.rebars.add(edgeLine);
+      });
+      notifyRaw('status:钢筋槽渲染完成 (' + D.rebarSlots.length + ' 条)');
+    }
+
     // 地面 & 网格
     var gnd = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), new THREE.MeshStandardMaterial({ color: 0x181828, roughness: 1.0 }));
     gnd.rotation.x = -Math.PI / 2; gnd.position.set(cx, -3, cz); gnd.receiveShadow = true;
@@ -533,6 +639,7 @@
     document.getElementById('info-panel').style.display = 'none';
     document.getElementById('legend').style.display = 'none';
     document.getElementById('brick-tooltip').style.display = 'none';
+    document.getElementById('rebar-tooltip').style.display = 'none';
     hovBrick = null;
     function disposeGroup(group) {
       if (!group || !group.children) return;
@@ -549,7 +656,7 @@
       if (group.parent) group.parent.remove(group);
     }
     for (var k in layers) { if (layers[k]) disposeGroup(layers[k]); }
-    layers = {}; brickMeshes = []; EDGES = [];
+    layers = {}; brickMeshes = []; rebarMeshes = []; rebarHitMeshes = []; EDGES = [];
     (function reAnimate() {
       animateId = requestAnimationFrame(reAnimate);
       controls.update(); renderer.render(scene, camera);
@@ -589,6 +696,9 @@
     var tipB = document.getElementById('brick-tooltip');
     var tipBShown = false;
 
+    var tipR = document.getElementById('rebar-tooltip');
+    var tipRShown = false;
+
     window.addEventListener('mousemove', function (e) {
       var mx = e.clientX, my = e.clientY;
 
@@ -614,7 +724,45 @@
         notifyRaw('edgeMeasure:');
       }
 
+      /* ── 钢筋槽悬浮（优先检测） ── */
+      mouse.set((mx / window.innerWidth) * 2 - 1, -(my / window.innerHeight) * 2 + 1);
+      ray.setFromCamera(mouse, camera);
+      var rebarHits = ray.intersectObjects(rebarHitMeshes, false);
+      if (rebarHits.length > 0) {
+        var rud = rebarHits[0].object.userData;
+        // 先隐藏砖块 tooltip
+        if (tipBShown) { tipB.style.display = 'none'; tipBShown = false; }
+        clearHL();
+        document.getElementById('rt-dir').textContent = rud.direction;
+        document.getElementById('rt-dia').textContent = (+rud.diameter).toFixed(1) + ' mm';
+        document.getElementById('rt-len').textContent = (+rud.length).toFixed(1) + ' mm';
+        document.getElementById('rt-dep').textContent = (+rud.depth).toFixed(1) + ' mm';
+        document.getElementById('rt-pn').textContent = rud.pn || '—';
+        document.getElementById('rt-start').textContent =
+          '(' + (+rud.startX).toFixed(1) + ', ' + (+rud.startY).toFixed(1) + ')';
+        document.getElementById('rt-end').textContent =
+          '(' + (+rud.endX).toFixed(1) + ', ' + (+rud.endY).toFixed(1) + ')';
+        if (!tipRShown) {
+          tipR.style.display = 'block';
+          tipRShown = true;
+        }
+        var rCurLeft = parseFloat(tipR.style.left) || 0;
+        var rCurTop = parseFloat(tipR.style.top) || 0;
+        if (Math.abs(mx + 18 - rCurLeft) > 40 || Math.abs(my + 18 - rCurTop) > 40) {
+          placeEl(tipR, mx, my, 0);
+        }
+        return;
+      }
+      // 隐藏钢筋 tooltip
+      if (tipRShown) { tipR.style.display = 'none'; tipRShown = false; }
+
       /* ── 砖块悬浮 → HTML 面板 ── */
+      // 砖块隐藏时不显示悬浮信息
+      if (layers && layers.slices && !layers.slices.visible) {
+        clearHL();
+        if (tipBShown) { tipB.style.display = 'none'; tipBShown = false; }
+        return;
+      }
       mouse.set((mx / window.innerWidth) * 2 - 1, -(my / window.innerHeight) * 2 + 1);
       ray.setFromCamera(mouse, camera);
       var hits = ray.intersectObjects(brickMeshes, false);
@@ -651,6 +799,7 @@
       hlLine.visible = false; clearHL();
       notifyRaw('edgeMeasure:');
       if (tipBShown) { tipB.style.display = 'none'; tipBShown = false; }
+      if (tipRShown) { tipR.style.display = 'none'; tipRShown = false; }
     });
   }
 
