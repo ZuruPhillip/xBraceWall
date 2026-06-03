@@ -389,8 +389,8 @@ namespace CncWallStation.VersionMappers
                 }
 
                 // ── 3.1 起终点（局部 2D 投影）─────────────────
-                var startPos = new Vec2(rod.StartPoint.X, rod.StartPoint.Y);
-                var endPos = new Vec2(rod.EndPoint.X, rod.EndPoint.Y);
+                var startPos = new Vec2(rod.StartPoint.X, rod.StartPoint.Z);
+                var endPos = new Vec2(rod.EndPoint.X, rod.EndPoint.Z);
 
                 // ── 3.2 严格方向判定 ─────────────────────────
                 float dx = MathF.Abs(endPos.X - startPos.X);
@@ -419,7 +419,7 @@ namespace CncWallStation.VersionMappers
                     : rebar.VerticalDepth;
 
                 // ── 3.4 加工面按 Z 值判定 ─────────────────────
-                float avgZ = (rod.StartPoint.Z + rod.EndPoint.Z) * 0.5f;
+                float avgZ = (rod.StartPoint.Y + rod.EndPoint.Y) * 0.5f;
                 MachineSide side = avgZ >= faceZThreshold
                     ? MachineSide.Top
                     : MachineSide.Bottom;

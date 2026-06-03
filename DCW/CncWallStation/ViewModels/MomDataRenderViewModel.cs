@@ -205,6 +205,17 @@ namespace CncWallStation.ViewModels
             }
         }
 
+        private bool _isRebarVisible = true;
+        public bool IsRebarVisible
+        {
+            get => _isRebarVisible;
+            set
+            {
+                if (SetProperty(ref _isRebarVisible, value))
+                    ExecuteLayerToggle("rebar", value);
+            }
+        }
+
         private bool _isDimVisible = true;
         public bool IsDimVisible
         {
@@ -533,6 +544,10 @@ namespace CncWallStation.ViewModels
                 {
                     features.Add(SerializeHole(hole));
                 }
+                else if (feature is RebarSlot rebarSlot)
+                {
+                    features.Add(SerializeRebarSlot(rebarSlot));
+                }
             }
 
             var material = momWall.Material ?? "AAC";
@@ -710,6 +725,33 @@ namespace CncWallStation.ViewModels
                 initialSide = pocket.InitialSide.ToString(),
                 currentSide = pocket.CurrentSide.ToString(),
                 outlinePoints = (object?)null       // Pocket 暂不提供角点
+            };
+        }
+
+        /// <summary>
+        /// 将 RebarSlot 特征序列化为 HTML 渲染引擎可识别的格式。
+        /// HTML 端通过 featureType==='RebarSlot' 筛选钢筋槽特征。
+        /// </summary>
+        private static object SerializeRebarSlot(RebarSlot rebarSlot)
+        {
+            var normal = rebarSlot.CurrentNormal;
+
+            return new
+            {
+                id = rebarSlot.Id,
+                featureType = "RebarSlot",
+                localPos = new { x = rebarSlot.LocalPos.X, y = rebarSlot.LocalPos.Y },
+                endPos = new { x = rebarSlot.EndPos.X, y = rebarSlot.EndPos.Y },
+                diameter = rebarSlot.Diameter,
+                depth = rebarSlot.Depth,
+                length = rebarSlot.Length,
+                direction = rebarSlot.Direction.ToString(),    // "Vertical" / "Horizontal"
+                startThreading = rebarSlot.StartThreading,
+                endThreading = rebarSlot.EndThreading,
+                pn = rebarSlot.Pn,
+                currentNormal = new { x = normal.X, y = normal.Y, z = normal.Z },
+                initialSide = rebarSlot.InitialSide.ToString(),
+                currentSide = rebarSlot.CurrentSide.ToString()
             };
         }
 

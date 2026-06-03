@@ -109,6 +109,18 @@
     }
     #hint-bar b { color: #94a3b8; margin-right: 2px; }
 
+    /* ══ 工具栏按钮 ══ */
+    .toolbar-btn {
+      background: rgba(56,189,248,.06); border: 1px solid rgba(56,189,248,.15);
+      border-radius: 6px; color: #94a3b8; font-size: 10.5px;
+      padding: 3px 10px; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; gap: 4px; user-select: none;
+    }
+    .toolbar-btn:hover { background: rgba(56,189,248,.14); border-color: rgba(56,189,248,.3); color: #e2e8f0; }
+    .toolbar-btn.on { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
+    .toolbar-btn.off { background: rgba(148,163,184,.03); border-color: rgba(148,163,184,.06); color: #475569; }
+    .toolbar-btn .tb-dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+
     /* ══ 错误 ══ */
     #error-toast {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -287,6 +299,19 @@
     }
     #mom-tooltip.mom-hole-slotted .mttitle { color: #f472b6; border-bottom-color: rgba(244,114,182,0.15); }
     #mom-tooltip.mom-hole-slotted .mtval.highlight { color: #f472b6; }
+
+    /* RebarSlot 特征卡片特殊配色 */
+    #mom-tooltip.mom-rebar {
+      border-color: #ff8c42;
+      box-shadow: 0 4px 20px rgba(255,140,66,0.25);
+    }
+    #mom-tooltip.mom-rebar .mttitle { color: #ff8c42; border-bottom-color: rgba(255,140,66,0.15); }
+    #mom-tooltip.mom-rebar .mtval.highlight { color: #ff8c42; }
+
+    /* 新增 Rebar 专属行 */
+    #mtt-thread-row { display: none; }
+    #mtt-thread-start { display: inline; }
+    #mtt-thread-end { display: inline; }
   </style>
 </head>
 <body>
@@ -425,6 +450,10 @@
           <span class="param-lbl"><span class="plbl-icon">📍</span>剪力钉孔数</span>
           <span class="param-val" id="d-slotted-hole-count">—</span>
         </div>
+        <div class="param-row">
+          <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽数</span>
+          <span class="param-val" id="d-rebar-count">—</span>
+        </div>
       </div>
     </div>
 
@@ -479,6 +508,9 @@ const GROOVE_COLORS = {
 
 const HOLE_COLOR_ROUND   = new THREE.Color(0x22d3ee); // 青色 — 圆孔
 const HOLE_COLOR_SLOTTED = new THREE.Color(0xf472b6); // 粉色 — 腰孔
+
+const REBAR_SLOT_COLOR   = new THREE.Color(0xff8c42); // 橙色 — 钢筋槽
+const REBAR_HIT_PAD      = 5 * S; // 钢筋槽命中容差 (m)
 
 const MEP_COLOR_SHALLOW = new THREE.Color(0xfbbf24);
 const MEP_COLOR_DEEP    = new THREE.Color(0xf97316);
@@ -537,15 +569,16 @@ window.addEventListener('resize', () => {
 // ══════════════════════════════════════════════════
 //  图层管理
 // ══════════════════════════════════════════════════
-const layers     = { wall: null, groove: null, edge: null, mep: null, holeRound: null, holeSlotted: null, dim: null };
-const layerState = { wall: true, groove: true, edge: false, mep: true, holeRound: true, holeSlotted: true, dim: true };
+const layers     = { wall: null, groove: null, edge: null, mep: null, holeRound: null, holeSlotted: null, dim: null, rebar: null };
+const layerState = { wall: true, groove: true, edge: false, mep: true, holeRound: true, holeSlotted: true, dim: true, rebar: true };
 
 window.toggleLayer       = k      => setLayerVisible(k, !layerState[k]);
 window.toggleLayerSwitch = (k, v) => setLayerVisible(k, v);
 
 function setLayerVisible(key, val) {
   layerState[key] = val;
-  const btn = document.getElementById('btn-'  + key); if (btn) btn.classList.toggle('on', val);
+  const btn = document.getElementById('btn-'  + key);
+  if (btn) { btn.classList.toggle('on', val); btn.classList.toggle('off', !val); }
   const sw  = document.getElementById('sw-'   + key); if (sw)  sw.checked = val;
   if (layers[key]) layers[key].visible = val;
 
@@ -856,6 +889,101 @@ function buildArcSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth) {
   return { mesh, line };
 }
 
+/// 构建 RebarSlot 槽体可视化（叠加渲染，非 CSG 减法）
+function buildRebarSlotMesh(rebarFeature, WL, WH, WT) {
+  const normal = rebarFeature.currentNormal ?? {x:0,y:0,z:1};
+  const diameter = (rebarFeature.diameter ?? 20) * S;
+  const depth    = (rebarFeature.depth    ?? 50) * S;
+
+  // 将 2D 墙体局部坐标映射到 3D 世界坐标
+  const sp = mepLocalToWorld(
+    rebarFeature.localPos?.x ?? 0, rebarFeature.localPos?.y ?? 0,
+    normal, WL, WH, WT
+  );
+  const ep = mepLocalToWorld(
+    rebarFeature.endPos?.x ?? 0, rebarFeature.endPos?.y ?? 0,
+    normal, WL, WH, WT
+  );
+
+  const dir3   = new THREE.Vector3().subVectors(ep, sp);
+  const length = dir3.length();
+  if (length < 1e-6) return null;
+
+  const mid3  = new THREE.Vector3().addVectors(sp, ep).multiplyScalar(0.5);
+  const depOff = mepDepthOffset(rebarFeature.depth ?? 50, normal);
+  const center = mid3.clone().add(depOff);
+
+  // 确定盒体尺寸：长度沿 start→end 方向，宽度/深度垂直
+  const nx = Math.round(normal.x??0), ny = Math.round(normal.y??0), nz = Math.round(normal.z??0);
+  let bx, by, bz;
+  const dx = Math.abs(ep.x - sp.x), dy = Math.abs(ep.y - sp.y), dz = Math.abs(ep.z - sp.z);
+  if (nz !== 0) {
+    // 前/后面：XY 平面内
+    if (dy > dx) { bx = diameter; by = length; bz = depth; } else { bx = length; by = diameter; bz = depth; }
+  } else if (ny !== 0) {
+    // 顶/底面：XZ 平面内
+    if (dz > dx) { bx = diameter; by = depth; bz = length; } else { bx = length; by = depth; bz = diameter; }
+  } else {
+    // 左/右侧面：YZ 平面内
+    if (dz > dy) { bx = depth; by = diameter; bz = length; } else { bx = depth; by = length; bz = diameter; }
+  }
+
+  // 槽体 mesh
+  const geo = new THREE.BoxGeometry(Math.max(bx, 0.001), Math.max(by, 0.001), Math.max(bz, 0.001));
+  const mat = new THREE.MeshStandardMaterial({
+    color: REBAR_SLOT_COLOR, roughness: 0.4, metalness: 0.1,
+    transparent: true, opacity: 0.38, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(center);
+  mesh.userData.origOpacity = 0.38;
+  mesh.userData.origColor   = REBAR_SLOT_COLOR.clone();
+
+  // 不可见的扩大命中区域
+  const hitGeo = new THREE.BoxGeometry(
+    Math.max(bx + REBAR_HIT_PAD * 2, 0.001),
+    Math.max(by + REBAR_HIT_PAD * 2, 0.001),
+    Math.max(bz + REBAR_HIT_PAD * 2, 0.001)
+  );
+  const hitMesh = new THREE.Mesh(hitGeo, new THREE.MeshBasicMaterial({ visible: false }));
+  hitMesh.position.copy(center);
+  meshRebarMap.set(hitMesh, { rebarFeature, visualMesh: mesh });
+
+  // 边缘线
+  const edgeMat = new THREE.LineBasicMaterial({
+    color: REBAR_SLOT_COLOR, transparent: true, opacity: 0.88,
+  });
+  const edgeLine = new THREE.LineSegments(new THREE.EdgesGeometry(geo), edgeMat);
+  edgeLine.position.copy(center);
+
+  // 底面贴片（朝向法向量方向内侧）
+  const nAbs = new THREE.Vector3(
+    Math.abs(Math.round(normal.x??0)),
+    Math.abs(Math.round(normal.y??0)),
+    Math.abs(Math.round(normal.z??0))
+  );
+  let floorW, floorH;
+  if (nAbs.z > 0.5) { floorW = bx; floorH = by; }
+  else if (nAbs.y > 0.5) { floorW = bx; floorH = bz; }
+  else { floorW = by; floorH = bz; }
+  const floorGeo = new THREE.PlaneGeometry(Math.max(floorW, 0.001), Math.max(floorH, 0.001));
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: REBAR_SLOT_COLOR, roughness: 0.55, transparent: true, opacity: 0.62,
+    depthWrite: false, side: THREE.DoubleSide,
+  });
+  const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+  floorMesh.position.copy(center);
+  // 旋转平面使其平行于墙面
+  if (nAbs.y > 0.5) floorMesh.rotation.x = -Math.PI / 2;
+  else if (nAbs.x > 0.5) floorMesh.rotation.y =  Math.PI / 2;
+  floorMesh.position.add(
+    new THREE.Vector3(normal.x ?? 0, normal.y ?? 0, normal.z ?? 0).normalize()
+      .multiplyScalar(-(nAbs.z > 0.5 ? bz : nAbs.y > 0.5 ? by : bx) * 0.5 + 0.0003)
+  );
+
+  return { mesh, hitMesh, edgeLine, floorMesh };
+}
+
 function makeLabel(text, pos, color='#38bdf8') {
   const cv=document.createElement('canvas'); cv.width=320; cv.height=72;
   const ctx=cv.getContext('2d');
@@ -888,12 +1016,16 @@ const mouse       = new THREE.Vector2(-9,-9);
 const meshFeatureMap = new WeakMap();
 const meshMepMap     = new WeakMap();
 const meshHoleMap    = new WeakMap(); // hole cavity mesh → { holeFeature }
+const meshRebarMap   = new WeakMap(); // rebar hit mesh → { rebarFeature }
 let   grooveMeshes   = [];
 let   mepSegMeshes   = [];
 let   holeMeshes     = [];
+let   rebarMeshes    = [];
+let   rebarHitMeshes = [];
 let   hoveredMesh    = null;
 let   hoveredMepMesh = null;
 let   hoveredHoleMesh = null;
+let   hoveredRebarMesh = null;
 
 function normalLabel(n) {
   const nx=Math.round(n.x??0), ny=Math.round(n.y??0), nz=Math.round(n.z??0);
@@ -943,18 +1075,23 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     const isRound = isHoleRound(feature.shape);
     cfg = isRound ? { css: '#22d3ee', label: '圆孔 (Hole)' } : { css: '#f472b6', label: '腰孔 (Slotted)' };
     typeKey = isRound ? 'hole-round' : 'hole-slotted';
+  } else if (featureType === 'RebarSlot') {
+    typeKey = 'rebar';
+    cfg = { css: '#ff8c42', label: '钢筋槽 (RebarSlot)' };
   } else {
     typeKey = 'mep';
     cfg = { css: '#fbbf24', label: 'MepSlot' };
   }
 
   // 配色模式切换
-  momTooltip.classList.remove('mom-mep', 'mom-hole-round', 'mom-hole-slotted');
+  momTooltip.classList.remove('mom-mep', 'mom-hole-round', 'mom-hole-slotted', 'mom-rebar');
   if (featureType === 'MepSlot') {
     momTooltip.classList.add('mom-mep');
   } else if (featureType === 'Hole') {
     const isRound = isHoleRound(feature.shape);
     momTooltip.classList.add(isRound ? 'mom-hole-round' : 'mom-hole-slotted');
+  } else if (featureType === 'RebarSlot') {
+    momTooltip.classList.add('mom-rebar');
   }
   document.getElementById('mtt-dot').style.background = cfg.css;
   document.getElementById('mtt-type').textContent = cfg.label;
@@ -1091,6 +1228,44 @@ function showMomTooltip(mesh, mouseX, mouseY) {
       document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
       document.getElementById('mtt-endpt').textContent = feature.throughHole ? '✓ 通孔' : '✗ 盲孔';
     }
+    document.getElementById('mtt-sub').textContent = '';
+  } else if (featureType === 'RebarSlot') {
+    // 判断方向
+    const dir = feature.direction;
+    const dirLabel = (dir === 'Vertical' || dir === 1) ? '纵向 (Vertical)' : '横向 (Horizontal)';
+    const dia = feature.diameter ?? 0;
+    const len = feature.length ?? 0;
+    const dep = feature.depth ?? 0;
+
+    document.getElementById('mtt-ftype').textContent = '钢筋槽 (RebarSlot)';
+    document.getElementById('mtt-len').textContent  = (+len).toFixed(1);
+    document.getElementById('mtt-wid').textContent  = (+dia).toFixed(1);
+    document.getElementById('mtt-dep').textContent  = (+dep).toFixed(1);
+    document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
+    document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+
+    // 起点/终点
+    const lp = feature.localPos;
+    const ep = feature.endPos;
+    document.getElementById('mtt-startpt').parentElement.style.display = '';
+    document.getElementById('mtt-endpt').parentElement.style.display = '';
+    document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
+    document.getElementById('mtt-endpt').textContent   = ep ? `(${(+(ep.x??0)).toFixed(1)}, ${(+(ep.y??0)).toFixed(1)})` : '—';
+
+    // 隐藏非 RebarSlot 专属行
+    document.getElementById('mtt-radius-row').style.display = 'none';
+    document.getElementById('mtt-arc-row1').style.display = 'none';
+    document.getElementById('mtt-arc-row2').style.display = 'none';
+    document.getElementById('mtt-hole-shape-row').style.display = 'none';
+    document.getElementById('mtt-hole-radius-row').style.display = 'none';
+    document.getElementById('mtt-hole-diameter-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
+    document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
+
+    // 方向（复用 mtt-center-row）
+    document.getElementById('mtt-center-row').style.display = '';
+    document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = '方向';
+    document.getElementById('mtt-centerpt').textContent = dirLabel;
     document.getElementById('mtt-sub').textContent = '';
   }
 
@@ -1277,6 +1452,17 @@ function highlightHoleMesh(mesh) {
   }
   canvas.style.cursor = 'crosshair';
 }
+function highlightRebarMesh(mesh) {
+  if (hoveredRebarMesh === mesh) return;
+  unhighlightAll();
+  hoveredRebarMesh = mesh;
+  if (mesh.material) {
+    mesh.material.opacity           = Math.min((mesh.userData.origOpacity ?? 0.38) * 2.2, 0.85);
+    mesh.material.emissive          = new THREE.Color(mesh.userData.origColor ?? 0xff8c42);
+    mesh.material.emissiveIntensity = 0.35;
+  }
+  canvas.style.cursor = 'crosshair';
+}
 function unhighlightAll() {
   if (hoveredMesh) {
     if (hoveredMesh.material) {
@@ -1299,6 +1485,13 @@ function unhighlightAll() {
     }
     hoveredHoleMesh = null;
   }
+  if (hoveredRebarMesh) {
+    if (hoveredRebarMesh.material) {
+      hoveredRebarMesh.material.opacity           = hoveredRebarMesh.userData.origOpacity ?? 0.38;
+      hoveredRebarMesh.material.emissiveIntensity = 0;
+    }
+    hoveredRebarMesh = null;
+  }
   canvas.style.cursor = '';
 }
 
@@ -1316,6 +1509,7 @@ canvas.addEventListener('mousemove', e => {
     ...(layerState.groove ? grooveMeshes : []),
     ...(layerState.mep    ? mepSegMeshes : []),
     ...(layerState.holeRound || layerState.holeSlotted ? holeMeshes : []),
+    ...(layerState.rebar  ? rebarHitMeshes : []),
   ];
   if (!allPickable.length) {
     unhighlightAll();
@@ -1327,17 +1521,23 @@ canvas.addEventListener('mousemove', e => {
   if (hits.length) {
     const hit = hits[0].object;
     if (meshFeatureMap.has(hit)) {
-      if (hoveredMepMesh || hoveredHoleMesh) { unhighlightAll(); }
+      if (hoveredMepMesh || hoveredHoleMesh || hoveredRebarMesh) { unhighlightAll(); }
       highlightGrooveMesh(hit);
       showMomTooltip(hit, e.clientX, e.clientY);
     } else if (meshMepMap.has(hit)) {
-      if (hoveredMesh || hoveredHoleMesh) { unhighlightAll(); }
+      if (hoveredMesh || hoveredHoleMesh || hoveredRebarMesh) { unhighlightAll(); }
       highlightMepMesh(hit);
       showMomTooltip(hit, e.clientX, e.clientY);
     } else if (meshHoleMap.has(hit)) {
-      if (hoveredMesh || hoveredMepMesh) { unhighlightAll(); }
+      if (hoveredMesh || hoveredMepMesh || hoveredRebarMesh) { unhighlightAll(); }
       highlightHoleMesh(hit);
       showMomTooltip(hit, e.clientX, e.clientY);
+    } else if (meshRebarMap.has(hit)) {
+      const rebarInfo = meshRebarMap.get(hit);
+      const visualMesh = rebarInfo.visualMesh;
+      if (hoveredMesh || hoveredMepMesh || hoveredHoleMesh) { unhighlightAll(); }
+      highlightRebarMesh(visualMesh);
+      showMomTooltip(visualMesh, e.clientX, e.clientY);
     }
   } else {
     unhighlightAll();
@@ -1353,7 +1553,7 @@ canvas.addEventListener('mouseleave', () => {
 // ══════════════════════════════════════════════════
 //  信息面板（墙体信息，原样保留）
 // ══════════════════════════════════════════════════
-function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes) {
+function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, rebarSlots) {
   document.getElementById('dv-length').textContent = (WL/S).toFixed(1);
   document.getElementById('dv-height').textContent = (WH/S).toFixed(1);
   document.getElementById('dv-thick').textContent  = (WT/S).toFixed(1);
@@ -1376,9 +1576,12 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes) {
   console.log('[fillInfoPanel] roundHoles:', roundHoles.length, 'slottedHoles:', slottedHoles.length);
   document.getElementById('d-round-hole-count').textContent = roundHoles.length > 0 ? `${roundHoles.length} 个` : '—';
   document.getElementById('d-slotted-hole-count').textContent = slottedHoles.length > 0 ? `${slottedHoles.length} 个` : '—';
+  // 钢筋槽统计
+  const rbSlots = Array.isArray(rebarSlots) ? rebarSlots : [];
+  document.getElementById('d-rebar-count').textContent = rbSlots.length > 0 ? `${rbSlots.length} 条` : '0 条';
 }
 
-function fillLegend(usedTypes, typeCount, hasMep, holes) {
+function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
   const el=document.getElementById('legend-items'); el.innerHTML='';
   const items = [
     {label:'AAC 墙体主体', css:'#c8d0d8', count:1, key:'wall'},
@@ -1398,6 +1601,10 @@ function fillLegend(usedTypes, typeCount, hasMep, holes) {
   }
   if (slottedHoles.length > 0) {
     items.push({label:'剪力钉孔', css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
+  }
+  // 钢筋槽图例
+  if (Array.isArray(rebarSlots) && rebarSlots.length > 0) {
+    items.push({label:'钢筋槽', css:'#ff8c42', count:rebarSlots.length, key:'rebar'});
   }
   if (hasMep) {
     items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0, key:'mep'});
@@ -1432,6 +1639,8 @@ async function buildWall(data) {
   grooveMeshes = [];
   mepSegMeshes = [];
   holeMeshes   = [];
+  rebarMeshes  = [];
+  rebarHitMeshes = [];
   unhighlightAll();
   hideMomTooltip();
 
@@ -1795,6 +2004,32 @@ async function buildWall(data) {
 
   scene.add(mepGroup); layers.mep = mepGroup;
 
+  // ── RebarSlot 渲染（叠加可视化，非 CSG 减法）──
+  const rebarSlots = allFeatures.filter(f =>
+    f.featureType === 'RebarSlot' || f.$type === 'RebarSlot'
+  );
+  if (rebarSlots.length > 0) {
+    setLoadingText(`渲染钢筋槽（${rebarSlots.length} 条）...`);
+    await tick();
+  }
+  const rebarGroup = new THREE.Group();
+  for (const rf of rebarSlots) {
+    const result = buildRebarSlotMesh(rf, WL, WH, WT);
+    if (!result) { console.warn('[RebarSlot] 零尺寸跳过'); continue; }
+    const { mesh, hitMesh, edgeLine, floorMesh } = result;
+
+    meshMomDataMap.set(mesh, { feature: rf, featureType: 'RebarSlot', extra: {} });
+    rebarMeshes.push(mesh);
+    rebarGroup.add(mesh);
+
+    rebarHitMeshes.push(hitMesh);
+    rebarGroup.add(hitMesh);
+
+    rebarGroup.add(edgeLine);
+    rebarGroup.add(floorMesh);
+  }
+  scene.add(rebarGroup); layers.rebar = rebarGroup;
+
   // 尺寸标注
   const dimGroup=new THREE.Group();
   const off=0.14;
@@ -1806,10 +2041,10 @@ async function buildWall(data) {
   dimGroup.add(makeLabel(`T  ${(WT/S).toFixed(1)} mm`,new THREE.Vector3(WL+off+0.26,WH/2,WT/2)));
   scene.add(dimGroup); layers.dim=dimGroup;
 
-  fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes);
-  fillLegend(usedTypes, typeCount, mepSlots.length > 0, holes);
+  fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, rebarSlots);
+  fillLegend(usedTypes, typeCount, mepSlots.length > 0, holes, rebarSlots);
 
-  ['wall','groove','mep','holeRound','holeSlotted','dim'].forEach(k=>setLayerVisible(k,true));
+  ['wall','groove','mep','holeRound','holeSlotted','dim','rebar'].forEach(k=>setLayerVisible(k,true));
   setLayerVisible('edge',false);
   setView2('iso');
 }
@@ -1881,7 +2116,7 @@ window.resetCamera = function() {
 /// 重置所有图层为可见状态（用于初始化时调用）
 /// </summary>
 window.resetAllLayers = function() {
-  ['wall','groove','mep','holeRound','holeSlotted','dim'].forEach(function(k) {
+  ['wall','groove','mep','holeRound','holeSlotted','dim','rebar'].forEach(function(k) {
     setLayerVisible(k, true);
   });
 };
