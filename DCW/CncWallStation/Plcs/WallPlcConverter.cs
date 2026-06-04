@@ -98,11 +98,14 @@ namespace CncWallStation.Plcs
                 || g.GrooveType == GrooveType.BaseBracket
                 || g.GrooveType == GrooveType.TopBracket)
                 .ToList();
-            foreach (var step in stepGrooves)
+            if (stepGrooves.Count > 0)
             {
                 before = ctx.Output.Count;
-                StepHandler.Handle(step, ctx, wall);
-                AddGroupIfNotEmpty(groups, "StepHandler", "台阶", ctx.Output, before);
+                foreach (var step in stepGrooves)
+                {
+                    StepHandler.Handle(step, ctx, wall);
+                }
+                AddGroupIfNotEmpty(groups, "StepHandler", "钢柱槽", ctx.Output, before);
             }
 
             // 密封条
@@ -112,6 +115,15 @@ namespace CncWallStation.Plcs
                 before = ctx.Output.Count;
                 GlueSealHandler.Handle(glueSeal, ctx, wall);
                 AddGroupIfNotEmpty(groups, "GlueSealHandler", "密封条", ctx.Output, before);
+            }
+
+            // 顶板
+            var topPlateGrooves = grooves.Where(g => g.GrooveType == GrooveType.TopPlate).ToList();
+            foreach (var topPlate in topPlateGrooves)
+            {
+                before = ctx.Output.Count;
+                TopPlateHandler.Handle(topPlate, ctx, wall);
+                AddGroupIfNotEmpty(groups, "TopPlateHandler", "顶板", ctx.Output, before);
             }
 
             // X 斜槽

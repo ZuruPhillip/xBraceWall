@@ -9,7 +9,7 @@ namespace CncWallStation.Plcs.Handlers
     {
         public static void Handle(Groove g, PlcConvertContext ctx, MomWall wall)
         {
-            if (g.GrooveType is not GrooveType.SteelColumn) return;
+            if (g.GrooveType is not (GrooveType.SteelColumn or GrooveType.BaseBracket or GrooveType.TopBracket)) return;
 
             // ── 自动判定方向 ──
             GrooveSide side = GrooveSideClassifier.Classify(g, wall);
@@ -47,8 +47,8 @@ namespace CncWallStation.Plcs.Handlers
                 T = PlcTool.StepCutter,    // T4
                 F = f,
                 D = 0,
-                X0 = minX,
-                Y0 = minY,
+                X0 = x0,
+                Y0 = y0,
                 Z0 = 0,
                 X1 = maxX - minX,           // 槽长（X 方向跨度）
                 Y1 = maxY - minY,           // 槽宽（Y 方向跨度）
