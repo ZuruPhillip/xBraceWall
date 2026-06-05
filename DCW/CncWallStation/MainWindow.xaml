@@ -67,7 +67,7 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="MomDataRenderPage"/>
 
-                <!-- 控制页面 -->
+                <!-- 控制页面 
                 <hc:SideMenuItem 
                 Header="JSON编辑器" 
                 Command="{Binding NavigateCommand}"
@@ -83,7 +83,7 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="PlcDataPage"/>
                 
-                <!-- 控制页面 -->
+                 -->
                 <hc:SideMenuItem 
                 Header="控制页面" 
                 Command="{Binding NavigateCommand}"

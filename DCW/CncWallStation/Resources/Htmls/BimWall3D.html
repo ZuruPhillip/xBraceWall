@@ -10,18 +10,15 @@
 
     /* ── 通用面板 ── */
     .panel {
-      background: rgba(10,18,35,.88); backdrop-filter: blur(20px);
-      border: 1px solid rgba(148,163,184,.12); border-radius: 14px;
-      padding: 14px 16px; position: relative;
-      transition: border-color .25s, box-shadow .25s;
+      background: #1a1a2e;
+      border: 1px solid #333;
+      padding: 10px 12px; position: relative;
     }
     .panel-title {
-      font-size: 10px; font-weight: 700; color: #38bdf8;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; color: #aaa;
+      margin-bottom: 8px;
     }
-    .panel-title::before { content: ''; display: block;
-      width: 3px; height: 12px; background: #38bdf8; border-radius: 2px; }
+    .panel-title::before { display: none; }
 
     /* ── 左侧信息面板（左上·与 MomWall3D 统一） ── */
     #info-panel {
@@ -32,24 +29,23 @@
     .param-val.highlight { color: #38bdf8; }
     .param-val.warn { color: #fbbf24; }
     .dim-visual {
-      background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.1);
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: space-around; gap: 6px;
+      background: #222; border: 1px solid #444;
+      padding: 8px 10px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-around; gap: 4px;
     }
-    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .dim-box-icon { font-size: 10px; color: #475569; letter-spacing: .5px; text-transform: uppercase; }
-    .dim-box-val { font-size: 15px; font-weight: 800; color: #e2e8f0;
-      font-variant-numeric: tabular-nums; line-height: 1; }
-    .dim-box-unit { font-size: 9px; color: #475569; }
-    .dim-sep { width: 1px; height: 32px; background: rgba(148,163,184,.1); }
+    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .dim-box-icon { font-size: 10px; color: #888; }
+    .dim-box-val { font-size: 14px; font-weight: 700; color: #ccc; }
+    .dim-box-unit { font-size: 9px; color: #888; }
+    .dim-sep { width: 1px; height: 28px; background: #444; }
     .param-row {
       display: flex; justify-content: space-between; align-items: center;
-      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06);
+      gap: 8px; padding: 4px 0; border-bottom: 1px solid #333;
     }
     .param-row:last-child { border-bottom: none; }
-    .param-lbl { color: #64748b; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+    .param-lbl { color: #999; font-size: 11px; }
     .param-lbl .plbl-icon { font-size: 12px; }
-    .param-val { color: #e2e8f0; font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .param-val { color: #ccc; font-weight: 600; font-size: 11px; }
 
     /* ── 图例（右上·与 MomWall3D 统一） ── */
     #legend {
@@ -57,57 +53,50 @@
       min-width: 220px; z-index: 100;
       pointer-events: none; display: none;
     }
-    #legend .item { display:flex; align-items:center; margin-bottom:6px; font-size:11px; color:#cbd5e1; }
-    #legend .dot { width:12px; height:12px; border-radius:2px; margin-right:9px; flex-shrink:0; border:1px solid rgba(255,255,255,0.10); }
+    #legend .item { display:flex; align-items:center; margin-bottom:4px; font-size:11px; color:#aaa; }
+    #legend .dot { width:10px; height:10px; margin-right:7px; flex-shrink:0; }
 
     /* ── 砖块悬浮面板 ── */
     #brick-tooltip {
       position:fixed;
-      background:rgba(8,8,28,0.95); backdrop-filter:blur(8px);
-      border:1px solid #f5a623; border-radius:10px;
-      padding:10px 14px; color:#fff;
+      background:#222; border:1px solid #666;
+      padding:8px 12px; color:#ccc;
       pointer-events:none; z-index:300; display:none;
       min-width:200px;
-      box-shadow:0 4px 20px rgba(245,166,35,0.25);
     }
     #brick-tooltip .btitle {
-      color:#f5a623; font-weight:700; font-size:10px;
-      letter-spacing:1.5px; margin-bottom:7px;
-      text-transform:uppercase;
+      color:#ccc; font-weight:700; font-size:11px;
+      margin-bottom:6px;
     }
-    #brick-tooltip .brow { display:flex; justify-content:space-between; gap:14px; margin-bottom:3px; font-size:12px; }
-    #brick-tooltip .bkey { color:#ccaa66; }
-    #brick-tooltip .bval { color:#fff; font-weight:600; font-size:11px; }
+    #brick-tooltip .brow { display:flex; justify-content:space-between; gap:10px; margin-bottom:2px; font-size:11px; }
+    #brick-tooltip .bkey { color:#999; }
+    #brick-tooltip .bval { color:#ddd; font-weight:600; }
 
     /* ── 钢筋槽悬浮面板 ── */
     #rebar-tooltip {
       position:fixed;
-      background:rgba(8,8,28,0.95); backdrop-filter:blur(8px);
-      border:1px solid #ff8c42; border-radius:10px;
-      padding:10px 14px; color:#fff;
+      background:#222; border:1px solid #666;
+      padding:8px 12px; color:#ccc;
       pointer-events:none; z-index:300; display:none;
       min-width:220px;
-      box-shadow:0 4px 20px rgba(255,140,66,0.25);
     }
     #rebar-tooltip .rtitle {
-      color:#ff8c42; font-weight:700; font-size:10px;
-      letter-spacing:1.5px; margin-bottom:7px;
-      text-transform:uppercase;
+      color:#ccc; font-weight:700; font-size:11px;
+      margin-bottom:6px;
     }
-    #rebar-tooltip .rrow { display:flex; justify-content:space-between; gap:14px; margin-bottom:3px; font-size:12px; }
-    #rebar-tooltip .rkey { color:#cc8844; }
-    #rebar-tooltip .rval { color:#fff; font-weight:600; font-size:11px; }
+    #rebar-tooltip .rrow { display:flex; justify-content:space-between; gap:10px; margin-bottom:2px; font-size:11px; }
+    #rebar-tooltip .rkey { color:#999; }
+    #rebar-tooltip .rval { color:#ddd; font-weight:600; }
 
     /* ── 底部提示 ── */
     #hint-bar {
       position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
-      background:rgba(13,13,28,0.55); backdrop-filter:blur(4px);
-      border:1px solid rgba(97,218,251,0.15); border-radius:24px;
-      padding:7px 22px; display:flex; gap:16px;
-      color:#8888aa; font-size:10px; z-index:100; white-space:nowrap;
+      background:#1a1a2e; border:1px solid #444;
+      padding:6px 16px; display:flex; gap:12px;
+      color:#777; font-size:10px; z-index:100; white-space:nowrap;
       pointer-events:none;
     }
-    #hint-bar b { color:#bbb; margin-right:2px; }
+    #hint-bar b { color:#999; margin-right:2px; }
   </style>
 </head>
 <body>
@@ -134,31 +123,19 @@
     </div>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+    <span class="param-lbl">材质</span>
     <span class="param-val" id="v-material">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
-    <span class="param-val highlight" id="v-volume">—</span>
-  </div>
-  <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
-    <span class="param-val" id="v-area-front">—</span>
-  </div>
-  <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
-    <span class="param-val" id="v-area-top">—</span>
-  </div>
-  <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🧱</span>砖块分片</span>
+    <span class="param-lbl">砖块分片</span>
     <span class="param-val" id="v-slc">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>轮廓顶点</span>
+    <span class="param-lbl">轮廓顶点</span>
     <span class="param-val" id="v-ver">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽</span>
+    <span class="param-lbl">钢筋槽</span>
     <span class="param-val" id="v-rebar">—</span>
   </div>
 </div>
@@ -377,30 +354,6 @@
 
     // 材质
     document.getElementById('v-material').textContent = D.material || 'AAC';
-
-    // 毛体积 (mm³ → dm³ 或 cm³)
-    var volMm3 = W * H * TH;
-    var volCm3 = volMm3 * 1e-3; // mm³ → cm³ (实际上 mm³/1000 = cm³? 需要看单位)
-    // 实际：1 mm = 0.001 m，所以 W*H*TH 单位是 mm³，1 cm³ = 1000 mm³
-    var volCm3Real = volMm3 / 1000;
-    document.getElementById('v-volume').textContent =
-      volCm3Real >= 1e6 ? (volCm3Real / 1e6).toFixed(1) + ' m³'
-      : volCm3Real >= 1000 ? (volCm3Real / 1000).toFixed(1) + ' dm³'
-      : (+volCm3Real).toFixed(1) + ' cm³';
-
-    // 正面面积 (W * H，单位 mm²)
-    var areaFrontMm2 = W * H;
-    var areaFrontCm2 = areaFrontMm2 / 100; // mm² → cm²
-    document.getElementById('v-area-front').textContent =
-      areaFrontCm2 >= 10000 ? (areaFrontCm2 / 10000).toFixed(1) + ' m²'
-      : (+areaFrontCm2).toFixed(1) + ' cm²';
-
-    // 顶面面积 (W * TH，单位 mm²)
-    var areaTopMm2 = W * TH;
-    var areaTopCm2 = areaTopMm2 / 100;
-    document.getElementById('v-area-top').textContent =
-      areaTopCm2 >= 10000 ? (areaTopCm2 / 10000).toFixed(1) + ' m²'
-      : (+areaTopCm2).toFixed(1) + ' cm²';
 
     document.getElementById('v-slc').textContent = D.slices.length + ' 块';
     document.getElementById('v-ver').textContent = D.wallContour.length + ' 个';

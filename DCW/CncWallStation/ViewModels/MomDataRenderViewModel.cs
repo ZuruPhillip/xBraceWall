@@ -526,29 +526,26 @@ namespace CncWallStation.ViewModels
             // 提取特征: Groove、MepSlot、Pocket、Hole
             var features = new List<object>();
 
-            foreach (var feature in momWall.Features)
-            {
-                if (feature is Groove groove)
-                {
-                    features.Add(SerializeGroove(groove));
-                }
-                else if (feature is MepSlot mepSlot)
-                {
-                    features.Add(SerializeMepSlot(mepSlot));
-                }
-                else if (feature is Pocket pocket)
-                {
-                    features.Add(SerializePocket(pocket));
-                }
-                else if (feature is Hole hole)
-                {
-                    features.Add(SerializeHole(hole));
-                }
-                else if (feature is RebarSlot rebarSlot)
-                {
-                    features.Add(SerializeRebarSlot(rebarSlot));
-                }
-            }
+			foreach (var feature in momWall.Features)
+			{
+				if (feature is Groove groove)
+				{
+					features.Add(SerializeGroove(groove));
+				}
+				else if (feature is Pocket pocket)
+				{
+					features.Add(SerializePocket(pocket));
+				}
+				else if (feature is Hole hole)
+				{
+					features.Add(SerializeHole(hole));
+				}
+				else if (feature is RebarSlot rebarSlot)
+				{
+					features.Add(SerializeRebarSlot(rebarSlot));
+				}
+				// MepSlot features are intentionally skipped (hidden from rendering)
+			}
 
             var material = momWall.Material ?? "AAC";
 

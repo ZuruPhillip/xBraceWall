@@ -124,26 +124,7 @@
 							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
 							ToolTip="对选中墙体执行完整管线：校验Bim→转换→校验Mom"/>
 
-					<Separator Style="{x:Null}" Width="1" Height="20" Background="#F0F0F0" Margin="4,0"/>
-
-					<!-- 审核 -->
-					<Button Content="✅ 审核"
-							Command="{Binding AuditSelectedCommand}"
-							Style="{StaticResource BaseButtonStyle}"
-							Width="80" Margin="0,0,4,2"
-							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
-							ToolTip="审核选中的墙体，锁定数据不可覆盖导入"/>
-
-					<Button Content="↩ 反审核"
-							Command="{Binding UnauditSelectedCommand}"
-							Style="{StaticResource BaseButtonStyle}"
-							Width="80" Margin="0,0,4,2"
-							IsEnabled="{Binding IsLoading, Converter={StaticResource BoolInvertConverter}}"
-							ToolTip="反审核选中的墙体，允许重新导入 BimData 测试"/>
-
-					<Separator Style="{x:Null}" Width="1" Height="20" Background="#F0F0F0" Margin="4,0"/>
-
-					<!-- 优先级 -->
+				<!-- 优先级 -->
 					<Button Content="▲ 提高"
 							Command="{Binding IncreasePriorityCommand}"
 							Style="{StaticResource BaseButtonStyle}"
@@ -236,23 +217,6 @@
 
 
 
-				<!-- 审核状态 -->
-				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
-					<TextBlock Text="审核:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
-					<ComboBox ItemsSource="{Binding AllAuditStatuses}"
-							  SelectedValue="{Binding FilterAuditStatus}"
-							  Style="{StaticResource BaseComboBoxStyle}" Height="28" Width="90"
-							  SelectionChanged="AuditStatusComboBox_SelectionChanged">
-						<ComboBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Converter={StaticResource AuditStatusToTextConverter}}" FontSize="11"/>
-							</DataTemplate>
-						</ComboBox.ItemTemplate>
-					</ComboBox>
-				</StackPanel>
-
-
-
 				<!-- 生产结束时间范围 -->
 				<StackPanel Orientation="Horizontal" Margin="0,0,16,4">
 					<TextBlock Text="生产结束时间:" Style="{StaticResource FilterLabelText}" Margin="0,0,6,0"/>
@@ -292,13 +256,6 @@
 				<ContextMenu>
 					<MenuItem Header="📋 复制" Click="ContextMenu_CopyCell"
 							  InputGestureText="Ctrl+C"/>
-					<Separator/>
-					<MenuItem Header="✏️ 修改墙体名称" Click="ContextMenu_RenameWall"
-							  Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-					<Separator/>
-					<MenuItem Header="🏗️ 查看BIM模型渲染" Click="ContextMenu_ViewDetail"/>
-					<MenuItem Header="🧱 查看MOM模型渲染" Click="ContextMenu_ViewMomRender"/>
-					<MenuItem Header="📝 编辑 JSON" Click="ContextMenu_EditJson"/>
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 
@@ -472,23 +429,6 @@
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
 
-				<!-- 审核状态 -->
-				<DataGridTemplateColumn Header="审核" Width="100">
-					<DataGridTemplateColumn.HeaderTemplate>
-						<DataTemplate>
-							<Button Content="审核 ▾" Background="Transparent" BorderThickness="0"
-									Command="{Binding DataContext.SortByCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-									CommandParameter="AuditStatus"
-									Cursor="Hand" FontWeight="SemiBold" FontSize="12"
-									Foreground="#262626"/>
-						</DataTemplate>
-					</DataGridTemplateColumn.HeaderTemplate>
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<ContentPresenter ContentTemplate="{StaticResource AuditStatusTagTemplate}"/>
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
 			</DataGrid.Columns>
 		</DataGrid>
 

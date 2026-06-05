@@ -14,31 +14,28 @@
     /* ══ 加载遮罩 ══ */
     #loading {
       position: absolute; inset: 0; z-index: 150;
-      background: rgba(15,23,42,.92); backdrop-filter: blur(6px);
+      background: rgba(15,23,42,.92);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: opacity .4s, visibility .4s;
     }
     #loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .spinner { width: 52px; height: 52px; border: 3px solid #1e293b;
-      border-top-color: #38bdf8; border-radius: 50%;
-      animation: spin .75s linear infinite; margin-bottom: 16px; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #333;
+      border-top-color: #888; border-radius: 50%;
+      animation: spin .75s linear infinite; margin-bottom: 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #loading-text { color: #94a3b8; font-size: 13px; letter-spacing: 1px; }
+    #loading-text { color: #999; font-size: 12px; }
 
     /* ══ 通用面板 ══ */
     .panel {
-      background: rgba(10,18,35,.88); backdrop-filter: blur(20px);
-      border: 1px solid rgba(148,163,184,.12); border-radius: 14px;
-      padding: 14px 16px; position: relative;
-      transition: border-color .25s, box-shadow .25s;
+      background: #1a1a2e;
+      border: 1px solid #333;
+      padding: 10px 12px; position: relative;
     }
     .panel-title {
-      font-size: 10px; font-weight: 700; color: #38bdf8;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 700; color: #aaa;
+      margin-bottom: 8px;
     }
-    .panel-title::before { content: ''; display: block;
-      width: 3px; height: 12px; background: #38bdf8; border-radius: 2px; }
+    .panel-title::before { display: none; }
 
     /* ══ 左侧面板 ══ */
     #left-panels {
@@ -60,253 +57,234 @@
 
     #wall-info-panel { min-width: 220px; }
     .dim-visual {
-      background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.1);
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;
-      display: flex; align-items: center; justify-content: space-around; gap: 6px;
+      background: #222; border: 1px solid #444;
+      padding: 8px 10px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-around; gap: 4px;
     }
-    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .dim-box-icon { font-size: 10px; color: #475569; letter-spacing: .5px; text-transform: uppercase; }
-    .dim-box-val { font-size: 15px; font-weight: 800; color: #e2e8f0;
-      font-variant-numeric: tabular-nums; line-height: 1; }
-    .dim-box-unit { font-size: 9px; color: #475569; }
-    .dim-sep { width: 1px; height: 32px; background: rgba(148,163,184,.1); }
+    .dim-box { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .dim-box-icon { font-size: 10px; color: #888; }
+    .dim-box-val { font-size: 14px; font-weight: 700; color: #ccc; }
+    .dim-box-unit { font-size: 9px; color: #888; }
+    .dim-sep { width: 1px; height: 28px; background: #444; }
     .param-row {
       display: flex; justify-content: space-between; align-items: center;
-      gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(148,163,184,.06);
+      gap: 8px; padding: 4px 0; border-bottom: 1px solid #333;
     }
     .param-row:last-child { border-bottom: none; }
-    .param-lbl { color: #64748b; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+    .param-lbl { color: #999; font-size: 11px; }
     .param-lbl .plbl-icon { font-size: 12px; }
-    .param-val { color: #e2e8f0; font-weight: 600; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+    .param-val { color: #ccc; font-weight: 600; font-size: 11px; }
     .param-val.highlight { color: #38bdf8; }
     .param-val.warn { color: #fbbf24; }
 
     #legend-panel { min-width: 220px; }
-    .legend-item { display: flex; align-items: center; gap: 8px;
-      padding: 4px 0; cursor: pointer; transition: opacity .18s;
-      user-select: none; border-radius: 6px; padding: 4px 6px; }
-    .legend-item:hover { opacity: .72; background: rgba(148,163,184,.04); }
-    .legend-item.off { opacity: .38; text-decoration: line-through; text-decoration-color: rgba(148,163,184,.35); }
+    .legend-item { display: flex; align-items: center; gap: 6px;
+      padding: 3px 0; cursor: pointer;
+      user-select: none; }
+    .legend-item:hover { opacity: .7; }
+    .legend-item.off { opacity: .4; text-decoration: line-through; }
     .legend-item.off .legend-dot { filter: grayscale(60%); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .legend-label { color: #cbd5e1; font-size: 11.5px; line-height: 1.4; }
-    .legend-count { margin-left: auto; color: #475569; font-size: 10px;
-      background: rgba(148,163,184,.08); border-radius: 4px; padding: 1px 6px; }
+    .legend-dot { width: 10px; height: 10px; flex-shrink: 0; }
+    .legend-label { color: #aaa; font-size: 11px; }
+    .legend-count { margin-left: auto; color: #777; font-size: 10px; }
 
 
     #hint {
-      color: #475569; font-size: 10.5px; line-height: 2;
+      color: #777; font-size: 10px; line-height: 1.8;
     }
-    #hint b { color: #64748b; }
+    #hint b { color: #999; }
 
     /* ══ 底部操作提示栏 ══ */
     #hint-bar {
       position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-      background: rgba(10,18,35,.82); backdrop-filter: blur(12px);
-      border: 1px solid rgba(148,163,184,.12); border-radius: 24px;
-      padding: 7px 22px; display: flex; gap: 12px;
-      color: #64748b; font-size: 10.5px; z-index: 10; white-space: nowrap;
+      background: #1a1a2e; border: 1px solid #444;
+      padding: 6px 16px; display: flex; gap: 12px;
+      color: #777; font-size: 10px; z-index: 10; white-space: nowrap;
     }
-    #hint-bar b { color: #94a3b8; margin-right: 2px; }
+    #hint-bar b { color: #999; margin-right: 2px; }
 
     /* ══ 工具栏按钮 ══ */
     .toolbar-btn {
-      background: rgba(56,189,248,.06); border: 1px solid rgba(56,189,248,.15);
-      border-radius: 6px; color: #94a3b8; font-size: 10.5px;
-      padding: 3px 10px; cursor: pointer; transition: all .2s;
+      background: #222; border: 1px solid #555;
+      color: #aaa; font-size: 10px;
+      padding: 3px 8px; cursor: pointer;
       display: flex; align-items: center; gap: 4px; user-select: none;
     }
-    .toolbar-btn:hover { background: rgba(56,189,248,.14); border-color: rgba(56,189,248,.3); color: #e2e8f0; }
-    .toolbar-btn.on { background: rgba(56,189,248,.18); border-color: #38bdf8; color: #38bdf8; }
-    .toolbar-btn.off { background: rgba(148,163,184,.03); border-color: rgba(148,163,184,.06); color: #475569; }
-    .toolbar-btn .tb-dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+    .toolbar-btn:hover { background: #333; border-color: #777; color: #ddd; }
+    .toolbar-btn.on { background: #333; border-color: #888; color: #ddd; }
+    .toolbar-btn.off { background: #1a1a2e; border-color: #333; color: #666; }
+    .toolbar-btn .tb-dot { width: 6px; height: 6px; flex-shrink: 0; }
 
     /* ══ 错误 ══ */
     #error-toast {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      background: rgba(127,29,29,.96); border: 1px solid #ef4444;
-      border-radius: 12px; padding: 18px 26px; color: #fca5a5;
-      font-size: 13px; z-index: 300; text-align: center;
-      display: none; max-width: 380px; line-height: 1.6;
+      background: #300; border: 1px solid #f44;
+      padding: 14px 20px; color: #f88;
+      font-size: 12px; z-index: 300; text-align: center;
+      display: none; max-width: 380px; line-height: 1.5;
     }
-    #error-toast.show { display: block; animation: fadeIn .3s; }
-    @keyframes fadeIn {
-      from { opacity:0; transform:translate(-50%,-60%); }
-      to   { opacity:1; transform:translate(-50%,-50%); }
-    }
+    #error-toast.show { display: block; }
 
     /* ══ 凹槽悬浮信息卡 ══ */
     #groove-card {
       position: absolute; z-index: 100; pointer-events: none;
       width: 268px;
-      background: rgba(8,15,30,.96); backdrop-filter: blur(20px);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(148,163,184,.1);
-      opacity: 0; transform: translateY(6px) scale(.97);
-      transition: opacity .18s ease, transform .18s ease;
+      background: #1a1a2e; border: 1px solid #555;
+      opacity: 0;
     }
-    #groove-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+    #groove-card.visible { opacity: 1; }
     .gc-header {
-      padding: 10px 14px 9px;
-      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px 7px;
+      display: flex; align-items: center; gap: 7px;
+      border-bottom: 1px solid #333;
     }
-    .gc-type-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .gc-type-name { font-size: 12px; font-weight: 700; color: #f1f5f9; flex: 1; letter-spacing: .3px; }
-    .gc-id { font-size: 10px; color: #475569; font-family: monospace; }
+    .gc-type-dot { width: 10px; height: 10px; flex-shrink: 0; }
+    .gc-type-name { font-size: 11px; font-weight: 700; color: #ccc; flex: 1; }
+    .gc-id { font-size: 10px; color: #777; font-family: monospace; }
     .gc-dims {
       display: flex; gap: 0;
-      border-top: 1px solid rgba(148,163,184,.07);
-      border-bottom: 1px solid rgba(148,163,184,.07);
+      border-bottom: 1px solid #333;
     }
-    .gc-dim-cell { flex: 1; padding: 9px 6px; text-align: center; border-right: 1px solid rgba(148,163,184,.07); }
+    .gc-dim-cell { flex: 1; padding: 7px 5px; text-align: center; border-right: 1px solid #333; }
     .gc-dim-cell:last-child { border-right: none; }
-    .gc-dim-label { font-size: 9px; color: #475569; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
-    .gc-dim-value { font-size: 14px; font-weight: 800; color: #e2e8f0; font-variant-numeric: tabular-nums; line-height: 1; }
-    .gc-dim-unit  { font-size: 9px; color: #334155; margin-top: 2px; }
-    .gc-body { padding: 8px 14px 10px; }
+    .gc-dim-label { font-size: 9px; color: #888; margin-bottom: 2px; }
+    .gc-dim-value { font-size: 13px; font-weight: 700; color: #ccc; }
+    .gc-dim-unit  { font-size: 9px; color: #666; margin-top: 1px; }
+    .gc-body { padding: 6px 10px 8px; }
     .gc-row {
       display: flex; justify-content: space-between; align-items: baseline;
-      gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(148,163,184,.05);
+      gap: 6px; padding: 2px 0; border-bottom: 1px solid #2a2a3e;
     }
     .gc-row:last-child { border-bottom: none; }
-    .gc-row-label { font-size: 10.5px; color: #475569; }
-    .gc-row-val   { font-size: 10.5px; color: #cbd5e1; font-weight: 600;
+    .gc-row-label { font-size: 10px; color: #888; }
+    .gc-row-val   { font-size: 10px; color: #aaa; font-weight: 600;
       font-family: monospace; text-align: right; max-width: 160px;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .gc-pts-section { padding: 0 14px 12px; }
+    .gc-pts-section { padding: 0 10px 10px; }
     .gc-pts-title {
-      font-size: 9px; color: #334155; letter-spacing: 1px;
-      text-transform: uppercase; margin-bottom: 6px;
+      font-size: 9px; color: #666;
+      margin-bottom: 5px;
       display: flex; align-items: center; gap: 5px;
     }
-    .gc-pts-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); }
-    .gc-pts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 120px; overflow-y: auto; }
-    .gc-pt { background: rgba(56,189,248,.04); border: 1px solid rgba(56,189,248,.08); border-radius: 6px; padding: 5px 7px; }
-    .gc-pt-idx  { font-size: 9px; color: #334155; margin-bottom: 2px; }
-    .gc-pt-xyz  { font-size: 10px; color: #7dd3fc; font-family: monospace; line-height: 1.6; }
+    .gc-pts-title::before { content:''; flex:1; height:1px; background:#333; }
+    .gc-pts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; max-height: 120px; overflow-y: auto; }
+    .gc-pt { background: #222; border: 1px solid #333; padding: 4px 5px; }
+    .gc-pt-idx  { font-size: 9px; color: #666; margin-bottom: 2px; }
+    .gc-pt-xyz  { font-size: 10px; color: #aaa; font-family: monospace; line-height: 1.4; }
     .gc-normal-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(56,189,248,.08); border: 1px solid rgba(56,189,248,.15);
-      border-radius: 6px; padding: 3px 8px; font-size: 10px;
-      color: #7dd3fc; font-family: monospace; margin-top: 4px;
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #222; border: 1px solid #444;
+      padding: 2px 6px; font-size: 10px;
+      color: #aaa; font-family: monospace; margin-top: 3px;
     }
 
     /* ══ MepSlot 悬浮信息卡 ══ */
     #mep-card {
       position: absolute; z-index: 101; pointer-events: none;
       width: 268px;
-      background: rgba(8,15,30,.97); backdrop-filter: blur(20px);
-      border-radius: 14px; overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(251,191,36,.18);
-      opacity: 0; transform: translateY(6px) scale(.97);
-      transition: opacity .18s ease, transform .18s ease;
+      background: #1a1a2e; border: 1px solid #555;
+      opacity: 0;
       display: none;
     }
-    #mep-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+    #mep-card.visible { opacity: 1; }
     .mc-header {
-      padding: 10px 14px 9px;
-      background: linear-gradient(135deg, rgba(251,191,36,.08), rgba(245,158,11,.04));
-      display: flex; align-items: center; gap: 9px;
-      border-bottom: 1px solid rgba(251,191,36,.12);
+      padding: 8px 10px 7px;
+      background: #222;
+      display: flex; align-items: center; gap: 7px;
+      border-bottom: 1px solid #333;
     }
-    .mc-icon { font-size: 16px; }
-    .mc-title { font-size: 12px; font-weight: 700; color: #fde68a; flex: 1; letter-spacing: .3px; }
-    .mc-id { font-size: 10px; color: #78716c; font-family: monospace; }
+    .mc-icon { font-size: 14px; }
+    .mc-title { font-size: 11px; font-weight: 700; color: #ccc; flex: 1; }
+    .mc-id { font-size: 10px; color: #777; font-family: monospace; }
     .mc-meta {
       display: flex; gap: 0;
-      border-bottom: 1px solid rgba(148,163,184,.07);
+      border-bottom: 1px solid #333;
     }
-    .mc-meta-cell { flex: 1; padding: 8px 6px; text-align: center; border-right: 1px solid rgba(148,163,184,.07); }
+    .mc-meta-cell { flex: 1; padding: 7px 5px; text-align: center; border-right: 1px solid #333; }
     .mc-meta-cell:last-child { border-right: none; }
-    .mc-meta-label { font-size: 9px; color: #475569; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 3px; }
-    .mc-meta-value { font-size: 13px; font-weight: 800; color: #fde68a; font-variant-numeric: tabular-nums; line-height: 1; }
-    .mc-meta-unit  { font-size: 9px; color: #44403c; margin-top: 2px; }
-    .mc-body { padding: 8px 14px 6px; }
+    .mc-meta-label { font-size: 9px; color: #888; margin-bottom: 2px; }
+    .mc-meta-value { font-size: 13px; font-weight: 700; color: #ccc; }
+    .mc-meta-unit  { font-size: 9px; color: #666; margin-top: 1px; }
+    .mc-body { padding: 6px 10px 5px; }
     .mc-row {
       display: flex; justify-content: space-between; align-items: baseline;
-      gap: 8px; padding: 3px 0; border-bottom: 1px solid rgba(148,163,184,.05);
+      gap: 6px; padding: 2px 0; border-bottom: 1px solid #2a2a3e;
     }
     .mc-row:last-child { border-bottom: none; }
-    .mc-row-label { font-size: 10.5px; color: #57534e; }
-    .mc-row-val   { font-size: 10.5px; color: #d6d3d1; font-weight: 600; font-family: monospace; }
-    .mc-segs { padding: 0 14px 12px; }
+    .mc-row-label { font-size: 10px; color: #888; }
+    .mc-row-val   { font-size: 10px; color: #aaa; font-weight: 600; font-family: monospace; }
+    .mc-segs { padding: 0 10px 10px; }
     .mc-segs-title {
-      font-size: 9px; color: #44403c; letter-spacing: 1px; text-transform: uppercase;
-      margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+      font-size: 9px; color: #666;
+      margin-bottom: 5px; display: flex; align-items: center; gap: 5px;
     }
-    .mc-segs-title::before { content:''; flex:1; height:1px; background:rgba(148,163,184,.08); }
+    .mc-segs-title::before { content:''; flex:1; height:1px; background:#333; }
     .mc-seg-item {
-      background: rgba(251,191,36,.04); border: 1px solid rgba(251,191,36,.1);
-      border-radius: 7px; padding: 6px 9px; margin-bottom: 5px;
+      background: #222; border: 1px solid #333;
+      padding: 5px 7px; margin-bottom: 4px;
     }
     .mc-seg-item:last-child { margin-bottom: 0; }
     .mc-seg-type {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      padding: 2px 7px; border-radius: 4px; margin-bottom: 5px;
+      font-size: 9px; font-weight: 700;
+      padding: 2px 5px; margin-bottom: 4px;
     }
-    .mc-seg-type.line { background: rgba(56,189,248,.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,.2); }
-    .mc-seg-type.arc  { background: rgba(167,139,250,.12); color: #c4b5fd; border: 1px solid rgba(167,139,250,.2); }
-    .mc-seg-props { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
-    .mc-seg-prop { font-size: 10px; color: #78716c; }
-    .mc-seg-prop span { color: #d6d3d1; font-weight: 600; font-family: monospace; }
-    .mc-segs-scroll { max-height: 220px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(251,191,36,.2) transparent; }
+    .mc-seg-type.line { background: #223; color: #aaa; border: 1px solid #444; }
+    .mc-seg-type.arc  { background: #223; color: #aaa; border: 1px solid #444; }
+    .mc-seg-props { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 6px; }
+    .mc-seg-prop { font-size: 10px; color: #888; }
+    .mc-seg-prop span { color: #aaa; font-weight: 600; font-family: monospace; }
+    .mc-segs-scroll { max-height: 220px; overflow-y: auto; }
 
     /* ══ MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip 样式） ══ */
     #mom-tooltip {
       position: fixed;
-      background: rgba(8,8,28,0.95); backdrop-filter: blur(8px);
-      border: 1px solid #61dafb; border-radius: 10px;
-      padding: 10px 14px; color: #fff;
+      background: #222; border: 1px solid #555;
+      padding: 8px 12px; color: #ccc;
       pointer-events: none; z-index: 350; display: none;
       width: 268px;
-      box-shadow: 0 4px 20px rgba(97,218,251,0.20);
     }
     #mom-tooltip .mttitle {
-      color: #61dafb; font-weight: 700; font-size: 10px;
-      letter-spacing: 1.5px; margin-bottom: 8px; padding-bottom: 6px;
-      border-bottom: 1px solid rgba(97,218,251,0.15);
-      display: flex; align-items: center; gap: 6px;
+      color: #ccc; font-weight: 700; font-size: 11px;
+      margin-bottom: 6px; padding-bottom: 5px;
+      border-bottom: 1px solid #333;
+      display: flex; align-items: center; gap: 5px;
     }
     #mom-tooltip .mttitle-dot {
-      width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0;
+      width: 8px; height: 8px; flex-shrink: 0;
     }
-    #mom-tooltip .mtrow { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 4px; font-size: 11.5px; }
-    #mom-tooltip .mtkey { color: #8899bb; font-size: 10.5px; }
-    #mom-tooltip .mtval { color: #e2e8f0; font-weight: 600; font-size: 11px; font-family: monospace; }
-    #mom-tooltip .mtval.highlight { color: #61dafb; }
-    #mom-tooltip .mtsub { font-size: 9px; color: #556688; margin-top: 2px; }
+    #mom-tooltip .mtrow { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 3px; font-size: 11px; }
+    #mom-tooltip .mtkey { color: #888; font-size: 10px; }
+    #mom-tooltip .mtval { color: #ccc; font-weight: 600; font-size: 10px; font-family: monospace; }
+    #mom-tooltip .mtval.highlight { color: #ddd; }
+    #mom-tooltip .mtsub { font-size: 9px; color: #777; margin-top: 2px; }
 
     /* MepSlot 特征卡片特殊配色 */
     #mom-tooltip.mom-mep {
-      border-color: #fbbf24;
-      box-shadow: 0 4px 20px rgba(251,191,36,0.20);
+      border-color: #666;
     }
-    #mom-tooltip.mom-mep .mttitle { color: #fbbf24; border-bottom-color: rgba(251,191,36,0.15); }
-    #mom-tooltip.mom-mep .mtval.highlight { color: #fbbf24; }
+    #mom-tooltip.mom-mep .mttitle { color: #ccc; border-bottom-color: #333; }
+    #mom-tooltip.mom-mep .mtval.highlight { color: #ddd; }
 
     /* Hole 特征卡片特殊配色 */
     #mom-tooltip.mom-hole-round {
-      border-color: #22d3ee;
-      box-shadow: 0 4px 20px rgba(34,211,238,0.20);
+      border-color: #666;
     }
-    #mom-tooltip.mom-hole-round .mttitle { color: #22d3ee; border-bottom-color: rgba(34,211,238,0.15); }
-    #mom-tooltip.mom-hole-round .mtval.highlight { color: #22d3ee; }
+    #mom-tooltip.mom-hole-round .mttitle { color: #ccc; border-bottom-color: #333; }
+    #mom-tooltip.mom-hole-round .mtval.highlight { color: #ddd; }
 
     #mom-tooltip.mom-hole-slotted {
-      border-color: #f472b6;
-      box-shadow: 0 4px 20px rgba(244,114,182,0.20);
+      border-color: #666;
     }
-    #mom-tooltip.mom-hole-slotted .mttitle { color: #f472b6; border-bottom-color: rgba(244,114,182,0.15); }
-    #mom-tooltip.mom-hole-slotted .mtval.highlight { color: #f472b6; }
+    #mom-tooltip.mom-hole-slotted .mttitle { color: #ccc; border-bottom-color: #333; }
+    #mom-tooltip.mom-hole-slotted .mtval.highlight { color: #ddd; }
 
     /* RebarSlot 特征卡片特殊配色 */
     #mom-tooltip.mom-rebar {
-      border-color: #ff8c42;
-      box-shadow: 0 4px 20px rgba(255,140,66,0.25);
+      border-color: #666;
     }
-    #mom-tooltip.mom-rebar .mttitle { color: #ff8c42; border-bottom-color: rgba(255,140,66,0.15); }
-    #mom-tooltip.mom-rebar .mtval.highlight { color: #ff8c42; }
+    #mom-tooltip.mom-rebar .mttitle { color: #ccc; border-bottom-color: #333; }
+    #mom-tooltip.mom-rebar .mtval.highlight { color: #ddd; }
 
     /* 新增 Rebar 专属行 */
     #mtt-thread-row { display: none; }
@@ -411,47 +389,27 @@
           </div>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+          <span class="param-lbl">材质</span>
           <span class="param-val" id="d-material">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
-          <span class="param-val highlight" id="d-volume">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
-          <span class="param-val" id="d-area-front">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
-          <span class="param-val" id="d-area-top">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">⚖️</span>估算重量</span>
-          <span class="param-val warn" id="d-weight">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🕳</span>凹槽总数</span>
+          <span class="param-lbl">凹槽总数</span>
           <span class="param-val" id="d-groove-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔢</span>凹槽类型</span>
+          <span class="param-lbl">凹槽类型</span>
           <span class="param-val" id="d-groove-types">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔌</span>MEP槽数</span>
+          <span class="param-lbl">MEP槽数</span>
           <span class="param-val" id="d-mep-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🕳</span>圆孔数</span>
-          <span class="param-val" id="d-round-hole-count">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📍</span>剪力钉孔数</span>
+          <span class="param-lbl">剪力钉孔数</span>
           <span class="param-val" id="d-slotted-hole-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽数</span>
+          <span class="param-lbl">钢筋槽数</span>
           <span class="param-val" id="d-rebar-count">—</span>
         </div>
       </div>
@@ -1558,13 +1516,6 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
   document.getElementById('dv-height').textContent = (WH/S).toFixed(1);
   document.getElementById('dv-thick').textContent  = (WT/S).toFixed(1);
   document.getElementById('d-material').textContent = data.material ?? 'AAC';
-  const volM3=WL*WH*WT;
-  document.getElementById('d-volume').textContent = volM3.toFixed(1) + ' m³';
-  const aF=WL*WH, aT=WL*WT;
-  document.getElementById('d-area-front').textContent = aF.toFixed(1) + ' m²';
-  document.getElementById('d-area-top').textContent   = aT.toFixed(1) + ' m²';
-  const wKg=volM3*AAC_DENSITY;
-  document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(1)+' t':wKg.toFixed(1)+' kg';
   document.getElementById('d-groove-count').textContent = grooves.length+' 个';
   document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length+' 种';
   document.getElementById('d-mep-count').textContent = mepSlots.length+' 条';
@@ -1573,8 +1524,6 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
   console.log('[fillInfoPanel] holes count:', holeArr.length, 'shapes:', holeArr.map(h => h.shape));
   const roundHoles = holeArr.filter(h => isHoleRound(h.shape));
   const slottedHoles = holeArr.filter(h => isHoleSlotted(h.shape));
-  console.log('[fillInfoPanel] roundHoles:', roundHoles.length, 'slottedHoles:', slottedHoles.length);
-  document.getElementById('d-round-hole-count').textContent = roundHoles.length > 0 ? `${roundHoles.length} 个` : '—';
   document.getElementById('d-slotted-hole-count').textContent = slottedHoles.length > 0 ? `${slottedHoles.length} 个` : '—';
   // 钢筋槽统计
   const rbSlots = Array.isArray(rebarSlots) ? rebarSlots : [];
