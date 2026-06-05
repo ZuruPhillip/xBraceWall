@@ -40,7 +40,7 @@
         /// 钢柱底板槽标准切削深度（mm）
         /// 钢柱嵌入 AAC 墙体的标准深度
         /// </summary>
-        public const float BaseBracketGrooveDepth = 63f;
+        public const float BaseBracketGrooveDepth = 130f;
 
         /// <summary>
         /// 钢柱底板槽标准切削长度（mm）
@@ -52,7 +52,7 @@
         /// 钢柱底板槽标准切削宽度（mm）
         /// 钢柱嵌入 AAC 墙体的标准宽度
         /// </summary>
-        public const float BaseBracketGrooveWidth = 130f;
+        public const float BaseBracketGrooveWidth = 63f;
 
 
         // ══════════════════════════════════════════════════════════
@@ -63,7 +63,7 @@
         /// 钢柱顶板槽标准切削深度（mm）
         /// 钢柱嵌入 AAC 墙体的标准深度
         /// </summary>
-        public const float TopBracketGrooveDepth = 39f;
+        public const float TopBracketGrooveDepth = 123f;
 
         /// <summary>
         /// 钢柱顶板槽标准切削长度（mm）
@@ -75,7 +75,7 @@
         /// 钢柱顶板槽标准切削宽度（mm）
         /// 钢柱嵌入 AAC 墙体的标准宽度
         /// </summary>
-        public const float TopBracketGrooveWidth = 123f;
+        public const float TopBracketGrooveWidth = 39f;
 
         // ══════════════════════════════════════════════════════════
         // 顶板槽基础尺寸
