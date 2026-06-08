@@ -254,6 +254,8 @@
 
 			<DataGrid.ContextMenu>
 				<ContextMenu>
+					<MenuItem Header="✏️ 修改墙体名称" Click="ContextMenu_RenameWall"/>
+					<Separator/>
 					<MenuItem Header="📋 复制" Click="ContextMenu_CopyCell"
 							  InputGestureText="Ctrl+C"/>
 				</ContextMenu>
