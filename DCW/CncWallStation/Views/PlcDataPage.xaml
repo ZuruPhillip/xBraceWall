@@ -5,9 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:hc="https://handyorg.github.io/handycontrol"
       xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+      xmlns:l="clr-namespace:CncWallStation.Localization"
       xmlns:local="clr-namespace:CncWallStation.Views"
       mc:Ignorable="d"
-      Title="PLC指令单元"
+      Title="{l:Loc PageTitle_PlcData}"
       FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
     <Page.Resources>
@@ -32,15 +33,15 @@
                 BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <Border Width="4" Height="20" Background="#1890FF" CornerRadius="2" Margin="0,0,10,0" />
-                <TextBlock Text="PLC 指令单元" FontSize="18" FontWeight="Bold"
+                <TextBlock Text="{l:Loc PageTitle_PlcData}" FontSize="18" FontWeight="Bold"
                            Foreground="#333" VerticalAlignment="Center" Margin="0,0,20,0" />
-                <TextBlock Text="墙体 ID:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#666" />
+                <TextBlock Text="{l:Loc Label_WallIdPlc}" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#666" />
                 <TextBox x:Name="SearchBox" Width="300" Height="28"
                          Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
-                         hc:InfoElement.Placeholder="输入墙体 ID 回车搜索"
+                         hc:InfoElement.Placeholder="{l:Loc Placeholder_PlcSearch}"
                          Style="{StaticResource TextBoxExtend}"
                          KeyDown="SearchBox_OnKeyDown" />
-                <Button Content="搜索" Width="70" Height="28" Margin="8,0,0,0"
+                <Button Content="{l:Loc Common_Search}" Width="80" Height="28" Margin="8,0,0,0"
                         Command="{Binding SearchCommand}"
                         Style="{StaticResource ButtonPrimary}" />
             </StackPanel>
@@ -53,29 +54,29 @@
                 Visibility="{Binding IsWallLoaded, Converter={StaticResource BoolToVisibilityConverter}}">
             <WrapPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="墙体 ID: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_WallIdInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.WallId}" FontWeight="Bold" Foreground="#333" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="名称: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_NameInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.WallName}" FontWeight="Bold" Foreground="#333" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="版本: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_VersionInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.SchemaVersion}" Foreground="#555" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="审核: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_AuditInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.AuditStatus, Converter={StaticResource AuditStatusToTextConverter}}"
                                Foreground="{Binding WallInfo.AuditStatus, Converter={StaticResource AuditStatusToColorConverter}}"
                                FontWeight="Bold" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="项目号: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_ProjectInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.ProjectName}" Foreground="#555" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
-                    <TextBlock Text="楼层: " Foreground="Gray" />
+                    <TextBlock Text="{l:Loc Label_FloorInfo}" Foreground="Gray" />
                     <TextBlock Text="{Binding WallInfo.Floor}" Foreground="#555" />
                 </StackPanel>
             </WrapPanel>
@@ -88,34 +89,29 @@
                 Visibility="{Binding IsWallLoaded, Converter={StaticResource BoolToVisibilityConverter}}">
             <StackPanel Orientation="Horizontal">
                 <!-- 审核（已审核时置灰） -->
-                <Button Content="审核" Width="70" Height="30" Margin="0,0,6,0"
+                <Button Content="{l:Loc Button_Audit}" Width="100" Height="30" Margin="0,0,6,0"
                         Command="{Binding AuditCommand}"
                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}"
                         Style="{StaticResource ButtonDefault}" />
-                <!-- 反审核（未审核时置灰） -->
-                <Button Content="反审核" Width="70" Height="30" Margin="0,0,6,0"
+                <Button Content="{l:Loc Button_UnauditPlc}" Width="100" Height="30" Margin="0,0,6,0"
                         Command="{Binding UnauditCommand}"
                         IsEnabled="{Binding IsAudited}"
                         Style="{StaticResource ButtonDefault}" />
 
                 <Rectangle Width="1" Fill="#E0E0E0" Margin="6,4" />
 
-                <!-- 下发指令 -->
-                <Button Content="下发指令" Width="80" Height="30" Margin="6,0,6,0"
+                <Button Content="{l:Loc Button_SendCommand}" Width="110" Height="30" Margin="6,0,6,0"
                         Command="{Binding SendCommand}"
                         Style="{StaticResource ButtonDefault}" />
-                <!-- 重新生成（未审核时可用） -->
-                <Button Content="重新生成" Width="80" Height="30" Margin="0,0,6,0"
+                <Button Content="{l:Loc Button_Regenerate}" Width="110" Height="30" Margin="0,0,6,0"
                         Command="{Binding RegenerateCommand}"
                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}"
                         Style="{StaticResource ButtonDefault}" />
-                <!-- 保存草稿（未审核时可用） -->
-                <Button Content="保存草稿" Width="80" Height="30" Margin="0,0,6,0"
+                <Button Content="{l:Loc Button_SaveDraft}" Width="110" Height="30" Margin="0,0,6,0"
                         Command="{Binding SaveDraftCommand}"
                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}"
                         Style="{StaticResource ButtonDefault}" />
-                <!-- 清空面板（始终可用） -->
-                <Button Content="清空面板" Width="80" Height="30" Margin="6,0,0,0"
+                <Button Content="{l:Loc Button_ClearPanel}" Width="110" Height="30" Margin="6,0,0,0"
                         Command="{Binding ClearPanelCommand}"
                         Style="{StaticResource ButtonDefault}" />
             </StackPanel>
@@ -143,7 +139,7 @@
                         Background="White" CornerRadius="4"
                         BorderBrush="#E0E0E0" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="加工统计" FontWeight="Bold" FontSize="14"
+                        <TextBlock Text="{l:Loc Section_ProcessingStats}" FontWeight="Bold" FontSize="14"
                                    Margin="0,0,0,8" Foreground="#1890FF" />
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -158,13 +154,13 @@
                             </Grid.RowDefinitions>
 
                             <!-- 总指令条数 -->
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="总指令" Foreground="Gray" />
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Loc Stat_TotalInstructions}" Foreground="Gray" />
                             <TextBlock Grid.Row="0" Grid.Column="1"
                                        Text="{Binding Statistics.TotalInstructionCount, StringFormat={}{0} 条}"
                                        HorizontalAlignment="Right" Foreground="Gray" />
 
                             <!-- 换刀次数 -->
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="换刀次数" Foreground="Gray"
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Loc Stat_ToolChanges}" Foreground="Gray"
                                        Margin="0,4,0,0" />
                             <TextBlock Grid.Row="1" Grid.Column="1"
                                        Text="{Binding Statistics.ToolChangeCount}"
@@ -172,7 +168,7 @@
                                        Foreground="Orange" Margin="0,4,0,0" />
 
                             <!-- 总切削面积 -->
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="切削面积" Foreground="Gray"
+                            <TextBlock Grid.Row="2" Grid.Column="0"                            Text="{l:Loc Stat_CuttingArea}" Foreground="Gray"
                                        Margin="0,4,0,0" />
                             <TextBlock Grid.Row="2" Grid.Column="1"
                                        Text="{Binding Statistics.TotalCuttingArea, StringFormat={}{0:F0} mm²}"
@@ -180,7 +176,7 @@
                                        Foreground="DodgerBlue" Margin="0,4,0,0" />
 
                             <!-- 预估工时 -->
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="预估工时" Foreground="Gray"
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Loc Stat_EstimatedHours}" Foreground="Gray"
                                        Margin="0,4,0,0" />
                             <TextBlock Grid.Row="3" Grid.Column="1"
                                        Text="{Binding Statistics.EstimatedHours, StringFormat={}{0:F1} min}"
@@ -192,9 +188,9 @@
 
                 <!-- 特征分组标题 -->
                 <TextBlock Grid.Row="1" Margin="2,0,0,6" Foreground="Gray">
-                    <Run Text="特征分组 (" />
+                    <Run Text="{l:Loc Label_FeatureGroups}" />
                     <Run Text="{Binding FeatureGroups.Count, Mode=OneWay}" FontWeight="Bold" />
-                    <Run Text=" 组)" />
+                    <Run Text="{l:Loc Label_FeatureGroupsSuffix}" />
                 </TextBlock>
 
                 <!-- 特征列表 -->
@@ -248,7 +244,7 @@
                         Background="White"
                         Style="{StaticResource TabControlCapsule}">
                 <!-- Tab1: 指令表格 -->
-                <TabItem Header="指令数据">
+                <TabItem Header="{l:Loc Tab_InstructionData}">
                     <DataGrid ItemsSource="{Binding CurrentInstructions}"
                               SelectedItem="{Binding SelectedInstruction}"
                               AutoGenerateColumns="False"
@@ -310,7 +306,7 @@
                 </TabItem>
 
                 <!-- Tab2: 3D 渲染 -->
-                <TabItem Header="3D 渲染">
+                <TabItem Header="{l:Loc Tab_3DRender}">
                     <Grid>
                         <wv2:WebView2 x:Name="PlcWebView"
                                       NavigationCompleted="PlcWebView_NavigationCompleted"
@@ -325,17 +321,17 @@
                 Background="White" CornerRadius="4"
                 BorderBrush="#E0E0E0" BorderThickness="1">
             <TextBlock Foreground="Gray" FontSize="12">
-                <Run Text="总指令: " />
+                <Run Text="{l:Loc Status_TotalInstructions}" />
                 <Run Text="{Binding CurrentInstructions.Count, Mode=OneWay}" FontWeight="Bold" Foreground="#333" />
-                <Run Text=" | 选中特征: " />
+                <Run Text="{l:Loc Status_SelectedFeature}" />
                 <Run Text="{Binding SelectedGroup.FeatureName, Mode=OneWay, TargetNullValue=--}" FontWeight="Bold" Foreground="#1890FF" />
-                <Run Text=" | 换刀: " />
+                <Run Text="{l:Loc Status_ToolChange}" />
                 <Run Text="{Binding Statistics.ToolChangeCount, Mode=OneWay}" FontWeight="Bold" Foreground="#333" />
-                <Run Text=" 次 | 面积: " />
+                <Run Text="{l:Loc Status_Times}" />
                 <Run Text="{Binding Statistics.TotalCuttingArea, StringFormat={}{0:F0}, Mode=OneWay}" FontWeight="Bold" Foreground="#333" />
-                <Run Text=" mm² | 工时: " />
+                <Run Text="{l:Loc Status_AreaSuffix}" />
                 <Run Text="{Binding Statistics.EstimatedHours, StringFormat={}{0:F1}, Mode=OneWay}" FontWeight="Bold" Foreground="#333" />
-                <Run Text=" min" />
+                <Run Text="{l:Loc Status_TimeSuffix}" />
             </TextBlock>
         </Border>
     </Grid>

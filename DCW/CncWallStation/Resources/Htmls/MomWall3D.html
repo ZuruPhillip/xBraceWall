@@ -320,7 +320,7 @@
   <!-- 加载 -->
   <div id="loading" class="hidden">
     <div class="spinner"></div>
-    <div id="loading-text">解析 JSON 数据...</div>
+    <div id="loading-text" data-i18n="load_parsing">解析 JSON 数据...</div>
   </div>
 
   <!-- 错误 -->
@@ -334,9 +334,9 @@
       <span class="gc-id" id="gc-id"></span>
     </div>
     <div class="gc-dims">
-      <div class="gc-dim-cell"><div class="gc-dim-label">长度</div><div class="gc-dim-value" id="gc-len">—</div><div class="gc-dim-unit">mm</div></div>
-      <div class="gc-dim-cell"><div class="gc-dim-label">宽度</div><div class="gc-dim-value" id="gc-wid">—</div><div class="gc-dim-unit">mm</div></div>
-      <div class="gc-dim-cell"><div class="gc-dim-label">深度</div><div class="gc-dim-value" id="gc-dep">—</div><div class="gc-dim-unit">mm</div></div>
+      <div class="gc-dim-cell"><div class="gc-dim-label" data-i18n="gc_length">长度</div><div class="gc-dim-value" id="gc-len">—</div><div class="gc-dim-unit">mm</div></div>
+      <div class="gc-dim-cell"><div class="gc-dim-label" data-i18n="gc_width">宽度</div><div class="gc-dim-value" id="gc-wid">—</div><div class="gc-dim-unit">mm</div></div>
+      <div class="gc-dim-cell"><div class="gc-dim-label" data-i18n="gc_depth">深度</div><div class="gc-dim-value" id="gc-dep">—</div><div class="gc-dim-unit">mm</div></div>
     </div>
     <div class="gc-body" id="gc-body"></div>
     <div class="gc-pts-section" id="gc-pts-section"></div>
@@ -350,9 +350,9 @@
       <span class="mc-id" id="mc-id"></span>
     </div>
     <div class="mc-meta">
-      <div class="mc-meta-cell"><div class="mc-meta-label">总长</div><div class="mc-meta-value" id="mc-totlen">—</div><div class="mc-meta-unit">mm</div></div>
-      <div class="mc-meta-cell"><div class="mc-meta-label">默认宽</div><div class="mc-meta-value" id="mc-width">—</div><div class="mc-meta-unit">mm</div></div>
-      <div class="mc-meta-cell"><div class="mc-meta-label">分段数</div><div class="mc-meta-value" id="mc-segcnt">—</div><div class="mc-meta-unit">segs</div></div>
+      <div class="mc-meta-cell"><div class="mc-meta-label" data-i18n="mc_totlen">总长</div><div class="mc-meta-value" id="mc-totlen">—</div><div class="mc-meta-unit">mm</div></div>
+      <div class="mc-meta-cell"><div class="mc-meta-label" data-i18n="mc_width">默认宽</div><div class="mc-meta-value" id="mc-width">—</div><div class="mc-meta-unit">mm</div></div>
+      <div class="mc-meta-cell"><div class="mc-meta-label" data-i18n="mc_segcnt">分段数</div><div class="mc-meta-value" id="mc-segcnt">—</div><div class="mc-meta-unit">segs</div></div>
     </div>
     <div class="mc-body" id="mc-body"></div>
     <div class="mc-segs">
@@ -363,25 +363,25 @@
 
   <!-- MOM 特征悬浮面板（参考 BimWall3D #brick-tooltip 样式） -->
   <div id="mom-tooltip">
-    <div class="mttitle"><span class="mttitle-dot" id="mtt-dot"></span><span id="mtt-type">特征信息</span></div>
-    <div class="mtrow"><span class="mtkey">特征 ID</span><span class="mtval" id="mtt-id">—</span></div>
-    <div class="mtrow"><span class="mtkey">类型</span><span class="mtval" id="mtt-ftype">—</span></div>
-    <div class="mtrow"><span class="mtkey">长度 (L)</span><span class="mtval" id="mtt-len">—</span></div>
-    <div class="mtrow"><span class="mtkey">宽度 (W)</span><span class="mtval" id="mtt-wid">—</span></div>
-    <div class="mtrow"><span class="mtkey">深度 (D)</span><span class="mtval" id="mtt-dep">—</span></div>
-    <div class="mtrow"><span class="mtkey">切削面</span><span class="mtval highlight" id="mtt-face">—</span></div>
-    <div class="mtrow"><span class="mtkey">所在面</span><span class="mtval" id="mtt-side">—</span></div>
-    <div class="mtrow"><span class="mtkey">起点</span><span class="mtval" id="mtt-startpt">—</span></div>
-    <div class="mtrow"><span class="mtkey">终点</span><span class="mtval" id="mtt-endpt">—</span></div>
-    <div class="mtrow" id="mtt-center-row" style="display:none"><span class="mtkey">中心点</span><span class="mtval highlight" id="mtt-centerpt">—</span></div>
-    <div class="mtrow" id="mtt-radius-row" style="display:none"><span class="mtkey">圆角半径</span><span class="mtval" id="mtt-radius">—</span></div>
-    <div class="mtrow" id="mtt-arc-row1" style="display:none"><span class="mtkey">圆心</span><span class="mtval" id="mtt-arc-center">—</span></div>
-    <div class="mtrow" id="mtt-arc-row2" style="display:none"><span class="mtkey">半径</span><span class="mtval" id="mtt-arc-radius">—</span></div>
-    <div class="mtrow" id="mtt-hole-radius-row" style="display:none"><span class="mtkey">孔半径</span><span class="mtval highlight" id="mtt-hole-radius">—</span></div>
-    <div class="mtrow" id="mtt-hole-diameter-row" style="display:none"><span class="mtkey">孔直径</span><span class="mtval" id="mtt-hole-diameter">—</span></div>
-    <div class="mtrow" id="mtt-hole-slotlen-row" style="display:none"><span class="mtkey">腰孔长度</span><span class="mtval" id="mtt-hole-slotlen">—</span></div>
-    <div class="mtrow" id="mtt-hole-slotangle-row" style="display:none"><span class="mtkey">腰孔角度</span><span class="mtval" id="mtt-hole-slotangle">—</span></div>
-    <div class="mtrow" id="mtt-hole-shape-row" style="display:none"><span class="mtkey">孔形状</span><span class="mtval" id="mtt-hole-shape">—</span></div>
+    <div class="mttitle"><span class="mttitle-dot" id="mtt-dot"></span><span id="mtt-type" data-i18n="mom_feature_info">特征信息</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_feature_id">特征 ID</span><span class="mtval" id="mtt-id">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_type">类型</span><span class="mtval" id="mtt-ftype">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_length">长度 (L)</span><span class="mtval" id="mtt-len">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_width">宽度 (W)</span><span class="mtval" id="mtt-wid">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_depth">深度 (D)</span><span class="mtval" id="mtt-dep">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_cutface">切削面</span><span class="mtval highlight" id="mtt-face">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_side">所在面</span><span class="mtval" id="mtt-side">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_start">起点</span><span class="mtval" id="mtt-startpt">—</span></div>
+    <div class="mtrow"><span class="mtkey" data-i18n="mom_end">终点</span><span class="mtval" id="mtt-endpt">—</span></div>
+    <div class="mtrow" id="mtt-center-row" style="display:none"><span class="mtkey" data-i18n="mom_center">中心点</span><span class="mtval highlight" id="mtt-centerpt">—</span></div>
+    <div class="mtrow" id="mtt-radius-row" style="display:none"><span class="mtkey" data-i18n="mom_radius">圆角半径</span><span class="mtval" id="mtt-radius">—</span></div>
+    <div class="mtrow" id="mtt-arc-row1" style="display:none"><span class="mtkey" data-i18n="mom_arc_center">圆心</span><span class="mtval" id="mtt-arc-center">—</span></div>
+    <div class="mtrow" id="mtt-arc-row2" style="display:none"><span class="mtkey" data-i18n="mom_arc_radius">半径</span><span class="mtval" id="mtt-arc-radius">—</span></div>
+    <div class="mtrow" id="mtt-hole-radius-row" style="display:none"><span class="mtkey" data-i18n="mom_hole_radius">孔半径</span><span class="mtval highlight" id="mtt-hole-radius">—</span></div>
+    <div class="mtrow" id="mtt-hole-diameter-row" style="display:none"><span class="mtkey" data-i18n="mom_hole_diameter">孔直径</span><span class="mtval" id="mtt-hole-diameter">—</span></div>
+    <div class="mtrow" id="mtt-hole-slotlen-row" style="display:none"><span class="mtkey" data-i18n="mom_hole_slotlen">腰孔长度</span><span class="mtval" id="mtt-hole-slotlen">—</span></div>
+    <div class="mtrow" id="mtt-hole-slotangle-row" style="display:none"><span class="mtkey" data-i18n="mom_hole_slotangle">腰孔角度</span><span class="mtval" id="mtt-hole-slotangle">—</span></div>
+    <div class="mtrow" id="mtt-hole-shape-row" style="display:none"><span class="mtkey" data-i18n="mom_hole_shape">孔形状</span><span class="mtval" id="mtt-hole-shape">—</span></div>
     <div class="mtsub" id="mtt-sub"></div>
   </div>
 
@@ -390,68 +390,68 @@
     <div id="left-panels">
 
       <div class="panel" id="wall-info-panel">
-        <div class="panel-title">墙体信息</div>
+        <div class="panel-title" data-i18n="mom_wall_info">墙体信息</div>
         <div class="dim-visual">
           <div class="dim-box">
-            <span class="dim-box-icon">L 长度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_l">L 长度</span>
             <span class="dim-box-val" id="dv-length">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
           <div class="dim-sep"></div>
           <div class="dim-box">
-            <span class="dim-box-icon">H 高度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_h">H 高度</span>
             <span class="dim-box-val" id="dv-height">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
           <div class="dim-sep"></div>
           <div class="dim-box">
-            <span class="dim-box-icon">T 厚度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_t">T 厚度</span>
             <span class="dim-box-val" id="dv-thick">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+          <span class="param-lbl"><span class="plbl-icon">🏷</span><span data-i18n="mom_param_material">材质</span></span>
           <span class="param-val" id="d-material">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
+          <span class="param-lbl"><span class="plbl-icon">📦</span><span data-i18n="mom_param_volume">毛体积</span></span>
           <span class="param-val highlight" id="d-volume">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
+          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_frontarea">正面面积</span></span>
           <span class="param-val" id="d-area-front">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
+          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_toparea">顶面面积</span></span>
           <span class="param-val" id="d-area-top">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">⚖️</span>估算重量</span>
+          <span class="param-lbl"><span class="plbl-icon">⚖️</span><span data-i18n="mom_param_weight">估算重量</span></span>
           <span class="param-val warn" id="d-weight">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🕳</span>凹槽总数</span>
+          <span class="param-lbl"><span class="plbl-icon">🕳</span><span data-i18n="mom_param_grooves">凹槽总数</span></span>
           <span class="param-val" id="d-groove-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔢</span>凹槽类型</span>
+          <span class="param-lbl"><span class="plbl-icon">🔢</span><span data-i18n="mom_param_groovetypes">凹槽类型</span></span>
           <span class="param-val" id="d-groove-types">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔌</span>MEP槽数</span>
+          <span class="param-lbl"><span class="plbl-icon">🔌</span><span data-i18n="mom_param_mepcount">MEP槽数</span></span>
           <span class="param-val" id="d-mep-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🕳</span>圆孔数</span>
+          <span class="param-lbl"><span class="plbl-icon">🕳</span><span data-i18n="mom_param_roundholes">圆孔数</span></span>
           <span class="param-val" id="d-round-hole-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📍</span>剪力钉孔数</span>
+          <span class="param-lbl"><span class="plbl-icon">📍</span><span data-i18n="mom_param_slottedholes">剪力钉孔数</span></span>
           <span class="param-val" id="d-slotted-hole-count">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽数</span>
+          <span class="param-lbl"><span class="plbl-icon">🔩</span><span data-i18n="mom_param_rebarcount">钢筋槽数</span></span>
           <span class="param-val" id="d-rebar-count">—</span>
         </div>
       </div>
@@ -459,17 +459,17 @@
 
     <div id="right-panels">
       <div class="panel" id="legend-panel">
-        <div class="panel-title">图 例</div>
+        <div class="panel-title" data-i18n="mom_legend_title">图 例</div>
         <div id="legend-items"></div>
       </div>
     </div>
 
     <div id="hint-bar">
-      <span><b>左键</b> 旋转</span>
-      <span><b>右键</b> 平移</span>
-      <span><b>滚轮</b> 缩放</span>
-      <span><b>双击</b> 复位视角</span>
-      <span><b>悬停特征</b> 查看属性</span>
+      <span><b data-i18n="mom_hint_lmb">左键</b> <span data-i18n="mom_hint_rotate">旋转</span></span>
+      <span><b data-i18n="mom_hint_rmb">右键</b> <span data-i18n="mom_hint_pan">平移</span></span>
+      <span><b data-i18n="mom_hint_wheel">滚轮</b> <span data-i18n="mom_hint_zoom">缩放</span></span>
+      <span><b data-i18n="mom_hint_dblclick">双击</b> <span data-i18n="mom_hint_reset">复位视角</span></span>
+      <span><b data-i18n="mom_hint_hover_feature">悬停特征</b> <span data-i18n="mom_hint_view_props">查看属性</span></span>
     </div>
   </div>
 </div>
@@ -497,14 +497,15 @@ const S           = 0.001;
 const AAC_DENSITY = 650;
 
 const GROOVE_COLORS = {
-  steelColumn : { hex: 0xef5350, label: '钢柱槽',   css: '#ef5350' },
-  topBracket  : { hex: 0x42a5f5, label: '顶部托架', css: '#42a5f5' },
-  baseBracket : { hex: 0x66bb6a, label: '底部托架', css: '#66bb6a' },
-  topPlate    : { hex: 0xffa726, label: '顶板槽',   css: '#ffa726' },
-  glueSeal    : { hex: 0xf06292, label: '密封胶槽', css: '#f06292' },
-  pocket      : { hex: 0xAB47BC, label: '开关盒坑', css: '#AB47BC' },
-  default     : { hex: 0xce93d8, label: '其他凹槽', css: '#ce93d8' },
+  steelColumn : { hex: 0xef5350, cn:'钢柱槽',   en:'Steel Column', css: '#ef5350' },
+  topBracket  : { hex: 0x42a5f5, cn:'顶部托架', en:'Top Bracket', css: '#42a5f5' },
+  baseBracket : { hex: 0x66bb6a, cn:'底部托架', en:'Base Bracket', css: '#66bb6a' },
+  topPlate    : { hex: 0xffa726, cn:'顶板槽',   en:'Top Plate',   css: '#ffa726' },
+  glueSeal    : { hex: 0xf06292, cn:'密封胶槽', en:'Glue Seal',   css: '#f06292' },
+  pocket      : { hex: 0xAB47BC, cn:'开关盒坑', en:'Switch Box Pocket', css: '#AB47BC' },
+  default     : { hex: 0xce93d8, cn:'其他凹槽', en:'Other Groove', css: '#ce93d8' },
 };
+(function(){ Object.keys(GROOVE_COLORS).forEach(k=>{ if(GROOVE_COLORS[k].label===undefined) GROOVE_COLORS[k].label=GROOVE_COLORS[k].cn; }); })();
 
 const HOLE_COLOR_ROUND   = new THREE.Color(0x22d3ee); // 青色 — 圆孔
 const HOLE_COLOR_SLOTTED = new THREE.Color(0xf472b6); // 粉色 — 腰孔
@@ -1584,9 +1585,9 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
 function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
   const el=document.getElementById('legend-items'); el.innerHTML='';
   const items = [
-    {label:'AAC 墙体主体', css:'#c8d0d8', count:1, key:'wall'},
+    {label:window.t('legend_wall_body'), css:'#c8d0d8', count:1, key:'wall'},
     ...[...usedTypes].map(k=>({
-      label:(GROOVE_COLORS[k]??GROOVE_COLORS.default).label,
+      label:window.t('groove_'+k)||GROOVE_COLORS[k]?.label||k,
       css  :(GROOVE_COLORS[k]??GROOVE_COLORS.default).css,
       count:typeCount[k]??0,
       key:'groove',
@@ -1597,10 +1598,20 @@ function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
   const roundHoles = holeArr.filter(h => isHoleRound(h.shape));
   const slottedHoles = holeArr.filter(h => isHoleSlotted(h.shape));
   if (roundHoles.length > 0) {
-    items.push({label:'圆孔 (Hole)', css:'#22d3ee', count:roundHoles.length, key:'holeRound'});
+    items.push({label:window.t('legend_round_hole'), css:'#22d3ee', count:roundHoles.length, key:'holeRound'});
   }
   if (slottedHoles.length > 0) {
-    items.push({label:'剪力钉孔', css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
+    items.push({label:window.t('legend_slotted_hole'), css:'#f472b6', count:slottedHoles.length, key:'holeSlotted'});
+  }
+  // 钢筋槽图例
+  const rebarArr = Array.isArray(rebarSlots) ? rebarSlots : [];
+  if (rebarArr.length > 0) {
+    items.push({label:window.t('legend_rebar'), css:'#e0b0ff', count:rebarArr.length, key:'rebar'});
+  }
+  // MEP 图例
+  if (hasMep) {
+    items.push({label:window.t('legend_mep_line'), css:'#fbbf24', count:0, key:'mepLine'});
+    items.push({label:window.t('legend_mep_arc'),  css:'#a78bfa', count:0, key:'mepArc'});
   }
   // 钢筋槽图例
   if (Array.isArray(rebarSlots) && rebarSlots.length > 0) {
@@ -2122,6 +2133,163 @@ window.resetAllLayers = function() {
 };
 
 
+</script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  i18n 国际化脚本                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<script>
+(function () {
+  var lang = 'zh';
+
+  var I18N = {
+    load_parsing: { zh: '解析 JSON 数据...', en: 'Parsing JSON data...' },
+    mom_wall_info: { zh: '墙体信息', en: 'Wall Info' },
+    mom_dim_l: { zh: 'L 长度', en: 'L Length' },
+    mom_dim_h: { zh: 'H 高度', en: 'H Height' },
+    mom_dim_t: { zh: 'T 厚度', en: 'T Thickness' },
+    mom_param_material: { zh: '材质', en: 'Material' },
+    mom_param_volume: { zh: '毛体积', en: 'Gross Volume' },
+    mom_param_frontarea: { zh: '正面面积', en: 'Front Area' },
+    mom_param_toparea: { zh: '顶面面积', en: 'Top Area' },
+    mom_param_weight: { zh: '估算重量', en: 'Est. Weight' },
+    mom_param_grooves: { zh: '凹槽总数', en: 'Groove Count' },
+    mom_param_groovetypes: { zh: '凹槽类型', en: 'Groove Types' },
+    mom_param_mepcount: { zh: 'MEP槽数', en: 'MEP Count' },
+    mom_param_roundholes: { zh: '圆孔数', en: 'Round Holes' },
+    mom_param_slottedholes: { zh: '剪力钉孔数', en: 'Slotted Holes' },
+    mom_param_rebarcount: { zh: '钢筋槽数', en: 'Rebar Slots' },
+    mom_legend_title: { zh: '图 例', en: 'Legend' },
+    legend_wall_body: { zh: 'AAC 墙体主体', en: 'AAC Wall Body' },
+    legend_round_hole: { zh: '圆孔 (Hole)', en: 'Round Hole' },
+    legend_slotted_hole: { zh: '剪力钉孔', en: 'Slotted Hole' },
+    legend_rebar: { zh: '钢筋槽', en: 'Rebar Slot' },
+    legend_mep_line: { zh: 'MEP 管槽 (Line)', en: 'MEP Slot (Line)' },
+    legend_mep_arc: { zh: 'MEP 弧槽 (Arc)', en: 'MEP Arc Slot' },
+    mom_hint_lmb: { zh: '左键', en: 'LMB' },
+    mom_hint_rotate: { zh: '旋转', en: 'Rotate' },
+    mom_hint_rmb: { zh: '右键', en: 'RMB' },
+    mom_hint_pan: { zh: '平移', en: 'Pan' },
+    mom_hint_wheel: { zh: '滚轮', en: 'Wheel' },
+    mom_hint_zoom: { zh: '缩放', en: 'Zoom' },
+    mom_hint_dblclick: { zh: '双击', en: 'DblClick' },
+    mom_hint_reset: { zh: '复位视角', en: 'Reset View' },
+    mom_hint_hover_feature: { zh: '悬停特征', en: 'Hover Feature' },
+    mom_hint_view_props: { zh: '查看属性', en: 'View Props' },
+    gc_length: { zh: '长度', en: 'Length' },
+    gc_width: { zh: '宽度', en: 'Width' },
+    gc_depth: { zh: '深度', en: 'Depth' },
+    gc_cutface: { zh: '切削面', en: 'Cut Face' },
+    gc_cutdepth: { zh: '切削深度', en: 'Cut Depth' },
+    gc_slotwidth: { zh: '槽宽', en: 'Slot Width' },
+    gc_slotlen: { zh: '槽长', en: 'Slot Length' },
+    gc_start_xy: { zh: '起点 X/Y', en: 'Start X/Y' },
+    gc_end_xy: { zh: '终点 X/Y', en: 'End X/Y' },
+    gc_initial_side: { zh: '初始面', en: 'Initial Side' },
+    gc_current_side: { zh: '当前面', en: 'Current Side' },
+    mc_totlen: { zh: '总长', en: 'Total Len' },
+    mc_width: { zh: '默认宽', en: 'Default W' },
+    mc_segcnt: { zh: '分段数', en: 'Segments' },
+    mc_face: { zh: '所在面', en: 'Face' },
+    mc_path_start: { zh: '路径起点', en: 'Path Start' },
+    mc_path_end: { zh: '路径终点', en: 'Path End' },
+    mc_uniform_depth: { zh: '均匀深度', en: 'Uniform Depth' },
+    mc_initial_side: { zh: '初始面', en: 'Initial Side' },
+    mc_current_side: { zh: '当前面', en: 'Current Side' },
+    mc_current_seg: { zh: '当前悬浮段', en: 'Current Segment' },
+    mom_feature_info: { zh: '特征信息', en: 'Feature Info' },
+    mom_feature_id: { zh: '特征 ID', en: 'Feature ID' },
+    mom_type: { zh: '类型', en: 'Type' },
+    mom_length: { zh: '长度 (L)', en: 'Length (L)' },
+    mom_width: { zh: '宽度 (W)', en: 'Width (W)' },
+    mom_depth: { zh: '深度 (D)', en: 'Depth (D)' },
+    mom_cutface: { zh: '切削面', en: 'Cut Face' },
+    mom_side: { zh: '所在面', en: 'Face' },
+    mom_start: { zh: '起点', en: 'Start' },
+    mom_end: { zh: '终点', en: 'End' },
+    mom_center: { zh: '中心点', en: 'Center' },
+    mom_radius: { zh: '圆角半径', en: 'Fillet Radius' },
+    mom_arc_center: { zh: '圆心', en: 'Arc Center' },
+    mom_arc_radius: { zh: '半径', en: 'Radius' },
+    mom_hole_radius: { zh: '孔半径', en: 'Hole Radius' },
+    mom_hole_diameter: { zh: '孔直径', en: 'Hole Diameter' },
+    mom_hole_slotlen: { zh: '腰孔长度', en: 'Slot Length' },
+    mom_hole_slotangle: { zh: '腰孔角度', en: 'Slot Angle' },
+    mom_hole_shape: { zh: '孔形状', en: 'Hole Shape' },
+    normal_front_z: { zh: '正面 (+Z)', en: 'Front (+Z)' },
+    normal_back_z: { zh: '背面 (−Z)', en: 'Back (−Z)' },
+    normal_top_y: { zh: '顶面 (+Y)', en: 'Top (+Y)' },
+    normal_bottom_y: { zh: '底面 (−Y)', en: 'Bottom (−Y)' },
+    normal_right_x: { zh: '右侧 (+X)', en: 'Right (+X)' },
+    normal_left_x: { zh: '左侧 (−X)', en: 'Left (−X)' },
+    groove_steel_column: { zh: '钢柱槽', en: 'Steel Column' },
+    groove_top_bracket: { zh: '顶部托架', en: 'Top Bracket' },
+    groove_base_bracket: { zh: '底部托架', en: 'Base Bracket' },
+    groove_top_plate: { zh: '顶板槽', en: 'Top Plate' },
+    groove_glue_seal: { zh: '密封胶槽', en: 'Glue Seal' },
+    groove_pocket: { zh: '开关盒坑', en: 'Pocket' },
+    groove_default: { zh: '其他凹槽', en: 'Other Groove' },
+    ftype_groove: { zh: '凹槽 (Groove)', en: 'Groove' },
+    ftype_hole_round: { zh: '圆孔 (Hole)', en: 'Round Hole' },
+    ftype_hole_slotted: { zh: '剪力钉孔', en: 'Slotted Hole' },
+    ftype_mep: { zh: 'MepSlot 管槽', en: 'MepSlot' },
+    ftype_rebar: { zh: '钢筋槽 (RebarSlot)', en: 'RebarSlot' },
+    hole_shape_round: { zh: '圆形', en: 'Round' },
+    hole_shape_slotted: { zh: '腰形', en: 'Slotted' },
+    hole_through: { zh: '✓ 通孔', en: '✓ Through' },
+    hole_blind: { zh: '✗ 盲孔', en: '✗ Blind' },
+    yes: { zh: '✓ 是', en: '✓ Yes' },
+    no: { zh: '✗ 否', en: '✗ No' },
+    cw: { zh: '顺时针', en: 'CW' },
+    ccw: { zh: '逆时针', en: 'CCW' },
+    rebar_vertical: { zh: '纵向 (Vertical)', en: 'Vertical' },
+    rebar_horizontal: { zh: '横向 (Horizontal)', en: 'Horizontal' },
+    mom_status_view_reset: { zh: '视角已重置', en: 'View reset' },
+    mom_status_parse_null: { zh: 'JSON 解析结果为空', en: 'JSON parse result is empty' },
+    mom_status_data_fail: { zh: 'C# 数据注入失败：', en: 'C# data injection failed: ' },
+    unit_pcs: { zh: '个', en: 'pcs' },
+    unit_types: { zh: '种', en: 'types' },
+    unit_slots: { zh: '条', en: 'slots' },
+    unit_segs: { zh: '段', en: 'segs' },
+    unit_t: { zh: ' t', en: ' t' },
+    unit_kg: { zh: ' kg', en: ' kg' },
+    seg_start: { zh: '起点', en: 'Start' },
+    seg_end: { zh: '终点', en: 'End' },
+    seg_length: { zh: '长度', en: 'Length' },
+    seg_depth: { zh: '深度', en: 'Depth' },
+    seg_width: { zh: '宽度', en: 'Width' },
+    seg_center: { zh: '圆心', en: 'Center' },
+    seg_radius: { zh: '半径', en: 'Radius' },
+    seg_direction: { zh: '方向', en: 'Direction' },
+    seg_current: { zh: '◀ 当前', en: '◀ Current' },
+  };
+
+  window.t = function(key) {
+    var entry = I18N[key];
+    if (!entry) return '[[' + key + ']]';
+    return entry[lang] || entry['zh'];
+  };
+
+  window.setLanguage = function(langCode) {
+    lang = langCode === 'en' ? 'en' : 'zh';
+    document.documentElement.lang = lang === 'en' ? 'en-US' : 'zh-CN';
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      var entry = I18N[key];
+      if (entry) { el.textContent = entry[lang] || entry['zh']; }
+    });
+    // 同步更新 GROOVE_COLORS 标签
+    Object.keys(GROOVE_COLORS).forEach(function(k) {
+      var entry = I18N['groove_'+k];
+      if (entry && GROOVE_COLORS[k]) {
+        GROOVE_COLORS[k].label = entry[lang] || entry['zh'];
+      }
+    });
+    document.title = lang === 'zh' ? 'AAC 墙体 CSG 渲染器' : 'AAC Wall CSG Renderer';
+  };
+
+  window.getCurrentLanguage = function() { return lang; };
+})();
 </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Extensions;
+using CncWallStation.Localization;
 using CncWallStation.Services.Application;
 using CncWallStation.Services.Configs;
 using CncWallStation.Services.DataCheck;
@@ -104,6 +105,9 @@ namespace CncWallStation
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // 加载上次保存的语言偏好
+            LocalizationService.Instance.LoadSavedLanguage();
+
             HostApp.StartAsync().GetAwaiter().GetResult();
 
             using (var scope = HostApp.Services.CreateScope())

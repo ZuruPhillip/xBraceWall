@@ -79,4 +79,110 @@
         Slotted
     }
 
+    /// <summary>FeatureType 扩展方法</summary>
+    public static class FeatureTypeExtensions
+    {
+        public static string ToDisplayText(this FeatureType ft) => ft switch
+        {
+            FeatureType.Groove => "矩形切槽",
+            FeatureType.Hole => "开孔",
+            FeatureType.Pocket => "矩形挖坑",
+            FeatureType.MepSlot => "电线管道线槽",
+            FeatureType.RebarSlot => "钢筋槽",
+            FeatureType.Propping => "斜撑",
+            FeatureType.Window => "窗口",
+            FeatureType.PolygonCut => "多边形切割",
+            _ => ft.ToString()
+        };
+
+        public static string ToDisplayTextEn(this FeatureType ft) => ft switch
+        {
+            FeatureType.Groove => "Groove",
+            FeatureType.Hole => "Hole",
+            FeatureType.Pocket => "Pocket",
+            FeatureType.MepSlot => "MEP Slot",
+            FeatureType.RebarSlot => "Rebar Slot",
+            FeatureType.Propping => "Propping",
+            FeatureType.Window => "Window",
+            FeatureType.PolygonCut => "Polygon Cut",
+            _ => ft.ToString()
+        };
+    }
+
+    /// <summary>MachineSide 扩展方法</summary>
+    public static class MachineSideExtensions
+    {
+        public static string ToDisplayText(this MachineSide ms) => ms switch
+        {
+            MachineSide.Top => "顶面",
+            MachineSide.Bottom => "底面",
+            MachineSide.Front => "前面",
+            MachineSide.Back => "后面",
+            MachineSide.Right => "右面",
+            MachineSide.Left => "左面",
+            MachineSide.Custom => "自定义",
+            _ => ms.ToString()
+        };
+
+        public static string ToDisplayTextEn(this MachineSide ms) => ms switch
+        {
+            MachineSide.Top => "Top",
+            MachineSide.Bottom => "Bottom",
+            MachineSide.Front => "Front",
+            MachineSide.Back => "Back",
+            MachineSide.Right => "Right",
+            MachineSide.Left => "Left",
+            MachineSide.Custom => "Custom",
+            _ => ms.ToString()
+        };
+    }
+
+    /// <summary>GrooveType 扩展方法</summary>
+    public static class GrooveTypeExtensions
+    {
+        public static string ToDisplayText(this GrooveType gt) => gt switch
+        {
+            GrooveType.General => "通用槽",
+            GrooveType.SteelColumn => "钢柱槽",
+            GrooveType.XBraceSteel => "斜撑钢槽",
+            GrooveType.BaseBracket => "钢柱底板槽",
+            GrooveType.TopBracket => "钢柱顶板槽",
+            GrooveType.TopPlate => "顶板槽",
+            GrooveType.GlueSeal => "胶水密封槽",
+            GrooveType.Custom => "自定义",
+            _ => gt.ToString()
+        };
+
+        public static string ToDisplayTextEn(this GrooveType gt) => gt switch
+        {
+            GrooveType.General => "General",
+            GrooveType.SteelColumn => "Steel Column",
+            GrooveType.XBraceSteel => "X-Brace Steel",
+            GrooveType.BaseBracket => "Base Bracket",
+            GrooveType.TopBracket => "Top Bracket",
+            GrooveType.TopPlate => "Top Plate",
+            GrooveType.GlueSeal => "Glue Seal",
+            GrooveType.Custom => "Custom",
+            _ => gt.ToString()
+        };
+    }
+
+    /// <summary>HoleShape 扩展方法</summary>
+    public static class HoleShapeExtensions
+    {
+        public static string ToDisplayText(this HoleShape hs) => hs switch
+        {
+            HoleShape.Round => "圆形孔",
+            HoleShape.Slotted => "腰孔",
+            _ => hs.ToString()
+        };
+
+        public static string ToDisplayTextEn(this HoleShape hs) => hs switch
+        {
+            HoleShape.Round => "Round",
+            HoleShape.Slotted => "Slotted",
+            _ => hs.ToString()
+        };
+    }
+
 }

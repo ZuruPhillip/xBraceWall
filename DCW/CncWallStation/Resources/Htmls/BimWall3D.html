@@ -113,92 +113,97 @@
 <body>
 
 <div class="panel" id="info-panel">
-  <div class="panel-title">墙体信息</div>
+  <div class="panel-title" data-i18n="info_panel_title">墙体信息</div>
   <div class="dim-visual">
     <div class="dim-box">
-      <span class="dim-box-icon">L 长度</span>
+      <span class="dim-box-icon" data-i18n="dim_length">L 长度</span>
       <span class="dim-box-val" id="v-x">—</span>
       <span class="dim-box-unit">mm</span>
     </div>
     <div class="dim-sep"></div>
     <div class="dim-box">
-      <span class="dim-box-icon">H 高度</span>
+      <span class="dim-box-icon" data-i18n="dim_height">H 高度</span>
       <span class="dim-box-val" id="v-y">—</span>
       <span class="dim-box-unit">mm</span>
     </div>
     <div class="dim-sep"></div>
     <div class="dim-box">
-      <span class="dim-box-icon">T 厚度</span>
+      <span class="dim-box-icon" data-i18n="dim_thickness">T 厚度</span>
       <span class="dim-box-val" id="v-z">—</span>
       <span class="dim-box-unit">mm</span>
     </div>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🏷</span>材质</span>
+    <span class="param-lbl"><span class="plbl-icon">🏷</span><span data-i18n="param_material">材质</span></span>
     <span class="param-val" id="v-material">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📦</span>毛体积</span>
+    <span class="param-lbl"><span class="plbl-icon">📦</span><span data-i18n="param_volume">毛体积</span></span>
     <span class="param-val highlight" id="v-volume">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>正面面积</span>
+    <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="param_front_area">正面面积</span></span>
     <span class="param-val" id="v-area-front">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>顶面面积</span>
+    <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="param_top_area">顶面面积</span></span>
     <span class="param-val" id="v-area-top">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🧱</span>砖块分片</span>
+    <span class="param-lbl"><span class="plbl-icon">🧱</span><span data-i18n="param_slices">砖块分片</span></span>
     <span class="param-val" id="v-slc">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span>轮廓顶点</span>
+    <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="param_vertices">轮廓顶点</span></span>
     <span class="param-val" id="v-ver">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">🔩</span>钢筋槽</span>
+    <span class="param-lbl"><span class="plbl-icon">🔩</span><span data-i18n="param_rebar">钢筋槽</span></span>
     <span class="param-val" id="v-rebar">—</span>
   </div>
 </div>
 
 <div class="panel" id="legend">
-  <div class="panel-title">图例</div>
-  <div class="item"><div class="dot" style="background:#c8d0d8;opacity:.45;"></div>AAC 整体墙体</div>
-  <div class="item"><div class="dot" style="background:#d5d5d5;"></div>砖块 · 列 0</div>
-  <div class="item"><div class="dot" style="background:#c8c8c8;"></div>砖块 · 列 1</div>
-  <div class="item"><div class="dot" style="background:#bbbbbb;"></div>砖块 · 列 2</div>
-  <div class="item"><div class="dot" style="background:#ff6060;height:3px;border-radius:1px;"></div>竖向胶缝</div>
-  <div class="item"><div class="dot" style="background:#ffd700;"></div>尺寸标注</div>
-  <div class="item"><div class="dot" style="background:#00ffcc;"></div>悬停高亮边</div>
-  <div class="item"><div class="dot" style="background:#ff8c42;"></div>钢筋槽</div>
+  <div class="panel-title" data-i18n="legend_title">图例</div>
+  <div class="item"><div class="dot" style="background:#c8d0d8;opacity:.45;"></div><span data-i18n="legend_wall">AAC 整体墙体</span></div>
+  <div class="item"><div class="dot" style="background:#d5d5d5;"></div><span data-i18n="legend_brick_col0">砖块 · 列 0</span></div>
+  <div class="item"><div class="dot" style="background:#c8c8c8;"></div><span data-i18n="legend_brick_col1">砖块 · 列 1</span></div>
+  <div class="item"><div class="dot" style="background:#bbbbbb;"></div><span data-i18n="legend_brick_col2">砖块 · 列 2</span></div>
+  <div class="item"><div class="dot" style="background:#ff6060;height:3px;border-radius:1px;"></div><span data-i18n="legend_glue_joint">竖向胶缝</span></div>
+  <div class="item"><div class="dot" style="background:#ffd700;"></div><span data-i18n="legend_dims">尺寸标注</span></div>
+  <div class="item"><div class="dot" style="background:#00ffcc;"></div><span data-i18n="legend_hover_edge">悬停高亮边</span></div>
+  <div class="item"><div class="dot" style="background:#ff8c42;"></div><span data-i18n="legend_rebar_slots">钢筋槽</span></div>
 </div>
 
 <div id="brick-tooltip">
-  <div class="btitle">🪨 砖块信息</div>
-  <div class="brow"><span class="bkey">列号</span><span class="bval" id="bt-col">—</span></div>
-  <div class="brow"><span class="bkey">宽度 (X)</span><span class="bval" id="bt-w">—</span></div>
-  <div class="brow"><span class="bkey">高度 (Y)</span><span class="bval" id="bt-h">—</span></div>
-  <div class="brow"><span class="bkey">厚度 (Z)</span><span class="bval" id="bt-t">—</span></div>
-  <div class="brow"><span class="bkey">胶缝</span><span class="bval" id="bt-glue">—</span></div>
-  <div class="brow"><span class="bkey">零件号</span><span class="bval" id="bt-pn">—</span></div>
+  <div class="btitle">🪨 <span data-i18n="brick_tooltip_title">砖块信息</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_col">列号</span><span class="bval" id="bt-col">—</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_width">宽度 (X)</span><span class="bval" id="bt-w">—</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_height">高度 (Y)</span><span class="bval" id="bt-h">—</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_thickness">厚度 (Z)</span><span class="bval" id="bt-t">—</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_glue">胶缝</span><span class="bval" id="bt-glue">—</span></div>
+  <div class="brow"><span class="bkey" data-i18n="brick_partno">零件号</span><span class="bval" id="bt-pn">—</span></div>
 </div>
 
 <div id="rebar-tooltip">
-  <div class="rtitle">🔩 钢筋槽信息</div>
-  <div class="rrow"><span class="rkey">方向</span><span class="rval" id="rt-dir">—</span></div>
-  <div class="rrow"><span class="rkey">直径</span><span class="rval" id="rt-dia">—</span></div>
-  <div class="rrow"><span class="rkey">长度</span><span class="rval" id="rt-len">—</span></div>
-  <div class="rrow"><span class="rkey">深度</span><span class="rval" id="rt-dep">—</span></div>
-  <div class="rrow"><span class="rkey">零件号</span><span class="rval" id="rt-pn">—</span></div>
-  <div class="rrow"><span class="rkey">起点</span><span class="rval" id="rt-start">—</span></div>
-  <div class="rrow"><span class="rkey">终点</span><span class="rval" id="rt-end">—</span></div>
+  <div class="rtitle">🔩 <span data-i18n="rebar_tooltip_title">钢筋槽信息</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_direction">方向</span><span class="rval" id="rt-dir">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_diameter">直径</span><span class="rval" id="rt-dia">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_length">长度</span><span class="rval" id="rt-len">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_depth">深度</span><span class="rval" id="rt-dep">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_partno">零件号</span><span class="rval" id="rt-pn">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_start">起点</span><span class="rval" id="rt-start">—</span></div>
+  <div class="rrow"><span class="rkey" data-i18n="rebar_end">终点</span><span class="rval" id="rt-end">—</span></div>
 </div>
 
 <div id="hint-bar">
-  <span><b>左键</b>旋转</span><span><b>右键</b>平移</span><span><b>滚轮</b>缩放</span><span><b>双击</b>复位</span>
-  <span><b>悬停墙边</b>测量</span><span><b>悬停砖块</b>信息</span><span><b>悬停钢筋槽</b>信息</span>
+  <span><b data-i18n="hint_left_btn">左键</b><span data-i18n="hint_rotate">旋转</span></span>
+  <span><b data-i18n="hint_right_btn">右键</b><span data-i18n="hint_pan">平移</span></span>
+  <span><b data-i18n="hint_wheel">滚轮</b><span data-i18n="hint_zoom">缩放</span></span>
+  <span><b data-i18n="hint_dblclick">双击</b><span data-i18n="hint_reset">复位</span></span>
+  <span><b data-i18n="hint_hover_edge">悬停墙边</b><span data-i18n="hint_measure">测量</span></span>
+  <span><b data-i18n="hint_hover_brick">悬停砖块</b><span data-i18n="hint_info">信息</span></span>
+  <span><b data-i18n="hint_hover_rebar">悬停钢筋槽</b><span data-i18n="hint_rebar_info">信息</span></span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
@@ -254,9 +259,9 @@
     try {
       var D = JSON.parse(jsonStr);
       rebuildScene(D);
-      notifyRaw('status:场景重建完成');
+      notifyRaw('status:' + t('status_scene_rebuilt'));
     } catch (e) {
-      notifyRaw('status:数据解析失败: ' + e.message);
+      notifyRaw('status:' + t('status_parse_fail') + e.message);
     }
   };
 
@@ -269,7 +274,7 @@
       camera.position.copy(defaultPos);
       controls.target.copy(defaultTarget);
       controls.update();
-      notifyRaw('status:视角已重置');
+      notifyRaw('status:' + t('status_view_reset'));
     }
   };
 
@@ -333,7 +338,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    notifyRaw('status:渲染引擎就绪，等待数据注入');
+    notifyRaw('status:' + t('status_scene_ready'));
 
     (function animate() {
       animateId = requestAnimationFrame(animate);
@@ -402,9 +407,9 @@
       areaTopCm2 >= 10000 ? (areaTopCm2 / 10000).toFixed(1) + ' m²'
       : (+areaTopCm2).toFixed(1) + ' cm²';
 
-    document.getElementById('v-slc').textContent = D.slices.length + ' 块';
-    document.getElementById('v-ver').textContent = D.wallContour.length + ' 个';
-    document.getElementById('v-rebar').textContent = (D.rebarSlots && D.rebarSlots.length || 0) + ' 条';
+    document.getElementById('v-slc').textContent = D.slices.length + ' ' + t('brick_unit');
+    document.getElementById('v-ver').textContent = D.wallContour.length + ' ' + t('vertex_unit');
+    document.getElementById('v-rebar').textContent = (D.rebarSlots && D.rebarSlots.length || 0) + ' ' + t('rebar_unit');
 
     layers = { wall: new THREE.Group(), slices: new THREE.Group(), joints: new THREE.Group(), dim: new THREE.Group(), rebars: new THREE.Group() };
     for (var k in layers) scene.add(layers[k]);
@@ -571,7 +576,7 @@
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         mesh.userData = {
-          direction: isHoriz ? '水平槽 (X)' : '垂直槽 (Z)',
+          direction: isHoriz ? t('rebar_horiz') : t('rebar_vert'),
           diameter: sl.diameter,
           length: isHoriz ? dx : dz,
           depth: isHoriz ? (sl.horizontalDepth || sl.diameter) : (sl.verticalDepth || sl.diameter),
@@ -598,10 +603,8 @@
         edgeLine.position.copy(mesh.position);
         layers.rebars.add(edgeLine);
       });
-      notifyRaw('status:钢筋槽渲染完成 (' + D.rebarSlots.length + ' 条)');
+      notifyRaw('status:' + t('status_rebar_done_prefix') + D.rebarSlots.length + t('status_rebar_done_suffix'));
     }
-
-    // 地面 & 网格
     var gnd = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), new THREE.MeshStandardMaterial({ color: 0x181828, roughness: 1.0 }));
     gnd.rotation.x = -Math.PI / 2; gnd.position.set(cx, -3, cz); gnd.receiveShadow = true;
     scene.add(gnd);
@@ -623,15 +626,15 @@
     }
     var bW = (+(xMaxW - xMinW)).toFixed(1), bH = (+(yMaxW - yMinW)).toFixed(1), bT = (+TH).toFixed(1);
     EDGES = [
-      mkE(0, 1, '宽度边 X=' + bW + 'mm'), mkE(1, 2, '高度边 Y=' + bH + 'mm'),
-      mkE(2, 3, '宽度边 X=' + bW + 'mm'), mkE(3, 0, '高度边 Y=' + bH + 'mm'),
-      mkE(4, 5, '宽度边 X=' + bW + 'mm'), mkE(5, 6, '高度边 Y=' + bH + 'mm'),
-      mkE(6, 7, '宽度边 X=' + bW + 'mm'), mkE(7, 4, '高度边 Y=' + bH + 'mm'),
-      mkE(0, 4, '厚度边 Z=' + bT + 'mm'), mkE(1, 5, '厚度边 Z=' + bT + 'mm'),
-      mkE(2, 6, '厚度边 Z=' + bT + 'mm'), mkE(3, 7, '厚度边 Z=' + bT + 'mm')
+      mkE(0, 1, t('edge_width')+bW+'mm'), mkE(1, 2, t('edge_height')+bH+'mm'),
+      mkE(2, 3, t('edge_width')+bW+'mm'), mkE(3, 0, t('edge_height')+bH+'mm'),
+      mkE(4, 5, t('edge_width')+bW+'mm'), mkE(5, 6, t('edge_height')+bH+'mm'),
+      mkE(6, 7, t('edge_width')+bW+'mm'), mkE(7, 4, t('edge_height')+bH+'mm'),
+      mkE(0, 4, t('edge_thickness')+bT+'mm'), mkE(1, 5, t('edge_thickness')+bT+'mm'),
+      mkE(2, 6, t('edge_thickness')+bT+'mm'), mkE(3, 7, t('edge_thickness')+bT+'mm')
     ];
 
-    notifyRaw('status:场景重建完成');
+    notifyRaw('status:' + t('status_scene_rebuilt'));
   }
 
   function clearScene() {
@@ -770,11 +773,11 @@
         var ud = hits[0].object.userData;
         hlBrick(hits[0].object);
         // 仅首次显示时设置位置，之后不再跳动
-        document.getElementById('bt-col').textContent = '第 ' + ud.col + ' 列';
+        document.getElementById('bt-col').textContent = t('brick_col_prefix') + ud.col + t('brick_col_suffix');
         document.getElementById('bt-w').textContent = (+ud.brickW).toFixed(1) + ' mm';
         document.getElementById('bt-h').textContent = (+ud.brickH).toFixed(1) + ' mm';
         document.getElementById('bt-t').textContent = (+ud.brickT).toFixed(1) + ' mm';
-        document.getElementById('bt-glue').textContent = ud.hasGlue ? '✅ 有 (pn:' + ud.gluePn + ')' : '❌ 无';
+        document.getElementById('bt-glue').textContent = ud.hasGlue ? t('brick_glue_yes') + ud.gluePn + t('brick_glue_close') : t('brick_glue_no');
         document.getElementById('bt-pn').textContent = ud.pn || '—';
         if (!tipBShown) {
           tipB.style.display = 'block';
@@ -805,11 +808,129 @@
 
   /* ═══ 启动 ═══ */
   window.addEventListener('load', function () {
-    if (typeof THREE === 'undefined') { notifyRaw('status:Three.js 加载失败'); return; }
-    if (typeof THREE.OrbitControls === 'undefined') { notifyRaw('status:OrbitControls 加载失败'); return; }
+    if (typeof THREE === 'undefined') { notifyRaw('status:' + t('status_threejs_fail')); return; }
+    if (typeof THREE.OrbitControls === 'undefined') { notifyRaw('status:' + t('status_orbit_fail')); return; }
     initScene();
-    notifyRaw('status:渲染引擎初始化完成');
+    notifyRaw('status:' + t('status_engine_init'));
   });
+</script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  i18n 国际化脚本                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<script>
+(function () {
+  var lang = 'zh'; // default
+
+  var I18N = {
+    // 信息面板
+    info_panel_title: { zh: '墙体信息', en: 'Wall Info' },
+    dim_length: { zh: 'L 长度', en: 'L Length' },
+    dim_height: { zh: 'H 高度', en: 'H Height' },
+    dim_thickness: { zh: 'T 厚度', en: 'T Thickness' },
+    param_material: { zh: '材质', en: 'Material' },
+    param_volume: { zh: '毛体积', en: 'Gross Volume' },
+    param_front_area: { zh: '正面面积', en: 'Front Area' },
+    param_top_area: { zh: '顶面面积', en: 'Top Area' },
+    param_slices: { zh: '砖块分片', en: 'Brick Slices' },
+    param_vertices: { zh: '轮廓顶点', en: 'Contour Vertices' },
+    param_rebar: { zh: '钢筋槽', en: 'Rebar Slots' },
+    // 图例
+    legend_title: { zh: '图例', en: 'Legend' },
+    legend_wall: { zh: 'AAC 整体墙体', en: 'AAC Full Wall' },
+    legend_brick_col0: { zh: '砖块 · 列 0', en: 'Brick · Col 0' },
+    legend_brick_col1: { zh: '砖块 · 列 1', en: 'Brick · Col 1' },
+    legend_brick_col2: { zh: '砖块 · 列 2', en: 'Brick · Col 2' },
+    legend_glue_joint: { zh: '竖向胶缝', en: 'Vertical Glue Joint' },
+    legend_dims: { zh: '尺寸标注', en: 'Dimensions' },
+    legend_hover_edge: { zh: '悬停高亮边', en: 'Hover Highlight Edge' },
+    legend_rebar_slots: { zh: '钢筋槽', en: 'Rebar Slots' },
+    // 砖块悬浮
+    brick_tooltip_title: { zh: '砖块信息', en: 'Brick Info' },
+    brick_col: { zh: '列号', en: 'Column' },
+    brick_width: { zh: '宽度 (X)', en: 'Width (X)' },
+    brick_height: { zh: '高度 (Y)', en: 'Height (Y)' },
+    brick_thickness: { zh: '厚度 (Z)', en: 'Thickness (Z)' },
+    brick_glue: { zh: '胶缝', en: 'Glue Joint' },
+    brick_partno: { zh: '零件号', en: 'Part No.' },
+    // 钢筋槽悬浮
+    rebar_tooltip_title: { zh: '钢筋槽信息', en: 'Rebar Slot Info' },
+    rebar_direction: { zh: '方向', en: 'Direction' },
+    rebar_diameter: { zh: '直径', en: 'Diameter' },
+    rebar_length: { zh: '长度', en: 'Length' },
+    rebar_depth: { zh: '深度', en: 'Depth' },
+    rebar_partno: { zh: '零件号', en: 'Part No.' },
+    rebar_start: { zh: '起点', en: 'Start' },
+    rebar_end: { zh: '终点', en: 'End' },
+    // 底部提示
+    hint_left_btn: { zh: '左键', en: 'LMB' },
+    hint_rotate: { zh: '旋转', en: 'Rotate' },
+    hint_right_btn: { zh: '右键', en: 'RMB' },
+    hint_pan: { zh: '平移', en: 'Pan' },
+    hint_wheel: { zh: '滚轮', en: 'Wheel' },
+    hint_zoom: { zh: '缩放', en: 'Zoom' },
+    hint_dblclick: { zh: '双击', en: 'DblClick' },
+    hint_reset: { zh: '复位', en: 'Reset' },
+    hint_hover_edge: { zh: '悬停墙边', en: 'Hover Edge' },
+    hint_measure: { zh: '测量', en: 'Measure' },
+    hint_hover_brick: { zh: '悬停砖块', en: 'Hover Brick' },
+    hint_info: { zh: '信息', en: 'Info' },
+    hint_hover_rebar: { zh: '悬停钢筋槽', en: 'Hover Rebar' },
+    hint_rebar_info: { zh: '信息', en: 'Info' },
+    // JS 动态消息
+    status_scene_ready: { zh: '渲染引擎就绪，等待数据注入', en: 'Engine ready, waiting for data' },
+    status_scene_rebuilt: { zh: '场景重建完成', en: 'Scene rebuilt' },
+    status_parse_fail: { zh: '数据解析失败: ', en: 'Data parse failed: ' },
+    status_view_reset: { zh: '视角已重置', en: 'View reset' },
+    status_rebar_done_prefix: { zh: '钢筋槽渲染完成 (', en: 'Rebar slots rendered (' },
+    status_rebar_done_suffix: { zh: ' 条)', en: ' slots)' },
+    status_engine_init: { zh: '渲染引擎初始化完成', en: 'Engine initialized' },
+    status_threejs_fail: { zh: 'Three.js 加载失败', en: 'Three.js load failed' },
+    status_orbit_fail: { zh: 'OrbitControls 加载失败', en: 'OrbitControls load failed' },
+    // 边缘测量
+    edge_width: { zh: '宽度边 X=', en: 'Width Edge X=' },
+    edge_height: { zh: '高度边 Y=', en: 'Height Edge Y=' },
+    edge_thickness: { zh: '厚度边 Z=', en: 'Thickness Edge Z=' },
+    edge_unit_mm: { zh: 'mm', en: 'mm' },
+    // 动态标签
+    brick_col_prefix: { zh: '第 ', en: 'Col ' },
+    brick_col_suffix: { zh: ' 列', en: '' },
+    brick_glue_yes: { zh: '✅ 有 (pn:', en: '✅ Yes (pn:' },
+    brick_glue_no: { zh: '❌ 无', en: '❌ No' },
+    brick_glue_close: { zh: ')', en: ')' },
+    rebar_horiz: { zh: '水平槽 (X)', en: 'Horizontal (X)' },
+    rebar_vert: { zh: '垂直槽 (Z)', en: 'Vertical (Z)' },
+    brick_unit: { zh: '块', en: 'pcs' },
+    vertex_unit: { zh: '个', en: 'pts' },
+    rebar_unit: { zh: '条', en: 'slots' }
+  };
+
+  /** 获取当前语言的翻译 */
+  window.t = function(key, langCode) {
+    var lc = langCode || lang;
+    var entry = I18N[key];
+    if (!entry) return '[[' + key + ']]';
+    return entry[lc] || entry['zh'];
+  };
+
+  /** 刷新所有 data-i18n 元素 */
+  window.setLanguage = function(langCode) {
+    lang = langCode === 'en' ? 'en' : 'zh';
+    document.documentElement.lang = lang === 'en' ? 'en-US' : 'zh-CN';
+    // 更新 data-i18n 属性元素
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      var entry = I18N[key];
+      if (entry) {
+        el.textContent = entry[lang] || entry['zh'];
+      }
+    });
+    // 更新页面标题
+    document.title = lang === 'zh' ? 'AAC 墙体 3D 渲染引擎' : 'AAC Wall 3D Render Engine';
+  };
+
+  window.getCurrentLanguage = function() { return lang; };
+})();
 </script>
 </body>
 </html>

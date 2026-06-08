@@ -1,4 +1,5 @@
-﻿using CncWallStation.Models;
+﻿using CncWallStation.Localization;
+using CncWallStation.Models;
 using CncWallStation.Models.Enums;
 using CncWallStation.ViewModels;
 using System.Globalization;
@@ -291,16 +292,17 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>int 优先级 → 中文显示</summary>
+    /// <summary>int 优先级 → 中/英文显示</summary>
     public class PriorityIntToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
             if (value is int p)
             {
-                if (p >= 2) return "高";
-                if (p >= 1) return "中";
-                return "低";
+                if (p >= 2) return isEn ? "High" : "高";
+                if (p >= 1) return isEn ? "Medium" : "中";
+                return isEn ? "Low" : "低";
             }
             return value?.ToString() ?? "—";
         }
@@ -309,18 +311,13 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>优先级枚举 → 中文</summary>
+    /// <summary>优先级枚举 → 中/英文</summary>
     public class PriorityToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is ProcessPriority p ? p switch
-            {
-                ProcessPriority.高 => "高",
-                ProcessPriority.中 => "中",
-                ProcessPriority.低 => "低",
-                _ => "未知"
-            } : "未知";
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+            return value is ProcessPriority p ? (isEn ? p.ToDisplayTextEn() : p.ToDisplayText()) : "—";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -348,21 +345,13 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>状态 → 中文</summary>
+    /// <summary>状态 → 中/英文</summary>
     public class StatusToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is ProcessStatus s ? s switch
-            {
-                ProcessStatus.待校验 => "待校验",
-                ProcessStatus.待加工 => "待加工",
-                ProcessStatus.加工中 => "加工中",
-                ProcessStatus.已完成 => "已完成",
-                ProcessStatus.异常 => "异常",
-                ProcessStatus.已质检 => "已质检",
-                _ => "未知"
-            } : "未知";
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+            return value is ProcessStatus s ? (isEn ? s.ToDisplayTextEn() : s.ToDisplayText()) : "—";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -395,12 +384,17 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>管线阶段 → 中文</summary>
+    /// <summary>管线阶段 → 中/英文</summary>
     public class PipelineStageToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is PipelineStage s ? s.ToDisplayText() : "未知";
+            if (value is PipelineStage s)
+            {
+                bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+                return isEn ? s.ToDisplayTextEn() : s.ToDisplayText();
+            }
+            return "—";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -423,29 +417,30 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>审核状态 → 中文</summary>
+    /// <summary>审核状态 → 中/英文</summary>
     public class AuditStatusToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is AuditStatus s ? s switch
-            {
-                AuditStatus.已审核 => "已审核",
-                AuditStatus.未审核 => "未审核",
-                _ => "未知"
-            } : value is int i ? AuditStatusExtensions.FromInt(i).ToDisplayText() : "未知";
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+            return value is AuditStatus s
+                ? (isEn ? s.ToDisplayTextEn() : s.ToDisplayText())
+                : value is int i
+                    ? (isEn ? AuditStatusExtensions.FromInt(i).ToDisplayTextEn() : AuditStatusExtensions.FromInt(i).ToDisplayText())
+                    : "—";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
     }
 
-    /// <summary>是否最新版本 → 中文</summary>
+    /// <summary>是否最新版本 → 中/英文</summary>
     public class IsLatestToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is bool b ? b ? "仅最新版本" : "不限" : "不限";
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+            return value is bool b ? (b ? (isEn ? "Latest Only" : "仅最新版本") : (isEn ? "All" : "不限")) : "—";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

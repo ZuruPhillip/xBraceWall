@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <!-- 选项卡关闭按钮样式 -->
         <Style x:Key="TabCloseButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="18"/>
+            <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="18"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>

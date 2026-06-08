@@ -25,6 +25,14 @@ namespace CncWallStation.Models.Enums
             _ => "未知"
         };
 
+        /// <summary>获取审核状态的英文显示文本</summary>
+        public static string ToDisplayTextEn(this AuditStatus status) => status switch
+        {
+            AuditStatus.未审核 => "Unaudited",
+            AuditStatus.已审核 => "Audited",
+            _ => "Unknown"
+        };
+
         /// <summary>从 int 转换为 AuditStatus</summary>
         public static AuditStatus FromInt(int value) => value switch
         {

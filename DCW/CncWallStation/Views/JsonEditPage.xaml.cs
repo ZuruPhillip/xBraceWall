@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using CncWallStation.Models;
 using CncWallStation.ViewModels;
@@ -13,6 +15,9 @@ namespace CncWallStation.Views;
 public partial class JsonEditPage : Page
 {
     private JsonEditPageViewModel ViewModel => (JsonEditPageViewModel)DataContext;
+
+    /// <summary>匹配计数格式化转换器</summary>
+    public static readonly IValueConverter MatchCountFormatConverter = new MatchCountToTextConverter();
 
     public JsonEditPage(JsonEditPageViewModel viewModel)
     {
@@ -178,4 +183,21 @@ public partial class JsonEditPage : Page
             }
         }
     }
+}
+
+/// <summary>匹配计数 → 格式化文本（支持中/英文）</summary>
+public class MatchCountToTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int count)
+        {
+            var format = Localization.LocalizationService.Instance["JsonEdit_MatchCount"];
+            return string.Format(format, count);
+        }
+        return "0";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 }

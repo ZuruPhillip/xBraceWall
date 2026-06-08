@@ -60,5 +60,22 @@ namespace CncWallStation.Models.Enums
             PipelineStage.Ready => "待加工",
             _ => "未知"
         };
+
+        /// <summary>获取管线阶段的英文显示文本</summary>
+        public static string ToDisplayTextEn(this PipelineStage stage) => stage switch
+        {
+            PipelineStage.Imported => "Pending Validation",
+            PipelineStage.ValidatingBim => "Validating BIM",
+            PipelineStage.BimValid => "BIM Valid",
+            PipelineStage.BimInvalid => "BIM Invalid",
+            PipelineStage.Converting => "Converting",
+            PipelineStage.ConversionFailed => "Conversion Failed",
+            PipelineStage.Converted => "Converted",
+            PipelineStage.ValidatingMom => "Validating MOM",
+            PipelineStage.MomValid => "MOM Valid",
+            PipelineStage.MomInvalid => "MOM Invalid",
+            PipelineStage.Ready => "Ready",
+            _ => "Unknown"
+        };
     }
 }

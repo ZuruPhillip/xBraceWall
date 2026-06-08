@@ -13,15 +13,16 @@ namespace CncWallStation.ViewModels
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<MainPageViewModel> _logger;
 
-        private readonly Dictionary<string, (string Header, Type PageType)> _pageMap = new()
+        private readonly Dictionary<string, (string HeaderKey, Type PageType)> _pageMap = new()
         {
-            { "WallListPage", ("墙体清单", typeof(Views.WallListPage)) },
-            { "BimDataRenderPage", ("BIM模型渲染", typeof(Views.BimDataRenderPage)) },
-            { "MomDataRenderPage", ("MOM模型渲染", typeof(Views.MomDataRenderPage)) },
-            { "ControllerPage", ("控制页面", typeof(Views.ControllerPage)) },
-            { "JsonEditPage", ("JSON编辑器", typeof(Views.JsonEditPage)) },
-            { "DataCheckPage", ("数据预检", typeof(Views.DataCheckPage)) },
-            { "PlcDataPage", ("PLC指令单元", typeof(Views.PlcDataPage)) }
+            { "WallListPage", ("TabHeader_WallList", typeof(Views.WallListPage)) },
+            { "BimDataRenderPage", ("TabHeader_BimRender", typeof(Views.BimDataRenderPage)) },
+            { "MomDataRenderPage", ("TabHeader_MomRender", typeof(Views.MomDataRenderPage)) },
+            { "ControllerPage", ("TabHeader_Controller", typeof(Views.ControllerPage)) },
+            { "JsonEditPage", ("TabHeader_JsonEditor", typeof(Views.JsonEditPage)) },
+            { "DataCheckPage", ("TabHeader_DataCheck", typeof(Views.DataCheckPage)) },
+            { "PlcDataPage", ("TabHeader_PlcData", typeof(Views.PlcDataPage)) },
+            { "SettingPage", ("TabHeader_Settings", typeof(Views.SettingPage)) }
         };
 
         public ObservableCollection<TabItemViewModel> Tabs { get; } = new();
@@ -75,7 +76,7 @@ namespace CncWallStation.ViewModels
                 Content = page,
                 NavigationUIVisibility = NavigationUIVisibility.Hidden
             };
-            var tab = new TabItemViewModel(pageInfo.Header, pageKey, frame)
+            var tab = new TabItemViewModel(pageInfo.HeaderKey, pageKey, frame)
             {
                 IsSelected = true
             };
@@ -91,6 +92,7 @@ namespace CncWallStation.ViewModels
             if (tab == null) return;
 
             Tabs.Remove(tab);
+            tab.Dispose();
             _logger.LogInformation("关闭选项卡: {PageKey}", tab.PageKey);
 
             // 切换到最后一个选项卡

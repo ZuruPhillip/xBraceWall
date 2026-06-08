@@ -4,11 +4,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:hc="https://handyorg.github.io/handycontrol"
+      xmlns:l="clr-namespace:CncWallStation.Localization"
       xmlns:local="clr-namespace:CncWallStation.Views"
       xmlns:enums="clr-namespace:CncWallStation.Models.Enums"
       mc:Ignorable="d"
       d:DesignHeight="900" d:DesignWidth="1400"
-      Title="数据预检"
+      Title="{l:Loc PageTitle_DataCheck}"
       FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
     <Page.Resources>
@@ -41,21 +42,21 @@
                 <!-- 标题 -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Border Width="4" Height="20" Background="#1890FF" CornerRadius="2" Margin="0,0,10,0"/>
-                    <TextBlock Text="数据预检" FontSize="18" FontWeight="Bold" Foreground="#333"
+                    <TextBlock Text="{l:Loc PageTitle_DataCheck}" FontSize="18" FontWeight="Bold" Foreground="#333"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- 搜索控件 + 执行预检 -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="墙体ID" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#666"/>
+                    <TextBlock Text="{l:Loc Common_WallId}" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#666"/>
                     <TextBox x:Name="TxtWallId" Text="{Binding SearchWallId, UpdateSourceTrigger=PropertyChanged}"
                              Width="300" Height="34" VerticalContentAlignment="Center"
                              Style="{StaticResource TextBoxExtend}"
-                             hc:InfoElement.Placeholder="输入墙体Id"/>
-                    <Button Content="搜索" Command="{Binding SearchCommand}" Width="80" Height="34"
+                             hc:InfoElement.Placeholder="{l:Loc Label_Placeholder_WallId}"/>
+                    <Button Content="{l:Loc Common_Search}" Command="{Binding SearchCommand}" Width="110" Height="34"
                             Margin="12,0,0,0" Style="{StaticResource ButtonPrimary}"/>
-                    <Button Content="执行预检" Command="{Binding StartCheckCommand}"
-                            Width="100" Height="34" Style="{StaticResource ButtonPrimary}"
+                    <Button Content="{l:Loc Button_StartCheck}" Command="{Binding StartCheckCommand}"
+                            Width="130" Height="34" Style="{StaticResource ButtonPrimary}"
                             Margin="12,0,0,0"/>
                 </StackPanel>
             </Grid>
@@ -69,32 +70,32 @@
                 Padding="16,10"
                 Visibility="{Binding HasWallInfo, Converter={StaticResource BoolToVisConverter}, FallbackValue=Collapsed}">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}" Width="60"/>
+                <TextBlock Text="{l:Loc Common_WallId}" Style="{StaticResource DetailLabelText}" Width="60"/>
                 <TextBlock Text="{Binding DetailWallId}" Style="{StaticResource DetailValueText}" Width="250"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="项目" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{l:Loc Common_Project}" Style="{StaticResource DetailLabelText}" Width="30"/>
                 <TextBlock Text="{Binding DetailProject}" Style="{StaticResource DetailValueText}" Width="50"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{l:Loc Common_Floor}" Style="{StaticResource DetailLabelText}" Width="30"/>
                 <TextBlock Text="{Binding DetailFloor}" Style="{StaticResource DetailValueText}" Width="50"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="阶段" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{l:Loc Common_Stage}" Style="{StaticResource DetailLabelText}" Width="30"/>
                 <TextBlock Text="{Binding DetailStage}" Style="{StaticResource DetailValueText}" Width="50"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="版本" Style="{StaticResource DetailLabelText}" Width="30"/>
+                <TextBlock Text="{l:Loc Common_Version}" Style="{StaticResource DetailLabelText}" Width="30"/>
                 <TextBlock Text="{Binding DetailVersion}" Style="{StaticResource DetailValueText}" Width="50"/>
 
                 <Separator Style="{x:Null}" Width="1" Background="#D9D9D9" Margin="12,0,12,0"/>
 
-                <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}" Width="60"/>
+                <TextBlock Text="{l:Loc Common_ImportTime}" Style="{StaticResource DetailLabelText}" Width="60"/>
                 <TextBlock Text="{Binding DetailImportTime}" Style="{StaticResource DetailValueText}"/>
 
             </StackPanel>
@@ -111,7 +112,7 @@
             <TabControl x:Name="MainTabControl" Margin="15,10" Background="White"
                         Style="{StaticResource TabControlCapsule}">
                 <!-- Tab 1: 预检结果 -->
-                <TabItem Header="预检结果">
+                <TabItem Header="{l:Loc Tab_CheckResults}">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="False">
                         <StackPanel Margin="15">
                             <!-- 评分卡片 + 严重等级分布（同行） -->
@@ -129,7 +130,7 @@
                                         <DropShadowEffect ShadowDepth="2" BlurRadius="6" Opacity="0.12" Color="#000000"/>
                                     </Border.Effect>
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <TextBlock Text="BIM模型总分" Foreground="#999" FontSize="12"
+                                        <TextBlock Text="{l:Loc Score_BimTotal}" Foreground="#999" FontSize="12"
                                                    HorizontalAlignment="Center"/>
                                         <TextBlock Text="{Binding BimTotalScore, StringFormat={}{0:F0}}"
                                                    FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"
@@ -144,7 +145,7 @@
                                         <DropShadowEffect ShadowDepth="2" BlurRadius="6" Opacity="0.12" Color="#000000"/>
                                     </Border.Effect>
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <TextBlock Text="MOM模型总分" Foreground="#999" FontSize="12"
+                                        <TextBlock Text="{l:Loc Score_MomTotal}" Foreground="#999" FontSize="12"
                                                    HorizontalAlignment="Center"/>
                                         <TextBlock Text="{Binding MomTotalScore, StringFormat={}{0:F0}}"
                                                    FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"
@@ -156,7 +157,7 @@
                                 <Border Grid.Column="2" CornerRadius="8" Background="White"
                                         BorderBrush="#E0E0E0" BorderThickness="1" Padding="20,10">
                                     <StackPanel>
-                                        <TextBlock Text="严重等级分布" FontSize="13" FontWeight="Bold"
+                                        <TextBlock Text="{l:Loc Section_SeverityDistribution}" FontSize="13" FontWeight="Bold"
                                                    Foreground="#333" Margin="0,0,0,8"/>
                                         <Grid Margin="0,3">
                                             <Grid.ColumnDefinitions>
@@ -164,7 +165,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="35"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="致命" Foreground="#FF4D4F" FontWeight="SemiBold" FontSize="12"/>
+                                            <TextBlock Text="{l:Loc Severity_Critical}" Foreground="#FF4D4F" FontWeight="SemiBold" FontSize="12"/>
                                             <ProgressBar Grid.Column="1" Height="14" Minimum="0" Maximum="100"
                                                          Value="{Binding CriticalCount}" Foreground="#FF4D4F" Margin="6,0"/>
                                             <TextBlock Grid.Column="2" Text="{Binding CriticalCount}" Foreground="#FF4D4F"
@@ -176,7 +177,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="35"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="错误" Foreground="#FF7A45" FontWeight="SemiBold" FontSize="12"/>
+                                            <TextBlock Text="{l:Loc Severity_Error}" Foreground="#FF7A45" FontWeight="SemiBold" FontSize="12"/>
                                             <ProgressBar Grid.Column="1" Height="14" Minimum="0" Maximum="100"
                                                          Value="{Binding ErrorCount}" Foreground="#FF7A45" Margin="6,0"/>
                                             <TextBlock Grid.Column="2" Text="{Binding ErrorCount}" Foreground="#FF7A45"
@@ -188,7 +189,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="35"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="警告" Foreground="#FAAD14" FontWeight="SemiBold" FontSize="12"/>
+                                            <TextBlock Text="{l:Loc Severity_Warning}" Foreground="#FAAD14" FontWeight="SemiBold" FontSize="12"/>
                                             <ProgressBar Grid.Column="1" Height="14" Minimum="0" Maximum="100"
                                                          Value="{Binding WarningCount}" Foreground="#FAAD14" Margin="6,0"/>
                                             <TextBlock Grid.Column="2" Text="{Binding WarningCount}" Foreground="#FAAD14"
@@ -200,7 +201,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="35"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="提示" Foreground="#1677FF" FontWeight="SemiBold" FontSize="12"/>
+                                            <TextBlock Text="{l:Loc Severity_Info}" Foreground="#1677FF" FontWeight="SemiBold" FontSize="12"/>
                                             <ProgressBar Grid.Column="1" Height="14" Minimum="0" Maximum="100"
                                                          Value="{Binding InfoCount}" Foreground="#1677FF" Margin="6,0"/>
                                             <TextBlock Grid.Column="2" Text="{Binding InfoCount}" Foreground="#1677FF"
@@ -211,15 +212,15 @@
                             </Grid>
 
                             <!-- 特征分类统计 -->
-                            <GroupBox Header="BIM模型特征分类统计" Padding="10" Margin="0,0,0,10">
+                            <GroupBox Header="{l:Loc GroupBox_BimFeatureStats}" Padding="10" Margin="0,0,0,10">
                                 <DataGrid ItemsSource="{Binding BimFeatureResults}"
                                           AutoGenerateColumns="False" HeadersVisibility="Column"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           IsReadOnly="True" RowHeight="32">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="特征名称" Binding="{Binding CategoryNameCn}" Width="120"/>
-                                        <DataGridTextColumn Header="检查项" Binding="{Binding CheckItemCount}" Width="70"/>
-                                        <DataGridTextColumn Header="致命" Binding="{Binding CriticalCount}" Width="60">
+                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding CategoryNameCn}" Width="120"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_CheckItems}" Binding="{Binding CheckItemCount}" Width="70"/>
+                                        <DataGridTextColumn Header="{l:Loc Severity_Critical}" Binding="{Binding CriticalCount}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="#FF4D4F"/>
@@ -227,7 +228,7 @@
                                                 </Style>
                                             </DataGridTextColumn.ElementStyle>
                                         </DataGridTextColumn>
-                                        <DataGridTextColumn Header="错误" Binding="{Binding ErrorCount}" Width="60">
+                                        <DataGridTextColumn Header="{l:Loc Severity_Error}" Binding="{Binding ErrorCount}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="#FF7A45"/>
@@ -235,7 +236,7 @@
                                                 </Style>
                                             </DataGridTextColumn.ElementStyle>
                                         </DataGridTextColumn>
-                                        <DataGridTextColumn Header="警告" Binding="{Binding WarningCount}" Width="60">
+                                        <DataGridTextColumn Header="{l:Loc Severity_Warning}" Binding="{Binding WarningCount}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="#FAAD14"/>
@@ -243,7 +244,7 @@
                                                 </Style>
                                             </DataGridTextColumn.ElementStyle>
                                         </DataGridTextColumn>
-                                        <DataGridTextColumn Header="提示" Binding="{Binding InfoCount}" Width="60">
+                                        <DataGridTextColumn Header="{l:Loc Severity_Info}" Binding="{Binding InfoCount}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="#1677FF"/>
@@ -251,7 +252,7 @@
                                                 </Style>
                                             </DataGridTextColumn.ElementStyle>
                                         </DataGridTextColumn>
-                                        <DataGridTextColumn Header="得分" Binding="{Binding Score, StringFormat={}{0:F0}}" Width="60">
+                                        <DataGridTextColumn Header="{l:Loc Column_Score}" Binding="{Binding Score, StringFormat={}{0:F0}}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground"
@@ -261,7 +262,7 @@
                                                 </Style>
                                             </DataGridTextColumn.ElementStyle>
                                         </DataGridTextColumn>
-                                        <DataGridTextColumn Header="状态" Width="90">
+                                        <DataGridTextColumn Header="{l:Loc Column_Status}" Width="90">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Text" Value="{Binding IsPassed, Converter={StaticResource IsPassedToColorConverter}}"/>
@@ -274,19 +275,19 @@
                             </GroupBox>
 
                             <!-- 特征分类统计 - MomData -->
-                            <GroupBox Header="MOM模型特征分类统计" Padding="10" Margin="0,0,0,10">
+                            <GroupBox Header="{l:Loc GroupBox_MomFeatureStats}" Padding="10" Margin="0,0,0,10">
                                 <DataGrid ItemsSource="{Binding MomFeatureResults}"
                                           AutoGenerateColumns="False" HeadersVisibility="Column"
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           IsReadOnly="True" RowHeight="32">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="特征名称" Binding="{Binding CategoryNameCn}" Width="120"/>
-                                        <DataGridTextColumn Header="检查项" Binding="{Binding CheckItemCount}" Width="70"/>
-                                        <DataGridTextColumn Header="致命" Binding="{Binding CriticalCount}" Width="60"/>
-                                        <DataGridTextColumn Header="错误" Binding="{Binding ErrorCount}" Width="60"/>
-                                        <DataGridTextColumn Header="警告" Binding="{Binding WarningCount}" Width="60"/>
-                                        <DataGridTextColumn Header="提示" Binding="{Binding InfoCount}" Width="60"/>
-                                        <DataGridTextColumn Header="得分" Binding="{Binding Score, StringFormat={}{0:F0}}" Width="70"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding CategoryNameCn}" Width="120"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_CheckItems}" Binding="{Binding CheckItemCount}" Width="70"/>
+                                        <DataGridTextColumn Header="{l:Loc Severity_Critical}" Binding="{Binding CriticalCount}" Width="60"/>
+                                        <DataGridTextColumn Header="{l:Loc Severity_Error}" Binding="{Binding ErrorCount}" Width="60"/>
+                                        <DataGridTextColumn Header="{l:Loc Severity_Warning}" Binding="{Binding WarningCount}" Width="60"/>
+                                        <DataGridTextColumn Header="{l:Loc Severity_Info}" Binding="{Binding InfoCount}" Width="60"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_Score}" Binding="{Binding Score, StringFormat={}{0:F0}}" Width="70"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </GroupBox>
@@ -295,7 +296,7 @@
                 </TabItem>
 
                 <!-- Tab 2: 异常清单 -->
-                <TabItem Header="异常清单">
+                <TabItem Header="{l:Loc Tab_ErrorList}">
                     <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -304,19 +305,19 @@
 
                         <!-- 严重等级筛选 -->
                         <WrapPanel Margin="0,10">
-                            <Button Content="全部" Width="70" Height="30" Margin="0,0,8,5"
+                            <Button Content="{l:Loc Filter_All}" Width="100" Height="30" Margin="0,0,8,5"
                                     Command="{Binding SetSeverityFilterCommand}" CommandParameter=""
                                     Style="{StaticResource ButtonDefault}"/>
-                            <Button Content="致命" Width="70" Height="30" Margin="0,0,8,5"
+                            <Button Content="{l:Loc Severity_Critical}" Width="100" Height="30" Margin="0,0,8,5"
                                     Command="{Binding SetSeverityFilterCommand}" CommandParameter="Critical"
                                     Foreground="#FF4D4F" Style="{StaticResource ButtonDefault}"/>
-                            <Button Content="错误" Width="70" Height="30" Margin="0,0,8,5"
+                            <Button Content="{l:Loc Severity_Error}" Width="100" Height="30" Margin="0,0,8,5"
                                     Command="{Binding SetSeverityFilterCommand}" CommandParameter="Error"
                                     Foreground="#FF7A45" Style="{StaticResource ButtonDefault}"/>
-                            <Button Content="警告" Width="70" Height="30" Margin="0,0,8,5"
+                            <Button Content="{l:Loc Severity_Warning}" Width="100" Height="30" Margin="0,0,8,5"
                                     Command="{Binding SetSeverityFilterCommand}" CommandParameter="Warning"
                                     Foreground="#FAAD14" Style="{StaticResource ButtonDefault}"/>
-                            <Button Content="提示" Width="70" Height="30" Margin="0,0,8,5"
+                            <Button Content="{l:Loc Severity_Info}" Width="100" Height="30" Margin="0,0,8,5"
                                     Command="{Binding SetSeverityFilterCommand}" CommandParameter="Info"
                                     Foreground="#1677FF" Style="{StaticResource ButtonDefault}"/>
                         </WrapPanel>
@@ -327,7 +328,7 @@
                                   IsReadOnly="True" RowHeight="32"
                                   ScrollViewer.HorizontalScrollBarVisibility="Auto">
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="等级" Width="70">
+                                <DataGridTemplateColumn Header="{l:Loc Column_Level}" Width="70">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Border CornerRadius="3" Padding="6,2"
@@ -339,18 +340,18 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="分类" Binding="{Binding ErrorCategory}" Width="80"/>
-                                <DataGridTextColumn Header="特征类别" Binding="{Binding FeatureCategory}" Width="130"/>
-                                <DataGridTextColumn Header="错误码" Binding="{Binding ErrorCode}" Width="150"/>
-                                <DataGridTextColumn Header="中文描述" Binding="{Binding ErrorMessage}" Width="300"/>
-                                <DataGridTextColumn Header="英文描述" Binding="{Binding ErrorMessageEn}" Width="300"/>
+                                <DataGridTextColumn Header="{l:Loc Column_Classification}" Binding="{Binding ErrorCategory}" Width="80"/>
+                                <DataGridTextColumn Header="{l:Loc Column_FeatureCategory}" Binding="{Binding FeatureCategory}" Width="130"/>
+                                <DataGridTextColumn Header="{l:Loc Column_ErrorCode}" Binding="{Binding ErrorCode}" Width="150"/>
+                                <DataGridTextColumn Header="{l:Loc Column_DescriptionCn}" Binding="{Binding ErrorMessage}" Width="300"/>
+                                <DataGridTextColumn Header="{l:Loc Column_DescriptionEn}" Binding="{Binding ErrorMessageEn}" Width="300"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Grid>
                 </TabItem>
 
                 <!-- Tab 3: 历史记录 -->
-                <TabItem Header="历史记录">
+                <TabItem Header="{l:Loc Tab_History}">
                     <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -358,8 +359,8 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Button Content="加载历史记录" Command="{Binding LoadHistoryCommand}"
-                                Width="120" Height="32" Margin="0,10" Style="{StaticResource ButtonDefault}"/>
+                        <Button Content="{l:Loc Button_LoadHistory}" Command="{Binding LoadHistoryCommand}"
+                                Width="150" Height="32" Margin="0,10" Style="{StaticResource ButtonDefault}"/>
 
                         <DataGrid Grid.Row="1" ItemsSource="{Binding HistoryRecords}"
                                   SelectedItem="{Binding SelectedHistory1}"
@@ -368,18 +369,18 @@
                                   IsReadOnly="True" RowHeight="32" Height="200"
                                   SelectionMode="Single">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="检查时间" Binding="{Binding CheckTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="160"/>
-                                <DataGridTextColumn Header="版本" Binding="{Binding Version}" Width="80"/>
-                                <DataGridTextColumn Header="BIM模型得分" Binding="{Binding BimScore, StringFormat={}{0:F0}}" Width="80"/>
-                                <DataGridTextColumn Header="MOM模型得分" Binding="{Binding MomScore, StringFormat={}{0:F0}}" Width="80"/>
-                                <DataGridTextColumn Header="异常数" Binding="{Binding ErrorCount}" Width="70"/>
-                                <DataGridTextColumn Header="结果" Binding="{Binding ResultText}" Width="80"/>
-                                <DataGridTextColumn Header="操作员" Binding="{Binding Operator}" Width="100"/>
+                                <DataGridTextColumn Header="{l:Loc Column_CheckTime}" Binding="{Binding CheckTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="160"/>
+                                <DataGridTextColumn Header="{l:Loc Common_Version}" Binding="{Binding Version}" Width="80"/>
+                                <DataGridTextColumn Header="{l:Loc Column_BimScore}" Binding="{Binding BimScore, StringFormat={}{0:F0}}" Width="80"/>
+                                <DataGridTextColumn Header="{l:Loc Column_MomScore}" Binding="{Binding MomScore, StringFormat={}{0:F0}}" Width="80"/>
+                                <DataGridTextColumn Header="{l:Loc Column_ErrorCount}" Binding="{Binding ErrorCount}" Width="70"/>
+                                <DataGridTextColumn Header="{l:Loc Column_Result}" Binding="{Binding ResultText}" Width="80"/>
+                                <DataGridTextColumn Header="{l:Loc Column_Operator}" Binding="{Binding Operator}" Width="100"/>
                             </DataGrid.Columns>
                         </DataGrid>
 
                         <!-- 差异对比区域 -->
-                        <GroupBox Grid.Row="2" Header="差异对比" Padding="10" Margin="0,10,0,0">
+                        <GroupBox Grid.Row="2" Header="{l:Loc GroupBox_DiffCompare}" Padding="10" Margin="0,10,0,0">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -387,19 +388,19 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
-                                    <TextBlock Text="选择两次记录进行对比：" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                    <TextBlock Text="{l:Loc Label_SelectTwoRecords}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                                     <ComboBox ItemsSource="{Binding HistoryRecords}"
                                               SelectedItem="{Binding SelectedHistory1}"
                                               DisplayMemberPath="CheckTime" Width="200" Height="30"
                                               Margin="0,0,10,0"/>
-                                    <TextBlock Text=" vs " VerticalAlignment="Center" Margin="0,0,10,0"
+                                    <TextBlock Text="{l:Loc Label_Vs}" VerticalAlignment="Center" Margin="0,0,10,0"
                                                FontWeight="Bold"/>
                                     <ComboBox ItemsSource="{Binding HistoryRecords}"
                                               SelectedItem="{Binding SelectedHistory2}"
                                               DisplayMemberPath="CheckTime" Width="200" Height="30"
                                               Margin="0,0,10,0"/>
-                                    <Button Content="对比" Command="{Binding CompareDiffCommand}"
-                                            Width="70" Height="30" Style="{StaticResource ButtonPrimary}"/>
+                                    <Button Content="{l:Loc Button_Compare}" Command="{Binding CompareDiffCommand}"
+                                            Width="100" Height="30" Style="{StaticResource ButtonPrimary}"/>
                                 </StackPanel>
 
                                 <Grid Grid.Row="1" Visibility="{Binding HasDiffResult, Converter={StaticResource BoolToVisConverter}}">
@@ -410,7 +411,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!-- 新增异常 -->
-                                    <GroupBox Grid.Column="0" Header="新增异常" Margin="0,0,5,0">
+                                    <GroupBox Grid.Column="0" Header="{l:Loc GroupBox_NewErrors}" Margin="0,0,5,0">
                                         <ListBox ItemsSource="{Binding DiffResult.NewErrors}" BorderThickness="0"
                                                  Background="#FFF1F0">
                                             <ListBox.ItemTemplate>
@@ -423,7 +424,7 @@
                                     </GroupBox>
 
                                     <!-- 已修复异常 -->
-                                    <GroupBox Grid.Column="1" Header="已修复异常" Margin="5,0">
+                                    <GroupBox Grid.Column="1" Header="{l:Loc GroupBox_FixedErrors}" Margin="5,0">
                                         <ListBox ItemsSource="{Binding DiffResult.FixedErrors}" BorderThickness="0"
                                                  Background="#F6FFED">
                                             <ListBox.ItemTemplate>
@@ -436,7 +437,7 @@
                                     </GroupBox>
 
                                     <!-- 仍存在异常 -->
-                                    <GroupBox Grid.Column="2" Header="仍存在异常" Margin="5,0,0,0">
+                                    <GroupBox Grid.Column="2" Header="{l:Loc GroupBox_PersistentErrors}" Margin="5,0,0,0">
                                         <ListBox ItemsSource="{Binding DiffResult.PersistentErrors}" BorderThickness="0"
                                                  Background="#FFFBE6">
                                             <ListBox.ItemTemplate>
@@ -459,23 +460,23 @@
                     Visibility="{Binding IsBatchMode, Converter={StaticResource BoolToVisConverter}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="15">
-                        <TextBlock Text="批量预检" FontSize="16" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
+                        <TextBlock Text="{l:Loc Section_BatchCheck}" FontSize="16" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
 
-                        <TextBlock Text="项目号" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
+                        <TextBlock Text="{l:Loc Label_ProjectNumber}" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding BatchFilterProjectNumber}" Height="30" Margin="0,0,0,10"
-                                 hc:InfoElement.Placeholder="留空表示不限"/>
+                                 hc:InfoElement.Placeholder="{l:Loc Placeholder_LeaveEmpty}"/>
 
-                        <TextBlock Text="楼层" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
+                        <TextBlock Text="{l:Loc Label_BatchFloor}" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding BatchFilterFloor}" Height="30" Margin="0,0,0,10"
-                                 hc:InfoElement.Placeholder="留空表示不限"/>
+                                 hc:InfoElement.Placeholder="{l:Loc Placeholder_LeaveEmpty}"/>
 
-                        <TextBlock Text="版本" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
+                        <TextBlock Text="{l:Loc Label_BatchVersion}" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
                         <ComboBox ItemsSource="{Binding BatchFilterVersionOptions}"
                                   SelectedItem="{Binding BatchFilterSelectedVersion}"
                                   Height="30" Margin="0,0,0,10"/>
 
-                        <Button Content="开始批量预检" Command="{Binding StartBatchCheckCommand}"
-                                Width="150" Height="36" Style="{StaticResource ButtonPrimary}"
+                        <Button Content="{l:Loc Button_StartBatchCheck}" Command="{Binding StartBatchCheckCommand}"
+                                Width="180" Height="36" Style="{StaticResource ButtonPrimary}"
                                 IsEnabled="{Binding IsChecking, Converter={StaticResource BoolInvertConverter}}"/>
 
                         <!-- 进度条 -->
@@ -492,7 +493,7 @@
                         </Grid>
 
                         <!-- 问题墙体 Top 榜 -->
-                        <TextBlock Text="问题墙体 Top 榜" FontSize="14" FontWeight="SemiBold"
+                        <TextBlock Text="{l:Loc Section_TopProblemWalls}" FontSize="14" FontWeight="SemiBold"
                                    Foreground="#333" Margin="0,20,0,8"/>
                         <ItemsControl ItemsSource="{Binding TopProblemWalls}">
                             <ItemsControl.ItemTemplate>
@@ -512,8 +513,8 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <Button Content="导出批量报告" Command="{Binding ExportBatchExcelCommand}"
-                                Width="150" Height="32" Style="{StaticResource ButtonDefault}" Margin="0,15,0,0"/>
+                        <Button Content="{l:Loc Button_ExportBatchReport}" Command="{Binding ExportBatchExcelCommand}"
+                                Width="180" Height="32" Style="{StaticResource ButtonDefault}" Margin="0,15,0,0"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
@@ -529,10 +530,10 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="导出 PDF 报告" Command="{Binding ExportPdfCommand}"
-                            Width="120" Height="30" Margin="0,0,8,0" Style="{StaticResource ButtonDefault}"/>
-                    <Button Content="导出 Excel 报告" Command="{Binding ExportExcelCommand}"
-                            Width="120" Height="30" Style="{StaticResource ButtonDefault}"/>
+                    <Button Content="{l:Loc Button_ExportPdf}" Command="{Binding ExportPdfCommand}"
+                            Width="150" Height="30" Margin="0,0,8,0" Style="{StaticResource ButtonDefault}"/>
+                    <Button Content="{l:Loc Button_ExportExcel}" Command="{Binding ExportExcelCommand}"
+                            Width="150" Height="30" Style="{StaticResource ButtonDefault}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">

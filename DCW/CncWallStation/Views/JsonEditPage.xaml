@@ -4,13 +4,14 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:CncWallStation.Views"
+      xmlns:l="clr-namespace:CncWallStation.Localization"
       xmlns:vm="clr-namespace:CncWallStation.ViewModels"
       xmlns:models="clr-namespace:CncWallStation.Models"
       xmlns:system="clr-namespace:System;assembly=System.Runtime"
       mc:Ignorable="d"
       d:DesignHeight="700" d:DesignWidth="1200"
       Background="{StaticResource BgWhite}"
-      Title="JSON编辑器">
+      Title="{l:Loc PageTitle_JsonEditor}">
 
     <Page.Resources>
         <!-- Bool 转 Visibility 转换器 -->
@@ -146,13 +147,13 @@
 
                 <!-- 左侧：墙体信息 + 加载按钮 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="墙体 ID:" VerticalAlignment="Center" Margin="0,0,6,0"
+                    <TextBlock Text="{l:Loc Label_WallIdBtn}" VerticalAlignment="Center" Margin="0,0,6,0"
                                Style="{StaticResource BodyText}" />
                     <TextBox Text="{Binding WallId, UpdateSourceTrigger=PropertyChanged}"
                              Width="300" Height="30" VerticalAlignment="Center"
                              Style="{StaticResource BaseTextBoxStyle}" Margin="0,0,10,0"
                              x:Name="WallIdTextBox" />
-                    <Button Content="加载" Command="{Binding LoadCommand}" Width="60" Height="30"
+                    <Button Content="{l:Loc Button_Load}" Command="{Binding LoadCommand}" Width="70" Height="30"
                             Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" />
                 </StackPanel>
 
@@ -167,9 +168,9 @@
                             <KeyBinding Key="Enter" Command="{Binding SearchCommand}" />
                         </TextBox.InputBindings>
                     </TextBox>
-                    <Button Content="搜索" Command="{Binding SearchCommand}" Width="50" Height="30"
+                    <Button Content="{l:Loc Common_Search}" Command="{Binding SearchCommand}" Width="60" Height="30"
                             Style="{StaticResource PrimaryButtonStyle}" Margin="4,0,4,0" />
-                    <Button Content="清除" Command="{Binding ClearSearchCommand}" Width="50" Height="30"
+                    <Button Content="{l:Loc Common_Clear}" Command="{Binding ClearSearchCommand}" Width="60" Height="30"
                             Style="{StaticResource BaseButtonStyle}" />
 
                     <!-- 匹配计数 -->
@@ -179,7 +180,7 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text"
-                                        Value="{Binding MatchCount, StringFormat='匹配 {0} 项'}" />
+                                        Value="{Binding MatchCount, Converter={x:Static local:JsonEditPage.MatchCountFormatConverter}, ConverterParameter=MatchCount}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding MatchCount}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -211,11 +212,11 @@
                 BorderBrush="{StaticResource BorderLight}" BorderThickness="0,0,0,1"
                 Padding="12,6">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Content="保存" Command="{Binding SaveCommand}" Width="60" Height="30"
+                <Button Content="{l:Loc Common_Save}" Command="{Binding SaveCommand}" Width="70" Height="30"
                         Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,6,0" />
-                <Button Content="格式化" Command="{Binding FormatJsonCommand}" Width="60" Height="30"
+                <Button Content="{l:Loc Button_Format}" Command="{Binding FormatJsonCommand}" Width="70" Height="30"
                         Style="{StaticResource BaseButtonStyle}" Margin="0,0,6,0" />
-                <Button Content="刷新树" Command="{Binding RefreshTreeCommand}" Width="60" Height="30"
+                <Button Content="{l:Loc Button_RefreshTree}" Command="{Binding RefreshTreeCommand}" Width="70" Height="30"
                         Style="{StaticResource BaseButtonStyle}" />
             </StackPanel>
         </Border>
@@ -241,7 +242,7 @@
                     <Border Grid.Row="0" Background="{StaticResource BgLightGray}"
                             Padding="12,6" BorderBrush="{StaticResource BorderLight}"
                             BorderThickness="0,0,0,1">
-                        <TextBlock Text="JSON 树视图（右键节点操作）" FontWeight="SemiBold"
+                        <TextBlock Text="{l:Loc TreeView_Title}" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextPrimary}" FontSize="13" />
                     </Border>
 
@@ -259,13 +260,13 @@
                             <ContextMenu x:Name="TreeContextMenu"
                                          DataContext="{Binding PlacementTarget.DataContext,
                                              RelativeSource={RelativeSource Self}}">
-                                <MenuItem Header="编辑值" Click="MenuItem_EditValue_Click" />
+                                <MenuItem Header="{l:Loc ContextMenu_EditValue}" Click="MenuItem_EditValue_Click" />
                                 <Separator />
-                                <MenuItem Header="删除节点" Command="{Binding DeleteNodeCommand}"
+                                <MenuItem Header="{l:Loc ContextMenu_DeleteNode}" Command="{Binding DeleteNodeCommand}"
                                           Foreground="#FF1744" />
                                 <Separator />
-                                <MenuItem Header="全部展开" Click="MenuItem_ExpandAll_Click" />
-                                <MenuItem Header="全部折叠" Click="MenuItem_CollapseAll_Click" />
+                                <MenuItem Header="{l:Loc ContextMenu_ExpandAll}" Click="MenuItem_ExpandAll_Click" />
+                                <MenuItem Header="{l:Loc ContextMenu_CollapseAll}" Click="MenuItem_CollapseAll_Click" />
                             </ContextMenu>
                         </TreeView.ContextMenu>
                     </TreeView>
@@ -290,9 +291,9 @@
                             Padding="12,6" BorderBrush="{StaticResource BorderLight}"
                             BorderThickness="0,0,0,1">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="原始 JSON（可编辑）" FontWeight="SemiBold"
+                            <TextBlock Text="{l:Loc TextEditor_Title}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}" FontSize="13" />
-                            <TextBlock Text="● 已修改" Margin="16,0,0,0" FontSize="11"
+                            <TextBlock Text="{l:Loc Indicator_Modified}" Margin="16,0,0,0" FontSize="11"
                                        VerticalAlignment="Center" Foreground="#FF1744">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -336,7 +337,7 @@
                         </Border.Style>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="JSON 格式错误：" Foreground="#D32F2F"
+                                <TextBlock Text="{l:Loc Error_JsonFormat}" Foreground="#D32F2F"
                                            FontWeight="SemiBold" FontSize="12"
                                            VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding ErrorMessage}" Foreground="#D32F2F"
@@ -380,7 +381,7 @@
                 <TextBlock Grid.Column="1" FontSize="11"
                            Foreground="{StaticResource TextPlaceholder}"
                            VerticalAlignment="Center"
-                           Text="保存时 PipelineStage → 待校验" />
+                           Text="{l:Loc StatusBar_JsonSaveHint}" />
             </Grid>
         </Border>
     </Grid>

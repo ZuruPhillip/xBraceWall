@@ -1,4 +1,5 @@
-﻿using CncWallStation.ViewModels;
+﻿using CncWallStation.Localization;
+using CncWallStation.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,6 +60,19 @@ namespace CncWallStation.Views
 
             // 初始化 WebView2 运行时
             InitializeWebViewAsync();
+
+            // 订阅语言切换事件，同步 HTML 3D 视图语言
+            LocalizationService.Instance.CultureChanged += OnCultureChanged;
+        }
+
+        private async void OnCultureChanged(object? sender, string cultureName)
+        {
+            var langCode = cultureName == "zh-CN" ? "zh" : "en";
+            if (MomWebView?.CoreWebView2 != null)
+            {
+                await MomWebView.CoreWebView2.ExecuteScriptAsync(
+                    $"setLanguage('{langCode}')");
+            }
         }
 
         /// <summary>异步初始化 WebView2 CoreWebView2 环境</summary>
@@ -121,6 +135,10 @@ namespace CncWallStation.Views
             {
                 // 隐藏占位遮罩
                 PlaceholderPanel.Visibility = Visibility.Collapsed;
+
+                // 同步语言到 HTML
+                var langCode = LocalizationService.Instance.CurrentLanguage == "zh-CN" ? "zh" : "en";
+                _ = MomWebView.CoreWebView2.ExecuteScriptAsync($"setLanguage('{langCode}')");
 
                 // 通知 ViewModel 页面加载完成（将触发数据注入）
                 _viewModel.OnPageLoaded();

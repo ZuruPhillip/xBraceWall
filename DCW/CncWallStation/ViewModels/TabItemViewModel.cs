@@ -6,6 +6,8 @@ namespace CncWallStation.ViewModels
 {
     public partial class TabItemViewModel : ObservableObject
     {
+        private readonly string _headerKey = string.Empty;
+
         [ObservableProperty]
         private string _header = string.Empty;
 
@@ -18,11 +20,32 @@ namespace CncWallStation.ViewModels
         [ObservableProperty]
         private bool _isSelected;
 
-        public TabItemViewModel(string header, string pageKey, object? content)
+        public TabItemViewModel(string headerKey, string pageKey, object? content)
         {
-            _header = header;
+            _headerKey = headerKey;
             _pageKey = pageKey;
             _content = content;
+            RefreshHeader();
+
+            Localization.LocalizationService.Instance.CultureChanged += OnCultureChanged;
+        }
+
+        private void OnCultureChanged(object? sender, string e)
+        {
+            RefreshHeader();
+        }
+
+        private void RefreshHeader()
+        {
+            Header = Localization.LocalizationService.Instance[_headerKey];
+        }
+
+        /// <summary>
+        /// 清理事件订阅，防止内存泄漏
+        /// </summary>
+        public void Dispose()
+        {
+            Localization.LocalizationService.Instance.CultureChanged -= OnCultureChanged;
         }
     }
 }

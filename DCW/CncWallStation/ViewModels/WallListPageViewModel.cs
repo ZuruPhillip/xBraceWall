@@ -7,6 +7,7 @@ using CncWallStation.Services.Application;
 using CncWallStation.VersionMappers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -152,7 +153,16 @@ namespace CncWallStation.ViewModels
             _pipelineService = pipelineService;
             _mainPageViewModel = mainPageViewModel;
 
+            Localization.LocalizationService.Instance.CultureChanged += OnCultureChanged;
+
             _ = LoadDataFromDbAsync();
+        }
+
+        private void OnCultureChanged(object? sender, string e)
+        {
+            // 强制刷新显示以触发所有 Status/AuditStatus 转换器重新评估
+            if (_filteredItems.Count > 0)
+                RefreshDisplay();
         }
 
         private readonly MainPageViewModel _mainPageViewModel;

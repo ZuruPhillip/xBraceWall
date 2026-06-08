@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  MainWindow / 公共                         -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="AppTitle" xml:space="preserve"><value>CNC工站管理系统</value></data>
+  <data name="Menu_WallList" xml:space="preserve"><value>墙体清单</value></data>
+  <data name="Menu_BimRender" xml:space="preserve"><value>BIM数据渲染</value></data>
+  <data name="Menu_MomRender" xml:space="preserve"><value>MOM数据渲染</value></data>
+  <data name="Menu_JsonEditor" xml:space="preserve"><value>JSON编辑器</value></data>
+  <data name="Menu_DataCheck" xml:space="preserve"><value>数据预检</value></data>
+  <data name="Menu_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
+  <data name="Menu_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="Menu_Quality" xml:space="preserve"><value>质量控制</value></data>
+  <data name="Menu_Report" xml:space="preserve"><value>报表分析</value></data>
+  <data name="Menu_Settings" xml:space="preserve"><value>系统设置</value></data>
+
+  <!--  Tab 标题                                 -->
+  <data name="TabHeader_WallList" xml:space="preserve"><value>墙体清单</value></data>
+  <data name="TabHeader_BimRender" xml:space="preserve"><value>BIM模型渲染</value></data>
+  <data name="TabHeader_MomRender" xml:space="preserve"><value>MOM模型渲染</value></data>
+  <data name="TabHeader_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="TabHeader_JsonEditor" xml:space="preserve"><value>JSON编辑器</value></data>
+  <data name="TabHeader_DataCheck" xml:space="preserve"><value>数据预检</value></data>
+  <data name="TabHeader_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
+  <data name="TabHeader_Settings" xml:space="preserve"><value>系统设置</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  通用                                      -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Common_Search" xml:space="preserve"><value>搜索</value></data>
+  <data name="Common_WallId" xml:space="preserve"><value>墙体ID</value></data>
+  <data name="Common_Project" xml:space="preserve"><value>项目</value></data>
+  <data name="Common_Floor" xml:space="preserve"><value>楼层</value></data>
+  <data name="Common_Stage" xml:space="preserve"><value>阶段</value></data>
+  <data name="Common_Version" xml:space="preserve"><value>版本</value></data>
+  <data name="Common_ImportTime" xml:space="preserve"><value>导入时间</value></data>
+  <data name="Common_Audit" xml:space="preserve"><value>审核</value></data>
+  <data name="Common_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="Common_Clear" xml:space="preserve"><value>清除</value></data>
+  <data name="Common_Loading" xml:space="preserve"><value>处理中...</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Common_LoadingText" xml:space="preserve"><value>● 加载中...</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  WallListPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_WallList" xml:space="preserve"><value>墙体清单</value></data>
+  <data name="Button_BatchImport" xml:space="preserve"><value>📂 批量导入</value></data>
+  <data name="Button_SingleImport" xml:space="preserve"><value>📄 单墙导入</value></data>
+  <data name="Button_ExecutePipeline" xml:space="preserve"><value>🚀 执行管线</value></data>
+  <data name="Button_Audit" xml:space="preserve"><value>✅ 审核</value></data>
+  <data name="Button_Unaudit" xml:space="preserve"><value>↩ 反审核</value></data>
+  <data name="Button_IncreasePriority" xml:space="preserve"><value>▲ 提高</value></data>
+  <data name="Button_DecreasePriority" xml:space="preserve"><value>▼ 降低</value></data>
+  <data name="Button_ResetFilter" xml:space="preserve"><value>↺ 重置</value></data>
+  <data name="Label_ProjectName" xml:space="preserve"><value>项目名称:</value></data>
+  <data name="Label_Floor" xml:space="preserve"><value>楼层:</value></data>
+  <data name="Label_WallId" xml:space="preserve"><value>墙体ID:</value></data>
+  <data name="Label_WallName" xml:space="preserve"><value>墙体名称:</value></data>
+  <data name="Label_Status" xml:space="preserve"><value>状态:</value></data>
+  <data name="Label_Priority" xml:space="preserve"><value>优先级:</value></data>
+  <data name="Label_AuditStatus" xml:space="preserve"><value>审核:</value></data>
+  <data name="Label_EndProductionTime" xml:space="preserve"><value>生产结束时间:</value></data>
+  <data name="Column_ProjectName" xml:space="preserve"><value>项目名称</value></data>
+  <data name="Column_ProjectName_Sort" xml:space="preserve"><value>项目名称 ▾</value></data>
+  <data name="Column_Floor" xml:space="preserve"><value>楼层</value></data>
+  <data name="Column_WallId" xml:space="preserve"><value>墙体ID</value></data>
+  <data name="Column_WallName" xml:space="preserve"><value>墙体名称</value></data>
+  <data name="Column_StartProductionTime" xml:space="preserve"><value>生产开始时间</value></data>
+  <data name="Column_EndProductionTime" xml:space="preserve"><value>生产结束时间</value></data>
+  <data name="Column_Priority" xml:space="preserve"><value>优先级</value></data>
+  <data name="Column_ProductionStatus" xml:space="preserve"><value>生产状态</value></data>
+  <data name="Column_AuditStatus" xml:space="preserve"><value>审核</value></data>
+  <data name="Column_AuditStatus_Sort" xml:space="preserve"><value>审核 ▾</value></data>
+  <data name="Column_Floor_Sort" xml:space="preserve"><value>楼层 ▾</value></data>
+  <data name="Column_WallId_Sort" xml:space="preserve"><value>墙体ID ▾</value></data>
+  <data name="Column_WallName_Sort" xml:space="preserve"><value>墙体名称 ▾</value></data>
+  <data name="Column_EndProductionTime_Sort" xml:space="preserve"><value>生产结束时间 ▾</value></data>
+  <data name="Column_Priority_Sort" xml:space="preserve"><value>优先级 ▾</value></data>
+  <data name="Column_ProductionStatus_Sort" xml:space="preserve"><value>生产状态 ▾</value></data>
+  <data name="Tooltip_BatchImport" xml:space="preserve"><value>批量导入文件夹中的墙体 .mjson 文件</value></data>
+  <data name="Tooltip_SingleImport" xml:space="preserve"><value>导入单面墙体的 .mjson 文件</value></data>
+  <data name="Tooltip_ExecutePipeline" xml:space="preserve"><value>对选中墙体执行完整管线：校验Bim→转换→校验Mom</value></data>
+  <data name="Tooltip_Audit" xml:space="preserve"><value>审核选中的墙体，锁定数据不可覆盖导入</value></data>
+  <data name="Tooltip_Unaudit" xml:space="preserve"><value>反审核选中的墙体，允许重新导入 BimData 测试</value></data>
+  <data name="ContextMenu_Copy" xml:space="preserve"><value>📋 复制</value></data>
+  <data name="ContextMenu_RenameWall" xml:space="preserve"><value>✏️ 修改墙体名称</value></data>
+  <data name="ContextMenu_ViewBimRender" xml:space="preserve"><value>🏗️ 查看BIM模型渲染</value></data>
+  <data name="ContextMenu_ViewMomRender" xml:space="preserve"><value>🧱 查看MOM模型渲染</value></data>
+  <data name="ContextMenu_EditJson" xml:space="preserve"><value>📝 编辑 JSON</value></data>
+  <data name="Pagination_TotalRecords" xml:space="preserve"><value>共 {0} 条记录</value></data>
+  <data name="Pagination_PerPage" xml:space="preserve"><value>每页</value></data>
+  <data name="Pagination_ItemsUnit" xml:space="preserve"><value>条</value></data>
+  <data name="Pagination_PageInfo" xml:space="preserve"><value>第 {0} / {1} 页</value></data>
+  <data name="Empty_NoData" xml:space="preserve"><value>暂无匹配数据</value></data>
+  <data name="Empty_AdjustFilter" xml:space="preserve"><value>请调整筛选条件或导入新数据</value></data>
+  <data name="Import_Processing" xml:space="preserve"><value>📂 处理中</value></data>
+  <data name="Pagination_Total" xml:space="preserve"><value>共 </value></data>
+  <data name="Pagination_Records" xml:space="preserve"><value> 条记录</value></data>
+  <data name="Pagination_Page" xml:space="preserve"><value>第 </value></data>
+  <data name="Pagination_Separator" xml:space="preserve"><value> / </value></data>
+  <data name="Pagination_PageSuffix" xml:space="preserve"><value> 页</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  BimDataRenderPage                        -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_BimRender" xml:space="preserve"><value>BIM 数据渲染</value></data>
+  <data name="Button_LoadRender" xml:space="preserve"><value>▶ 加载渲染</value></data>
+  <data name="Button_ResetView" xml:space="preserve"><value>↻ 重置视角</value></data>
+  <data name="Toggle_Wall" xml:space="preserve"><value>墙体</value></data>
+  <data name="Toggle_Brick" xml:space="preserve"><value>砖块</value></data>
+  <data name="Toggle_Joint" xml:space="preserve"><value>接缝</value></data>
+  <data name="Toggle_Rebar" xml:space="preserve"><value>钢筋</value></data>
+  <data name="Toggle_Dim" xml:space="preserve"><value>标注</value></data>
+  <data name="Tooltip_LoadRender" xml:space="preserve"><value>加载墙体BimJSON数据并渲染3D场景</value></data>
+  <data name="Tooltip_ToggleWall" xml:space="preserve"><value>切换墙体图层</value></data>
+  <data name="Tooltip_ToggleBrick" xml:space="preserve"><value>切换砖块图层</value></data>
+  <data name="Tooltip_ToggleJoint" xml:space="preserve"><value>切换接缝图层</value></data>
+  <data name="Tooltip_ToggleRebar" xml:space="preserve"><value>切换钢筋槽图层</value></data>
+  <data name="Tooltip_ToggleDim" xml:space="preserve"><value>切换标注图层</value></data>
+  <data name="Tooltip_ResetView" xml:space="preserve"><value>重置摄像机到默认视角</value></data>
+  <data name="Tooltip_SearchWallId" xml:space="preserve"><value>输入墙体ID，默认查询最新版本</value></data>
+  <data name="Placeholder_BimTitle" xml:space="preserve"><value>AAC 墙体三维渲染</value></data>
+  <data name="Placeholder_BimSubtitle" xml:space="preserve"><value>BIM 数据可视化引擎</value></data>
+  <data name="Placeholder_BimHint" xml:space="preserve"><value>输入墙体ID搜索 → 点击「加载渲染」启动 3D 场景</value></data>
+  <data name="StatusBar_BimModule" xml:space="preserve"><value>BIM 渲染模块 v1.0</value></data>
+  <data name="Status_BimReady" xml:space="preserve"><value>就绪 · 请输入墙体ID搜索</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  MomDataRenderPage                        -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_MomRender" xml:space="preserve"><value>MOM 数据渲染</value></data>
+  <data name="Button_LoadMomRender" xml:space="preserve"><value>▶ 加载渲染</value></data>
+  <data name="Toggle_Cavity" xml:space="preserve"><value>腔体</value></data>
+  <data name="Toggle_MepSlot" xml:space="preserve"><value>MEP槽</value></data>
+  <data name="Tooltip_LoadMomRender" xml:space="preserve"><value>加载墙体MomJSON数据并渲染3D CSG场景</value></data>
+  <data name="Tooltip_ToggleWallMom" xml:space="preserve"><value>切换墙体主体图层</value></data>
+  <data name="Tooltip_ToggleCavity" xml:space="preserve"><value>切换切削腔体图层</value></data>
+  <data name="Tooltip_ToggleMep" xml:space="preserve"><value>切换MEP管槽图层</value></data>
+  <data name="Tooltip_ToggleRebarMom" xml:space="preserve"><value>切换钢筋槽图层</value></data>
+  <data name="Tooltip_ToggleDimMom" xml:space="preserve"><value>切换尺寸标注图层</value></data>
+  <data name="Placeholder_MomTitle" xml:space="preserve"><value>AAC 墙体 CSG 三维渲染</value></data>
+  <data name="Placeholder_MomSubtitle" xml:space="preserve"><value>MOM 数据可视化引擎 · CSG 布尔运算</value></data>
+  <data name="Placeholder_MomHint" xml:space="preserve"><value>输入墙体ID搜索 → 点击「加载渲染」启动 3D 场景</value></data>
+  <data name="StatusBar_MomModule" xml:space="preserve"><value>MOM 渲染模块 v1.0</value></data>
+  <data name="Status_MomReady" xml:space="preserve"><value>就绪 · 请输入墙体ID搜索</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  ControllerPage                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="Button_Test" xml:space="preserve"><value>测试按钮</value></data>
+  <data name="Button_GenerateWallData" xml:space="preserve"><value>生成WallData数据</value></data>
+  <data name="Tooltip_TestBtn" xml:space="preserve"><value>加载AAC墙体3D渲染页面</value></data>
+  <data name="Tooltip_GenerateWallData" xml:space="preserve"><value>BimWall转换为WallData数据</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  JsonEditPage                             -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_JsonEditor" xml:space="preserve"><value>JSON编辑器</value></data>
+  <data name="Label_WallIdBtn" xml:space="preserve"><value>墙体 ID:</value></data>
+  <data name="Button_Load" xml:space="preserve"><value>加载</value></data>
+  <data name="Button_Format" xml:space="preserve"><value>格式化</value></data>
+  <data name="Button_RefreshTree" xml:space="preserve"><value>刷新树</value></data>
+  <data name="TreeView_Title" xml:space="preserve"><value>JSON 树视图（右键节点操作）</value></data>
+  <data name="TextEditor_Title" xml:space="preserve"><value>原始 JSON（可编辑）</value></data>
+  <data name="Indicator_Modified" xml:space="preserve"><value>● 已修改</value></data>
+  <data name="Error_JsonFormat" xml:space="preserve"><value>JSON 格式错误：</value></data>
+  <data name="Error_Position" xml:space="preserve"><value>位置：行 {0}, 列 {1}</value></data>
+  <data name="JsonEdit_MatchCount" xml:space="preserve"><value>匹配 {0} 项</value></data>
+  <data name="ContextMenu_EditValue" xml:space="preserve"><value>编辑值</value></data>
+  <data name="ContextMenu_DeleteNode" xml:space="preserve"><value>删除节点</value></data>
+  <data name="ContextMenu_ExpandAll" xml:space="preserve"><value>全部展开</value></data>
+  <data name="ContextMenu_CollapseAll" xml:space="preserve"><value>全部折叠</value></data>
+  <data name="StatusBar_JsonSaveHint" xml:space="preserve"><value>保存时 PipelineStage → 待校验</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  DataCheckPage                            -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_DataCheck" xml:space="preserve"><value>数据预检</value></data>
+  <data name="Button_StartCheck" xml:space="preserve"><value>执行预检</value></data>
+  <data name="Tab_CheckResults" xml:space="preserve"><value>预检结果</value></data>
+  <data name="Tab_ErrorList" xml:space="preserve"><value>异常清单</value></data>
+  <data name="Tab_History" xml:space="preserve"><value>历史记录</value></data>
+  <data name="Label_Placeholder_WallId" xml:space="preserve"><value>输入墙体Id</value></data>
+  <data name="Score_BimTotal" xml:space="preserve"><value>BIM模型总分</value></data>
+  <data name="Score_MomTotal" xml:space="preserve"><value>MOM模型总分</value></data>
+  <data name="Section_SeverityDistribution" xml:space="preserve"><value>严重等级分布</value></data>
+  <data name="Severity_Critical" xml:space="preserve"><value>致命</value></data>
+  <data name="Severity_Error" xml:space="preserve"><value>错误</value></data>
+  <data name="Severity_Warning" xml:space="preserve"><value>警告</value></data>
+  <data name="Severity_Info" xml:space="preserve"><value>提示</value></data>
+  <data name="GroupBox_BimFeatureStats" xml:space="preserve"><value>BIM模型特征分类统计</value></data>
+  <data name="GroupBox_MomFeatureStats" xml:space="preserve"><value>MOM模型特征分类统计</value></data>
+  <data name="Column_FeatureName" xml:space="preserve"><value>特征名称</value></data>
+  <data name="Column_CheckItems" xml:space="preserve"><value>检查项</value></data>
+  <data name="Column_Score" xml:space="preserve"><value>得分</value></data>
+  <data name="Column_Result" xml:space="preserve"><value>结果</value></data>
+  <data name="Column_Classification" xml:space="preserve"><value>分类</value></data>
+  <data name="Column_FeatureCategory" xml:space="preserve"><value>特征类别</value></data>
+  <data name="Column_ErrorCode" xml:space="preserve"><value>错误码</value></data>
+  <data name="Column_DescriptionCn" xml:space="preserve"><value>中文描述</value></data>
+  <data name="Column_DescriptionEn" xml:space="preserve"><value>英文描述</value></data>
+  <data name="Column_CheckTime" xml:space="preserve"><value>检查时间</value></data>
+  <data name="Column_BimScore" xml:space="preserve"><value>BIM模型得分</value></data>
+  <data name="Column_MomScore" xml:space="preserve"><value>MOM模型得分</value></data>
+  <data name="Column_ErrorCount" xml:space="preserve"><value>异常数</value></data>
+  <data name="Column_Operator" xml:space="preserve"><value>操作员</value></data>
+  <data name="Button_LoadHistory" xml:space="preserve"><value>加载历史记录</value></data>
+  <data name="Button_Compare" xml:space="preserve"><value>对比</value></data>
+  <data name="GroupBox_DiffCompare" xml:space="preserve"><value>差异对比</value></data>
+  <data name="Label_SelectTwoRecords" xml:space="preserve"><value>选择两次记录进行对比：</value></data>
+  <data name="Label_Vs" xml:space="preserve"><value> vs </value></data>
+  <data name="GroupBox_NewErrors" xml:space="preserve"><value>新增异常</value></data>
+  <data name="GroupBox_FixedErrors" xml:space="preserve"><value>已修复异常</value></data>
+  <data name="GroupBox_PersistentErrors" xml:space="preserve"><value>仍存在异常</value></data>
+  <data name="Section_BatchCheck" xml:space="preserve"><value>批量预检</value></data>
+  <data name="Label_ProjectNumber" xml:space="preserve"><value>项目号</value></data>
+  <data name="Label_BatchFloor" xml:space="preserve"><value>楼层</value></data>
+  <data name="Label_BatchVersion" xml:space="preserve"><value>版本</value></data>
+  <data name="Placeholder_LeaveEmpty" xml:space="preserve"><value>留空表示不限</value></data>
+  <data name="Button_StartBatchCheck" xml:space="preserve"><value>开始批量预检</value></data>
+  <data name="Section_TopProblemWalls" xml:space="preserve"><value>问题墙体 Top 榜</value></data>
+  <data name="Button_ExportBatchReport" xml:space="preserve"><value>导出批量报告</value></data>
+  <data name="Button_ExportPdf" xml:space="preserve"><value>导出 PDF 报告</value></data>
+  <data name="Button_ExportExcel" xml:space="preserve"><value>导出 Excel 报告</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>全部</value></data>
+  <data name="CheckResult_Pass" xml:space="preserve"><value>✓ 通过</value></data>
+  <data name="CheckResult_Fail" xml:space="preserve"><value>✗ 失败</value></data>
+  <data name="Column_Level" xml:space="preserve"><value>等级</value></data>
+  <data name="Column_Status" xml:space="preserve"><value>状态</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  PlcDataPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_PlcData" xml:space="preserve"><value>PLC 指令单元</value></data>
+  <data name="Label_WallIdPlc" xml:space="preserve"><value>墙体 ID:</value></data>
+  <data name="Label_WallIdInfo" xml:space="preserve"><value>墙体 ID: </value></data>
+  <data name="Label_NameInfo" xml:space="preserve"><value>名称: </value></data>
+  <data name="Label_VersionInfo" xml:space="preserve"><value>版本: </value></data>
+  <data name="Label_AuditInfo" xml:space="preserve"><value>审核: </value></data>
+  <data name="Label_ProjectInfo" xml:space="preserve"><value>项目号: </value></data>
+  <data name="Label_FloorInfo" xml:space="preserve"><value>楼层: </value></data>
+  <data name="Placeholder_PlcSearch" xml:space="preserve"><value>输入墙体 ID 回车搜索</value></data>
+  <data name="Button_UnauditPlc" xml:space="preserve"><value>反审核</value></data>
+  <data name="Button_SendCommand" xml:space="preserve"><value>下发指令</value></data>
+  <data name="Button_Regenerate" xml:space="preserve"><value>重新生成</value></data>
+  <data name="Button_SaveDraft" xml:space="preserve"><value>保存草稿</value></data>
+  <data name="Button_ClearPanel" xml:space="preserve"><value>清空面板</value></data>
+  <data name="Section_ProcessingStats" xml:space="preserve"><value>加工统计</value></data>
+  <data name="Stat_TotalInstructions" xml:space="preserve"><value>总指令</value></data>
+  <data name="Stat_ToolChanges" xml:space="preserve"><value>换刀次数</value></data>
+  <data name="Stat_CuttingArea" xml:space="preserve"><value>切削面积</value></data>
+  <data name="Stat_EstimatedHours" xml:space="preserve"><value>预估工时</value></data>
+  <data name="Stat_InstructionUnit" xml:space="preserve"><value>{0} 条</value></data>
+  <data name="Stat_AreaUnit" xml:space="preserve"><value>{0:F0} mm²</value></data>
+  <data name="Stat_TimeUnit" xml:space="preserve"><value>{0:F1} min</value></data>
+  <data name="Label_FeatureGroups" xml:space="preserve"><value>特征分组 (</value></data>
+  <data name="Label_FeatureGroupsSuffix" xml:space="preserve"><value> 组)</value></data>
+  <data name="Tab_InstructionData" xml:space="preserve"><value>指令数据</value></data>
+  <data name="Tab_3DRender" xml:space="preserve"><value>3D 渲染</value></data>
+  <data name="Status_TotalInstructions" xml:space="preserve"><value>总指令: </value></data>
+  <data name="Status_SelectedFeature" xml:space="preserve"><value> | 选中特征: </value></data>
+  <data name="Status_ToolChange" xml:space="preserve"><value> | 换刀: </value></data>
+  <data name="Status_Times" xml:space="preserve"><value> 次 | 面积: </value></data>
+  <data name="Status_AreaSuffix" xml:space="preserve"><value> mm² | 工时: </value></data>
+  <data name="Status_TimeSuffix" xml:space="preserve"><value> min</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  SettingPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_Settings" xml:space="preserve"><value>系统设置</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>语言设置</value></data>
+  <data name="Settings_LanguageDesc" xml:space="preserve"><value>切换界面显示语言，立即生效</value></data>
+  <data name="Settings_LangChinese" xml:space="preserve"><value>中文</value></data>
+  <data name="Settings_LangChineseSubtitle" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Settings_LangEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="Settings_LangEnglishSubtitle" xml:space="preserve"><value>English (US)</value></data>
+</root>

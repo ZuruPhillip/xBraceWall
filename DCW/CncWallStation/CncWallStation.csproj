@@ -65,4 +65,5 @@
 	  <ProjectReference Include="..\BimWallData\BimWallData.csproj" />
 	  <ProjectReference Include="..\infrastructure\Infrastructure.csproj" />
 	</ItemGroup>
+
 </Project>

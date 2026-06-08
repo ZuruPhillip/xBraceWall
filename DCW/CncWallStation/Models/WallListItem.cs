@@ -27,6 +27,56 @@ namespace CncWallStation.Models
 	}
 
 	/// <summary>
+	/// ProcessPriority 扩展方法
+	/// </summary>
+	public static class ProcessPriorityExtensions
+	{
+		public static string ToDisplayText(this ProcessPriority p) => p switch
+		{
+			ProcessPriority.低 => "低",
+			ProcessPriority.中 => "中",
+			ProcessPriority.高 => "高",
+			_ => "未知"
+		};
+
+		public static string ToDisplayTextEn(this ProcessPriority p) => p switch
+		{
+			ProcessPriority.低 => "Low",
+			ProcessPriority.中 => "Medium",
+			ProcessPriority.高 => "High",
+			_ => "Unknown"
+		};
+	}
+
+	/// <summary>
+	/// ProcessStatus 扩展方法
+	/// </summary>
+	public static class ProcessStatusExtensions
+	{
+		public static string ToDisplayText(this ProcessStatus s) => s switch
+		{
+			ProcessStatus.待校验 => "待校验",
+			ProcessStatus.待加工 => "待加工",
+			ProcessStatus.加工中 => "加工中",
+			ProcessStatus.已完成 => "已完成",
+			ProcessStatus.异常 => "异常",
+			ProcessStatus.已质检 => "已质检",
+			_ => "未知"
+		};
+
+		public static string ToDisplayTextEn(this ProcessStatus s) => s switch
+		{
+			ProcessStatus.待校验 => "Pending",
+			ProcessStatus.待加工 => "Queued",
+			ProcessStatus.加工中 => "Processing",
+			ProcessStatus.已完成 => "Completed",
+			ProcessStatus.异常 => "Error",
+			ProcessStatus.已质检 => "Inspected",
+			_ => "Unknown"
+		};
+	}
+
+	/// <summary>
 	/// 墙体清单数据项（MVVM 展示模型）
 	/// </summary>
 	public partial class WallListItem : ObservableObject
@@ -59,7 +109,10 @@ namespace CncWallStation.Models
 		public PipelineStage PipelineStage { get; set; } = PipelineStage.Imported;
 
 		/// <summary>管线阶段显示文本</summary>
-		public string PipelineStageText => PipelineStage.ToDisplayText();
+		public string PipelineStageText =>
+			CncWallStation.Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en")
+				? PipelineStage.ToDisplayTextEn()
+				: PipelineStage.ToDisplayText();
 
 		/// <summary>加工优先级（int，数值越大优先级越高）</summary>
 		public int Priority { get; set; } = 0;
@@ -71,7 +124,10 @@ namespace CncWallStation.Models
 		public int AuditStatus { get; set; } = 0;
 
 		/// <summary>审核状态显示文本</summary>
-		public string AuditStatusText => AuditStatusExtensions.FromInt(AuditStatus).ToDisplayText();
+		public string AuditStatusText =>
+			CncWallStation.Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en")
+				? AuditStatusExtensions.FromInt(AuditStatus).ToDisplayTextEn()
+				: AuditStatusExtensions.FromInt(AuditStatus).ToDisplayText();
 
 		/// <summary>Schema 版本号（来自 BimJson schema 字段）</summary>
 		public string SchemaVersion { get; set; } = "V0.0.0";

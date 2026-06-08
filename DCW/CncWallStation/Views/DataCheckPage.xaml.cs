@@ -1,3 +1,4 @@
+using CncWallStation.Localization;
 using CncWallStation.Models.Enums;
 using CncWallStation.ViewModels;
 using System.Globalization;
@@ -44,13 +45,16 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>严重等级 → 中文图标文本</summary>
+    /// <summary>严重等级 → 中/英文图标文本</summary>
     public class SeverityToIconConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is ErrorSeverity severity)
-                return severity.ToDisplayText();
+            {
+                bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+                return isEn ? severity.ToDisplayTextEn() : severity.ToDisplayText();
+            }
             return "?";
         }
 
@@ -78,14 +82,16 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
-    /// <summary>IsPassed → 状态文本/颜色</summary>
+    /// <summary>IsPassed → 状态文本</summary>
     public class IsPassedToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool passed)
             {
-                return passed ? "✓ 通过" : "✗ 失败";
+                return passed
+                    ? LocalizationService.Instance["CheckResult_Pass"]
+                    : LocalizationService.Instance["CheckResult_Fail"];
             }
             return "-";
         }

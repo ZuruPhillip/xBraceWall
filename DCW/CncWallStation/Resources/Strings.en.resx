@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  MainWindow / Common                      -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="AppTitle" xml:space="preserve"><value>CNC Workstation Manager</value></data>
+  <data name="Menu_WallList" xml:space="preserve"><value>Wall List</value></data>
+  <data name="Menu_BimRender" xml:space="preserve"><value>BIM Render</value></data>
+  <data name="Menu_MomRender" xml:space="preserve"><value>MOM Render</value></data>
+  <data name="Menu_JsonEditor" xml:space="preserve"><value>JSON Editor</value></data>
+  <data name="Menu_DataCheck" xml:space="preserve"><value>Data Check</value></data>
+  <data name="Menu_PlcData" xml:space="preserve"><value>PLC Instructions</value></data>
+  <data name="Menu_Controller" xml:space="preserve"><value>Controller</value></data>
+  <data name="Menu_Quality" xml:space="preserve"><value>Quality Control</value></data>
+  <data name="Menu_Report" xml:space="preserve"><value>Reports</value></data>
+  <data name="Menu_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <!--  Tab Headers                              -->
+  <data name="TabHeader_WallList" xml:space="preserve"><value>Wall List</value></data>
+  <data name="TabHeader_BimRender" xml:space="preserve"><value>BIM Model Render</value></data>
+  <data name="TabHeader_MomRender" xml:space="preserve"><value>MOM Model Render</value></data>
+  <data name="TabHeader_Controller" xml:space="preserve"><value>Controller</value></data>
+  <data name="TabHeader_JsonEditor" xml:space="preserve"><value>JSON Editor</value></data>
+  <data name="TabHeader_DataCheck" xml:space="preserve"><value>Data Check</value></data>
+  <data name="TabHeader_PlcData" xml:space="preserve"><value>PLC Instructions</value></data>
+  <data name="TabHeader_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  Common                                   -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Common_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Common_WallId" xml:space="preserve"><value>Wall ID</value></data>
+  <data name="Common_Project" xml:space="preserve"><value>Project</value></data>
+  <data name="Common_Floor" xml:space="preserve"><value>Floor</value></data>
+  <data name="Common_Stage" xml:space="preserve"><value>Stage</value></data>
+  <data name="Common_Version" xml:space="preserve"><value>Version</value></data>
+  <data name="Common_ImportTime" xml:space="preserve"><value>Import Time</value></data>
+  <data name="Common_Audit" xml:space="preserve"><value>Audit</value></data>
+  <data name="Common_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Common_Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="Common_Loading" xml:space="preserve"><value>Processing...</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_LoadingText" xml:space="preserve"><value>● Loading...</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  WallListPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_WallList" xml:space="preserve"><value>Wall List</value></data>
+  <data name="Button_BatchImport" xml:space="preserve"><value>📂 Batch Import</value></data>
+  <data name="Button_SingleImport" xml:space="preserve"><value>📄 Single Import</value></data>
+  <data name="Button_ExecutePipeline" xml:space="preserve"><value>🚀 Execute Pipeline</value></data>
+  <data name="Button_Audit" xml:space="preserve"><value>✅ Audit</value></data>
+  <data name="Button_Unaudit" xml:space="preserve"><value>↩ Unaudit</value></data>
+  <data name="Button_IncreasePriority" xml:space="preserve"><value>▲ Increase</value></data>
+  <data name="Button_DecreasePriority" xml:space="preserve"><value>▼ Decrease</value></data>
+  <data name="Button_ResetFilter" xml:space="preserve"><value>↺ Reset</value></data>
+  <data name="Label_ProjectName" xml:space="preserve"><value>Project Name:</value></data>
+  <data name="Label_Floor" xml:space="preserve"><value>Floor:</value></data>
+  <data name="Label_WallId" xml:space="preserve"><value>Wall ID:</value></data>
+  <data name="Label_WallName" xml:space="preserve"><value>Wall Name:</value></data>
+  <data name="Label_Status" xml:space="preserve"><value>Status:</value></data>
+  <data name="Label_Priority" xml:space="preserve"><value>Priority:</value></data>
+  <data name="Label_AuditStatus" xml:space="preserve"><value>Audit:</value></data>
+  <data name="Label_EndProductionTime" xml:space="preserve"><value>End Time:</value></data>
+  <data name="Column_ProjectName" xml:space="preserve"><value>Project Name</value></data>
+  <data name="Column_ProjectName_Sort" xml:space="preserve"><value>Project Name ▾</value></data>
+  <data name="Column_Floor" xml:space="preserve"><value>Floor</value></data>
+  <data name="Column_Floor_Sort" xml:space="preserve"><value>Floor ▾</value></data>
+  <data name="Column_WallId" xml:space="preserve"><value>Wall ID</value></data>
+  <data name="Column_WallName" xml:space="preserve"><value>Wall Name</value></data>
+  <data name="Column_StartProductionTime" xml:space="preserve"><value>Start Time</value></data>
+  <data name="Column_EndProductionTime" xml:space="preserve"><value>End Time</value></data>
+  <data name="Column_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="Column_ProductionStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Column_AuditStatus" xml:space="preserve"><value>Audit</value></data>
+  <data name="Column_AuditStatus_Sort" xml:space="preserve"><value>Audit ▾</value></data>
+  <data name="Column_WallId_Sort" xml:space="preserve"><value>Wall ID ▾</value></data>
+  <data name="Column_WallName_Sort" xml:space="preserve"><value>Wall Name ▾</value></data>
+  <data name="Column_EndProductionTime_Sort" xml:space="preserve"><value>End Time ▾</value></data>
+  <data name="Column_Priority_Sort" xml:space="preserve"><value>Priority ▾</value></data>
+  <data name="Column_ProductionStatus_Sort" xml:space="preserve"><value>Status ▾</value></data>
+  <data name="Tooltip_BatchImport" xml:space="preserve"><value>Batch import wall .mjson files from a folder</value></data>
+  <data name="Tooltip_SingleImport" xml:space="preserve"><value>Import a single wall .mjson file</value></data>
+  <data name="Tooltip_ExecutePipeline" xml:space="preserve"><value>Execute full pipeline on selected walls: Validate Bim → Convert → Validate Mom</value></data>
+  <data name="Tooltip_Audit" xml:space="preserve"><value>Audit selected walls and lock data from overwrite imports</value></data>
+  <data name="Tooltip_Unaudit" xml:space="preserve"><value>Unaudit selected walls to allow BimData re-import for testing</value></data>
+  <data name="ContextMenu_Copy" xml:space="preserve"><value>📋 Copy</value></data>
+  <data name="ContextMenu_RenameWall" xml:space="preserve"><value>✏️ Rename Wall</value></data>
+  <data name="ContextMenu_ViewBimRender" xml:space="preserve"><value>🏗️ View BIM Render</value></data>
+  <data name="ContextMenu_ViewMomRender" xml:space="preserve"><value>🧱 View MOM Render</value></data>
+  <data name="ContextMenu_EditJson" xml:space="preserve"><value>📝 Edit JSON</value></data>
+  <data name="Pagination_TotalRecords" xml:space="preserve"><value>{0} records total</value></data>
+  <data name="Pagination_PerPage" xml:space="preserve"><value>Per page</value></data>
+  <data name="Pagination_ItemsUnit" xml:space="preserve"><value>items</value></data>
+  <data name="Pagination_PageInfo" xml:space="preserve"><value>Page {0} / {1}</value></data>
+  <data name="Empty_NoData" xml:space="preserve"><value>No matching data</value></data>
+  <data name="Empty_AdjustFilter" xml:space="preserve"><value>Adjust filter criteria or import new data</value></data>
+  <data name="Import_Processing" xml:space="preserve"><value>📂 Processing</value></data>
+  <data name="Pagination_Total" xml:space="preserve"><value>Total: </value></data>
+  <data name="Pagination_Records" xml:space="preserve"><value> records</value></data>
+  <data name="Pagination_Page" xml:space="preserve"><value>Page </value></data>
+  <data name="Pagination_Separator" xml:space="preserve"><value> / </value></data>
+  <data name="Pagination_PageSuffix" xml:space="preserve"><value></value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  BimDataRenderPage                        -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_BimRender" xml:space="preserve"><value>BIM Data Render</value></data>
+  <data name="Button_LoadRender" xml:space="preserve"><value>▶ Load Render</value></data>
+  <data name="Button_ResetView" xml:space="preserve"><value>↻ Reset View</value></data>
+  <data name="Toggle_Wall" xml:space="preserve"><value>Wall</value></data>
+  <data name="Toggle_Brick" xml:space="preserve"><value>Bricks</value></data>
+  <data name="Toggle_Joint" xml:space="preserve"><value>Joints</value></data>
+  <data name="Toggle_Rebar" xml:space="preserve"><value>Rebar</value></data>
+  <data name="Toggle_Dim" xml:space="preserve"><value>Dims</value></data>
+  <data name="Tooltip_LoadRender" xml:space="preserve"><value>Load wall BimJSON data and render 3D scene</value></data>
+  <data name="Tooltip_ToggleWall" xml:space="preserve"><value>Toggle wall layer</value></data>
+  <data name="Tooltip_ToggleBrick" xml:space="preserve"><value>Toggle brick layer</value></data>
+  <data name="Tooltip_ToggleJoint" xml:space="preserve"><value>Toggle joint layer</value></data>
+  <data name="Tooltip_ToggleRebar" xml:space="preserve"><value>Toggle rebar slot layer</value></data>
+  <data name="Tooltip_ToggleDim" xml:space="preserve"><value>Toggle dimension layer</value></data>
+  <data name="Tooltip_ResetView" xml:space="preserve"><value>Reset camera to default view</value></data>
+  <data name="Tooltip_SearchWallId" xml:space="preserve"><value>Enter Wall ID, defaults to latest version</value></data>
+  <data name="Placeholder_BimTitle" xml:space="preserve"><value>AAC Wall 3D Render</value></data>
+  <data name="Placeholder_BimSubtitle" xml:space="preserve"><value>BIM Data Visualization Engine</value></data>
+  <data name="Placeholder_BimHint" xml:space="preserve"><value>Enter Wall ID → Click "Load Render" to start 3D scene</value></data>
+  <data name="StatusBar_BimModule" xml:space="preserve"><value>BIM Renderer v1.0</value></data>
+  <data name="Status_BimReady" xml:space="preserve"><value>Ready · Enter Wall ID to search</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  MomDataRenderPage                        -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_MomRender" xml:space="preserve"><value>MOM Data Render</value></data>
+  <data name="Button_LoadMomRender" xml:space="preserve"><value>▶ Load Render</value></data>
+  <data name="Toggle_Cavity" xml:space="preserve"><value>Cavity</value></data>
+  <data name="Toggle_MepSlot" xml:space="preserve"><value>MEP Slot</value></data>
+  <data name="Tooltip_LoadMomRender" xml:space="preserve"><value>Load wall MomJSON data and render 3D CSG scene</value></data>
+  <data name="Tooltip_ToggleWallMom" xml:space="preserve"><value>Toggle wall main body layer</value></data>
+  <data name="Tooltip_ToggleCavity" xml:space="preserve"><value>Toggle cavity layer</value></data>
+  <data name="Tooltip_ToggleMep" xml:space="preserve"><value>Toggle MEP slot layer</value></data>
+  <data name="Tooltip_ToggleRebarMom" xml:space="preserve"><value>Toggle rebar slot layer</value></data>
+  <data name="Tooltip_ToggleDimMom" xml:space="preserve"><value>Toggle dimension layer</value></data>
+  <data name="Placeholder_MomTitle" xml:space="preserve"><value>AAC Wall CSG 3D Render</value></data>
+  <data name="Placeholder_MomSubtitle" xml:space="preserve"><value>MOM Data Visualization Engine · CSG Boolean</value></data>
+  <data name="Placeholder_MomHint" xml:space="preserve"><value>Enter Wall ID → Click "Load Render" to start 3D scene</value></data>
+  <data name="StatusBar_MomModule" xml:space="preserve"><value>MOM Renderer v1.0</value></data>
+  <data name="Status_MomReady" xml:space="preserve"><value>Ready · Enter Wall ID to search</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  ControllerPage                           -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_Controller" xml:space="preserve"><value>Controller</value></data>
+  <data name="Button_Test" xml:space="preserve"><value>Test Button</value></data>
+  <data name="Button_GenerateWallData" xml:space="preserve"><value>Generate WallData</value></data>
+  <data name="Tooltip_TestBtn" xml:space="preserve"><value>Load AAC wall 3D render page</value></data>
+  <data name="Tooltip_GenerateWallData" xml:space="preserve"><value>Convert BimWall to WallData</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  JsonEditPage                             -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_JsonEditor" xml:space="preserve"><value>JSON Editor</value></data>
+  <data name="Label_WallIdBtn" xml:space="preserve"><value>Wall ID:</value></data>
+  <data name="Button_Load" xml:space="preserve"><value>Load</value></data>
+  <data name="Button_Format" xml:space="preserve"><value>Format</value></data>
+  <data name="Button_RefreshTree" xml:space="preserve"><value>Refresh Tree</value></data>
+  <data name="TreeView_Title" xml:space="preserve"><value>JSON Tree View (right-click to operate)</value></data>
+  <data name="TextEditor_Title" xml:space="preserve"><value>Raw JSON (editable)</value></data>
+  <data name="Indicator_Modified" xml:space="preserve"><value>● Modified</value></data>
+  <data name="Error_JsonFormat" xml:space="preserve"><value>JSON Format Error: </value></data>
+  <data name="Error_Position" xml:space="preserve"><value>Position: line {0}, col {1}</value></data>
+  <data name="JsonEdit_MatchCount" xml:space="preserve"><value>{0} matches</value></data>
+  <data name="ContextMenu_EditValue" xml:space="preserve"><value>Edit Value</value></data>
+  <data name="ContextMenu_DeleteNode" xml:space="preserve"><value>Delete Node</value></data>
+  <data name="ContextMenu_ExpandAll" xml:space="preserve"><value>Expand All</value></data>
+  <data name="ContextMenu_CollapseAll" xml:space="preserve"><value>Collapse All</value></data>
+  <data name="StatusBar_JsonSaveHint" xml:space="preserve"><value>PipelineStage → Pending Validation on save</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  DataCheckPage                            -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_DataCheck" xml:space="preserve"><value>Data Check</value></data>
+  <data name="Button_StartCheck" xml:space="preserve"><value>Run Check</value></data>
+  <data name="Tab_CheckResults" xml:space="preserve"><value>Check Results</value></data>
+  <data name="Tab_ErrorList" xml:space="preserve"><value>Error List</value></data>
+  <data name="Tab_History" xml:space="preserve"><value>History</value></data>
+  <data name="Label_Placeholder_WallId" xml:space="preserve"><value>Enter Wall ID</value></data>
+  <data name="Score_BimTotal" xml:space="preserve"><value>BIM Model Score</value></data>
+  <data name="Score_MomTotal" xml:space="preserve"><value>MOM Model Score</value></data>
+  <data name="Section_SeverityDistribution" xml:space="preserve"><value>Severity Distribution</value></data>
+  <data name="Severity_Critical" xml:space="preserve"><value>Critical</value></data>
+  <data name="Severity_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Severity_Warning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Severity_Info" xml:space="preserve"><value>Info</value></data>
+  <data name="GroupBox_BimFeatureStats" xml:space="preserve"><value>BIM Model Feature Stats</value></data>
+  <data name="GroupBox_MomFeatureStats" xml:space="preserve"><value>MOM Model Feature Stats</value></data>
+  <data name="Column_FeatureName" xml:space="preserve"><value>Feature Name</value></data>
+  <data name="Column_CheckItems" xml:space="preserve"><value>Checks</value></data>
+  <data name="Column_Score" xml:space="preserve"><value>Score</value></data>
+  <data name="Column_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Column_Classification" xml:space="preserve"><value>Category</value></data>
+  <data name="Column_FeatureCategory" xml:space="preserve"><value>Feature Category</value></data>
+  <data name="Column_ErrorCode" xml:space="preserve"><value>Error Code</value></data>
+  <data name="Column_DescriptionCn" xml:space="preserve"><value>Description (CN)</value></data>
+  <data name="Column_DescriptionEn" xml:space="preserve"><value>Description (EN)</value></data>
+  <data name="Column_CheckTime" xml:space="preserve"><value>Check Time</value></data>
+  <data name="Column_BimScore" xml:space="preserve"><value>BIM Score</value></data>
+  <data name="Column_MomScore" xml:space="preserve"><value>MOM Score</value></data>
+  <data name="Column_ErrorCount" xml:space="preserve"><value>Errors</value></data>
+  <data name="Column_Operator" xml:space="preserve"><value>Operator</value></data>
+  <data name="Button_LoadHistory" xml:space="preserve"><value>Load History</value></data>
+  <data name="Button_Compare" xml:space="preserve"><value>Compare</value></data>
+  <data name="GroupBox_DiffCompare" xml:space="preserve"><value>Diff Compare</value></data>
+  <data name="Label_SelectTwoRecords" xml:space="preserve"><value>Select two records to compare:</value></data>
+  <data name="Label_Vs" xml:space="preserve"><value> vs </value></data>
+  <data name="GroupBox_NewErrors" xml:space="preserve"><value>New Errors</value></data>
+  <data name="GroupBox_FixedErrors" xml:space="preserve"><value>Fixed Errors</value></data>
+  <data name="GroupBox_PersistentErrors" xml:space="preserve"><value>Persistent Errors</value></data>
+  <data name="Section_BatchCheck" xml:space="preserve"><value>Batch Check</value></data>
+  <data name="Label_ProjectNumber" xml:space="preserve"><value>Project No.</value></data>
+  <data name="Label_BatchFloor" xml:space="preserve"><value>Floor</value></data>
+  <data name="Label_BatchVersion" xml:space="preserve"><value>Version</value></data>
+  <data name="Placeholder_LeaveEmpty" xml:space="preserve"><value>Empty = no limit</value></data>
+  <data name="Button_StartBatchCheck" xml:space="preserve"><value>Start Batch Check</value></data>
+  <data name="Section_TopProblemWalls" xml:space="preserve"><value>Top Problem Walls</value></data>
+  <data name="Button_ExportBatchReport" xml:space="preserve"><value>Export Batch Report</value></data>
+  <data name="Button_ExportPdf" xml:space="preserve"><value>Export PDF Report</value></data>
+  <data name="Button_ExportExcel" xml:space="preserve"><value>Export Excel Report</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="CheckResult_Pass" xml:space="preserve"><value>Pass</value></data>
+  <data name="CheckResult_Fail" xml:space="preserve"><value>Fail</value></data>
+  <data name="Column_Level" xml:space="preserve"><value>Level</value></data>
+  <data name="Column_Status" xml:space="preserve"><value>Status</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  PlcDataPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_PlcData" xml:space="preserve"><value>PLC Instructions</value></data>
+  <data name="Label_WallIdPlc" xml:space="preserve"><value>Wall ID:</value></data>
+  <data name="Label_WallIdInfo" xml:space="preserve"><value>Wall ID: </value></data>
+  <data name="Label_NameInfo" xml:space="preserve"><value>Name: </value></data>
+  <data name="Label_VersionInfo" xml:space="preserve"><value>Version: </value></data>
+  <data name="Label_AuditInfo" xml:space="preserve"><value>Audit: </value></data>
+  <data name="Label_ProjectInfo" xml:space="preserve"><value>Project: </value></data>
+  <data name="Label_FloorInfo" xml:space="preserve"><value>Floor: </value></data>
+  <data name="Placeholder_PlcSearch" xml:space="preserve"><value>Enter Wall ID and press Enter</value></data>
+  <data name="Button_UnauditPlc" xml:space="preserve"><value>Unaudit</value></data>
+  <data name="Button_SendCommand" xml:space="preserve"><value>Send</value></data>
+  <data name="Button_Regenerate" xml:space="preserve"><value>Regenerate</value></data>
+  <data name="Button_SaveDraft" xml:space="preserve"><value>Save Draft</value></data>
+  <data name="Button_ClearPanel" xml:space="preserve"><value>Clear</value></data>
+  <data name="Section_ProcessingStats" xml:space="preserve"><value>Processing Stats</value></data>
+  <data name="Stat_TotalInstructions" xml:space="preserve"><value>Total Instructions</value></data>
+  <data name="Stat_ToolChanges" xml:space="preserve"><value>Tool Changes</value></data>
+  <data name="Stat_CuttingArea" xml:space="preserve"><value>Cutting Area</value></data>
+  <data name="Stat_EstimatedHours" xml:space="preserve"><value>Est. Time</value></data>
+  <data name="Stat_InstructionUnit" xml:space="preserve"><value>{0} instr.</value></data>
+  <data name="Stat_AreaUnit" xml:space="preserve"><value>{0:F0} mm²</value></data>
+  <data name="Stat_TimeUnit" xml:space="preserve"><value>{0:F1} min</value></data>
+  <data name="Label_FeatureGroups" xml:space="preserve"><value>Feature Groups (</value></data>
+  <data name="Label_FeatureGroupsSuffix" xml:space="preserve"><value> groups)</value></data>
+  <data name="Tab_InstructionData" xml:space="preserve"><value>Instructions</value></data>
+  <data name="Tab_3DRender" xml:space="preserve"><value>3D Render</value></data>
+  <data name="Status_TotalInstructions" xml:space="preserve"><value>Total: </value></data>
+  <data name="Status_SelectedFeature" xml:space="preserve"><value> | Feature: </value></data>
+  <data name="Status_ToolChange" xml:space="preserve"><value> | Tool Chg: </value></data>
+  <data name="Status_Times" xml:space="preserve"><value> times | Area: </value></data>
+  <data name="Status_AreaSuffix" xml:space="preserve"><value> mm² | Time: </value></data>
+  <data name="Status_TimeSuffix" xml:space="preserve"><value> min</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  SettingPage                              -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_LanguageDesc" xml:space="preserve"><value>Switch interface language, takes effect immediately</value></data>
+  <data name="Settings_LangChinese" xml:space="preserve"><value>Chinese</value></data>
+  <data name="Settings_LangChineseSubtitle" xml:space="preserve"><value>Simplified Chinese</value></data>
+  <data name="Settings_LangEnglish" xml:space="preserve"><value>English</value></data>
+  <data name="Settings_LangEnglishSubtitle" xml:space="preserve"><value>English (US)</value></data>
+</root>

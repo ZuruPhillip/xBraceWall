@@ -1,3 +1,4 @@
+using CncWallStation.Localization;
 using CncWallStation.ViewModels;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
@@ -158,13 +159,14 @@ namespace CncWallStation.Views
         }
     }
 
-    /// <summary>审核状态 → 显示文本（PlcDataPage 专用）</summary>
+    /// <summary>审核状态 → 中/英文显示文本（PlcDataPage 专用）</summary>
     public class PlcAuditStatusToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
             if (value is int status)
-                return status == 1 ? "已审核" : "未审核";
+                return status == 1 ? (isEn ? "Audited" : "已审核") : (isEn ? "Unaudited" : "未审核");
             return "--";
         }
 

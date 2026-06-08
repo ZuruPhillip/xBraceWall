@@ -472,8 +472,15 @@ namespace CncWallStation.ViewModels
 
             foreach (var group in grouped)
             {
-                var featureName = Plcs.PlcFeatureGroup.FeatureNameMap
-                    .TryGetValue(group.Key, out var name) ? name : group.Key;
+                var isEn = Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+                string? nameEn = null;
+                string? name = null;
+                bool found = isEn
+                    ? Plcs.PlcFeatureGroup.FeatureNameMapEn.TryGetValue(group.Key, out nameEn)
+                    : Plcs.PlcFeatureGroup.FeatureNameMap.TryGetValue(group.Key, out name);
+                var featureName = found
+                    ? (isEn ? nameEn! : name!)
+                    : group.Key;
 
                 var instructions = group
                     .OrderBy(e => e.SortOrder)

@@ -47,7 +47,7 @@ namespace CncWallStation.ViewModels
         //  状态属性
         // ──────────────────────────────────────────
 
-        private string _statusMessage = "就绪 · 请输入墙体ID搜索";
+        private string _statusMessage = Localization.LocalizationService.Instance["Status_MomReady"];
         public string StatusMessage
         {
             get => _statusMessage;
