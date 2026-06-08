@@ -982,7 +982,7 @@ namespace CncWallStation.ViewModels
 
         // ==================== 命令：翻页 ====================
         [RelayCommand]
-        private void GoToPage(object? parameter)
+        private async Task GoToPage(object? parameter)
         {
             var page = parameter switch
             {
@@ -993,9 +993,7 @@ namespace CncWallStation.ViewModels
 
             if (page < 1 || page > TotalPages) return;
             CurrentPage = page;
-            HasPreviousPage = CurrentPage > 1;
-            HasNextPage = CurrentPage < TotalPages;
-            RefreshDisplay();
+            await ApplyFiltersAsync();
         }
 
         // ==================== 命令：修改每页条数 ====================
@@ -1088,12 +1086,7 @@ namespace CncWallStation.ViewModels
         // ==================== 刷新当前页数据 ====================
         private void RefreshDisplay()
         {
-            var pageItems = _filteredItems
-                .Skip((CurrentPage - 1) * PageSize)
-                .Take(PageSize)
-                .ToList();
-
-            DisplayItems = new ObservableCollection<WallListItem>(pageItems);
+            DisplayItems = new ObservableCollection<WallListItem>(_filteredItems);
             UpdateIsAllSelected();
         }
 
