@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -36,6 +37,21 @@ namespace CncWallStation.ViewModels
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
+
+            // 语言切换时关闭所有页签
+            Localization.LocalizationService.Instance.CultureChanged += (_, _) =>
+            {
+                System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    var tabsToClose = Tabs.ToList();
+                    foreach (var tab in tabsToClose)
+                    {
+                        Tabs.Remove(tab);
+                        tab.Dispose();
+                    }
+                    SelectedTab = null;
+                });
+            };
         }
 
         public void AddOrActivateTab(string pageKey, Action<Page>? onPageCreated = null)

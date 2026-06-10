@@ -16,6 +16,7 @@
         <local:PlcBoolInverseConverter x:Key="BoolInverseConverter" />
         <local:PlcAuditStatusToTextConverter x:Key="AuditStatusToTextConverter" />
         <local:PlcAuditStatusToColorConverter x:Key="AuditStatusToColorConverter" />
+        <local:PlcInstructionCountConverter x:Key="InstructionCountConverter" />
     </Page.Resources>
 
     <Grid Margin="8" Background="#F5F5F5">
@@ -156,7 +157,7 @@
                             <!-- 总指令条数 -->
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Loc Stat_TotalInstructions}" Foreground="Gray" />
                             <TextBlock Grid.Row="0" Grid.Column="1"
-                                       Text="{Binding Statistics.TotalInstructionCount, StringFormat={}{0} 条}"
+                                       Text="{Binding Statistics.TotalInstructionCount, Converter={StaticResource InstructionCountConverter}}"
                                        HorizontalAlignment="Right" Foreground="Gray" />
 
                             <!-- 换刀次数 -->

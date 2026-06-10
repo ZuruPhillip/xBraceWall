@@ -1,3 +1,4 @@
+using CncWallStation.Localization;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
@@ -68,7 +69,7 @@ namespace CncWallStation.ViewModels
         private bool _isChecking;
 
         [ObservableProperty]
-        private string _checkStatusText = "就绪";
+        private string _checkStatusText = LocalizationService.Instance["CheckStatus_Ready"];
 
         [ObservableProperty]
         private double _checkProgress;
@@ -142,10 +143,10 @@ namespace CncWallStation.ViewModels
         private bool _batchFilterLatestOnly = true;
 
         [ObservableProperty]
-        private ObservableCollection<string> _batchFilterVersionOptions = new() { "最新版本", "全部版本" };
+        private ObservableCollection<string> _batchFilterVersionOptions = new();
 
         [ObservableProperty]
-        private string _batchFilterSelectedVersion = "最新版本";
+        private string _batchFilterSelectedVersion = string.Empty;
 
         [ObservableProperty]
         private DateTime? _batchFilterStartTime;
@@ -209,6 +210,20 @@ namespace CncWallStation.ViewModels
 
             // 获取当前 Windows 用户作为操作员
             CurrentOperator = Environment.UserName;
+
+            // 初始化批量预检版本选项（基于当前语言）
+            InitBatchFilterVersionOptions();
+        }
+
+        private void InitBatchFilterVersionOptions()
+        {
+            var latest = LocalizationService.Instance["BatchFilter_LatestVersion"];
+            var all = LocalizationService.Instance["BatchFilter_AllVersion"];
+            _batchFilterVersionOptions = new ObservableCollection<string> { latest, all };
+            OnPropertyChanged(nameof(BatchFilterVersionOptions));
+
+            if (string.IsNullOrEmpty(BatchFilterSelectedVersion))
+                BatchFilterSelectedVersion = latest;
         }
 
         // ==================== 搜索 ====================
@@ -220,15 +235,16 @@ namespace CncWallStation.ViewModels
         {
             try
             {
-                CheckStatusText = "搜索中...";
+                CheckStatusText = LocalizationService.Instance["CheckStatus_Searching"];
                 HasWallInfo = false;
 
                 var detail = await _wallAppService.GetDetailByWallIdAsync(SearchWallId);
 
                 if (detail == null)
                 {
-                    CheckStatusText = $"未找到墙体：{SearchWallId}";
-                    MessageBox.Show($"未找到墙体：{SearchWallId}", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    CheckStatusText = string.Format(LocalizationService.Instance["CheckStatus_NotFound"], SearchWallId);
+                    MessageBox.Show(string.Format(LocalizationService.Instance["Msg_NotFound"], SearchWallId),
+                        LocalizationService.Instance["Msg_Title_Info"], MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
@@ -240,21 +256,22 @@ namespace CncWallStation.ViewModels
                 // 设置墙体详情行显示字段
                 DetailWallId = detail.WallId;
                 DetailProject = detail.ProjectName;
-                DetailFloor = $"楼层 {detail.Floor}";
-                DetailStage = detail.PipelineStage.ToDisplayText();
+                DetailFloor = string.Format(Localization.LocalizationService.Instance["DetailFormat_Floor"], detail.Floor);
+                DetailStage = detail.PipelineStageText;
                 DetailVersion = $"v{resolvedVersion}";
                 DetailImportTime = detail.ImportTime.ToString("yyyy-MM-dd HH:mm");
 
                 HasWallInfo = true;
-                CheckStatusText = "已找到墙体，可以执行预检";
+                CheckStatusText = LocalizationService.Instance["CheckStatus_Found"];
 
                 _logger.LogInformation("搜索墙体成功: {WallId}", SearchWallId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "搜索墙体失败");
-                CheckStatusText = $"搜索失败：{ex.Message}";
-                MessageBox.Show($"搜索失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                CheckStatusText = string.Format(LocalizationService.Instance["CheckStatus_SearchFailed"], ex.Message);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Msg_SearchFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -270,7 +287,7 @@ namespace CncWallStation.ViewModels
                 IsChecking = true;
                 HasCheckResult = false;
                 CheckProgress = 0;
-                CheckStatusText = "正在执行数据预检...";
+                CheckStatusText = LocalizationService.Instance["CheckStatus_Checking"];
 
                 var result = await Task.Run(() =>
                     _dataCheckService.CheckSingleWallAsync(CurrentWallId, CurrentOperator)
@@ -278,7 +295,8 @@ namespace CncWallStation.ViewModels
 
                 ApplyCheckResult(result);
                 CheckProgress = 100;
-                CheckStatusText = $"预检完成 — {(result.IsPassed ? "通过" : "未通过")}";
+                var passedText = LocalizationService.Instance[result.IsPassed ? "CheckStatus_Passed" : "CheckStatus_Failed"];
+                CheckStatusText = $"{passedText}";
                 HasCheckResult = true;
 
                 _logger.LogInformation("预检完成: GroupId={GroupId}, Passed={Passed}",
@@ -287,8 +305,9 @@ namespace CncWallStation.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "预检执行失败");
-                CheckStatusText = $"预检失败：{ex.Message}";
-                MessageBox.Show($"预检执行失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                CheckStatusText = string.Format(LocalizationService.Instance["CheckStatus_CheckFailed"], ex.Message);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Msg_CheckFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -349,7 +368,8 @@ namespace CncWallStation.ViewModels
         /// <summary>版本选择变更时同步 LatestOnly</summary>
         partial void OnBatchFilterSelectedVersionChanged(string value)
         {
-            BatchFilterLatestOnly = value == "最新版本";
+            var latestText = LocalizationService.Instance["BatchFilter_LatestVersion"];
+            BatchFilterLatestOnly = value == latestText;
         }
 
         [RelayCommand]

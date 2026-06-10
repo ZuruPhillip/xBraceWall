@@ -2,6 +2,7 @@ using CncWallStation.Commands;
 using CncWallStation.Features;
 using CncWallStation.Features.Grooves;
 using CncWallStation.Features.MepSlots;
+using CncWallStation.Localization;
 using CncWallStation.Models.Dtos;
 using CncWallStation.MomWallData;
 using CncWallStation.Services.Application;
@@ -274,13 +275,13 @@ namespace CncWallStation.ViewModels
         {
             if (string.IsNullOrWhiteSpace(SearchWallId))
             {
-                StatusMessage = "⚠️ 请输入墙体ID";
+                StatusMessage = LocalizationService.Instance["Status_EnterWallId"];
                 return;
             }
 
             IsLoading = true;
             FoundWall = null;
-            StatusMessage = "🔍 正在搜索墙体...";
+            StatusMessage = LocalizationService.Instance["Status_SearchingWall"];
 
             try
             {
@@ -299,18 +300,18 @@ namespace CncWallStation.ViewModels
                     if (result.TotalCount > 0 && result.Items.Count > 0)
                     {
                         FoundWall = result.Items[0];
-                        StatusMessage = $"✅ 找到墙体: {FoundWall.WallId}";
+                        StatusMessage = string.Format(LocalizationService.Instance["Status_FoundWall"], FoundWall.WallId);
                     }
                     else
                     {
-                        StatusMessage = "⚠️ 未匹配到墙体记录";
+                        StatusMessage = LocalizationService.Instance["Status_WallNotFound"];
                     }
                 });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "搜索墙体失败");
-                StatusMessage = $"❌ 搜索失败: {ex.Message}";
+                StatusMessage = string.Format(LocalizationService.Instance["Status_SearchFailed"], ex.Message);
             }
             finally
             {
@@ -333,7 +334,7 @@ namespace CncWallStation.ViewModels
 
             DetailWallId = FoundWall.WallId;
             DetailProject = FoundWall.ProjectName;
-            DetailFloor = $"楼层 {FoundWall.Floor}";
+            DetailFloor = string.Format(Localization.LocalizationService.Instance["DetailFormat_Floor"], FoundWall.Floor);
             DetailStage = FoundWall.PipelineStageText;
             DetailVersion = $"v{FoundWall.SchemaVersion}";
             DetailImportTime = FoundWall.ImportTime.ToString("yyyy-MM-dd HH:mm");
@@ -347,7 +348,7 @@ namespace CncWallStation.ViewModels
         {
             if (FoundWall == null)
             {
-                StatusMessage = "⚠️ 请先搜索并找到墙体";
+                StatusMessage = LocalizationService.Instance["Status_NoWallToLoad"];
                 return;
             }
 
@@ -424,7 +425,7 @@ namespace CncWallStation.ViewModels
             SearchWallId = wallId;
             IsLoading = true;
             FoundWall = null;
-            StatusMessage = "🔍 正在搜索墙体...";
+            StatusMessage = LocalizationService.Instance["Status_SearchingWall"];
 
             try
             {
@@ -442,11 +443,11 @@ namespace CncWallStation.ViewModels
                     if (result.TotalCount > 0 && result.Items.Count > 0)
                     {
                         FoundWall = result.Items[0];
-                        StatusMessage = $"✅ 找到墙体: {FoundWall.WallId}";
+                        StatusMessage = string.Format(LocalizationService.Instance["Status_FoundWall"], FoundWall.WallId);
                     }
                     else
                     {
-                        StatusMessage = "⚠️ 未匹配到墙体记录";
+                        StatusMessage = LocalizationService.Instance["Status_WallNotFound"];
                         IsLoading = false;
                     }
                 });
@@ -459,7 +460,7 @@ namespace CncWallStation.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "搜索并加载墙体失败");
-                StatusMessage = $"❌ 搜索失败: {ex.Message}";
+                StatusMessage = string.Format(LocalizationService.Instance["Status_SearchFailed"], ex.Message);
                 IsLoading = false;
             }
         }
@@ -471,7 +472,7 @@ namespace CncWallStation.ViewModels
             if (!IsRendering)
             {
                 IsLoading = false;
-                StatusMessage = "✅ 渲染页面已就绪";
+                StatusMessage = LocalizationService.Instance["Status_PageReady"];
                 return;
             }
 
@@ -481,7 +482,7 @@ namespace CncWallStation.ViewModels
                 {
                     var escaped = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
                     await ExecuteScriptAsync($"loadWallData('{escaped}')");
-                    StatusMessage = "✅ MOM墙体CSG 3D渲染模型加载完成";
+                    StatusMessage = LocalizationService.Instance["Status_MomModelLoaded"];
                 }
                 catch (Exception ex)
                 {

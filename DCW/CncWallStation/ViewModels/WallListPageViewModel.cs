@@ -1,3 +1,4 @@
+using CncWallStation.Localization;
 using CncWallStation.Models;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
@@ -801,8 +802,8 @@ namespace CncWallStation.ViewModels
             if (item == null) return;
 
             var newName = InteractionHelper.ShowInputDialog(
-                "修改墙体名称",
-                $"墙体ID: {item.WallId}\n请输入新的墙体名称:",
+                LocalizationService.Instance["Dlg_RenameWallTitle"],
+                string.Format(LocalizationService.Instance["Dlg_RenameWallPrompt"], item.WallId),
                 item.WallName);
 
             if (newName == null) // 用户取消

@@ -1,3 +1,4 @@
+using CncWallStation.Localization;
 using CncWallStation.Models;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Enums;
@@ -53,7 +54,7 @@ public partial class JsonEditPageViewModel : ObservableObject
 
     /// <summary>状态消息</summary>
     [ObservableProperty]
-    private string _statusMessage = "就绪";
+    private string _statusMessage = LocalizationService.Instance["JsonStatus_Ready"];
 
     /// <summary>状态消息颜色（红色表示错误，绿色表示成功）</summary>
     [ObservableProperty]
@@ -161,14 +162,14 @@ public partial class JsonEditPageViewModel : ObservableObject
 
         IsLoading = true;
         ClearError();
-        SetStatus("正在加载...", "#1677FF");
+        SetStatus(LocalizationService.Instance["JsonStatus_Loading"], "#1677FF");
 
         try
         {
             _wallDetail = await _wallAppService.GetDetailByWallIdAsync(WallId);
             if (_wallDetail == null)
             {
-                ShowError($"未找到墙体 '{WallId}'");
+                ShowError(string.Format(LocalizationService.Instance["JsonStatus_NotFound"], WallId));
                 return;
             }
 
@@ -177,7 +178,7 @@ public partial class JsonEditPageViewModel : ObservableObject
 
             if (string.IsNullOrWhiteSpace(JsonText))
             {
-                SetStatus("BimJson 为空，请导入或手动输入 JSON 数据", "#FF9800");
+                SetStatus(LocalizationService.Instance["JsonStatus_Empty"], "#FF9800");
                 TreeNodes.Clear();
                 _rootToken = null;
             }
@@ -185,14 +186,15 @@ public partial class JsonEditPageViewModel : ObservableObject
             {
                 ParseAndBuildTree(JsonText);
                 FormatJson();
-                SetStatus($"加载成功 - {_wallDetail.ProjectName ?? "未知项目"} / 楼层 {_wallDetail.Floor}", "#4CAF50");
+                SetStatus(string.Format(LocalizationService.Instance["JsonStatus_LoadSuccess"],
+                    _wallDetail.ProjectName ?? "Unknown", _wallDetail.Floor), "#4CAF50");
             }
 
             HasChanges = false;
         }
         catch (Exception ex)
         {
-            ShowError($"加载失败: {ex.Message}");
+            ShowError(string.Format(LocalizationService.Instance["JsonStatus_LoadFailed"], ex.Message));
         }
         finally
         {
@@ -519,7 +521,7 @@ public partial class JsonEditPageViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(SearchText))
         {
             MatchCount = 0;
-            SetStatus("就绪", "#888888");
+            SetStatus(LocalizationService.Instance["JsonStatus_Ready"], "#888888");
             return;
         }
 
@@ -540,9 +542,9 @@ public partial class JsonEditPageViewModel : ObservableObject
         OnPropertyChanged(nameof(MatchCount));
 
         if (MatchCount > 0)
-            SetStatus($"找到 {MatchCount} 个匹配节点", "#4CAF50");
+            SetStatus(string.Format(LocalizationService.Instance["JsonStatus_SearchFound"], MatchCount), "#4CAF50");
         else
-            SetStatus("未找到匹配节点", "#FF9800");
+            SetStatus(LocalizationService.Instance["JsonStatus_SearchNotFound"], "#FF9800");
     }
 
     private void SearchNodesRecursive(IEnumerable<JsonTreeNode> nodes, string searchText, List<JsonTreeNode> results)
@@ -589,7 +591,7 @@ public partial class JsonEditPageViewModel : ObservableObject
         SearchText = string.Empty;
         ClearSearchHighlight(TreeNodes);
         MatchCount = 0;
-        SetStatus("就绪", "#888888");
+        SetStatus(LocalizationService.Instance["JsonStatus_Ready"], "#888888");
     }
 
     // ==================== 节点编辑 ====================

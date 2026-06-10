@@ -37,6 +37,7 @@
   <data name="Common_WallId" xml:space="preserve"><value>墙体ID</value></data>
   <data name="Common_Project" xml:space="preserve"><value>项目</value></data>
   <data name="Common_Floor" xml:space="preserve"><value>楼层</value></data>
+  <data name="DetailFormat_Floor" xml:space="preserve"><value>楼层 {0}</value></data>
   <data name="Common_Stage" xml:space="preserve"><value>阶段</value></data>
   <data name="Common_Version" xml:space="preserve"><value>版本</value></data>
   <data name="Common_ImportTime" xml:space="preserve"><value>导入时间</value></data>
@@ -175,6 +176,8 @@
   <data name="Error_JsonFormat" xml:space="preserve"><value>JSON 格式错误：</value></data>
   <data name="Error_Position" xml:space="preserve"><value>位置：行 {0}, 列 {1}</value></data>
   <data name="JsonEdit_MatchCount" xml:space="preserve"><value>匹配 {0} 项</value></data>
+  <data name="JsonEdit_ObjectPropCount" xml:space="preserve"><value>{0} 个属性</value></data>
+  <data name="JsonEdit_ArrayItemCount" xml:space="preserve"><value>{0} 项</value></data>
   <data name="ContextMenu_EditValue" xml:space="preserve"><value>编辑值</value></data>
   <data name="ContextMenu_DeleteNode" xml:space="preserve"><value>删除节点</value></data>
   <data name="ContextMenu_ExpandAll" xml:space="preserve"><value>全部展开</value></data>
@@ -234,6 +237,10 @@
   <data name="Filter_All" xml:space="preserve"><value>全部</value></data>
   <data name="CheckResult_Pass" xml:space="preserve"><value>✓ 通过</value></data>
   <data name="CheckResult_Fail" xml:space="preserve"><value>✗ 失败</value></data>
+  <data name="CheckStatus_Passed" xml:space="preserve"><value>通过</value></data>
+  <data name="CheckStatus_Failed" xml:space="preserve"><value>未通过</value></data>
+  <data name="BatchFilter_LatestVersion" xml:space="preserve"><value>最新版本</value></data>
+  <data name="BatchFilter_AllVersion" xml:space="preserve"><value>全部版本</value></data>
   <data name="Column_Level" xml:space="preserve"><value>等级</value></data>
   <data name="Column_Status" xml:space="preserve"><value>状态</value></data>
 
@@ -283,4 +290,42 @@
   <data name="Settings_LangChineseSubtitle" xml:space="preserve"><value>简体中文</value></data>
   <data name="Settings_LangEnglish" xml:space="preserve"><value>English</value></data>
   <data name="Settings_LangEnglishSubtitle" xml:space="preserve"><value>English (US)</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  状态消息（代码中动态使用）                -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Status_SearchingWall" xml:space="preserve"><value>🔍 正在搜索墙体...</value></data>
+  <data name="Status_FoundWall" xml:space="preserve"><value>✅ 找到墙体: {0}</value></data>
+  <data name="Status_WallNotFound" xml:space="preserve"><value>⚠️ 未匹配到墙体记录</value></data>
+  <data name="Status_SearchFailed" xml:space="preserve"><value>❌ 搜索失败: {0}</value></data>
+  <data name="Status_EnterWallId" xml:space="preserve"><value>⚠️ 请输入墙体ID</value></data>
+  <data name="Status_NoWallToLoad" xml:space="preserve"><value>⚠️ 请先搜索并找到墙体</value></data>
+  <data name="Status_PageReady" xml:space="preserve"><value>✅ 渲染页面已就绪</value></data>
+  <data name="CheckStatus_Ready" xml:space="preserve"><value>就绪</value></data>
+  <data name="CheckStatus_Searching" xml:space="preserve"><value>搜索中...</value></data>
+  <data name="CheckStatus_NotFound" xml:space="preserve"><value>未找到墙体：{0}</value></data>
+  <data name="CheckStatus_Found" xml:space="preserve"><value>已找到墙体，可以执行预检</value></data>
+  <data name="CheckStatus_Checking" xml:space="preserve"><value>正在执行数据预检...</value></data>
+  <data name="CheckStatus_CheckFailed" xml:space="preserve"><value>预检失败：{0}</value></data>
+  <data name="JsonStatus_Ready" xml:space="preserve"><value>就绪</value></data>
+  <data name="JsonStatus_Loading" xml:space="preserve"><value>正在加载...</value></data>
+  <data name="JsonStatus_LoadSuccess" xml:space="preserve"><value>加载成功 - {0} / 楼层 {1}</value></data>
+  <data name="JsonStatus_Empty" xml:space="preserve"><value>BimJson 为空，请导入或手动输入 JSON 数据</value></data>
+  <data name="JsonStatus_NotFound" xml:space="preserve"><value>未找到墙体 '{0}'</value></data>
+  <data name="JsonStatus_LoadFailed" xml:space="preserve"><value>加载失败: {0}</value></data>
+  <data name="JsonStatus_SearchFound" xml:space="preserve"><value>找到 {0} 个匹配节点</value></data>
+  <data name="JsonStatus_SearchNotFound" xml:space="preserve"><value>未找到匹配节点</value></data>
+  <data name="Msg_Title_Info" xml:space="preserve"><value>提示</value></data>
+  <data name="Msg_Title_Error" xml:space="preserve"><value>错误</value></data>
+  <data name="Msg_Title_Warning" xml:space="preserve"><value>查询失败</value></data>
+  <data name="Msg_Title_DataIncomplete" xml:space="preserve"><value>数据不完整</value></data>
+  <data name="Msg_NotFound" xml:space="preserve"><value>未找到墙体：{0}</value></data>
+  <data name="Msg_SearchFailed" xml:space="preserve"><value>搜索失败：{0}</value></data>
+  <data name="Msg_CheckFailed" xml:space="preserve"><value>预检执行失败：{0}</value></data>
+  <data name="Msg_WallNotFound" xml:space="preserve"><value>未找到墙体 "{0}"，请检查墙体ID是否正确。</value></data>
+  <data name="Status_BimModelLoaded" xml:space="preserve"><value>✅ AAC墙体3D渲染模型加载完成</value></data>
+  <data name="Status_MomModelLoaded" xml:space="preserve"><value>✅ MOM墙体CSG 3D渲染模型加载完成</value></data>
+  <data name="Dlg_RenameWallTitle" xml:space="preserve"><value>修改墙体名称</value></data>
+  <data name="Dlg_RenameWallPrompt" xml:space="preserve"><value>墙体ID: {0}
+请输入新的墙体名称:</value></data>
 </root>

@@ -25,8 +25,11 @@ namespace CncWallStation.Models.Dtos
         /// <summary>管线阶段</summary>
         public PipelineStage PipelineStage { get; set; }
 
-        /// <summary>管线阶段中文显示文本</summary>
-        public string PipelineStageText => PipelineStage.ToDisplayText();
+        /// <summary>管线阶段显示文本（支持中英文）</summary>
+        public string PipelineStageText =>
+            CncWallStation.Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en")
+                ? PipelineStage.ToDisplayTextEn()
+                : PipelineStage.ToDisplayText();
 
         /// <summary>加工优先级（int）</summary>
         public int Priority { get; set; }

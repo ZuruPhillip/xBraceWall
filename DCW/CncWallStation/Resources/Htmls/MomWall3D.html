@@ -393,19 +393,19 @@
         <div class="panel-title" data-i18n="mom_wall_info">墙体信息</div>
         <div class="dim-visual">
           <div class="dim-box">
-            <span class="dim-box-icon" data-i18n="mom_dim_l">L 长度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_l">长度</span>
             <span class="dim-box-val" id="dv-length">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
           <div class="dim-sep"></div>
           <div class="dim-box">
-            <span class="dim-box-icon" data-i18n="mom_dim_h">H 高度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_h">高度</span>
             <span class="dim-box-val" id="dv-height">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
           <div class="dim-sep"></div>
           <div class="dim-box">
-            <span class="dim-box-icon" data-i18n="mom_dim_t">T 厚度</span>
+            <span class="dim-box-icon" data-i18n="mom_dim_t">厚度</span>
             <span class="dim-box-val" id="dv-thick">—</span>
             <span class="dim-box-unit">mm</span>
           </div>
@@ -506,6 +506,12 @@ const GROOVE_COLORS = {
   default     : { hex: 0xce93d8, cn:'其他凹槽', en:'Other Groove', css: '#ce93d8' },
 };
 (function(){ Object.keys(GROOVE_COLORS).forEach(k=>{ if(GROOVE_COLORS[k].label===undefined) GROOVE_COLORS[k].label=GROOVE_COLORS[k].cn; }); })();
+
+// 获取凹槽类型的本地化标签（供 Legend / Tooltip 使用）
+window._getGrooveLabel = function(typeKey) {
+  var snakeKey = typeKey.replace(/([A-Z])/g, '_$1').toLowerCase();
+  return window.t('groove_' + snakeKey) || (GROOVE_COLORS[typeKey] || GROOVE_COLORS.default).cn;
+};
 
 const HOLE_COLOR_ROUND   = new THREE.Color(0x22d3ee); // 青色 — 圆孔
 const HOLE_COLOR_SLOTTED = new THREE.Color(0xf472b6); // 粉色 — 腰孔
@@ -1030,12 +1036,12 @@ let   hoveredRebarMesh = null;
 
 function normalLabel(n) {
   const nx=Math.round(n.x??0), ny=Math.round(n.y??0), nz=Math.round(n.z??0);
-  if (nz> 0) return '正面 (+Z)';
-  if (nz< 0) return '背面 (−Z)';
-  if (ny> 0) return '顶面 (+Y)';
-  if (ny< 0) return '底面 (−Y)';
-  if (nx> 0) return '右侧 (+X)';
-  if (nx< 0) return '左侧 (−X)';
+  if (nz> 0) return window.t('normal_front_z');
+  if (nz< 0) return window.t('normal_back_z');
+  if (ny> 0) return window.t('normal_top_y');
+  if (ny< 0) return window.t('normal_bottom_y');
+  if (nx> 0) return window.t('normal_right_x');
+  if (nx< 0) return window.t('normal_left_x');
   return `(${nx},${ny},${nz})`;
 }
 function fmt(v, unit='mm') {
@@ -1071,14 +1077,15 @@ function showMomTooltip(mesh, mouseX, mouseY) {
   let typeKey, cfg;
   if (featureType === 'Groove') {
     typeKey = feature.grooveType ?? 'default';
-    cfg = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
+    const grooveCfg = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
+    cfg = { css: grooveCfg.css, label: window._getGrooveLabel(typeKey) };
   } else if (featureType === 'Hole') {
     const isRound = isHoleRound(feature.shape);
-    cfg = isRound ? { css: '#22d3ee', label: '圆孔 (Hole)' } : { css: '#f472b6', label: '腰孔 (Slotted)' };
+    cfg = isRound ? { css: '#22d3ee', label: window.t('ftype_hole_round') } : { css: '#f472b6', label: window.t('ftype_hole_slotted') };
     typeKey = isRound ? 'hole-round' : 'hole-slotted';
   } else if (featureType === 'RebarSlot') {
     typeKey = 'rebar';
-    cfg = { css: '#ff8c42', label: '钢筋槽 (RebarSlot)' };
+    cfg = { css: '#ff8c42', label: window.t('ftype_rebar') };
   } else {
     typeKey = 'mep';
     cfg = { css: '#fbbf24', label: 'MepSlot' };
@@ -1102,7 +1109,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
   if (featureType === 'Groove') {
     const box = extra.box;
     const isPocket = (feature.grooveType === 'pocket');
-    document.getElementById('mtt-ftype').textContent = '凹槽 (Groove)';
+    document.getElementById('mtt-ftype').textContent = window.t('ftype_groove');
     document.getElementById('mtt-len').textContent  = feature.length != null ? (+feature.length).toFixed(1) : (+box.gx / S).toFixed(1);
     document.getElementById('mtt-wid').textContent  = feature.width  != null ? (+feature.width).toFixed(1)  : (+box.gy / S).toFixed(1);
     document.getElementById('mtt-dep').textContent  = feature.depth  != null ? (+feature.depth).toFixed(1)  : (+box.gz / S).toFixed(1);
@@ -1142,7 +1149,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
   } else if (featureType === 'MepSlot') {
     const seg = extra.seg;
     const segType = (seg.$segmentType ?? seg.type ?? 'line').toLowerCase();
-    document.getElementById('mtt-ftype').textContent = 'MepSlot 管槽';
+    document.getElementById('mtt-ftype').textContent = window.t('ftype_mep');
     document.getElementById('mtt-len').textContent  = feature.totalLength != null ? (+feature.totalLength).toFixed(1) : '—';
     document.getElementById('mtt-wid').textContent  = (seg.overrideWidth ?? feature.width) != null ? (+(seg.overrideWidth ?? feature.width)).toFixed(1) : '—';
     document.getElementById('mtt-dep').textContent  = seg.depth != null ? (+seg.depth).toFixed(1) : '—';
@@ -1186,7 +1193,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     const isSlotted = isHoleSlotted(feature.shape);
     const isRound = !isSlotted;
 
-    document.getElementById('mtt-ftype').textContent = isRound ? '圆孔 (Hole)' : '剪力钉孔';
+    document.getElementById('mtt-ftype').textContent = isRound ? window.t('ftype_hole_round') : window.t('ftype_hole_slotted');
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
 
@@ -1201,7 +1208,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-dep').textContent = feature.depth != null ? (+feature.depth).toFixed(1) + ' mm' : '—';
 
     // 孔专属行
-    document.getElementById('mtt-hole-shape').textContent = isRound ? '圆形' : '腰形';
+    document.getElementById('mtt-hole-shape').textContent = isRound ? window.t('hole_shape_round') : window.t('hole_shape_slotted');
     document.getElementById('mtt-hole-radius').textContent = r != null ? r.toFixed(1) + ' mm' : '—';
     document.getElementById('mtt-hole-diameter').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
 
@@ -1227,18 +1234,18 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     } else {
       const lp = feature.localPos;
       document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
-      document.getElementById('mtt-endpt').textContent = feature.throughHole ? '✓ 通孔' : '✗ 盲孔';
+      document.getElementById('mtt-endpt').textContent = feature.throughHole ? window.t('hole_through') : window.t('hole_blind');
     }
     document.getElementById('mtt-sub').textContent = '';
   } else if (featureType === 'RebarSlot') {
     // 判断方向
     const dir = feature.direction;
-    const dirLabel = (dir === 'Vertical' || dir === 1) ? '纵向 (Vertical)' : '横向 (Horizontal)';
+    const dirLabel = (dir === 'Vertical' || dir === 1) ? window.t('rebar_vertical') : window.t('rebar_horizontal');
     const dia = feature.diameter ?? 0;
     const len = feature.length ?? 0;
     const dep = feature.depth ?? 0;
 
-    document.getElementById('mtt-ftype').textContent = '钢筋槽 (RebarSlot)';
+    document.getElementById('mtt-ftype').textContent = window.t('ftype_rebar');
     document.getElementById('mtt-len').textContent  = (+len).toFixed(1);
     document.getElementById('mtt-wid').textContent  = (+dia).toFixed(1);
     document.getElementById('mtt-dep').textContent  = (+dep).toFixed(1);
@@ -1265,7 +1272,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
 
     // 方向（复用 mtt-center-row）
     document.getElementById('mtt-center-row').style.display = '';
-    document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = '方向';
+    document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = window.t('seg_direction');
     document.getElementById('mtt-centerpt').textContent = dirLabel;
     document.getElementById('mtt-sub').textContent = '';
   }
@@ -1306,21 +1313,21 @@ function showGrooveCard(mesh, mouseX, mouseY) {
   const typeKey = f.grooveType ?? 'default';
   const cfg     = GROOVE_COLORS[typeKey] ?? GROOVE_COLORS.default;
   document.getElementById('gc-dot').style.background  = cfg.css;
-  document.getElementById('gc-type').textContent      = cfg.label;
+  document.getElementById('gc-type').textContent      = window._getGrooveLabel(typeKey);
   document.getElementById('gc-id').textContent        = f.id ? `#${f.id}` : '';
   document.getElementById('gc-len').textContent = f.length != null ? (+f.length).toFixed(1) : (+box.gx/S).toFixed(1);
   document.getElementById('gc-wid').textContent = f.width  != null ? (+f.width).toFixed(1)  : (+box.gy/S).toFixed(1);
   document.getElementById('gc-dep').textContent = f.depth  != null ? (+f.depth).toFixed(1)  : (+box.gz/S).toFixed(1);
   const n    = f.currentNormal ?? {x:0,y:0,z:1};
   const rows = [
-    ['切削面', normalLabel(n)],
-    ['切削深度', fmt(f.depth)],
-    ['槽宽',     fmt(f.width)],
-    ['槽长',     f.length!=null ? fmt(f.length) : '—'],
-    ['起点 X/Y', f.startPt ? `${(+(f.startPt.x??0)).toFixed(1)}, ${(+(f.startPt.y??0)).toFixed(1)}` : '—'],
-    ['终点 X/Y', f.endPt   ? `${(+(f.endPt.x??0)).toFixed(1)}, ${(+(f.endPt.y??0)).toFixed(1)}`     : '—'],
-    ['初始面',   f.initialSide ?? '—'],
-    ['当前面',   f.currentSide ?? '—'],
+    [window.t('gc_cutface'), normalLabel(n)],
+    [window.t('gc_cutdepth'), fmt(f.depth)],
+    [window.t('gc_slotwidth'),    fmt(f.width)],
+    [window.t('gc_slotlen'),    f.length!=null ? fmt(f.length) : '—'],
+    [window.t('gc_start_xy'), f.startPt ? `${(+(f.startPt.x??0)).toFixed(1)}, ${(+(f.startPt.y??0)).toFixed(1)}` : '—'],
+    [window.t('gc_end_xy'), f.endPt   ? `${(+(f.endPt.x??0)).toFixed(1)}, ${(+(f.endPt.y??0)).toFixed(1)}`     : '—'],
+    [window.t('gc_initial_side'),  f.initialSide ?? '—'],
+    [window.t('gc_current_side'),  f.currentSide ?? '—'],
   ].filter(([,v])=>v&&v!=='—');
   const bodyEl = document.getElementById('gc-body');
   bodyEl.innerHTML = rows.map(([l,v])=>`
@@ -1358,13 +1365,13 @@ function showMepCard(mesh, mouseX, mouseY) {
 
   const n = f.currentNormal ?? {x:0,y:0,z:1};
   const rows = [
-    ['所在面',    normalLabel(n)],
-    ['路径起点',  f.pathStart ? `(${(+(f.pathStart.x)).toFixed(1)}, ${(+(f.pathStart.y)).toFixed(1)})` : '—'],
-    ['路径终点',  f.pathEnd   ? `(${(+(f.pathEnd.x)).toFixed(1)},   ${(+(f.pathEnd.y)).toFixed(1)})`   : '—'],
-    ['均匀深度',  f.isUniformDepth ? '✓ 是' : '✗ 否'],
-    ['初始面',    f.initialSide ?? '—'],
-    ['当前面',    f.currentSide ?? '—'],
-    ['当前悬浮段', `第 ${segIndex + 1} 段 / 共 ${f.segments?.length ?? 1} 段`],
+    [window.t('mc_face'),    normalLabel(n)],
+    [window.t('mc_path_start'),  f.pathStart ? `(${(+(f.pathStart.x)).toFixed(1)}, ${(+(f.pathStart.y)).toFixed(1)})` : '—'],
+    [window.t('mc_path_end'),  f.pathEnd   ? `(${(+(f.pathEnd.x)).toFixed(1)},   ${(+(f.pathEnd.y)).toFixed(1)})`   : '—'],
+    [window.t('mc_uniform_depth'),  f.isUniformDepth ? window.t('yes') : window.t('no')],
+    [window.t('mc_initial_side'),    f.initialSide ?? '—'],
+    [window.t('mc_current_side'),    f.currentSide ?? '—'],
+    [window.t('mc_current_seg'), `第 ${segIndex + 1} 段 / 共 ${f.segments?.length ?? 1} 段`],
   ];
   document.getElementById('mc-body').innerHTML = rows
     .filter(([,v])=>v&&v!=='—')
@@ -1379,22 +1386,22 @@ function showMepCard(mesh, mouseX, mouseY) {
     let props = '';
     if (segType === 'line') {
       props = `
-        <div class="mc-seg-prop">起点 <span>(${(+(s.startPoint?.x??0)).toFixed(1)}, ${(+(s.startPoint?.y??0)).toFixed(1)})</span></div>
-        <div class="mc-seg-prop">终点 <span>(${(+(s.endPoint?.x??0)).toFixed(1)}, ${(+(s.endPoint?.y??0)).toFixed(1)})</span></div>
-        <div class="mc-seg-prop">长度 <span>${(+s.length).toFixed(1)} mm</span></div>
-        <div class="mc-seg-prop">深度 <span>${(+s.depth).toFixed(1)} mm</span></div>
-        <div class="mc-seg-prop">宽度 <span>${(+w).toFixed(1)} mm</span></div>
-        ${s.overrideWidth != null ? '<div class="mc-seg-prop" style="grid-column:span 2;color:#fbbf24;font-size:9px">⚠ 覆盖宽度</div>' : ''}
+        <div class="mc-seg-prop">${window.t('seg_start')} <span>(${(+(s.startPoint?.x??0)).toFixed(1)}, ${(+(s.startPoint?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">${window.t('seg_end')} <span>(${(+(s.endPoint?.x??0)).toFixed(1)}, ${(+(s.endPoint?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">${window.t('seg_length')} <span>${(+s.length).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">${window.t('seg_depth')} <span>${(+s.depth).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">${window.t('seg_width')} <span>${(+w).toFixed(1)} mm</span></div>
+        ${s.overrideWidth != null ? '<div class="mc-seg-prop" style="grid-column:span 2;color:#fbbf24;font-size:9px">' + window.t('seg_override_width') + '</div>' : ''}
       `;
     } else {
       props = `
-        <div class="mc-seg-prop">圆心 <span>(${(+(s.center?.x??0)).toFixed(1)}, ${(+(s.center?.y??0)).toFixed(1)})</span></div>
-        <div class="mc-seg-prop">半径 <span>${(+(s.radius ?? 0)).toFixed(1)} mm</span></div>
-        <div class="mc-seg-prop">起角 <span>${s.StartAngleDeg}°</span></div>
-        <div class="mc-seg-prop">终角 <span>${s.EndAngleDeg}°</span></div>
-        <div class="mc-seg-prop">深度 <span>${(+s.depth).toFixed(1)} mm</span></div>
-        <div class="mc-seg-prop">方向 <span>${s.isClockwise ? '顺时针' : '逆时针'}</span></div>
-        <div class="mc-seg-prop">宽度 <span>${(+w).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">${window.t('seg_center')} <span>(${(+(s.center?.x??0)).toFixed(1)}, ${(+(s.center?.y??0)).toFixed(1)})</span></div>
+        <div class="mc-seg-prop">${window.t('seg_radius')} <span>${(+(s.radius ?? 0)).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">${window.t('seg_start_angle')} <span>${s.StartAngleDeg}°</span></div>
+        <div class="mc-seg-prop">${window.t('seg_end_angle')} <span>${s.EndAngleDeg}°</span></div>
+        <div class="mc-seg-prop">${window.t('seg_depth')} <span>${(+s.depth).toFixed(1)} mm</span></div>
+        <div class="mc-seg-prop">${window.t('seg_direction')} <span>${s.isClockwise ? window.t('cw') : window.t('ccw')}</span></div>
+        <div class="mc-seg-prop">${window.t('seg_width')} <span>${(+w).toFixed(1)} mm</span></div>
       `;
     }
     return `
@@ -1402,7 +1409,7 @@ function showMepCard(mesh, mouseX, mouseY) {
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
           <span style="font-size:9px;color:#57534e">#${i+1}</span>
           <div class="mc-seg-type ${segType === 'arc' ? 'arc' : 'line'}">${segType === 'arc' ? '⌒ Arc' : '— Line'}</div>
-          ${isCurrentSeg ? '<span style="font-size:9px;color:#fbbf24;margin-left:auto">◀ 当前</span>' : ''}
+          ${isCurrentSeg ? '<span style="font-size:9px;color:#fbbf24;margin-left:auto">' + window.t('seg_current') + '</span>' : ''}
         </div>
         <div class="mc-seg-props">${props}</div>
       </div>`;
@@ -1566,20 +1573,20 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
   document.getElementById('d-area-top').textContent   = aT.toFixed(1) + ' m²';
   const wKg=volM3*AAC_DENSITY;
   document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(1)+' t':wKg.toFixed(1)+' kg';
-  document.getElementById('d-groove-count').textContent = grooves.length+' 个';
-  document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length+' 种';
-  document.getElementById('d-mep-count').textContent = mepSlots.length+' 条';
+  document.getElementById('d-groove-count').textContent = grooves.length + ' ' + window.t('unit_pcs');
+  document.getElementById('d-groove-types').textContent = Object.keys(typeCount).length + ' ' + window.t('unit_types');
+  document.getElementById('d-mep-count').textContent = mepSlots.length + ' ' + window.t('unit_slots');
   // 孔统计（兼容 holes 为 null/undefined 的情况）
   const holeArr = Array.isArray(holes) ? holes : [];
   console.log('[fillInfoPanel] holes count:', holeArr.length, 'shapes:', holeArr.map(h => h.shape));
   const roundHoles = holeArr.filter(h => isHoleRound(h.shape));
   const slottedHoles = holeArr.filter(h => isHoleSlotted(h.shape));
   console.log('[fillInfoPanel] roundHoles:', roundHoles.length, 'slottedHoles:', slottedHoles.length);
-  document.getElementById('d-round-hole-count').textContent = roundHoles.length > 0 ? `${roundHoles.length} 个` : '—';
-  document.getElementById('d-slotted-hole-count').textContent = slottedHoles.length > 0 ? `${slottedHoles.length} 个` : '—';
+  document.getElementById('d-round-hole-count').textContent = roundHoles.length > 0 ? roundHoles.length + ' ' + window.t('unit_pcs') : '—';
+  document.getElementById('d-slotted-hole-count').textContent = slottedHoles.length > 0 ? slottedHoles.length + ' ' + window.t('unit_pcs') : '—';
   // 钢筋槽统计
   const rbSlots = Array.isArray(rebarSlots) ? rebarSlots : [];
-  document.getElementById('d-rebar-count').textContent = rbSlots.length > 0 ? `${rbSlots.length} 条` : '0 条';
+  document.getElementById('d-rebar-count').textContent = rbSlots.length > 0 ? rbSlots.length + ' ' + window.t('unit_slots') : '0 ' + window.t('unit_slots');
 }
 
 function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
@@ -1587,7 +1594,7 @@ function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
   const items = [
     {label:window.t('legend_wall_body'), css:'#c8d0d8', count:1, key:'wall'},
     ...[...usedTypes].map(k=>({
-      label:window.t('groove_'+k)||GROOVE_COLORS[k]?.label||k,
+      label:window._getGrooveLabel(k),
       css  :(GROOVE_COLORS[k]??GROOVE_COLORS.default).css,
       count:typeCount[k]??0,
       key:'groove',
@@ -1612,14 +1619,6 @@ function fillLegend(usedTypes, typeCount, hasMep, holes, rebarSlots) {
   if (hasMep) {
     items.push({label:window.t('legend_mep_line'), css:'#fbbf24', count:0, key:'mepLine'});
     items.push({label:window.t('legend_mep_arc'),  css:'#a78bfa', count:0, key:'mepArc'});
-  }
-  // 钢筋槽图例
-  if (Array.isArray(rebarSlots) && rebarSlots.length > 0) {
-    items.push({label:'钢筋槽', css:'#ff8c42', count:rebarSlots.length, key:'rebar'});
-  }
-  if (hasMep) {
-    items.push({label:'MEP 管槽 (Line)', css:'#fbbf24', count:0, key:'mep'});
-    items.push({label:'MEP 弧槽 (Arc)',  css:'#a78bfa', count:0, key:'mep'});
   }
   items.forEach(({label,css,count,key})=>{
     const d=document.createElement('div'); d.className='legend-item';
@@ -2145,9 +2144,9 @@ window.resetAllLayers = function() {
   var I18N = {
     load_parsing: { zh: '解析 JSON 数据...', en: 'Parsing JSON data...' },
     mom_wall_info: { zh: '墙体信息', en: 'Wall Info' },
-    mom_dim_l: { zh: 'L 长度', en: 'L Length' },
-    mom_dim_h: { zh: 'H 高度', en: 'H Height' },
-    mom_dim_t: { zh: 'T 厚度', en: 'T Thickness' },
+    mom_dim_l: { zh: '长度', en: 'Length' },
+    mom_dim_h: { zh: '高度', en: 'Height' },
+    mom_dim_t: { zh: '厚度', en: 'Thickness' },
     mom_param_material: { zh: '材质', en: 'Material' },
     mom_param_volume: { zh: '毛体积', en: 'Gross Volume' },
     mom_param_frontarea: { zh: '正面面积', en: 'Front Area' },
@@ -2157,12 +2156,12 @@ window.resetAllLayers = function() {
     mom_param_groovetypes: { zh: '凹槽类型', en: 'Groove Types' },
     mom_param_mepcount: { zh: 'MEP槽数', en: 'MEP Count' },
     mom_param_roundholes: { zh: '圆孔数', en: 'Round Holes' },
-    mom_param_slottedholes: { zh: '剪力钉孔数', en: 'Slotted Holes' },
+    mom_param_slottedholes: { zh: '剪力钉孔数', en: 'BendingKey Holes' },
     mom_param_rebarcount: { zh: '钢筋槽数', en: 'Rebar Slots' },
     mom_legend_title: { zh: '图 例', en: 'Legend' },
     legend_wall_body: { zh: 'AAC 墙体主体', en: 'AAC Wall Body' },
     legend_round_hole: { zh: '圆孔 (Hole)', en: 'Round Hole' },
-    legend_slotted_hole: { zh: '剪力钉孔', en: 'Slotted Hole' },
+    legend_slotted_hole: { zh: '剪力钉孔', en: 'BendingKey' },
     legend_rebar: { zh: '钢筋槽', en: 'Rebar Slot' },
     legend_mep_line: { zh: 'MEP 管槽 (Line)', en: 'MEP Slot (Line)' },
     legend_mep_arc: { zh: 'MEP 弧槽 (Arc)', en: 'MEP Arc Slot' },
@@ -2231,7 +2230,7 @@ window.resetAllLayers = function() {
     groove_default: { zh: '其他凹槽', en: 'Other Groove' },
     ftype_groove: { zh: '凹槽 (Groove)', en: 'Groove' },
     ftype_hole_round: { zh: '圆孔 (Hole)', en: 'Round Hole' },
-    ftype_hole_slotted: { zh: '剪力钉孔', en: 'Slotted Hole' },
+    ftype_hole_slotted: { zh: '剪力钉孔', en: 'BendingKey' },
     ftype_mep: { zh: 'MepSlot 管槽', en: 'MepSlot' },
     ftype_rebar: { zh: '钢筋槽 (RebarSlot)', en: 'RebarSlot' },
     hole_shape_round: { zh: '圆形', en: 'Round' },
@@ -2262,6 +2261,9 @@ window.resetAllLayers = function() {
     seg_radius: { zh: '半径', en: 'Radius' },
     seg_direction: { zh: '方向', en: 'Direction' },
     seg_current: { zh: '◀ 当前', en: '◀ Current' },
+    seg_start_angle: { zh: '起角', en: 'Start Angle' },
+    seg_end_angle: { zh: '终角', en: 'End Angle' },
+    seg_override_width: { zh: '⚠ 覆盖宽度', en: '⚠ Override Width' },
   };
 
   window.t = function(key) {
@@ -2278,9 +2280,11 @@ window.resetAllLayers = function() {
       var entry = I18N[key];
       if (entry) { el.textContent = entry[lang] || entry['zh']; }
     });
-    // 同步更新 GROOVE_COLORS 标签
+    // 同步更新 GROOVE_COLORS 标签（camelCase → snake_case）
+    function camelToSnake(s) { return s.replace(/([A-Z])/g, '_$1').toLowerCase(); }
     Object.keys(GROOVE_COLORS).forEach(function(k) {
-      var entry = I18N['groove_'+k];
+      var i18nKey = 'groove_' + camelToSnake(k);
+      var entry = I18N[i18nKey];
       if (entry && GROOVE_COLORS[k]) {
         GROOVE_COLORS[k].label = entry[lang] || entry['zh'];
       }

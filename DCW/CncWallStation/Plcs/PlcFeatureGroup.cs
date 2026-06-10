@@ -26,7 +26,8 @@ namespace CncWallStation.Plcs
             { "ProppingHandler", "斜撑" },
             { "StepHandler", "台阶" },
             { "GlueSealHandler", "密封条" },
-            { "XBraceHandler", "X斜槽" }
+            { "XBraceHandler", "X斜槽" },
+            { "TopPlateHandler", "顶板" }
         };
 
         /// <summary>
@@ -44,7 +45,8 @@ namespace CncWallStation.Plcs
             { "ProppingHandler", "Propping" },
             { "StepHandler", "Step" },
             { "GlueSealHandler", "Glue Seal" },
-            { "XBraceHandler", "X-Brace" }
+            { "XBraceHandler", "X-Brace" },
+            { "TopPlateHandler", "Top Plate" }
         };
 
         /// <summary>该分组下的指令列表</summary>

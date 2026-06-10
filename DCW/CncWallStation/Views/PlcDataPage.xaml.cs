@@ -174,6 +174,20 @@ namespace CncWallStation.Views
             => throw new NotSupportedException();
     }
 
+    /// <summary>指令条数 → 本地化格式（PlcDataPage 专用，支持中英文单位）</summary>
+    public class PlcInstructionCountConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int count)
+                return string.Format(LocalizationService.Instance["Stat_InstructionUnit"], count);
+            return "0";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotSupportedException();
+    }
+
     /// <summary>审核状态 → 颜色（PlcDataPage 专用）</summary>
     public class PlcAuditStatusToColorConverter : IValueConverter
     {

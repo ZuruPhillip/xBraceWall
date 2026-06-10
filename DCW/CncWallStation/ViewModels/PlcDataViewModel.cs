@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CncWallStation.Localization;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
@@ -126,8 +127,8 @@ namespace CncWallStation.ViewModels
                 if (wallInfo == null)
                 {
                     System.Windows.MessageBox.Show(
-                        $"未找到墙体 \"{SearchWallId}\"，请检查墙体ID是否正确。",
-                        "查询失败",
+                        string.Format(LocalizationService.Instance["Msg_WallNotFound"], SearchWallId),
+                        LocalizationService.Instance["Msg_Title_Warning"],
                         System.Windows.MessageBoxButton.OK,
                         System.Windows.MessageBoxImage.Warning);
                     IsWallLoaded = false;
@@ -141,7 +142,7 @@ namespace CncWallStation.ViewModels
                         $"墙体 \"{SearchWallId}\" 的 MOM 数据尚未生成，无法计算 PLC 指令。\n\n" +
                         "请先在 WallListPage 中对该墙体执行「管线」操作，\n" +
                         "完成 BimJSON → MomJSON 转换后再试。",
-                        "数据不完整",
+                        LocalizationService.Instance["Msg_Title_DataIncomplete"],
                         System.Windows.MessageBoxButton.OK,
                         System.Windows.MessageBoxImage.Warning);
                     IsWallLoaded = false;
@@ -171,7 +172,7 @@ namespace CncWallStation.ViewModels
                 _logger.LogError(ex, "搜索墙体失败: {WallId}", SearchWallId);
                 System.Windows.MessageBox.Show(
                     $"搜索墙体时发生异常：\n\n{ex.Message}",
-                    "错误",
+                    LocalizationService.Instance["Msg_Title_Error"],
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Error);
                 IsWallLoaded = false;
@@ -440,6 +441,8 @@ namespace CncWallStation.ViewModels
             FeatureGroups.Clear();
             CurrentInstructions.Clear();
 
+            var isEn = Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+
             foreach (var group in groups)
             {
                 var dtoInstructions = new List<PlcInstructionDto>();
@@ -449,10 +452,20 @@ namespace CncWallStation.ViewModels
                     dtoInstructions.Add(PlcInstructionDto.FromPlcInstruction(inst, sortOrder++));
                 }
 
+                // 根据当前语言从映射表中查找特征名称
+                string? nameEn = null;
+                string? name = null;
+                bool found = isEn
+                    ? Plcs.PlcFeatureGroup.FeatureNameMapEn.TryGetValue(group.HandlerName, out nameEn)
+                    : Plcs.PlcFeatureGroup.FeatureNameMap.TryGetValue(group.HandlerName, out name);
+                var featureName = found
+                    ? (isEn ? nameEn! : name!)
+                    : group.FeatureName;
+
                 var dto = new PlcFeatureGroupDto
                 {
                     HandlerName = group.HandlerName,
-                    FeatureName = group.FeatureName,
+                    FeatureName = featureName,
                     InstructionCount = group.Instructions.Count,
                     Instructions = dtoInstructions
                 };

@@ -147,8 +147,12 @@ public class JsonTreeNode : INotifyPropertyChanged
 
             return NodeType switch
             {
-                JsonNodeType.Object => $"{{ {Children.Count} 个属性 }}",
-                JsonNodeType.Array => $"[ {Children.Count} 项 ]",
+                JsonNodeType.Object => string.Format(
+                    Localization.LocalizationService.Instance["JsonEdit_ObjectPropCount"],
+                    Children.Count),
+                JsonNodeType.Array => string.Format(
+                    Localization.LocalizationService.Instance["JsonEdit_ArrayItemCount"],
+                    Children.Count),
                 _ => ""
             };
         }
