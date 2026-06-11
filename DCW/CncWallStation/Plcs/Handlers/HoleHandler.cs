@@ -76,9 +76,9 @@ namespace CncWallStation.Plcs.Handlers
 
             bool ok =
                 // ① 侧面 Φ25 → T3
-                (side == MachineSide.Back && Match(d, DIAMETER_25)) ||
+                (side == MachineSide.Front && Match(d, DIAMETER_25)) ||
                 // ② 侧面 Φ12 → T9
-                (side == MachineSide.Back && Match(d, DIAMETER_12)) ||
+                (side == MachineSide.Front && Match(d, DIAMETER_12)) ||
                 // ③ 顶面 Φ20 → T8
                 (side == MachineSide.Top && Match(d, DIAMETER_20)) ||
                 // ④ 顶面 Φ12 → T10
@@ -109,7 +109,7 @@ namespace CncWallStation.Plcs.Handlers
             //    Top   （墙正面进刀）   ：Z0 = 0（从墙正面切入）
             float z0 = first.Face.InitialSide switch
             {
-                MachineSide.Back => first.LocalPos.Y,
+                MachineSide.Front => first.LocalPos.Y,
                 MachineSide.Top => 0f,
                 _ => throw new NotSupportedException(
                          $"Unsupported face: {first.Face.InitialSide}")
@@ -121,11 +121,11 @@ namespace CncWallStation.Plcs.Handlers
                 F = f,
                 D = chain.CopyCount,
                 X0 = first.LocalPos.X,
-                Y0 = first.LocalPos.Y,
+                Y0 = 0,
                 Z0 = z0,
                 X1 = chain.Dx,
-                Y1 = chain.Dy,
-                Z1 = key.Depth
+                Y1 = key.Depth,
+                Z1 = chain.Dy
             });
         }
 
@@ -140,7 +140,7 @@ namespace CncWallStation.Plcs.Handlers
         private static (int t, int f) SelectToolAndFeature(
             float diameter, MachineSide side)
         {
-            if (side == MachineSide.Back)
+            if (side == MachineSide.Front)
             {
                 if (Match(diameter, DIAMETER_25))
                     return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9

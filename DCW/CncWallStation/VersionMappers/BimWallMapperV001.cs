@@ -32,6 +32,9 @@ namespace CncWallStation.VersionMappers
             //生成顶板槽数据TopPlateGroove
             ConvertTopPlateToFeature(dto.TopPlate, momWallData);
 
+            //生成剪力钉孔数据
+            ConvertStudsToFeature(dto.TopPlate, momWallData);
+
             //生成XBrace数据XBraceGroove
             ConvertCrossBraceToFeature(dto, momWallData);
 
@@ -214,6 +217,52 @@ namespace CncWallStation.VersionMappers
             momWallData.Features.Add(topPlateGroove);
         }
 
+
+        /// <summary>
+        /// 将 TopPlate 中 Studs.Points 转换为圆孔 Hole Feature
+        /// </summary>
+        private static void ConvertStudsToFeature(
+            List<BimTopPlateDtoV000>? topPlates, MomWall momWallData)
+        {
+            if (topPlates == null || topPlates.Count == 0)
+                return;
+
+            for (int i = 0; i < topPlates.Count; i++)
+            {
+                var topPlate = topPlates[i];
+                if (topPlate?.Studs == null || topPlate.Studs.Points == null || topPlate.Studs.Points.Count == 0)
+                    continue;
+
+                var studs = topPlate.Studs;
+                string pn = string.IsNullOrWhiteSpace(studs.Pn) ? "noPn" : studs.Pn!;
+                float radius = studs.HoleDiameter / 2f;
+
+                for (int j = 0; j < studs.Points.Count; j++)
+                {
+                    var point = studs.Points[j];
+                    if (point == null) continue;
+
+                    // ── 特征 ID ───────────────────────────────
+                    string id = studs.Points.Count == 1
+                        ? $"Studs-{pn}"
+                        : $"Studs-{pn}-{j:D2}";
+
+                    // ── 中心点（Front 面：X=墙长，Z=墙高）────
+                    var center = new Vec2((float)point.X, (float)point.Y);
+
+                    // ── 构造圆孔 Feature ──────────────────────
+                    var hole = Hole.CreateRound(
+                        id: id,
+                        side: MachineSide.Front,
+                        center: center,
+                        radius: radius,
+                        depth: WallConstants.StudHoleDepth,
+                        throughHole: false);
+
+                    momWallData.Features.Add(hole);
+                }
+            }
+        }
 
         /// <summary>
         /// 产生胶水密封槽

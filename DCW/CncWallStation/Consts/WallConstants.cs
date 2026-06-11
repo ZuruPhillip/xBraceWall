@@ -93,6 +93,11 @@
         /// </summary>
         public const float TopPlateGrooveDepth = 9f;
 
+        /// <summary>
+        /// 剪力钉孔切削深度（mm）
+        /// </summary>
+        public const float StudHoleDepth = 42f;
+
         // ══════════════════════════════════════════════════════════
         // 胶水密封槽基础尺寸
         // ══════════════════════════════════════════════════════════
