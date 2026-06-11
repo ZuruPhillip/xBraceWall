@@ -1,3 +1,4 @@
+using CncWallStation.Consts;
 using CncWallStation.Features;
 using CncWallStation.MomWallData;
 
@@ -69,12 +70,12 @@ namespace CncWallStation.Plcs.Handlers
                 _ => throw new NotSupportedException(key.Direction.ToString())
             };
 
-            (float x1, float y1) = key.Direction switch
+            (float x1, float y1, float z1) = key.Direction switch
             {
                 // 横槽：X1 = 钢筋长度，Y1 = 间距
-                RebarSlotDirection.Horizontal => (key.Length, chain.Dy),
+                RebarSlotDirection.Horizontal => (key.Length, chain.Dy, WallConstants.HorizontalRebarSlotDepth),
                 // 纵槽：X1 = 间距，Y1 = 钢筋长度
-                RebarSlotDirection.Vertical   => (chain.Dx, key.Length),
+                RebarSlotDirection.Vertical   => (chain.Dx, key.Length, WallConstants.VerticalRebarSlotDepth),
                 _ => throw new NotSupportedException(key.Direction.ToString())
             };
 
@@ -88,7 +89,7 @@ namespace CncWallStation.Plcs.Handlers
                 Z0 = 0f,
                 X1 = x1,
                 Y1 = y1,
-                Z1 = first.Depth
+                Z1 = z1
             });
         }
 

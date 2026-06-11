@@ -20,7 +20,7 @@
         /// 钢柱槽标准切削深度（mm）
         /// 钢柱嵌入 AAC 墙体的标准深度
         /// </summary>
-        public const float ColumnSteelGrooveDepth = 100f;
+        public const float ColumnSteelGrooveDepth = 103f;
 
         /// <summary>
         /// 钢柱槽距侧边长度（mm）
@@ -188,7 +188,7 @@
         /// BendingKey孔加工深度（mm）
         /// 嵌入 AAC 墙体底面的标准深度
         /// </summary>
-        public const float BendingKeyHoleDepth = 30f;
+        public const float BendingKeyHoleDepth = 105f;
 
         /// <summary>
         /// BendingKey 腰孔两圆心距（mm）
@@ -282,6 +282,12 @@
 
         /// <summary>胶缝/密封条槽深度（mm）</summary>
         public const float GlueSealDepth = 15f;
+
+        /// <summary>横向钢筋槽切割深度（mm）</summary>
+        public const float HorizontalRebarSlotDepth = 28f;
+
+        /// <summary>纵向钢筋槽切割深度（mm）</summary>
+        public const float VerticalRebarSlotDepth = 35f;
         #endregion
 
 

@@ -45,6 +45,38 @@ namespace CncWallStation.ViewModels
         [ObservableProperty]
         private bool _isAudited;
 
+        // ==================== 墙体实际尺寸 ====================
+
+        /// <summary>墙体实际长度（mm），同步写入 WallHandler 分组 X0</summary>
+        [ObservableProperty]
+        private float _wallActualLength;
+
+        /// <summary>墙体实际宽度（mm），同步写入 WallHandler 分组 Y0</summary>
+        [ObservableProperty]
+        private float _wallActualWidth;
+
+        /// <summary>墙体实际高度/厚度（mm），同步写入 WallHandler 分组 Z0</summary>
+        [ObservableProperty]
+        private float _wallActualHeight;
+
+        /// <summary>防止同步时递归触发</summary>
+        private bool _isSyncingDimensions;
+
+        partial void OnWallActualLengthChanged(float value)
+        {
+            if (!_isSyncingDimensions) SyncWallDimensions();
+        }
+
+        partial void OnWallActualWidthChanged(float value)
+        {
+            if (!_isSyncingDimensions) SyncWallDimensions();
+        }
+
+        partial void OnWallActualHeightChanged(float value)
+        {
+            if (!_isSyncingDimensions) SyncWallDimensions();
+        }
+
         // ==================== 特征分组 ====================
 
         /// <summary>所有特征分组</summary>
@@ -343,6 +375,12 @@ namespace CncWallStation.ViewModels
             SelectedGroup = null;
             SelectedInstruction = null;
 
+            _isSyncingDimensions = true;
+            WallActualLength = 0;
+            WallActualWidth = 0;
+            WallActualHeight = 0;
+            _isSyncingDimensions = false;
+
             _ = Clear3DAsync();
 
             _logger.LogInformation("清空PLC面板");
@@ -436,6 +474,51 @@ namespace CncWallStation.ViewModels
 
         // ==================== 内部方法 ====================
 
+        /// <summary>
+        /// 将实际尺寸同步到 WallHandler 分组中所有指令的 X0/Y0/Z0
+        /// </summary>
+        private void SyncWallDimensions()
+        {
+            if (!IsWallLoaded) return;
+
+            var wallGroup = FeatureGroups
+                .FirstOrDefault(g => g.HandlerName == "WallHandler");
+            if (wallGroup == null) return;
+
+            foreach (var inst in wallGroup.Instructions)
+            {
+                inst.X0 = WallActualLength;
+                inst.Y0 = WallActualWidth;
+                inst.Z0 = WallActualHeight;
+            }
+
+            // 更新统计（实际尺寸变化可能影响切削面积计算）
+            RecalculateStatistics();
+        }
+
+        /// <summary>
+        /// 从 WallHandler 分组第一条指令中读取实际尺寸初始值
+        /// </summary>
+        private void ReadWallDimensionsFromInstructions()
+        {
+            var wallGroup = FeatureGroups
+                .FirstOrDefault(g => g.HandlerName == "WallHandler");
+            if (wallGroup == null || wallGroup.Instructions.Count == 0) return;
+
+            var first = wallGroup.Instructions[0];
+            _isSyncingDimensions = true;
+            try
+            {
+                WallActualLength = first.X0;
+                WallActualWidth = first.Y0;
+                WallActualHeight = first.Z0;
+            }
+            finally
+            {
+                _isSyncingDimensions = false;
+            }
+        }
+
         private void LoadFeatureGroups(List<Plcs.PlcFeatureGroup> groups)
         {
             FeatureGroups.Clear();
@@ -471,6 +554,8 @@ namespace CncWallStation.ViewModels
                 };
                 FeatureGroups.Add(dto);
             }
+
+            ReadWallDimensionsFromInstructions();
         }
 
         private void LoadInstructionsFromEntities(List<PlcInstructionEntity> entities)
@@ -526,6 +611,8 @@ namespace CncWallStation.ViewModels
                 };
                 FeatureGroups.Add(dto);
             }
+
+            ReadWallDimensionsFromInstructions();
         }
 
         private void RecalculateStatistics()

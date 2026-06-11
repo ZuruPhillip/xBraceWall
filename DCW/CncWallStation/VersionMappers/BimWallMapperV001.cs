@@ -413,24 +413,36 @@ namespace CncWallStation.VersionMappers
                     continue;
                 }
 
-                // ── 3.3 深度按方向选择 ────────────────────────
+                // ── 3.3 起终点规范化 ──────────────────────────
+                if (direction == RebarSlotDirection.Horizontal && startPos.X > endPos.X)
+                {
+                    (startPos, endPos) = (endPos, startPos);
+                    (rod.StartThreading, rod.EndThreading) = (rod.EndThreading, rod.StartThreading);
+                }
+                else if (direction == RebarSlotDirection.Vertical && startPos.Y > endPos.Y)
+                {
+                    (startPos, endPos) = (endPos, startPos);
+                    (rod.StartThreading, rod.EndThreading) = (rod.EndThreading, rod.StartThreading);
+                }
+
+                // ── 3.4 深度按方向选择 ────────────────────────
                 float depth = direction == RebarSlotDirection.Horizontal
                     ? rebar.HorizontalDepth
                     : rebar.VerticalDepth;
 
-                // ── 3.4 加工面按 Z 值判定 ─────────────────────
+                // ── 3.5 加工面按 Z 值判定 ─────────────────────
                 float avgZ = (rod.StartPoint.Y + rod.EndPoint.Y) * 0.5f;
                 MachineSide side = avgZ >= faceZThreshold
                     ? MachineSide.Top
                     : MachineSide.Bottom;
 
-                // ── 3.5 特征 ID ───────────────────────────────
+                // ── 3.6 特征 ID ───────────────────────────────
                 string pn = string.IsNullOrWhiteSpace(rebar.Pn) ? "noPn" : rebar.Pn!;
                 string id = rebar.Rods.Count == 1
                     ? $"Rebar-{pn}"
                     : $"Rebar-{pn}-{i:D2}";
 
-                // ── 3.6 构造 RebarSlot Feature ────────────────
+                // ── 3.7 构造 RebarSlot Feature ────────────────
                 var rebarSlot = new RebarSlot(
                     id: id,
                     side: side,

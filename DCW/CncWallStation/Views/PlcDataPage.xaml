@@ -135,55 +135,39 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <!-- 统计卡片 -->
+                <!-- 实际尺寸面板 -->
                 <Border Grid.Row="0" Padding="10" Margin="0,0,0,6"
                         Background="White" CornerRadius="4"
                         BorderBrush="#E0E0E0" BorderThickness="1">
                     <StackPanel>
-                        <TextBlock Text="{l:Loc Section_ProcessingStats}" FontWeight="Bold" FontSize="14"
+                        <TextBlock Text="{l:Loc Label_ActualDimensions}" FontWeight="Bold" FontSize="14"
                                    Margin="0,0,0,8" Foreground="#1890FF" />
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <!-- 总指令条数 -->
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Loc Stat_TotalInstructions}" Foreground="Gray" />
-                            <TextBlock Grid.Row="0" Grid.Column="1"
-                                       Text="{Binding Statistics.TotalInstructionCount, Converter={StaticResource InstructionCountConverter}}"
-                                       HorizontalAlignment="Right" Foreground="Gray" />
-
-                            <!-- 换刀次数 -->
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Loc Stat_ToolChanges}" Foreground="Gray"
-                                       Margin="0,4,0,0" />
-                            <TextBlock Grid.Row="1" Grid.Column="1"
-                                       Text="{Binding Statistics.ToolChangeCount}"
-                                       HorizontalAlignment="Right" FontWeight="Bold"
-                                       Foreground="Orange" Margin="0,4,0,0" />
-
-                            <!-- 总切削面积 -->
-                            <TextBlock Grid.Row="2" Grid.Column="0"                            Text="{l:Loc Stat_CuttingArea}" Foreground="Gray"
-                                       Margin="0,4,0,0" />
-                            <TextBlock Grid.Row="2" Grid.Column="1"
-                                       Text="{Binding Statistics.TotalCuttingArea, StringFormat={}{0:F0} mm²}"
-                                       HorizontalAlignment="Right" FontWeight="Bold"
-                                       Foreground="DodgerBlue" Margin="0,4,0,0" />
-
-                            <!-- 预估工时 -->
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="{l:Loc Stat_EstimatedHours}" Foreground="Gray"
-                                       Margin="0,4,0,0" />
-                            <TextBlock Grid.Row="3" Grid.Column="1"
-                                       Text="{Binding Statistics.EstimatedHours, StringFormat={}{0:F1} min}"
-                                       HorizontalAlignment="Right" FontWeight="Bold"
-                                       Foreground="Green" Margin="0,4,0,0" />
-                        </Grid>
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="{l:Loc Label_ActualLength}" Foreground="Gray"
+                                           VerticalAlignment="Center" Width="20" />
+                                <TextBox Text="{Binding WallActualLength, StringFormat={}{0:F1}, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="24" VerticalContentAlignment="Center" Margin="6,0,0,0"
+                                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}" />
+                                <TextBlock Text="mm" Foreground="Gray" VerticalAlignment="Center" Margin="4,0,0,0" FontSize="11" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="{l:Loc Label_ActualWidth}" Foreground="Gray"
+                                           VerticalAlignment="Center" Width="20" />
+                                <TextBox Text="{Binding WallActualWidth, StringFormat={}{0:F1}, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="24" VerticalContentAlignment="Center" Margin="6,0,0,0"
+                                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}" />
+                                <TextBlock Text="mm" Foreground="Gray" VerticalAlignment="Center" Margin="4,0,0,0" FontSize="11" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{l:Loc Label_ActualHeight}" Foreground="Gray"
+                                           VerticalAlignment="Center" Width="20" />
+                                <TextBox Text="{Binding WallActualHeight, StringFormat={}{0:F1}, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="24" VerticalContentAlignment="Center" Margin="6,0,0,0"
+                                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}" />
+                                <TextBlock Text="mm" Foreground="Gray" VerticalAlignment="Center" Margin="4,0,0,0" FontSize="11" />
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
 

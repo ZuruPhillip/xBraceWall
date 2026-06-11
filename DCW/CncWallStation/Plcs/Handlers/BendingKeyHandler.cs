@@ -74,10 +74,10 @@ namespace CncWallStation.Plcs.Handlers
                 D = chain.CopyCount,
                 X0 = first.LocalPos.X,
                 Y0 = 0,
-                Z0 = wall.Thickness - first.LocalPos.Y,    //距离底面尺寸
+                Z0 = first.LocalPos.Y,    //距离底面尺寸
                 X1 = chain.Dx,
-                Y1 = key.Depth,                    // 孔深
-                Z1 = 0                // 条孔长
+                Y1 = key.Depth,           // 孔深
+                Z1 = 0                    // 条孔长
             });
         }
 

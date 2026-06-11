@@ -255,6 +255,10 @@
   <data name="Label_AuditInfo" xml:space="preserve"><value>审核: </value></data>
   <data name="Label_ProjectInfo" xml:space="preserve"><value>项目号: </value></data>
   <data name="Label_FloorInfo" xml:space="preserve"><value>楼层: </value></data>
+  <data name="Label_ActualDimensions" xml:space="preserve"><value>实际尺寸</value></data>
+  <data name="Label_ActualLength" xml:space="preserve"><value>长:</value></data>
+  <data name="Label_ActualWidth" xml:space="preserve"><value>宽:</value></data>
+  <data name="Label_ActualHeight" xml:space="preserve"><value>高:</value></data>
   <data name="Placeholder_PlcSearch" xml:space="preserve"><value>输入墙体 ID 回车搜索</value></data>
   <data name="Button_UnauditPlc" xml:space="preserve"><value>反审核</value></data>
   <data name="Button_SendCommand" xml:space="preserve"><value>下发指令</value></data>

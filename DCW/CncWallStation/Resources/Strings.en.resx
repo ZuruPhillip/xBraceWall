@@ -756,6 +756,18 @@
   <data name="Label_FloorInfo" xml:space="preserve">
     <value>Floor: </value>
   </data>
+  <data name="Label_ActualDimensions" xml:space="preserve">
+    <value>Actual Dims</value>
+  </data>
+  <data name="Label_ActualLength" xml:space="preserve">
+    <value>L:</value>
+  </data>
+  <data name="Label_ActualWidth" xml:space="preserve">
+    <value>W:</value>
+  </data>
+  <data name="Label_ActualHeight" xml:space="preserve">
+    <value>H:</value>
+  </data>
   <data name="Placeholder_PlcSearch" xml:space="preserve">
     <value>Enter Wall ID and press Enter</value>
   </data>
