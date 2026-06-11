@@ -73,7 +73,7 @@ namespace CncWallStation.Plcs.Handlers
             // 6. 发射指令
             ctx.Emit(new PlcInstruction
             {
-                T = PlcTool.SlotCutter,         // T8
+                T = PlcTool.SlotCutter,    // T8
                 F = f,
                 D = (int)g.Width,          // D = 槽宽度（注意：不是复制次数）
                 X0 = start.X,

@@ -372,7 +372,7 @@ namespace CncWallStation.Features.MepSlots
 
         private static void BuildTaperLines(
             MepSlot slot, CmdTaperLine ctl, bool isFirst,
-            int steps = 4)
+            int steps = 1)
         {
             Vec2 dir = (ctl.End - ctl.Start).Normalize();
             float len = (ctl.End - ctl.Start).Length();
