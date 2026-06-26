@@ -4,8 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:l="clr-namespace:CncWallStation.Localization"
+      xmlns:opc="clr-namespace:CncWallStation.Services.OpcUa"
       mc:Ignorable="d"
-      d:DesignHeight="600" d:DesignWidth="1000"
+      d:DesignHeight="900" d:DesignWidth="1000"
       FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
     <Page.Resources>
@@ -41,6 +42,73 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Settings form label style -->
+        <Style x:Key="FormLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#555"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="100"/>
+        </Style>
+
+        <Style x:Key="FormTextBoxStyle" TargetType="TextBox">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="MinWidth" Value="200"/>
+            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="MinWidth" Value="90"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#94A3B8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WarnButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Background" Value="#EF4444"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#DC2626"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Background" Value="#475569"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#334155"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
 
     <Grid Background="#F5F5F5">
@@ -65,10 +133,10 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16,8,16,16">
 
-                <!-- 语言设置卡片 -->
+                <!-- ==================== 语言设置卡片 ==================== -->
                 <Border Background="White" CornerRadius="8"
                         BorderBrush="#E8E8E8" BorderThickness="1"
-                        Padding="24,20">
+                        Padding="24,20" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="{l:Loc Settings_Language}"
                                    FontSize="16" FontWeight="Bold"
@@ -104,6 +172,162 @@
                                                Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ==================== OPC 连接配置卡片 ==================== -->
+                <Border Background="White" CornerRadius="8"
+                        BorderBrush="#E8E8E8" BorderThickness="1"
+                        Padding="24,20" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{l:Loc Settings_OpcConnection}"
+                                   FontSize="16" FontWeight="Bold"
+                                   Foreground="#1A1A1A" Margin="0,0,0,4"/>
+                        <TextBlock Text="{l:Loc Settings_OpcConnectionDesc}"
+                                   FontSize="13" Foreground="#8C8C8C"
+                                   Margin="0,0,0,20"/>
+
+                        <!-- IP 地址 -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{l:Loc Settings_OpcIpAddress}"
+                                       Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Grid.Column="1" Text="{Binding OpcIpAddress, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBoxStyle}"/>
+                        </Grid>
+
+                        <!-- 端口 -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="250"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{l:Loc Settings_OpcPort}"
+                                       Style="{StaticResource FormLabelStyle}"/>
+                            <TextBox Grid.Column="1" Text="{Binding OpcPort, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource FormTextBoxStyle}"/>
+                        </Grid>
+
+                        <!-- 自动连接 -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{l:Loc Settings_OpcAutoConnect}"
+                                       Style="{StaticResource FormLabelStyle}"/>
+                            <CheckBox Grid.Column="1" IsChecked="{Binding OpcAutoConnect}"
+                                      VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <!-- 操作按钮 -->
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{l:Loc Settings_SaveOpcConfig}"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Command="{Binding SaveOpcConfigCommand}"/>
+                            <Button Content="{l:Loc Settings_ConnectOpc}"
+                                    Style="{StaticResource ActionButtonStyle}"
+                                    Command="{Binding ConnectOpcCommand}"/>
+                            <Button Content="{l:Loc Settings_DisconnectOpc}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding DisconnectOpcCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ==================== OPC 节点管理卡片 ==================== -->
+                <Border Background="White" CornerRadius="8"
+                        BorderBrush="#E8E8E8" BorderThickness="1"
+                        Padding="24,20" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="{l:Loc Settings_OpcNodeManagement}"
+                                   FontSize="16" FontWeight="Bold"
+                                   Foreground="#1A1A1A" Margin="0,0,0,4"/>
+                        <TextBlock Text="{l:Loc Settings_OpcNodeManagementDesc}"
+                                   FontSize="13" Foreground="#8C8C8C"
+                                   Margin="0,0,0,16"/>
+
+                        <!-- 添加节点区域 -->
+                        <Border Background="#F8FAFC" CornerRadius="4"
+                                BorderBrush="#E2E8F0" BorderThickness="1"
+                                Padding="12" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="{l:Loc Settings_AddNode}" FontSize="14"
+                                           FontWeight="SemiBold" Foreground="#333"
+                                           Margin="0,0,0,8"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox Grid.Column="0" Text="{Binding NewNodeId, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource FormTextBoxStyle}"
+                                             Margin="0,0,8,0"
+                                             Tag="{l:Loc Settings_NodeIdPlaceholder}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding NewNodeDescription, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource FormTextBoxStyle}"
+                                             Margin="0,0,8,0"
+                                             Tag="{l:Loc Settings_NodeDescriptionPlaceholder}"/>
+                                    <CheckBox Grid.Column="2" IsChecked="{Binding NewNodeIsWritable}"
+                                              Content="{l:Loc Settings_NodeWritable}"
+                                              VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <Button Grid.Column="3" Content="{l:Loc Settings_AddNodeBtn}"
+                                            Style="{StaticResource ActionButtonStyle}"
+                                            Command="{Binding AddOpcNodeCommand}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 节点列表 DataGrid -->
+                        <DataGrid ItemsSource="{Binding OpcNodes}"
+                                  SelectedItem="{Binding SelectedOpcNode}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  IsReadOnly="True"
+                                  MinHeight="150"
+                                  MaxHeight="300"
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  BorderBrush="#E2E8F0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{l:Loc Settings_GridNodeId}"
+                                                    Binding="{Binding NodeId}"
+                                                    Width="200"/>
+                                <DataGridTextColumn Header="{l:Loc Settings_GridDescription}"
+                                                    Binding="{Binding Description}"
+                                                    Width="160"/>
+                                <DataGridCheckBoxColumn Header="{l:Loc Settings_GridWritable}"
+                                                        Binding="{Binding IsWritable}"
+                                                        Width="60"/>
+                                <DataGridTextColumn Header="{l:Loc Settings_GridValue}"
+                                                    Binding="{Binding CurrentValue}"
+                                                    Width="120"/>
+                                <DataGridTextColumn Header="{l:Loc Settings_GridUpdated}"
+                                                    Binding="{Binding LastUpdated, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+                                                    Width="160"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 操作按钮 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button Content="{l:Loc Settings_DeleteNode}"
+                                    Style="{StaticResource WarnButtonStyle}"
+                                    Command="{Binding DeleteOpcNodeCommand}"/>
+                            <Button Content="{l:Loc Settings_ClearAllNodes}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding ClearAllOpcNodesCommand}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

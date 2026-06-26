@@ -119,7 +119,45 @@
                 BorderThickness="0,1,0,0"
                 Padding="10,4">
             <Grid>
-                <TextBlock Text="{Binding CurrentTime}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- OPC 连接状态指示 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal"
+                            VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Ellipse Width="8" Height="8" Margin="0,0,6,0">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="#9E9E9E"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding OpcStatusColor}" Value="#4CAF50">
+                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OpcStatusColor}" Value="#FF9800">
+                                        <Setter Property="Fill" Value="#FF9800"/>
+                                        <Setter Property="Opacity" Value="0.7"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OpcStatusColor}" Value="#F44336">
+                                        <Setter Property="Fill" Value="#F44336"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OpcStatusColor}" Value="#9E9E9E">
+                                        <Setter Property="Fill" Value="#9E9E9E"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock Text="{Binding OpcStatusText}"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Foreground="{DynamicResource PrimaryTextBrush}"/>
+                </StackPanel>
+
+                <!-- 当前时间 -->
+                <TextBlock Grid.Column="2" Text="{Binding CurrentTime}"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            FontSize="12"

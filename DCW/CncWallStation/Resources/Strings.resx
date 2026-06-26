@@ -332,4 +332,45 @@
   <data name="Dlg_RenameWallTitle" xml:space="preserve"><value>修改墙体名称</value></data>
   <data name="Dlg_RenameWallPrompt" xml:space="preserve"><value>墙体ID: {0}
 请输入新的墙体名称:</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  OPC UA 设置                               -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Settings_OpcConnection" xml:space="preserve"><value>OPC UA 连接设置</value></data>
+  <data name="Settings_OpcConnectionDesc" xml:space="preserve"><value>配置 PLC 设备的 OPC UA 服务器地址和端口</value></data>
+  <data name="Settings_OpcIpAddress" xml:space="preserve"><value>IP 地址:</value></data>
+  <data name="Settings_OpcPort" xml:space="preserve"><value>端口:</value></data>
+  <data name="Settings_OpcAutoConnect" xml:space="preserve"><value>启动时自动连接</value></data>
+  <data name="Settings_SaveOpcConfig" xml:space="preserve"><value>保存配置</value></data>
+  <data name="Settings_ConnectOpc" xml:space="preserve"><value>连接 OPC</value></data>
+  <data name="Settings_DisconnectOpc" xml:space="preserve"><value>断开连接</value></data>
+  <data name="Settings_OpcNodeManagement" xml:space="preserve"><value>OPC 节点管理</value></data>
+  <data name="Settings_OpcNodeManagementDesc" xml:space="preserve"><value>配置需要读写和监控的 OPC UA 节点地址</value></data>
+  <data name="Settings_AddNode" xml:space="preserve"><value>添加新节点</value></data>
+  <data name="Settings_NodeIdPlaceholder" xml:space="preserve"><value>NodeId，如 ns=3;s=&quot;VarName&quot;</value></data>
+  <data name="Settings_NodeDescriptionPlaceholder" xml:space="preserve"><value>节点描述/别名</value></data>
+  <data name="Settings_NodeWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Settings_AddNodeBtn" xml:space="preserve"><value>添加节点</value></data>
+  <data name="Settings_DeleteNode" xml:space="preserve"><value>删除选中</value></data>
+  <data name="Settings_ClearAllNodes" xml:space="preserve"><value>清空全部</value></data>
+  <data name="Settings_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="Settings_GridDescription" xml:space="preserve"><value>描述</value></data>
+  <data name="Settings_GridWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Settings_GridValue" xml:space="preserve"><value>当前值</value></data>
+  <data name="Settings_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  ControllerPage - OPC 监控                -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Controller_OpcMonitor" xml:space="preserve"><value>OPC 节点监控</value></data>
+  <data name="Controller_OpcMonitorDesc" xml:space="preserve"><value>实时显示已配置节点的当前值</value></data>
+  <data name="Controller_LoadNodes" xml:space="preserve"><value>加载节点列表</value></data>
+  <data name="Controller_RefreshValues" xml:space="preserve"><value>刷新数值</value></data>
+  <data name="Controller_SubscribeAll" xml:space="preserve"><value>订阅全部</value></data>
+  <data name="Controller_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="Controller_GridDescription" xml:space="preserve"><value>描述</value></data>
+  <data name="Controller_GridValue" xml:space="preserve"><value>当前值</value></data>
+  <data name="Controller_GridQuality" xml:space="preserve"><value>质量</value></data>
+  <data name="Controller_GridWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Controller_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
 </root>

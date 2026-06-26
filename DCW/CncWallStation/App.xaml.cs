@@ -6,6 +6,7 @@ using CncWallStation.Services.Application;
 using CncWallStation.Services.Configs;
 using CncWallStation.Services.DataCheck;
 using CncWallStation.Services.Mappings;
+using CncWallStation.Services.OpcUa;
 using CncWallStation.VersionMappers;
 using CncWallStation.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +95,10 @@ namespace CncWallStation
                     services.AddSingleton<JsonKeyTranslationConfig>();
                     services.AddSingleton<DataCheckValidatorFactory>();
                     services.AddSingleton<BimWallMapperFactory>();
+
+                    // OPC UA 通讯服务（单例）
+                    services.AddSingleton<IOpcUaService, OpcUaService>();
+
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
 
                     // MainPageViewModel 需单例，确保 MainViewModel 和 MainPage 共享同一实例
@@ -138,6 +143,20 @@ namespace CncWallStation
                         INDEX IX_PlcInstruction_WallId (WallId),
                         INDEX IX_PlcInstruction_WallId_SortOrder (WallId, SortOrder),
                         CONSTRAINT FK_PlcInstruction_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
+                    );
+                ");
+
+                // 手动补建 Opc 表
+                db.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS Opc (
+                        Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        WallId BIGINT NOT NULL,
+                        GroupId VARCHAR(64) NOT NULL,
+                        NodeId VARCHAR(256) NOT NULL,
+                        Value VARCHAR(128) NOT NULL,
+                        CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        INDEX IX_Opc_GroupId (GroupId),
+                        INDEX IX_Opc_WallId (WallId)
                     );
                 ");
             }

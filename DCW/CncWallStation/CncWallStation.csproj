@@ -33,6 +33,7 @@
 		<PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.5.374.162" />
 	</ItemGroup>
 
 	<!-- 将 HTML 文件复制到输出目录 -->

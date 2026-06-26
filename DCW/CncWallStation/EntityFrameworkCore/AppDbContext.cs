@@ -17,6 +17,7 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<ValidationErrorEntity> ValidationErrors => Set<ValidationErrorEntity>();
         public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
         public DbSet<PlcInstructionEntity> PlcInstructions => Set<PlcInstructionEntity>();
+        public DbSet<OpcWriteRecordEntity> OpcWriteRecords => Set<OpcWriteRecordEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,6 +47,27 @@ namespace CncWallStation.EntityFrameworkCore
                     .WithMany()
                     .HasForeignKey(e => e.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== Opc 表配置 ====================
+            modelBuilder.Entity<OpcWriteRecordEntity>(entity =>
+            {
+                entity.ToTable("Opc");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.GroupId).HasDatabaseName("IX_Opc_GroupId");
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_Opc_WallId");
+
+                entity.Property(e => e.GroupId).HasMaxLength(64).IsRequired();
+                entity.Property(e => e.NodeId).HasMaxLength(256).IsRequired();
+                entity.Property(e => e.Value).HasMaxLength(128).IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ==================== Project 表配置 ====================

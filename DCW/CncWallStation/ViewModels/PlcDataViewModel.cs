@@ -1,10 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CncWallStation.EntityFrameworkCore;
 using CncWallStation.Localization;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
 using CncWallStation.Services.Application;
+using CncWallStation.Services.OpcUa;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -15,15 +18,26 @@ namespace CncWallStation.ViewModels
     {
         private readonly IPlcDataAppService _plcDataAppService;
         private readonly IWallAppService _wallAppService;
+        private readonly IOpcUaService _opcUaService;
+        private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly ILogger<PlcDataViewModel> _logger;
+
+        private const string OPC_NODE_ID_PREFIX = "ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.LineDef";
+
+        /// <summary>指令行头字母：T, F, D, X0, Y0, Z0, X1, Y1, Z1</summary>
+        private static readonly string[] LineHeaders = { "T", "F", "D", "X0", "Y0", "Z0", "X1", "Y1", "Z1" };
 
         public PlcDataViewModel(
             IPlcDataAppService plcDataAppService,
             IWallAppService wallAppService,
+            IOpcUaService opcUaService,
+            IDbContextFactory<AppDbContext> dbContextFactory,
             ILogger<PlcDataViewModel> logger)
         {
             _plcDataAppService = plcDataAppService;
             _wallAppService = wallAppService;
+            _opcUaService = opcUaService;
+            _dbContextFactory = dbContextFactory;
             _logger = logger;
         }
 
@@ -257,13 +271,120 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        /// <summary>下发指令</summary>
+        /// <summary>下发指令：将所有指令按 OPC UA NodeId 格式批量写入 PLC</summary>
         [RelayCommand]
         private async Task SendAsync()
         {
             _logger.LogInformation("下发PLC指令: WallId={WallId}", WallInfo?.WallId);
-            // TODO: 对接生产设备下发接口
-            await Task.CompletedTask;
+
+            if (!IsWallLoaded || WallInfo == null)
+            {
+                _logger.LogWarning("下发指令失败：墙体未加载");
+                System.Windows.MessageBox.Show(
+                    "请先搜索并加载墙体数据。",
+                    "提示",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!_opcUaService.IsConnected)
+            {
+                _logger.LogWarning("下发指令失败：OPC UA 未连接");
+                var result = System.Windows.MessageBox.Show(
+                    "OPC UA 尚未连接到 PLC 设备，是否继续尝试发送？\n（发送将在连接恢复后可能不会自动重试）",
+                    "OPC 未连接",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning);
+                if (result != System.Windows.MessageBoxResult.Yes)
+                    return;
+            }
+
+            try
+            {
+                // 1. 扁平化所有分组的指令，从 0 开始编号索引 i
+                var allInstructions = new List<PlcInstructionDto>();
+                foreach (var group in FeatureGroups)
+                {
+                    allInstructions.AddRange(group.Instructions);
+                }
+
+                if (allInstructions.Count == 0)
+                {
+                    _logger.LogWarning("下发指令失败：没有可发送的指令数据");
+                    System.Windows.MessageBox.Show(
+                        "没有可发送的指令数据。",
+                        "提示",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 2. 为每条指令生成 9 个 NodeId -> value 键值对
+                var nodeValues = new Dictionary<string, object>();
+
+                for (int i = 0; i < allInstructions.Count; i++)
+                {
+                    var inst = allInstructions[i];
+                    var values = new Dictionary<string, object>
+                    {
+                        ["T"] = inst.T,
+                        ["F"] = inst.F,
+                        ["D"] = inst.D,
+                        ["X0"] = inst.X0,
+                        ["Y0"] = inst.Y0,
+                        ["Z0"] = inst.Z0,
+                        ["X1"] = inst.X1,
+                        ["Y1"] = inst.Y1,
+                        ["Z1"] = inst.Z1
+                    };
+
+                    foreach (var kv in values)
+                    {
+                        var nodeId = $"{OPC_NODE_ID_PREFIX}[{i}].{kv.Key}";
+                        nodeValues[nodeId] = kv.Value;
+                    }
+                }
+
+                _logger.LogInformation(
+                    "准备批量写入 OPC 节点: 指令数={InstructionCount}, 总节点数={NodeCount}",
+                    allInstructions.Count, nodeValues.Count);
+
+                // 3. 一次性批量写入到 PLC
+                await _opcUaService.WriteNodesAsync(nodeValues);
+
+                // 4. 持久化写入记录到 Opc 表（同一批次共享 GroupId）
+                var groupId = Guid.NewGuid().ToString();
+                await using var db = await _dbContextFactory.CreateDbContextAsync();
+                foreach (var kv in nodeValues)
+                {
+                    db.OpcWriteRecords.Add(new OpcWriteRecordEntity(
+                        WallInfo.Id,
+                        groupId,
+                        kv.Key,
+                        kv.Value?.ToString() ?? string.Empty));
+                }
+                await db.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "PLC 指令下发成功: WallId={WallId}, 总节点数={NodeCount}, GroupId={GroupId}",
+                    WallInfo.WallId, nodeValues.Count, groupId);
+
+                System.Windows.MessageBox.Show(
+                    $"指令下发成功！\n\n共发送 {allInstructions.Count} 条指令，{nodeValues.Count} 个节点。",
+                    "下发成功",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "下发PLC指令失败: WallId={WallId}", WallInfo?.WallId);
+                System.Windows.MessageBox.Show(
+                    $"下发指令时发生异常：\n\n{ex.Message}",
+                    "下发失败",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
         }
 
         /// <summary>重新生成 PLC 数据</summary>

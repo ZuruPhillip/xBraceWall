@@ -5,8 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CncWallStation.Views"
       xmlns:l="clr-namespace:CncWallStation.Localization"
+      xmlns:opc="clr-namespace:CncWallStation.Services.OpcUa"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1200"
+      d:DesignHeight="700" d:DesignWidth="1200"
       Title="{l:Loc PageTitle_Controller}">
 
     <Page.Resources>
@@ -58,10 +59,20 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="SmallButtonStyle" TargetType="Button" BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="MinWidth" Value="70"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- Status color converter -->
+        <local:OpcQualityColorConverter x:Key="QualityColorConverter"/>
     </Page.Resources>
 
     <Grid Margin="8" Background="#F5F5F5">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -77,11 +88,11 @@
             </StackPanel>
         </Border>
 
-        <!-- ==================== Row1: 按钮区域 ==================== -->
+        <!-- ==================== Row1: 工具栏按钮区域 ==================== -->
         <StackPanel Grid.Row="1" Orientation="Horizontal"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Margin="10">
+                    Margin="10,0,10,10">
 
             <Button Content="{l:Loc Button_Test}"
                     Width="190"
@@ -94,7 +105,93 @@
                     Style="{StaticResource ToolbarButtonStyle}"
                     Command="{Binding WallDataGenerateCommand}"
                     ToolTip="{l:Loc Tooltip_GenerateWallData}"/>
-
         </StackPanel>
+
+        <!-- ==================== Row2: OPC 节点监控区域 ==================== -->
+        <Border Grid.Row="2" Background="White" CornerRadius="4"
+                BorderBrush="#E8E8E8" BorderThickness="1"
+                Padding="16" Margin="10,0,10,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 监控标题 + 操作按钮 -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{l:Loc Controller_OpcMonitor}" FontSize="15"
+                                   FontWeight="Bold" Foreground="#333"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{l:Loc Controller_OpcMonitorDesc}"
+                                   FontSize="12" Foreground="#999"
+                                   VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="{l:Loc Controller_LoadNodes}"
+                                Style="{StaticResource SmallButtonStyle}"
+                                Command="{Binding LoadOpcNodesCommand}"/>
+                        <Button Content="{l:Loc Controller_RefreshValues}"
+                                Style="{StaticResource SmallButtonStyle}"
+                                Command="{Binding RefreshOpcValuesCommand}"/>
+                        <Button Content="{l:Loc Controller_SubscribeAll}"
+                                Style="{StaticResource SmallButtonStyle}"
+                                Command="{Binding SubscribeAllNodesCommand}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 节点监控 DataGrid -->
+                <DataGrid Grid.Row="1" ItemsSource="{Binding OpcMonitoredNodes}"
+                          SelectedItem="{Binding SelectedOpcMonitoredNode}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          MinHeight="200"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          BorderBrush="#E2E8F0"
+                          RowBackground="White"
+                          AlternatingRowBackground="#F8FAFC">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{l:Loc Controller_GridNodeId}"
+                                            Binding="{Binding NodeId}"
+                                            Width="220"/>
+                        <DataGridTextColumn Header="{l:Loc Controller_GridDescription}"
+                                            Binding="{Binding Description}"
+                                            Width="140"/>
+                        <DataGridTextColumn Header="{l:Loc Controller_GridValue}"
+                                            Binding="{Binding CurrentValue}"
+                                            Width="160"/>
+                        <DataGridTextColumn Header="{l:Loc Controller_GridQuality}"
+                                            Binding="{Binding Quality}"
+                                            Width="70">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="#333"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Quality}" Value="Good">
+                                            <Setter Property="Foreground" Value="#4CAF50"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Quality}" Value="Bad">
+                                            <Setter Property="Foreground" Value="#F44336"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Quality}" Value="Uncertain">
+                                            <Setter Property="Foreground" Value="#FF9800"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridCheckBoxColumn Header="{l:Loc Controller_GridWritable}"
+                                                Binding="{Binding IsWritable}"
+                                                Width="60"/>
+                        <DataGridTextColumn Header="{l:Loc Controller_GridUpdated}"
+                                            Binding="{Binding LastUpdated, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+                                            Width="170"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
