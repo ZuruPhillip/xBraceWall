@@ -128,10 +128,13 @@ namespace CncWallStation.Plcs
 
             // X 斜槽
             var xBraceGrooves = grooves.Where(g => g.GrooveType == GrooveType.XBraceSteel).ToList();
-            foreach (var xBrace in xBraceGrooves)
+            if (xBraceGrooves.Count > 0)
             {
                 before = ctx.Output.Count;
-                XBraceHandler.Handle(xBrace, ctx, wall);
+                foreach (var xBrace in xBraceGrooves)
+                {
+                    XBraceHandler.Handle(xBrace, ctx, wall);
+                }
                 AddGroupIfNotEmpty(groups, "XBraceHandler", "X斜槽", ctx.Output, before);
             }
 

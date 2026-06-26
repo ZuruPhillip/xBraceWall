@@ -534,6 +534,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
 renderer.toneMapping       = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
+renderer.localClippingEnabled = true;
 const canvas = renderer.domElement;
 document.getElementById('app').appendChild(canvas);
 
@@ -1672,6 +1673,16 @@ async function buildWall(data) {
   _WL=WL; _WH=WH; _WT=WT; _cx=WL/2; _cy=WH/2; _cz=WT/2;
   rimLight.position.set(WL/2, WH+0.8, WT+0.5);
 
+  // 墙体边界裁剪平面（用于限制 xBraceSteel 腔体可视化不超出墙体）
+  const wallClipPlanes = [
+    new THREE.Plane(new THREE.Vector3( 1, 0, 0), 0),      // x >= 0
+    new THREE.Plane(new THREE.Vector3(-1, 0, 0), WL),     // x <= WL
+    new THREE.Plane(new THREE.Vector3( 0, 1, 0), 0),      // y >= 0
+    new THREE.Plane(new THREE.Vector3( 0,-1, 0), WH),     // y <= WH
+    new THREE.Plane(new THREE.Vector3( 0, 0, 1), 0),      // z >= 0
+    new THREE.Plane(new THREE.Vector3( 0, 0,-1), WT),     // z <= WT
+  ];
+
   const allFeatures = data.features ?? [];
   const grooves = allFeatures.filter(f =>
     f.featureType==='Groove' || f.$type==='Groove' || f.type==='groove'
@@ -1729,11 +1740,14 @@ async function buildWall(data) {
     const typeKey=f.grooveType??'default';
     const cfg=GROOVE_COLORS[typeKey]??GROOVE_COLORS.default;
     usedTypes.add(typeKey);
+    const isXBrace=(typeKey==='xBraceSteel');
 
     const cavGeo=new THREE.BoxGeometry(gx,gy,gz);
     const cavMat=new THREE.MeshStandardMaterial({
       color:cfg.hex, roughness:0.4, metalness:0.1,
       transparent:true, opacity:0.38, depthWrite:false, side:THREE.DoubleSide,
+      clippingPlanes: isXBrace ? wallClipPlanes : null,
+      clipShadows: true,
     });
     const cavMesh=new THREE.Mesh(cavGeo,cavMat);
     cavMesh.position.set(cx,cy,cz);
@@ -1751,7 +1765,10 @@ async function buildWall(data) {
     else{fW=gy;fH=gz;}
     const floorMesh=new THREE.Mesh(
       new THREE.PlaneGeometry(fW,fH),
-      new THREE.MeshStandardMaterial({color:cfg.hex,roughness:0.55,transparent:true,opacity:0.62,depthWrite:false,side:THREE.DoubleSide})
+      new THREE.MeshStandardMaterial({color:cfg.hex,roughness:0.55,transparent:true,opacity:0.62,depthWrite:false,side:THREE.DoubleSide,
+        clippingPlanes: isXBrace ? wallClipPlanes : null,
+        clipShadows: true,
+      })
     );
     if(Math.abs(floorNormal.y)>0.5) floorMesh.rotation.x=floorNormal.y>0?-Math.PI/2:Math.PI/2;
     else if(Math.abs(floorNormal.x)>0.5) floorMesh.rotation.y=floorNormal.x>0?Math.PI/2:-Math.PI/2;
@@ -1759,8 +1776,10 @@ async function buildWall(data) {
     if(rotationZ!==undefined) floorMesh.rotation.z=rotationZ;
     grooveGroup.add(floorMesh);
 
-    const el=new THREE.LineSegments(new THREE.EdgesGeometry(cavGeo),
-      new THREE.LineBasicMaterial({color:cfg.hex,transparent:true,opacity:0.88}));
+    const elMat=new THREE.LineBasicMaterial({color:cfg.hex,transparent:true,opacity:0.88,
+      clippingPlanes: isXBrace ? wallClipPlanes : null,
+    });
+    const el=new THREE.LineSegments(new THREE.EdgesGeometry(cavGeo), elMat);
     el.position.set(cx,cy,cz);
     if(rotationZ!==undefined) el.rotation.z=rotationZ;
     grooveGroup.add(el);

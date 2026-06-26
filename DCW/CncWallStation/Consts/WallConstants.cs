@@ -222,7 +222,7 @@
         /// <summary>
         /// XBrace槽宽度（mm）
         /// </summary>
-        public const float XBraceGrooveWidth = 60f;    // 槽宽 (mm)
+        public const float XBraceGrooveWidth = 80f;    // 槽宽 (mm)
 
         /// <summary>
         /// XBrace槽深度（mm）
