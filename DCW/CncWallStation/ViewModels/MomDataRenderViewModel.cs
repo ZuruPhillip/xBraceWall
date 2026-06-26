@@ -579,7 +579,7 @@ namespace CncWallStation.ViewModels
                 GrooveType.BaseBracket => "baseBracket",
                 GrooveType.TopPlate => "topPlate",
                 GrooveType.GlueSeal => "glueSeal",
-                GrooveType.XBraceSteel => "default",
+                GrooveType.XBraceSteel => "xBraceSteel",
                 GrooveType.Custom => "default",
                 _ => "default"
             };

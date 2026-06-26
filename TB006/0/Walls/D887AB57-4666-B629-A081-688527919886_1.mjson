@@ -1,5 +1,6 @@
 {
     "aacDensity": 500.00, 
+	"wallType": "CrossBraceWall", 
     "aacSlices": [
         {
             "contour": [

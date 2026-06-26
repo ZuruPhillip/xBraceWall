@@ -503,6 +503,7 @@ const GROOVE_COLORS = {
   topPlate    : { hex: 0xffa726, cn:'顶板槽',   en:'Top Plate',   css: '#ffa726' },
   glueSeal    : { hex: 0xf06292, cn:'密封胶槽', en:'Glue Seal',   css: '#f06292' },
   pocket      : { hex: 0xAB47BC, cn:'开关盒坑', en:'Switch Box Pocket', css: '#AB47BC' },
+  xBraceSteel : { hex: 0xff7043, cn:'斜撑钢槽', en:'X-Brace Steel', css: '#ff7043' },
   default     : { hex: 0xce93d8, cn:'其他凹槽', en:'Other Groove', css: '#ce93d8' },
 };
 (function(){ Object.keys(GROOVE_COLORS).forEach(k=>{ if(GROOVE_COLORS[k].label===undefined) GROOVE_COLORS[k].label=GROOVE_COLORS[k].cn; }); })();
@@ -653,13 +654,20 @@ function parseGrooveBox(f, WL, WH, WT) {
   const width = Math.max((f.width??100)*S, 0.001);
   const sp={x:(f.startPt?.x??0)*S, y:(f.startPt?.y??0)*S, z:(f.startPt?.z??0)*S};
   const ep={x:(f.endPt?.x??0)*S,   y:(f.endPt?.y??0)*S,   z:(f.endPt?.z??0)*S};
-  let cx,cy,cz,gx,gy,gz;
+  let cx,cy,cz,gx,gy,gz, rotationZ;
   const fn=new THREE.Vector3(0,0,1);
 
   if (nz!==0&&nx===0&&ny===0) {
     if (f.grooveType==='steelColumn') {
       gx=width; gy=Math.max(Math.abs(ep.y-sp.y),(f.length??0)*S,0.001); gz=depth;
       cx=sp.x; cy=(sp.y+ep.y)/2;
+    } else if (f.grooveType==='xBraceSteel') {
+      // 斜撑钢槽：沿对角线方向切削，需旋转
+      const dx=ep.x-sp.x, dy=ep.y-sp.y;
+      const len=Math.sqrt(dx*dx+dy*dy);
+      gx=Math.max(len,width,0.001); gy=width; gz=depth;
+      cx=(sp.x+ep.x)/2; cy=(sp.y+ep.y)/2;
+      rotationZ=Math.atan2(dy,dx);
     } else {
       gx=Math.max(Math.abs(ep.x-sp.x),(f.length??0)*S,0.001); gy=width; gz=depth;
       cx=(sp.x+ep.x)/2; cy=sp.y;
@@ -681,7 +689,7 @@ function parseGrooveBox(f, WL, WH, WT) {
     gx=Math.max(width,0.001); gy=Math.max(Math.abs(ep.y-sp.y),width,0.001); gz=Math.max(depth,0.001);
     cx=(sp.x+ep.x)/2; cy=(sp.y+ep.y)/2; cz=WT-gz/2; fn.set(0,0,1);
   }
-  return { cx,cy,cz,gx,gy,gz, floorNormal:fn };
+  return { cx,cy,cz,gx,gy,gz, floorNormal:fn, rotationZ };
 }
 
 // ══════════════════════════════════════════════════
@@ -1691,7 +1699,9 @@ async function buildWall(data) {
     if(box.gx<1e-5||box.gy<1e-5||box.gz<1e-5){ console.warn(`[buildWall] #${i} 零尺寸跳过`); continue; }
     grooveBoxes.push({f,box});
     const cb=new Brush(new THREE.BoxGeometry(box.gx+0.001,box.gy+0.001,box.gz+0.001),wallMat);
-    cb.position.set(box.cx,box.cy,box.cz); cb.updateMatrixWorld(true);
+    cb.position.set(box.cx,box.cy,box.cz);
+    if(box.rotationZ){ cb.rotation.z=box.rotationZ; }
+    cb.updateMatrixWorld(true);
     try {
       const r=evaluator.evaluate(wallBrush,cb,SUBTRACTION);
       r.position.set(0,0,0); r.updateMatrixWorld(true); wallBrush=r;
@@ -1715,7 +1725,7 @@ async function buildWall(data) {
   const usedTypes=new Set();
 
   for(const {f,box} of grooveBoxes){
-    const {cx,cy,cz,gx,gy,gz,floorNormal}=box;
+    const {cx,cy,cz,gx,gy,gz,floorNormal,rotationZ}=box;
     const typeKey=f.grooveType??'default';
     const cfg=GROOVE_COLORS[typeKey]??GROOVE_COLORS.default;
     usedTypes.add(typeKey);
@@ -1727,6 +1737,7 @@ async function buildWall(data) {
     });
     const cavMesh=new THREE.Mesh(cavGeo,cavMat);
     cavMesh.position.set(cx,cy,cz);
+    if(rotationZ!==undefined) cavMesh.rotation.z=rotationZ;
     cavMesh.userData.origOpacity=0.38;
     meshFeatureMap.set(cavMesh,{f,box});
     meshMomDataMap.set(cavMesh, { feature: f, featureType: 'Groove', extra: { box } });  // ★ MOM 悬浮面板
@@ -1745,11 +1756,14 @@ async function buildWall(data) {
     if(Math.abs(floorNormal.y)>0.5) floorMesh.rotation.x=floorNormal.y>0?-Math.PI/2:Math.PI/2;
     else if(Math.abs(floorNormal.x)>0.5) floorMesh.rotation.y=floorNormal.x>0?Math.PI/2:-Math.PI/2;
     floorMesh.position.set(cx-floorNormal.x*(gx/2-0.0003),cy-floorNormal.y*(gy/2-0.0003),cz-floorNormal.z*(gz/2-0.0003));
+    if(rotationZ!==undefined) floorMesh.rotation.z=rotationZ;
     grooveGroup.add(floorMesh);
 
     const el=new THREE.LineSegments(new THREE.EdgesGeometry(cavGeo),
       new THREE.LineBasicMaterial({color:cfg.hex,transparent:true,opacity:0.88}));
-    el.position.set(cx,cy,cz); grooveGroup.add(el);
+    el.position.set(cx,cy,cz);
+    if(rotationZ!==undefined) el.rotation.z=rotationZ;
+    grooveGroup.add(el);
   }
   scene.add(grooveGroup); layers.groove=grooveGroup;
 
@@ -2227,6 +2241,7 @@ window.resetAllLayers = function() {
     groove_top_plate: { zh: '顶板槽', en: 'Top Plate' },
     groove_glue_seal: { zh: '密封胶槽', en: 'Glue Seal' },
     groove_pocket: { zh: '开关盒坑', en: 'Pocket' },
+    groove_x_brace_steel: { zh: '斜撑钢槽', en: 'X-Brace Steel' },
     groove_default: { zh: '其他凹槽', en: 'Other Groove' },
     ftype_groove: { zh: '凹槽 (Groove)', en: 'Groove' },
     ftype_hole_round: { zh: '圆孔 (Hole)', en: 'Round Hole' },

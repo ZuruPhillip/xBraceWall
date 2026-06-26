@@ -635,8 +635,103 @@
         }
     ], 
     "id": "D887AB57-4666-B629-A081-688527919886_0", 
-    "mepCables": null, 
-    "mepDevices": null, 
+    "mepCables": [
+    {
+      "pn": "MEP_CABLE_5",
+      "points": [
+        {
+          "sn": 1,
+          "frontFace": true,
+          "position": {
+            "x": 3000,
+            "y": 2695
+          },
+          "type": "waffleBox"
+        },
+        {
+          "sn": 2,
+          "frontFace": true,
+          "position": {
+            "x": 3000,
+            "y": 1800
+          },
+          "type": "device"
+        }
+      ]
+    },
+    {
+      "pn": "MEP_CABLE_5",
+      "points": [
+        {
+          "sn": 1,
+          "frontFace": true,
+          "position": {
+            "x": 2965,
+            "y": 1765
+          },
+          "type": "device"
+        },
+        {
+          "sn": 2,
+          "frontFace": true,
+          "position": {
+            "x": 2000,
+            "y": 1765
+          },
+          "type": "corner"
+        },
+        {
+          "sn": 3,
+          "frontFace": true,
+          "position": {
+            "x": 2000,
+            "y": 1000
+          },
+          "type": "device"
+        }
+      ]
+    },
+    {
+      "pn": "MEP_CABLE_5",
+      "points": [
+        {
+          "sn": 1,
+          "frontFace": true,
+          "position": {
+            "x": 5000,
+            "y": 2695
+          },
+          "type": "waffleBox"
+        },
+        {
+          "sn": 2,
+          "frontFace": true,
+          "position": {
+            "x": 5000,
+            "y": 2000
+          },
+          "type": "piercing"
+        }
+      ]
+    }
+  ],
+  "mepDevices": [
+    {
+      "frontFace": true,
+      "pn": "MEP_DEVICE_8",
+      "position": {
+        "x": 3000,
+        "y": 1765
+      }
+    },{
+      "frontFace": true,
+      "pn": "MEP_DEVICE_8",
+      "position": {
+        "x": 2000,
+        "y": 965
+      }
+    }
+  ],
     "openingHoles": null, 
     "pn": "10001", 
     "rebars": {
