@@ -88,25 +88,6 @@
             </StackPanel>
         </Border>
 
-        <!-- 
-        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="10,0,10,10">
-
-            <Button Content="{l:Loc Button_Test}"
-                    Width="190"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Command="{Binding WallRotationTestCommand}"
-                    ToolTip="{l:Loc Tooltip_TestBtn}"/>
-
-            <Button Content="{l:Loc Button_GenerateWallData}"
-                    Width="190"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Command="{Binding WallDataGenerateCommand}"
-                    ToolTip="{l:Loc Tooltip_GenerateWallData}"/>
-        </StackPanel>
-        ==================== Row1: 工具栏按钮区域 ==================== -->
         <!-- ==================== Row2: OPC 节点监控区域 ==================== -->
         <Border Grid.Row="2" Background="White" CornerRadius="4"
                 BorderBrush="#E8E8E8" BorderThickness="1"
