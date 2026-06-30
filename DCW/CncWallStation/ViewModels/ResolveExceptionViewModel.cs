@@ -20,6 +20,7 @@ namespace CncWallStation.ViewModels
         [ObservableProperty] private string _resolver = string.Empty;
         [ObservableProperty] private string _repairDurationText = string.Empty;
         [ObservableProperty] private DateTime _completionTime = DateTime.Now;
+        [ObservableProperty] private string _completionTimeText = DateTime.Now.ToString("HH:mm:ss");
         [ObservableProperty] private string _improvementSuggestion = string.Empty;
         [ObservableProperty] private string _remarks = string.Empty;
 
@@ -76,6 +77,14 @@ namespace CncWallStation.ViewModels
                 }
             }
 
+            // 合并日期与时分秒
+            if (!TimeSpan.TryParse(CompletionTimeText?.Trim(), out var timePart))
+            {
+                MessageBox.Show("完成时间的时分秒格式不正确，请使用 HH:mm:ss 格式", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var completionTime = CompletionTime.Date + timePart;
+
             try
             {
                 await _exceptionReportService.ResolveReportAsync(
@@ -83,7 +92,7 @@ namespace CncWallStation.ViewModels
                     RepairMethod.Trim(),
                     Resolver.Trim(),
                     repairDuration,
-                    CompletionTime,
+                    completionTime,
                     string.IsNullOrWhiteSpace(ImprovementSuggestion) ? null : ImprovementSuggestion.Trim(),
                     string.IsNullOrWhiteSpace(Remarks) ? null : Remarks.Trim());
 

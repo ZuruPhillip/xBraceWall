@@ -170,9 +170,10 @@
                                 <DatePicker SelectedDate="{Binding OccurredAt, UpdateSourceTrigger=PropertyChanged}"
                                             Height="28" Width="160"
                                             VerticalContentAlignment="Center"/>
-                                <TextBlock Text="{Binding OccurredAt, StringFormat='HH:mm:ss'}"
-                                           Foreground="#262626" FontSize="12"
-                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBox Text="{Binding OccurredTime, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="28" FontSize="12"
+                                         VerticalContentAlignment="Center"
+                                         Margin="8,0,0,0"/>
                             </StackPanel>
                         </Grid>
                     </Grid>

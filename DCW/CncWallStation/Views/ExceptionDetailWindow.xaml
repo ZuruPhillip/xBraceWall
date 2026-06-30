@@ -46,12 +46,12 @@
 
                             <TextBlock Grid.Row="0" Grid.Column="0" Text="墙体编号" Foreground="#8C8C8C"
                                        FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding WallIdStr}"
+                            <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding WallIdStr}"
                                        Foreground="#262626" FontSize="12" VerticalAlignment="Center" FontWeight="SemiBold"/>
 
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="登记人" Foreground="#8C8C8C"
+                            <TextBlock Grid.Row="3" Grid.Column="2" Text="登记人" Foreground="#8C8C8C"
                                        FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding RegistrantName}"
+                            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding RegistrantName}"
                                        Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
 
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="登记时间" Foreground="#8C8C8C"
@@ -70,19 +70,20 @@
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OccurredAt}"
                                        Foreground="#262626" FontSize="12" VerticalAlignment="Center"
                                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                            <!-- 编辑模式：可编辑 DatePicker -->
-                            <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal"
+                            <!-- 编辑模式：可编辑 DatePicker + 时分秒 TextBox -->
+                            <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal"
                                         Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <DatePicker SelectedDate="{Binding OccurredAtValue, UpdateSourceTrigger=PropertyChanged}"
                                             Height="26" Width="160" VerticalContentAlignment="Center"/>
-                                <TextBlock Text="{Binding OccurredAtValue, StringFormat='HH:mm:ss'}"
-                                           Foreground="#262626" FontSize="12"
-                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBox Text="{Binding OccurredAtTime, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="26" FontSize="12"
+                                         VerticalContentAlignment="Center"
+                                         Margin="8,0,0,0"/>
                             </StackPanel>
-
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="状态" Foreground="#8C8C8C"
+       
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="状态" Foreground="#8C8C8C"
                                        FontSize="12" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding StatusText}"
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding StatusText}"
                                        VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">

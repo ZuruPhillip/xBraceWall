@@ -45,6 +45,7 @@ namespace CncWallStation.ViewModels
 
         /// <summary>可编辑的发生时间（编辑模式用）</summary>
         [ObservableProperty] private DateTime _occurredAtValue = DateTime.Now;
+        [ObservableProperty] private string _occurredAtTime = DateTime.Now.ToString("HH:mm:ss");
 
         // ═══════════════ 异常类型 ═══════════════
         [ObservableProperty] private int _selectedExceptionType;
@@ -107,6 +108,7 @@ namespace CncWallStation.ViewModels
             CreatedAt = item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
             OccurredAt = item.OccurredAt.ToString("yyyy-MM-dd HH:mm:ss");
             OccurredAtValue = item.OccurredAt;
+            OccurredAtTime = item.OccurredAt.ToString("HH:mm:ss");
             FrequencyCount = item.FrequencyCount;
             IsResolved = item.IsResolved;
             StatusText = item.IsResolved ? "已解决" : "未解决";
@@ -229,6 +231,14 @@ namespace CncWallStation.ViewModels
 
             try
             {
+                // 合并日期与时分秒
+                if (!TimeSpan.TryParse(OccurredAtTime?.Trim(), out var timePart))
+                {
+                    MessageBox.Show("发生时间的时分秒格式不正确，请使用 HH:mm:ss 格式", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                var occurredAt = OccurredAtValue.Date + timePart;
+
                 var photoPathsJson = _photoPaths.Count > 0
                     ? JsonSerializer.Serialize(_photoPaths)
                     : null;
@@ -241,7 +251,7 @@ namespace CncWallStation.ViewModels
                     customType,
                     Description,
                     photoPathsJson,
-                    OccurredAtValue,
+                    occurredAt,
                     FrequencyCount);
 
                 _logger.LogInformation("异常报告已更新: Id={Id}", ReportId);

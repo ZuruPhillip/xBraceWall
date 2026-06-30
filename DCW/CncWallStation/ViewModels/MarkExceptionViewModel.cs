@@ -57,6 +57,7 @@ namespace CncWallStation.ViewModels
 
         // ═══════════════ 发生时间 ═══════════════
         [ObservableProperty] private DateTime _occurredAt = DateTime.Now;
+        [ObservableProperty] private string _occurredTime = DateTime.Now.ToString("HH:mm:ss");
 
         // ═══════════════ 故障频次 ═══════════════
         [ObservableProperty] private int _frequencyCount = 1;
@@ -202,6 +203,14 @@ namespace CncWallStation.ViewModels
                 return;
             }
 
+            // 合并日期与时分秒
+            if (!TimeSpan.TryParse(OccurredTime?.Trim(), out var timePart))
+            {
+                MessageBox.Show("发生时间的时分秒格式不正确，请使用 HH:mm:ss 格式", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var occurredAt = OccurredAt.Date + timePart;
+
             try
             {
                 var photoPathsJson = _photoPaths.Count > 0
@@ -213,7 +222,7 @@ namespace CncWallStation.ViewModels
                     SelectedExceptionType,
                     Description,
                     RegistrantName,
-                    OccurredAt,
+                    occurredAt,
                     FrequencyCount,
                     SelectedExceptionType == 6 ? CustomExceptionType : null,
                     photoPathsJson);
