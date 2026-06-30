@@ -640,7 +640,7 @@ namespace CncWallStation.ViewModels
                         if (page is Views.ExceptionReportPage exPage
                             && exPage.DataContext is ExceptionReportPageViewModel exVm)
                         {
-                            exVm.OperatorName = OperatorName;
+                            exVm.RegistrantName = OperatorName;
                             _ = exVm.InitializeAsync(wallId, CurrentWall?.WallId ?? "");
                         }
                     });

@@ -28,10 +28,23 @@ namespace CncWallStation.ViewModels
         // ═══════════════ 基本信息（只读） ═══════════════
         [ObservableProperty] private long _reportId;
         [ObservableProperty] private string _wallIdStr = string.Empty;
-        [ObservableProperty] private string _operatorName = string.Empty;
+        [ObservableProperty] private string _registrantName = string.Empty;
         [ObservableProperty] private string _createdAt = string.Empty;
+        [ObservableProperty] private string _occurredAt = string.Empty;
+        [ObservableProperty] private int _frequencyCount;
         [ObservableProperty] private bool _isResolved;
         [ObservableProperty] private string _statusText = string.Empty;
+
+        // ═══════════════ 维修信息（只读） ═══════════════
+        [ObservableProperty] private string _repairMethod = string.Empty;
+        [ObservableProperty] private string _resolver = string.Empty;
+        [ObservableProperty] private string _repairDurationText = string.Empty;
+        [ObservableProperty] private string _completionTime = string.Empty;
+        [ObservableProperty] private string _improvementSuggestion = string.Empty;
+        [ObservableProperty] private string _remarks = string.Empty;
+
+        /// <summary>可编辑的发生时间（编辑模式用）</summary>
+        [ObservableProperty] private DateTime _occurredAtValue = DateTime.Now;
 
         // ═══════════════ 异常类型 ═══════════════
         [ObservableProperty] private int _selectedExceptionType;
@@ -90,11 +103,22 @@ namespace CncWallStation.ViewModels
         {
             ReportId = item.Id;
             WallIdStr = item.WallIdStr;
-            OperatorName = item.Operator;
+            RegistrantName = item.Registrant;
             CreatedAt = item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+            OccurredAt = item.OccurredAt.ToString("yyyy-MM-dd HH:mm:ss");
+            OccurredAtValue = item.OccurredAt;
+            FrequencyCount = item.FrequencyCount;
             IsResolved = item.IsResolved;
             StatusText = item.IsResolved ? "已解决" : "未解决";
             Description = item.Description;
+
+            // 维修信息
+            RepairMethod = item.RepairMethod ?? string.Empty;
+            Resolver = item.Resolver ?? string.Empty;
+            RepairDurationText = item.RepairDuration.HasValue ? $"{item.RepairDuration.Value} h" : string.Empty;
+            CompletionTime = item.CompletionTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? string.Empty;
+            ImprovementSuggestion = item.ImprovementSuggestion ?? string.Empty;
+            Remarks = item.Remarks ?? string.Empty;
 
             // 异常类型
             if (!string.IsNullOrWhiteSpace(item.CustomType))
@@ -199,7 +223,7 @@ namespace CncWallStation.ViewModels
         {
             if (string.IsNullOrWhiteSpace(Description))
             {
-                MessageBox.Show("请填写异常原因描述", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("请填写故障描述", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -216,7 +240,9 @@ namespace CncWallStation.ViewModels
                     SelectedExceptionType,
                     customType,
                     Description,
-                    photoPathsJson);
+                    photoPathsJson,
+                    OccurredAtValue,
+                    FrequencyCount);
 
                 _logger.LogInformation("异常报告已更新: Id={Id}", ReportId);
 

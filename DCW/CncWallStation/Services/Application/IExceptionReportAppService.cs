@@ -15,15 +15,18 @@ namespace CncWallStation.Services.Application
         Task<List<ExceptionReportDto>> GetReportsByWallIdAsync(long wallId);
 
         /// <summary>更新现有异常报告（编辑）</summary>
-        Task UpdateReportAsync(long reportId, int exceptionType, string? customType, string description, string? photoPaths);
+        Task UpdateReportAsync(long reportId, int exceptionType, string? customType, string description, string? photoPaths, DateTime occurredAt, int frequencyCount);
 
-        /// <summary>标记异常已解决</summary>
-        Task ResolveReportAsync(long reportId);
+        /// <summary>标记异常已解决，并保存维修信息</summary>
+        Task ResolveReportAsync(long reportId, string repairMethod, string resolver, decimal? repairDuration, DateTime? completionTime, string? improvementSuggestion, string? remarks);
 
         /// <summary>获取单个异常报告</summary>
         Task<MachiningExceptionEntity?> GetReportAsync(long reportId);
 
-        /// <summary>分页查询历史异常报告</summary>
-        Task<PagedResult<ExceptionReportDto>> GetPagedReportsAsync(long? wallId, int pageIndex, int pageSize);
+        /// <summary>分页查询历史异常报告（支持异常类型、时间段、是否解决过滤）</summary>
+        Task<PagedResult<ExceptionReportDto>> GetPagedReportsAsync(long? wallId, int? exceptionType, DateTime? startDate, DateTime? endDate, bool? isResolved, int pageIndex, int pageSize);
+
+        /// <summary>导出用全量查询（不分页，支持异常类型、时间段、是否解决过滤）</summary>
+        Task<List<ExceptionReportDto>> GetAllReportsForExportAsync(long? wallId, int? exceptionType, DateTime? startDate, DateTime? endDate, bool? isResolved);
     }
 }

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:conv="clr-namespace:CncWallStation.Converters"
         Title="{Binding Title, FallbackValue=标记异常}"
-        Width="600" Height="650"
+        Width="600" Height="720"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
@@ -129,6 +129,55 @@
                     </Grid>
                 </Border>
 
+                <!-- 登记员 + 发生时间 + 故障频次 -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="登记员" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding RegistrantName, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     VerticalContentAlignment="Center" Height="28" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="2" Text="故障频次" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBox Grid.Column="3"
+                                     Text="{Binding FrequencyCount, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource BaseTextBoxStyle}"
+                                     VerticalContentAlignment="Center" Height="28"
+                                     PreviewTextInput="NumberOnly_PreviewTextInput"
+                                     DataObject.Pasting="NumberOnly_Pasting"/>
+                        </Grid>
+                        <Grid Grid.Row="1" Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="发生时间" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <DatePicker SelectedDate="{Binding OccurredAt, UpdateSourceTrigger=PropertyChanged}"
+                                            Height="28" Width="160"
+                                            VerticalContentAlignment="Center"/>
+                                <TextBlock Text="{Binding OccurredAt, StringFormat='HH:mm:ss'}"
+                                           Foreground="#262626" FontSize="12"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+
                 <!-- 现场照片 -->
                 <Border Background="White" CornerRadius="4" Padding="16"
                         BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
@@ -176,7 +225,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="异常原因" Foreground="#8C8C8C"
+                        <TextBlock Grid.Row="0" Text="故障描述" Foreground="#8C8C8C"
                                    FontSize="12" Margin="0,0,0,4"/>
                         <TextBox Grid.Row="1"
                                  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"

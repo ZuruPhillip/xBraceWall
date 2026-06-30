@@ -52,8 +52,14 @@ namespace CncWallStation.ViewModels
         // ═══════════════ 描述 ═══════════════
         [ObservableProperty] private string _description = string.Empty;
 
-        // ═══════════════ 操作人 ═══════════════
-        [ObservableProperty] private string _operatorName = "操作员";
+        // ═══════════════ 登记员 ═══════════════
+        [ObservableProperty] private string _registrantName = "操作员";
+
+        // ═══════════════ 发生时间 ═══════════════
+        [ObservableProperty] private DateTime _occurredAt = DateTime.Now;
+
+        // ═══════════════ 故障频次 ═══════════════
+        [ObservableProperty] private int _frequencyCount = 1;
 
         // ═══════════════ 照片 ═══════════════
         public ObservableCollection<BitmapImage> PhotoPreviews { get; } = new();
@@ -79,9 +85,9 @@ namespace CncWallStation.ViewModels
         }
 
         /// <summary>初始化参数（由调用方设置）</summary>
-        public void Initialize(string operatorName, string? defaultWallId, string? windowTitle = null)
+        public void Initialize(string registrantName, string? defaultWallId, string? windowTitle = null)
         {
-            OperatorName = string.IsNullOrWhiteSpace(operatorName) ? "操作员" : operatorName;
+            RegistrantName = string.IsNullOrWhiteSpace(registrantName) ? "操作员" : registrantName;
 
             var titlePrefix = string.IsNullOrWhiteSpace(windowTitle) ? "标记异常" : windowTitle;
 
@@ -192,7 +198,7 @@ namespace CncWallStation.ViewModels
 
             if (string.IsNullOrWhiteSpace(Description))
             {
-                MessageBox.Show("请填写异常原因描述", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("请填写故障描述", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -206,7 +212,9 @@ namespace CncWallStation.ViewModels
                     SelectedWall.Id,
                     SelectedExceptionType,
                     Description,
-                    OperatorName,
+                    RegistrantName,
+                    OccurredAt,
+                    FrequencyCount,
                     SelectedExceptionType == 6 ? CustomExceptionType : null,
                     photoPathsJson);
 

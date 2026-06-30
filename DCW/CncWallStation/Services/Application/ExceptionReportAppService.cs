@@ -50,25 +50,13 @@ namespace CncWallStation.Services.Application
                     w => w.Id,
                     (e, walls) => new { e, walls })
                 .SelectMany(x => x.walls.DefaultIfEmpty(),
-                    (x, w) => new ExceptionReportDto
-                    {
-                        Id = x.e.Id,
-                        WallId = x.e.WallId,
-                        WallIdStr = w != null ? w.WallId : "(已删除)",
-                        ExceptionType = x.e.ExceptionType,
-                        CustomType = x.e.CustomType,
-                        Description = x.e.Description,
-                        PhotoPaths = x.e.PhotoPaths,
-                        Operator = x.e.Operator,
-                        CreatedAt = x.e.CreatedAt,
-                        IsResolved = x.e.IsResolved
-                    })
+                    (x, w) => ProjectDto(x.e, w))
                 .OrderByDescending(e => e.CreatedAt)
                 .ToListAsync();
         }
 
         /// <inheritdoc/>
-        public async Task UpdateReportAsync(long reportId, int exceptionType, string? customType, string description, string? photoPaths)
+        public async Task UpdateReportAsync(long reportId, int exceptionType, string? customType, string description, string? photoPaths, DateTime occurredAt, int frequencyCount)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -83,6 +71,8 @@ namespace CncWallStation.Services.Application
             existing.CustomType = customType;
             existing.Description = description;
             existing.PhotoPaths = photoPaths;
+            existing.OccurredAt = occurredAt;
+            existing.FrequencyCount = frequencyCount;
 
             await db.SaveChangesAsync();
 
@@ -90,7 +80,7 @@ namespace CncWallStation.Services.Application
         }
 
         /// <inheritdoc/>
-        public async Task ResolveReportAsync(long reportId)
+        public async Task ResolveReportAsync(long reportId, string repairMethod, string resolver, decimal? repairDuration, DateTime? completionTime, string? improvementSuggestion, string? remarks)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -101,10 +91,16 @@ namespace CncWallStation.Services.Application
                 throw new InvalidOperationException($"异常报告不存在: Id={reportId}");
 
             report.IsResolved = true;
+            report.RepairMethod = repairMethod;
+            report.Resolver = resolver;
+            report.RepairDuration = repairDuration;
+            report.CompletionTime = completionTime;
+            report.ImprovementSuggestion = improvementSuggestion;
+            report.Remarks = remarks;
 
             await db.SaveChangesAsync();
 
-            _logger.LogInformation("异常报告已标记解决: Id={reportId}", reportId);
+            _logger.LogInformation("异常报告已标记解决: Id={Id}, Resolver={Resolver}", reportId, resolver);
         }
 
         /// <inheritdoc/>
@@ -118,10 +114,55 @@ namespace CncWallStation.Services.Application
         }
 
         /// <inheritdoc/>
-        public async Task<PagedResult<ExceptionReportDto>> GetPagedReportsAsync(long? wallId, int pageIndex, int pageSize)
+        public async Task<PagedResult<ExceptionReportDto>> GetPagedReportsAsync(long? wallId, int? exceptionType, DateTime? startDate, DateTime? endDate, bool? isResolved, int pageIndex, int pageSize)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
+            var query = BuildFilteredQuery(db, wallId, exceptionType, startDate, endDate, isResolved);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(x => x.e.OccurredAt)
+                .Skip(pageIndex * pageSize)
+                .Take(pageSize)
+                .Select(x => ProjectDto(x.e, x.w))
+                .ToListAsync();
+
+            _logger.LogInformation("分页查询异常报告: WallId={WallId}, Type={Type}, Start={Start}, End={End}, IsResolved={IsResolved}, Page={Page}/{PageSize}, Total={Total}",
+                wallId, exceptionType, startDate, endDate, isResolved, pageIndex, pageSize, totalCount);
+
+            return new PagedResult<ExceptionReportDto>
+            {
+                TotalCount = totalCount,
+                Items = items
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<ExceptionReportDto>> GetAllReportsForExportAsync(long? wallId, int? exceptionType, DateTime? startDate, DateTime? endDate, bool? isResolved)
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var query = BuildFilteredQuery(db, wallId, exceptionType, startDate, endDate, isResolved);
+
+            var items = await query
+                .OrderByDescending(x => x.e.OccurredAt)
+                .Select(x => ProjectDto(x.e, x.w))
+                .ToListAsync();
+
+            _logger.LogInformation("导出查询异常报告: WallId={WallId}, Type={Type}, Start={Start}, End={End}, IsResolved={IsResolved}, Count={Count}",
+                wallId, exceptionType, startDate, endDate, isResolved, items.Count);
+
+            return items;
+        }
+
+        /// <summary>
+        /// 构建带过滤条件的 LEFT JOIN 查询
+        /// </summary>
+        private IQueryable<ExceptionWithWall> BuildFilteredQuery(
+            AppDbContext db, long? wallId, int? exceptionType, DateTime? startDate, DateTime? endDate, bool? isResolved)
+        {
             // 使用 LEFT JOIN 避免墙体软删除后异常记录无法显示
             var query = db.MachiningExceptions
                 .AsNoTracking()
@@ -130,42 +171,83 @@ namespace CncWallStation.Services.Application
                     w => w.Id,
                     (e, walls) => new { e, walls })
                 .SelectMany(x => x.walls.DefaultIfEmpty(),
-                    (x, w) => new { x.e, w });
+                    (x, w) => new ExceptionWithWall { e = x.e, w = w });
 
             if (wallId.HasValue && wallId.Value > 0)
             {
                 query = query.Where(x => x.e.WallId == wallId.Value);
             }
 
-            var totalCount = await query.CountAsync();
-
-            var items = await query
-                .OrderByDescending(x => x.e.CreatedAt)
-                .Skip(pageIndex * pageSize)
-                .Take(pageSize)
-                .Select(x => new ExceptionReportDto
-                {
-                    Id = x.e.Id,
-                    WallId = x.e.WallId,
-                    WallIdStr = x.w != null ? x.w.WallId : "(已删除)",
-                    ExceptionType = x.e.ExceptionType,
-                    CustomType = x.e.CustomType,
-                    Description = x.e.Description,
-                    PhotoPaths = x.e.PhotoPaths,
-                    Operator = x.e.Operator,
-                    CreatedAt = x.e.CreatedAt,
-                    IsResolved = x.e.IsResolved
-                })
-                .ToListAsync();
-
-            _logger.LogInformation("分页查询异常报告: WallId={WallId}, Page={Page}/{PageSize}, Total={Total}",
-                wallId, pageIndex, pageSize, totalCount);
-
-            return new PagedResult<ExceptionReportDto>
+            if (exceptionType.HasValue)
             {
-                TotalCount = totalCount,
-                Items = items
+                int typeValue = exceptionType.Value;
+                // 其他(6)类型匹配 CustomType 非空的记录
+                if (typeValue == 6)
+                {
+                    query = query.Where(x => x.e.ExceptionType == 6 || !string.IsNullOrEmpty(x.e.CustomType));
+                }
+                else
+                {
+                    query = query.Where(x => x.e.ExceptionType == typeValue);
+                }
+            }
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(x => x.e.OccurredAt >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                // EndDate 含当天（到当天 23:59:59）
+                var endExclusive = endDate.Value.Date.AddDays(1);
+                query = query.Where(x => x.e.OccurredAt < endExclusive);
+            }
+
+            if (isResolved.HasValue)
+            {
+                bool resolved = isResolved.Value;
+                query = query.Where(x => x.e.IsResolved == resolved);
+            }
+
+            return query;
+        }
+
+        /// <summary>
+        /// 实体投影为 DTO
+        /// </summary>
+        private static ExceptionReportDto ProjectDto(MachiningExceptionEntity e, WallEntity? w)
+        {
+            return new ExceptionReportDto
+            {
+                Id = e.Id,
+                WallId = e.WallId,
+                WallIdStr = w != null ? w.WallId : "(已删除)",
+                ExceptionType = e.ExceptionType,
+                CustomType = e.CustomType,
+                Description = e.Description,
+                PhotoPaths = e.PhotoPaths,
+                Registrant = e.Registrant,
+                CreatedAt = e.CreatedAt,
+                OccurredAt = e.OccurredAt,
+                FrequencyCount = e.FrequencyCount,
+                IsResolved = e.IsResolved,
+                RepairMethod = e.RepairMethod,
+                Resolver = e.Resolver,
+                RepairDuration = e.RepairDuration,
+                CompletionTime = e.CompletionTime,
+                ImprovementSuggestion = e.ImprovementSuggestion,
+                Remarks = e.Remarks
             };
+        }
+
+        /// <summary>
+        /// LEFT JOIN 中间结果（避免在 EF Core 表达式树中使用元组字面量）
+        /// </summary>
+        private sealed class ExceptionWithWall
+        {
+            public MachiningExceptionEntity e { get; set; } = null!;
+            public WallEntity? w { get; set; }
         }
     }
 }

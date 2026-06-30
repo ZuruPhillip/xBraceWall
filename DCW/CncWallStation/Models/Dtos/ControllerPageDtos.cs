@@ -126,8 +126,16 @@ namespace CncWallStation.Models.Dtos
         public string? CustomType { get; set; }
         public string Description { get; set; } = string.Empty;
         public string? PhotoPaths { get; set; }
-        public string Operator { get; set; } = string.Empty;
+        public string Registrant { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public DateTime OccurredAt { get; set; }
+        public int FrequencyCount { get; set; }
         public bool IsResolved { get; set; }
+        public string? RepairMethod { get; set; }
+        public string? Resolver { get; set; }
+        public decimal? RepairDuration { get; set; }
+        public DateTime? CompletionTime { get; set; }
+        public string? ImprovementSuggestion { get; set; }
+        public string? Remarks { get; set; }
     }
 }

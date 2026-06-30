@@ -104,6 +104,9 @@ namespace CncWallStation
                     // MainPageViewModel 需单例，确保 MainViewModel 和 MainPage 共享同一实例
                     services.AddSingleton<MainPageViewModel>();
 
+                    // 异常报告 PDF 导出服务
+                    services.AddTransient<ExceptionReportExportService>();
+
                 })
                 .Build();
         }
@@ -169,13 +172,47 @@ namespace CncWallStation
                         CustomType VARCHAR(128) NULL,
                         Description MEDIUMTEXT NOT NULL,
                         PhotoPaths TEXT NULL,
-                        Operator VARCHAR(64) NOT NULL,
+                        Registrant VARCHAR(64) NOT NULL,
                         CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        OccurredAt DATETIME NULL,
+                        FrequencyCount INT NOT NULL DEFAULT 1,
                         IsResolved TINYINT(1) NOT NULL DEFAULT 0,
+                        RepairMethod VARCHAR(512) NULL,
+                        Resolver VARCHAR(64) NULL,
+                        RepairDuration DECIMAL(10,2) NULL,
+                        CompletionTime DATETIME NULL,
+                        ImprovementSuggestion TEXT NULL,
+                        Remarks TEXT NULL,
                         INDEX IX_MachiningException_WallId (WallId),
                         CONSTRAINT FK_MachiningException_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
                     );
                 ");
+
+                // MachiningException 表结构升级（幂等，逐条 try-catch 忽略已存在/不存在错误）
+                var alterStatements = new[]
+                {
+                    "ALTER TABLE MachiningException CHANGE COLUMN Operator Registrant VARCHAR(64) NOT NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN OccurredAt DATETIME NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN FrequencyCount INT NOT NULL DEFAULT 1",
+                    "ALTER TABLE MachiningException ADD COLUMN RepairMethod VARCHAR(512) NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN Resolver VARCHAR(64) NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN RepairDuration DECIMAL(10,2) NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN CompletionTime DATETIME NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN ImprovementSuggestion TEXT NULL",
+                    "ALTER TABLE MachiningException ADD COLUMN Remarks TEXT NULL"
+                };
+                foreach (var sql in alterStatements)
+                {
+                    try
+                    {
+                        db.Database.ExecuteSqlRaw(sql);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 忽略列已存在(1060)、列不存在(1054) 等错误，保证幂等
+                        System.Diagnostics.Debug.WriteLine($"DDL 幂等跳过: {sql} => {ex.Message}");
+                    }
+                }
 
                 // 手动补建 MachiningRecord 表
                 db.Database.ExecuteSqlRaw(@"

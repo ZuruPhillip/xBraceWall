@@ -18,6 +18,7 @@
     <Grid Background="#F5F5F5" Loaded="Page_Loaded">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -44,8 +45,68 @@
             </Grid>
         </Border>
 
-        <!-- ═══════════════ Row1: 主内容区 ═══════════════ -->
-        <Grid Grid.Row="1" Margin="8,0,8,8">
+        <!-- ═══════════════ Row1: 查询区 ═══════════════ -->
+        <Border Grid.Row="1" Margin="8,0,8,6" Padding="16,10"
+                Background="White" CornerRadius="4"
+                BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="异常类型" Foreground="#8C8C8C" FontSize="12"
+                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding ExceptionTypeFilters}"
+                          SelectedValue="{Binding SelectedExceptionTypeFilter}"
+                          DisplayMemberPath="Name" SelectedValuePath="Value"
+                          Style="{StaticResource BaseComboBoxStyle}"
+                          Background="White" Foreground="#262626"
+                          BorderBrush="#D9D9D9" Height="28"/>
+
+                <TextBlock Grid.Column="2" Text="是否解决" Foreground="#8C8C8C" FontSize="12"
+                           VerticalAlignment="Center" Margin="12,0,8,0"/>
+                <ComboBox Grid.Column="3"
+                          ItemsSource="{Binding ResolvedFilters}"
+                          SelectedValue="{Binding SelectedResolvedFilter}"
+                          DisplayMemberPath="Name" SelectedValuePath="Value"
+                          Style="{StaticResource BaseComboBoxStyle}"
+                          Background="White" Foreground="#262626"
+                          BorderBrush="#D9D9D9" Height="28"/>
+
+                <TextBlock Grid.Column="4" Text="开始日期" Foreground="#8C8C8C" FontSize="12"
+                           VerticalAlignment="Center" Margin="12,0,8,0"/>
+                <DatePicker Grid.Column="5"
+                            SelectedDate="{Binding StartDate, UpdateSourceTrigger=PropertyChanged}"
+                            Height="28" VerticalContentAlignment="Center"/>
+
+                <TextBlock Grid.Column="6" Text="结束日期" Foreground="#8C8C8C" FontSize="12"
+                           VerticalAlignment="Center" Margin="12,0,8,0"/>
+                <DatePicker Grid.Column="7"
+                            SelectedDate="{Binding EndDate, UpdateSourceTrigger=PropertyChanged}"
+                            Height="28" VerticalContentAlignment="Center"/>
+
+                <Button Grid.Column="9" Content="查询" Width="70" Height="28" Margin="0,0,6,0"
+                        Command="{Binding SearchCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}" FontSize="12"/>
+                <Button Grid.Column="10" Content="导出PDF" Width="80" Height="28"
+                        Command="{Binding ExportPdfCommand}"
+                        Style="{StaticResource BaseButtonStyle}" FontSize="12"/>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════════ Row2: 主内容区 ═══════════════ -->
+        <Grid Grid.Row="2" Margin="8,0,8,8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -84,19 +145,23 @@
                               SelectionMode="Single"
                               ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="序号" Width="60"
+                            <DataGridTextColumn Header="序号" Width="50"
                                                 Binding="{Binding RowIndex}"/>
-                            <DataGridTextColumn Header="墙体Id" Width="120"
+                            <DataGridTextColumn Header="墙体Id" Width="110"
                                                 Binding="{Binding WallIdStr}"/>
-                            <DataGridTextColumn Header="异常类型" Width="120"
+                            <DataGridTextColumn Header="异常类型" Width="100"
                                                 Binding="{Binding ExceptionTypeDisplay}"/>
-                            <DataGridTextColumn Header="描述" Width="200"
+                            <DataGridTextColumn Header="故障描述" Width="180"
                                                 Binding="{Binding Description}"/>
-                            <DataGridTextColumn Header="时间" Width="150"
-                                                Binding="{Binding CreatedAt, StringFormat='yyyy-MM-dd HH:mm:ss'}"/>
-                            <DataGridTextColumn Header="操作人" Width="80"
-                                                Binding="{Binding Operator}"/>
-                            <DataGridTemplateColumn Header="状态" Width="80">
+                            <DataGridTextColumn Header="日期" Width="100"
+                                                Binding="{Binding CreatedAt, StringFormat='yyyy-MM-dd'}"/>
+                            <DataGridTextColumn Header="发生时间" Width="140"
+                                                Binding="{Binding OccurredAt, StringFormat='yyyy-MM-dd HH:mm'}"/>
+                            <DataGridTextColumn Header="故障频次" Width="60"
+                                                Binding="{Binding FrequencyCount}"/>
+                            <DataGridTextColumn Header="登记人" Width="70"
+                                                Binding="{Binding Registrant}"/>
+                            <DataGridTemplateColumn Header="状态" Width="70">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="2"
@@ -134,25 +199,37 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="操作" Width="210">
+                            <DataGridTextColumn Header="维修方法" Width="140"
+                                                Binding="{Binding RepairMethodDisplay}"/>
+                            <DataGridTextColumn Header="解决人员" Width="70"
+                                                Binding="{Binding ResolverDisplay}"/>
+                            <DataGridTextColumn Header="维修耗时" Width="70"
+                                                Binding="{Binding RepairDurationDisplay}"/>
+                            <DataGridTextColumn Header="完成时间" Width="120"
+                                                Binding="{Binding CompletionTimeDisplay}"/>
+                            <DataGridTextColumn Header="机构改善建议" Width="160"
+                                                Binding="{Binding ImprovementSuggestionDisplay}"/>
+                            <DataGridTextColumn Header="备注" Width="120"
+                                                Binding="{Binding RemarksDisplay}"/>
+                            <DataGridTemplateColumn Header="操作" Width="180">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Button Content="查看"
-                                                    Height="24" FontSize="10" MinWidth="50"
+                                                    Height="24" FontSize="10" MinWidth="45"
                                                     Padding="4,0" Margin="0,0,3,0"
                                                     Command="{Binding DataContext.ViewReportCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource BaseButtonStyle}"/>
                                             <Button Content="编辑"
-                                                    Height="24" FontSize="10" MinWidth="50"
+                                                    Height="24" FontSize="10" MinWidth="45"
                                                     Padding="4,0" Margin="0,0,3,0"
                                                     Command="{Binding DataContext.EditReportCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource BaseButtonStyle}"
                                                     Visibility="{Binding IsResolved, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                             <Button Content="解决"
-                                                    Height="24" FontSize="10" MinWidth="50"
+                                                    Height="24" FontSize="10" MinWidth="45"
                                                     Padding="4,0"
                                                     Command="{Binding DataContext.ResolveReportCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                     CommandParameter="{Binding}"

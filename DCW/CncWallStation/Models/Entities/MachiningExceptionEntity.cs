@@ -19,7 +19,7 @@ namespace CncWallStation.Models.Entities
         [Column(TypeName = "VARCHAR(128)")]
         public string? CustomType { get; set; }
 
-        /// <summary>异常描述/原因</summary>
+        /// <summary>故障描述</summary>
         [Column(TypeName = "MEDIUMTEXT")]
         public string Description { get; set; } = string.Empty;
 
@@ -27,25 +27,57 @@ namespace CncWallStation.Models.Entities
         [Column(TypeName = "TEXT")]
         public string? PhotoPaths { get; set; }
 
-        /// <summary>操作人</summary>
+        /// <summary>登记人</summary>
         [Column(TypeName = "VARCHAR(64)")]
-        public string Operator { get; set; } = string.Empty;
+        public string Registrant { get; set; } = string.Empty;
 
-        /// <summary>异常发生时间</summary>
+        /// <summary>登记时间（系统自动记录）</summary>
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>异常发生时间（用户输入）</summary>
+        public DateTime OccurredAt { get; set; }
+
+        /// <summary>故障频次</summary>
+        public int FrequencyCount { get; set; }
 
         /// <summary>是否已解决</summary>
         public bool IsResolved { get; set; }
 
+        /// <summary>维修方法</summary>
+        [Column(TypeName = "VARCHAR(512)")]
+        public string? RepairMethod { get; set; }
+
+        /// <summary>解决人员</summary>
+        [Column(TypeName = "VARCHAR(64)")]
+        public string? Resolver { get; set; }
+
+        /// <summary>维修耗时（小时，数字）</summary>
+        [Column(TypeName = "DECIMAL(10,2)")]
+        public decimal? RepairDuration { get; set; }
+
+        /// <summary>完成时间</summary>
+        public DateTime? CompletionTime { get; set; }
+
+        /// <summary>机构改善建议</summary>
+        [Column(TypeName = "TEXT")]
+        public string? ImprovementSuggestion { get; set; }
+
+        /// <summary>备注</summary>
+        [Column(TypeName = "TEXT")]
+        public string? Remarks { get; set; }
+
         protected MachiningExceptionEntity() { }
 
-        public MachiningExceptionEntity(long wallId, int exceptionType, string description, string operatorName,
+        public MachiningExceptionEntity(long wallId, int exceptionType, string description, string registrant,
+            DateTime occurredAt, int frequencyCount,
             string? customType = null, string? photoPaths = null)
         {
             WallId = wallId;
             ExceptionType = exceptionType;
             Description = description;
-            Operator = operatorName;
+            Registrant = registrant;
+            OccurredAt = occurredAt;
+            FrequencyCount = frequencyCount;
             CustomType = customType;
             PhotoPaths = photoPaths;
             CreatedAt = DateTime.Now;
