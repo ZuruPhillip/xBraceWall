@@ -25,7 +25,7 @@ namespace CncWallStation.Plcs.Handlers
 
             // 2. 分组：同面 + 同长 + 同宽 + 同深 才能合并
             var groups = slots.GroupBy(h => new BendingKeyKey(
-                h.Face,
+                h.Face.InitialSide,
                 Round(h.SlotLength),
                 Round(h.Radius),
                 Round(h.Depth)));
@@ -33,7 +33,7 @@ namespace CncWallStation.Plcs.Handlers
             // 3. 每组通过 CollinearMerger 合并
             foreach (var grp in groups)
             {
-                var list = grp.ToList();
+                var list = grp.OrderBy(x => x.LocalPos.X).ToList();
 
                 foreach (var chain in CollinearMerger.Merge(
                     list,
@@ -88,6 +88,6 @@ namespace CncWallStation.Plcs.Handlers
         private static float Round(float v) => MathF.Round(v, 1);
 
         private readonly record struct BendingKeyKey(
-            MachineFace Face, float SlotLength, float SlotWidth, float Depth);
+            MachineSide Face, float SlotLength, float SlotWidth, float Depth);
     }
 }
