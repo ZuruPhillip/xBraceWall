@@ -44,7 +44,7 @@ namespace CncWallStation.Plcs.Handlers
 
             // 3. 按 (面 + 孔径 + 深度) 分组
             var groups = rounds.GroupBy(h => new HoleKey(
-                h.Face,
+                h.Face.InitialSide,
                 Round(h.Diameter),
                 Round(h.Depth)
             ));
@@ -52,7 +52,7 @@ namespace CncWallStation.Plcs.Handlers
             // 4. 每组通过 CollinearMerger 合并
             foreach (var grp in groups)
             {
-                var list = grp.ToList();
+                var list = grp.OrderBy(x => x.LocalPos.X).ToList();
 
                 foreach (var chain in CollinearMerger.Merge(
                     list,
@@ -174,7 +174,7 @@ namespace CncWallStation.Plcs.Handlers
         // ══════════════════════════════════════════════════════
 
         private readonly record struct HoleKey(
-            MachineFace Face, float Diameter, float Depth);
+            MachineSide Face, float Diameter, float Depth);
     }
 }
 

@@ -39,14 +39,14 @@ namespace CncWallStation.Plcs.Handlers
             if (slots == null || slots.Count == 0) return;
 
             var groups = slots.GroupBy(s => new RebarSlotKey(
-                s.Face,
+                s.Face.InitialSide,
                 RoundByTol(s.Length, LengthTol),
                 s.Direction,
                 RoundByTol(s.Diameter, DiamTol)));
 
             foreach (var grp in groups)
             {
-                var list = grp.ToList();
+                var list = grp.OrderBy(x => x.StartPos.X).ThenBy(x => x.StartPos.Y).ToList();
 
                 foreach (var chain in CollinearMerger.Merge(
                     list,
@@ -100,7 +100,7 @@ namespace CncWallStation.Plcs.Handlers
         }
 
         private readonly record struct RebarSlotKey(
-            MachineFace Face,
+            MachineSide Face,
             float Length,
             RebarSlotDirection Direction,
             float Diameter);
