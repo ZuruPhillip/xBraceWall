@@ -334,9 +334,12 @@ namespace CncWallStation.Views
                 ProcessStatus.待校验 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E67E22")),
                 ProcessStatus.待加工 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#95A5A6")),
                 ProcessStatus.加工中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3498DB")),
-                ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")),
                 ProcessStatus.异常 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+                ProcessStatus.暂停 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD591")),
+                ProcessStatus.中止 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFA39E")),
+                ProcessStatus.待质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFD591")),
                 ProcessStatus.已质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1890FF")),
+                ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#27AE60")),
                 _ => new SolidColorBrush(Colors.Gray)
             } : new SolidColorBrush(Colors.Gray);
         }

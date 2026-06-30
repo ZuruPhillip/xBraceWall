@@ -92,6 +92,20 @@ namespace CncWallStation.Models.Dtos
         public int Floor { get; set; }
         public string BimJsonData { get; set; } = string.Empty;
         public string? MomJsonData { get; set; }
+        /// <summary>管线阶段</summary>
+        public string PipelineStage { get; set; } = string.Empty;
+        /// <summary>管线阶段显示文本</summary>
+        public string PipelineStageText { get; set; } = string.Empty;
+        /// <summary>加工优先级</summary>
+        public int Priority { get; set; }
+        /// <summary>导入时间</summary>
+        public DateTime ImportTime { get; set; }
+        /// <summary>加工状态</summary>
+        public int Status { get; set; }
+        /// <summary>加工状态显示文本</summary>
+        public string StatusText { get; set; } = string.Empty;
+        /// <summary>操作人</summary>
+        public string? UpdatedBy { get; set; }
     }
 
     /// <summary>

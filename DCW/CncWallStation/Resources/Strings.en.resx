@@ -162,6 +162,9 @@
   <data name="TabHeader_Controller" xml:space="preserve">
     <value>Controller</value>
   </data>
+  <data name="TabHeader_ExceptionReport" xml:space="preserve">
+    <value>Exception Report</value>
+  </data>
   <data name="TabHeader_JsonEditor" xml:space="preserve">
     <value>JSON Editor</value>
   </data>

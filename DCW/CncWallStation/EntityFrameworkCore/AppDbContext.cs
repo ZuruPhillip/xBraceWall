@@ -18,6 +18,8 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
         public DbSet<PlcInstructionEntity> PlcInstructions => Set<PlcInstructionEntity>();
         public DbSet<OpcWriteRecordEntity> OpcWriteRecords => Set<OpcWriteRecordEntity>();
+        public DbSet<MachiningExceptionEntity> MachiningExceptions => Set<MachiningExceptionEntity>();
+        public DbSet<MachiningRecordEntity> MachiningRecords => Set<MachiningRecordEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -200,6 +202,44 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.HasOne(r => r.Wall)
                     .WithMany(w => w.DataCheckRecords)
                     .HasForeignKey(r => r.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== MachiningException 表配置 ====================
+            modelBuilder.Entity<MachiningExceptionEntity>(entity =>
+            {
+                entity.ToTable("MachiningException");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_MachiningException_WallId");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne<WallEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== MachiningRecord 表配置 ====================
+            modelBuilder.Entity<MachiningRecordEntity>(entity =>
+            {
+                entity.ToTable("MachiningRecord");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_MachiningRecord_WallId");
+
+                entity.HasOne<WallEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

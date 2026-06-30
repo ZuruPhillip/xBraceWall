@@ -91,6 +91,12 @@
                 CommandParameter="ControllerPage"/>
 
                 <hc:SideMenuItem 
+                Header="{l:Loc Menu_ExceptionReport}" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="ExceptionReportPage"/>
+                    
+                
+                <hc:SideMenuItem 
                 Header="{l:Loc Menu_Quality}" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="QualityControlPage"/>

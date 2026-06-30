@@ -1,6 +1,8 @@
 using CncWallStation.EntityFrameworkCore;
+using CncWallStation.Models;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
+using CncWallStation.Models.Enums;
 using CncWallStation.MomWallData;
 using CncWallStation.Plcs;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +54,14 @@ namespace CncWallStation.Services.Application
                 ProjectName = wall.ProjectName,
                 Floor = wall.Floor,
                 BimJsonData = wall.BimJsonData,
-                MomJsonData = wall.MomJsonData
+                MomJsonData = wall.MomJsonData,
+                PipelineStage = wall.PipelineStage.ToDisplayText(),
+                PipelineStageText = wall.PipelineStage.ToDisplayText(),
+                Priority = wall.Priority,
+                ImportTime = wall.ImportTime,
+                Status = wall.Status,
+                StatusText = ((Models.ProcessStatus)wall.Status).ToDisplayText(),
+                UpdatedBy = wall.UpdatedBy
             };
         }
 

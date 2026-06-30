@@ -16,6 +16,7 @@
   <data name="Menu_DataCheck" xml:space="preserve"><value>数据预检</value></data>
   <data name="Menu_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
   <data name="Menu_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="Menu_ExceptionReport" xml:space="preserve"><value>异常报告</value></data>
   <data name="Menu_Quality" xml:space="preserve"><value>质量控制</value></data>
   <data name="Menu_Report" xml:space="preserve"><value>报表分析</value></data>
   <data name="Menu_Settings" xml:space="preserve"><value>系统设置</value></data>
@@ -25,6 +26,7 @@
   <data name="TabHeader_BimRender" xml:space="preserve"><value>BIM模型渲染</value></data>
   <data name="TabHeader_MomRender" xml:space="preserve"><value>MOM模型渲染</value></data>
   <data name="TabHeader_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="TabHeader_ExceptionReport" xml:space="preserve"><value>异常报告</value></data>
   <data name="TabHeader_JsonEditor" xml:space="preserve"><value>JSON编辑器</value></data>
   <data name="TabHeader_DataCheck" xml:space="preserve"><value>数据预检</value></data>
   <data name="TabHeader_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>

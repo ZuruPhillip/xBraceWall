@@ -20,6 +20,7 @@ namespace CncWallStation.ViewModels
             { "BimDataRenderPage", ("TabHeader_BimRender", typeof(Views.BimDataRenderPage)) },
             { "MomDataRenderPage", ("TabHeader_MomRender", typeof(Views.MomDataRenderPage)) },
             { "ControllerPage", ("TabHeader_Controller", typeof(Views.ControllerPage)) },
+            { "ExceptionReportPage", ("TabHeader_ExceptionReport", typeof(Views.ExceptionReportPage)) },
             { "JsonEditPage", ("TabHeader_JsonEditor", typeof(Views.JsonEditPage)) },
             { "DataCheckPage", ("TabHeader_DataCheck", typeof(Views.DataCheckPage)) },
             { "PlcDataPage", ("TabHeader_PlcData", typeof(Views.PlcDataPage)) },

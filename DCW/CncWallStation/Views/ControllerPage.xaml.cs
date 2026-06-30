@@ -1,14 +1,13 @@
 ﻿using CncWallStation.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace CncWallStation.Views
 {
-    /// <summary>
-    /// ControllerPage.xaml 的交互逻辑
-    /// </summary>
     public partial class ControllerPage : Page
     {
         private readonly ControllerPageViewModel _viewModel;
+
         public ControllerPage(ControllerPageViewModel viewModel)
         {
             InitializeComponent();
@@ -18,10 +17,9 @@ namespace CncWallStation.Views
             Loaded += OnPageLoaded;
         }
 
-        private void OnPageLoaded(object sender, System.Windows.RoutedEventArgs e)
+        private async void OnPageLoaded(object sender, RoutedEventArgs e)
         {
-            // 页面加载时自动加载节点列表
-            _viewModel.LoadOpcNodesCommand.Execute(null);
+            await _viewModel.InitializeAsync();
         }
     }
 }

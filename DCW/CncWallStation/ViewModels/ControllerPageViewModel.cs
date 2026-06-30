@@ -1,292 +1,651 @@
-﻿using CncWallStation.Commands;
-using CncWallStation.Features;
-using CncWallStation.Features.Grooves;
-using CncWallStation.MomWallData;
+﻿using CncWallStation.Models;
+using CncWallStation.Models.Dtos;
+using CncWallStation.Models.Enums;
+using CncWallStation.Services.Application;
 using CncWallStation.Services.OpcUa;
-using CncWallStation.VersionMappers;
+using CncWallStation.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Infrastructure.Maths;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
-// 解决项目自定义 RelayCommand 与 CommunityToolkit.Mvvm 生成的 RelayCommand 歧义
-using CncRelayCommand = CncWallStation.Commands.RelayCommand;
 
 namespace CncWallStation.ViewModels
 {
     public partial class ControllerPageViewModel : ObservableObject
     {
-        private readonly BimWallMapperFactory _factory = new();
         private readonly ILogger<ControllerPageViewModel> _logger;
         private readonly IOpcUaService _opcUaService;
+        private readonly IMachiningAppService _machiningAppService;
+        private readonly IServiceProvider _serviceProvider;
 
-        // ══════════════════════════════════════════
-        //  原有测试命令
-        // ══════════════════════════════════════════
+        // 计时器
+        private readonly DispatcherTimer _machiningTimer;
+        private DateTime _machiningStartTime;
+        private bool _isTimerRunning;
 
-        public CncRelayCommand WallRotationTestCommand { get; }
-        public CncRelayCommand WallDataGenerateCommand { get; }
+        // 当前墙体数据
+        [ObservableProperty] private WallInfoDto? _currentWall;
+        [ObservableProperty] private WallQueueItemDto? _selectedQueueItem;
 
-        // ══════════════════════════════════════════
-        //  OPC 节点监控
-        // ══════════════════════════════════════════
+        // 队列
+        public ObservableCollection<WallQueueItemDto> WallQueue { get; } = new();
 
-        public ObservableCollection<OpcNodeConfig> OpcMonitoredNodes { get; } = new();
+        // 实时参数
+        [ObservableProperty] private RealtimeParamsDto _realtimeParams = new();
 
-        [ObservableProperty]
-        private OpcNodeConfig? _selectedOpcMonitoredNode;
+        // PLC 数据
+        public ObservableCollection<PlcLineDataDto> PlcLineData { get; } = new();
+
+        // OPC 连接状态
+        [ObservableProperty] private bool _isOpcConnected;
+
+        // 分页
+        private const int DefaultPageSize = 10;
+        [ObservableProperty] private int _pageIndex;
+        [ObservableProperty] private int _totalPages;
+        [ObservableProperty] private int _totalCount;
+        [ObservableProperty] private bool _canPreviousPage;
+        [ObservableProperty] private bool _canNextPage;
+        public ObservableCollection<PlcLineDataDto> PagedPlcLineData { get; } = new();
+
+        /// <summary>显示用的页码（从 1 开始）</summary>
+        public int DisplayPageIndex => PageIndex + 1;
+        partial void OnPageIndexChanged(int value) => OnPropertyChanged(nameof(DisplayPageIndex));
+
+        // 加工状态
+        [ObservableProperty] private string _machiningDurationText = "00:00:00";
+        [ObservableProperty] private string _operatorName = "操作员";
+        [ObservableProperty] private string _statusText = "就绪";
+        [ObservableProperty] private string _statusBadgeBackground = "#1677FF";
+        [ObservableProperty] private string _statusIndicatorColor = "#FFFFFF";
+        [ObservableProperty] private string _progressText = "0%";
+
+        // 按钮启用状态
+        [ObservableProperty] private bool _canStart = true;
+        [ObservableProperty] private bool _canPause;
+        [ObservableProperty] private bool _canEmergencyStop;
+        [ObservableProperty] private bool _canReset;
+        [ObservableProperty] private bool _canMarkException;
+        [ObservableProperty] private bool _canComplete;
+
+        // 参数状态
+        [ObservableProperty] private string _spindleStatusColor = "#9E9E9E";
+        [ObservableProperty] private string _feedRateStatusColor = "#9E9E9E";
+        [ObservableProperty] private string _tableReadyColor = "#9E9E9E";
+        [ObservableProperty] private string _safetyDoorColor = "#9E9E9E";
+        [ObservableProperty] private string _stageBackground = "#334155";
 
         public ControllerPageViewModel(
             ILogger<ControllerPageViewModel> logger,
-            IOpcUaService opcUaService)
+            IOpcUaService opcUaService,
+            IMachiningAppService machiningAppService,
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _opcUaService = opcUaService;
+            _machiningAppService = machiningAppService;
+            _serviceProvider = serviceProvider;
+
+            _machiningTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            _machiningTimer.Tick += OnTimerTick;
+
+            // OPC 订阅回调
+            _opcUaService.NodeValuesUpdated += OnOpcNodeValuesUpdated;
+
+            // OPC 状态订阅
+            IsOpcConnected = _opcUaService.IsConnected;
+            _opcUaService.StatusChanged += OnOpcStatusChanged;
         }
 
-        // ══════════════════════════════════════════
-        //  OPC 命令
-        // ══════════════════════════════════════════
-
-        /// <summary>
-        /// 从配置文件加载节点列表到监控面板
-        /// </summary>
-        [RelayCommand]
-        private async Task LoadOpcNodesAsync()
+        // ═══════════════ 初始化 ═══════════════
+        public async Task InitializeAsync()
         {
             try
             {
-                var nodesFilePath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "CncWallStation", "opc_nodes.json");
+                // 直接加载队列（触发 LoadWallAsync → Load3DWallDataAsync 完整管道）
+                await LoadQueueAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "初始化 ControllerPage 失败");
+            }
+        }
 
-                OpcMonitoredNodes.Clear();
+        // ═══════════════ 墙体队列 ═══════════════
+        [RelayCommand]
+        private async Task LoadQueueAsync()
+        {
+            try
+            {
+                var queue = await _machiningAppService.GetWallQueueAsync(5);
+                WallQueue.Clear();
+                foreach (var item in queue)
+                    WallQueue.Add(item);
 
-                if (File.Exists(nodesFilePath))
+                if (WallQueue.Count > 0)
+                    SelectedQueueItem = WallQueue[0];
+
+                _logger.LogInformation("加载加工队列: {Count} 条", queue.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "加载队列失败");
+            }
+        }
+
+        partial void OnSelectedQueueItemChanged(WallQueueItemDto? value)
+        {
+            if (value != null)
+                _ = LoadWallAsync(value);
+        }
+
+        private async Task LoadWallAsync(WallQueueItemDto item)
+        {
+            try
+            {
+                var info = await _machiningAppService.GetWallInfoAsync(item.WallId);
+                CurrentWall = info;
+
+                if (info != null)
                 {
-                    var json = await File.ReadAllTextAsync(nodesFilePath);
-                    var nodes = JsonSerializer.Deserialize<List<OpcNodeConfig>>(json);
-                    if (nodes != null)
+                    StageBackground = GetStageColor(info.Status);
+
+                    // 初始化 PLC 数据行
+                    await InitPlcLineDataAsync(info.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "加载墙体失败: WallId={WallId}", item.WallId);
+            }
+        }
+
+        private const int DefaultPlcLineCount = 100;
+
+        private async Task InitPlcLineDataAsync(long wallId)
+        {
+            PlcLineData.Clear();
+            try
+            {
+                var count = DefaultPlcLineCount;
+
+                for (int i = 0; i < count; i++)
+                {
+                    PlcLineData.Add(new PlcLineDataDto { Index = i });
+                }
+
+                // 订阅 PLC 节点
+                await SubscribePlcNodesAsync(count);
+
+                _logger.LogInformation("初始化 PLC 数据: {Count} 行", count);
+
+                // 初始化首屏分页
+                RefreshPagedData();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "初始化 PLC 数据失败");
+            }
+        }
+
+        private async Task SubscribePlcNodesAsync(int count)
+        {
+            if (!_opcUaService.IsConnected) return;
+
+            try
+            {
+                var nodes = new System.Collections.Generic.List<OpcNodeConfig>();
+                string[] headers = { "T", "F", "D", "X0", "Y0", "Z0", "X1", "Y1", "Z1" };
+
+                for (int i = 0; i < count; i++)
+                {
+                    foreach (var h in headers)
                     {
-                        foreach (var node in nodes)
-                            OpcMonitoredNodes.Add(node);
+                        nodes.Add(new OpcNodeConfig
+                        {
+                            NodeId = $"ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.LineDef[{i}].{h}",
+                            Description = $"L{i}.{h}"
+                        });
                     }
                 }
 
-                _logger.LogInformation("已加载 {Count} 个节点到监控面板", OpcMonitoredNodes.Count);
+                await _opcUaService.SubscribeNodesAsync(nodes);
+                _logger.LogInformation("已订阅 {Count} 个 PLC 节点", nodes.Count);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "加载 OPC 节点到监控面板失败");
+                _logger.LogWarning(ex, "订阅 PLC 节点失败");
             }
         }
 
-        /// <summary>
-        /// 刷新所有节点的当前值（批量读取）
-        /// </summary>
-        [RelayCommand]
-        private async Task RefreshOpcValuesAsync()
+        // ═══════════════ OPC 回调 ═══════════════
+        private void OnOpcNodeValuesUpdated(object? sender, System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
         {
-            if (!_opcUaService.IsConnected)
+            Application.Current?.Dispatcher.BeginInvoke(() =>
             {
-                _logger.LogWarning("OPC 未连接，无法刷新节点值");
-                return;
-            }
-
-            try
-            {
-                var nodeIds = OpcMonitoredNodes.Select(n => n.NodeId).ToList();
-                if (nodeIds.Count == 0) return;
-
-                var values = await _opcUaService.ReadNodesAsync(nodeIds);
-                _logger.LogInformation("刷新完成: {Count} 个节点", values.Count);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "刷新 OPC 节点值失败");
-            }
-        }
-
-        /// <summary>
-        /// 订阅所有节点
-        /// </summary>
-        [RelayCommand]
-        private async Task SubscribeAllNodesAsync()
-        {
-            if (!_opcUaService.IsConnected)
-            {
-                _logger.LogWarning("OPC 未连接，无法订阅节点");
-                return;
-            }
-
-            try
-            {
-                var nodes = OpcMonitoredNodes.ToList();
-                if (nodes.Count == 0)
+                try
                 {
-                    _logger.LogWarning("没有可订阅的节点，请先加载节点");
-                    return;
+                    UpdatePlcLineDataFromOpc(nodes);
+                    UpdateRealtimeParamsFromOpc(nodes);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "OPC 数据更新失败");
+                }
+            });
+        }
+
+        private void OnOpcStatusChanged(object? sender, OpcConnectionStatus status)
+        {
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                IsOpcConnected = status == OpcConnectionStatus.Connected;
+                if (!IsOpcConnected)
+                    RefreshParameterColors();
+            });
+        }
+
+        private void UpdatePlcLineDataFromOpc(System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
+        {
+            var completedIndices = new System.Collections.Generic.List<int>();
+
+            foreach (var node in nodes)
+            {
+                var match = System.Text.RegularExpressions.Regex.Match(node.NodeId,
+                    @"LineDef\[(\d+)\]\.(\w+)");
+                if (!match.Success) continue;
+
+                int index = int.Parse(match.Groups[1].Value);
+                string header = match.Groups[2].Value;
+
+                if (index < 0 || index >= PlcLineData.Count) continue;
+
+                var line = PlcLineData[index];
+                var val = System.Convert.ToSingle(node.CurrentValue ?? 0f);
+
+                switch (header)
+                {
+                    case "T": line.T = (int)val; break;
+                    case "F": line.F = (int)val; break;
+                    case "D": line.D = (int)val; break;
+                    case "X0": line.X0 = val; break;
+                    case "Y0": line.Y0 = val; break;
+                    case "Z0": line.Z0 = val; break;
+                    case "X1": line.X1 = val; break;
+                    case "Y1": line.Y1 = val; break;
+                    case "Z1": line.Z1 = val; break;
                 }
 
-                await _opcUaService.SubscribeNodesAsync(nodes);
-                _logger.LogInformation("已订阅 {Count} 个节点", nodes.Count);
+                // 检查 D 值是否已完成（D=1 表示该行已加工）
+                if (header == "D" && (int)val == 1)
+                {
+                    line.IsCompleted = true;
+                    if (!completedIndices.Contains(index))
+                        completedIndices.Add(index);
+                }
             }
-            catch (Exception ex)
+
+            // 更新加工进度
+            if (completedIndices.Count > 0)
             {
-                _logger.LogError(ex, "订阅节点失败");
+                var pct = PlcLineData.Count > 0
+                    ? (completedIndices.Count * 100 / PlcLineData.Count) : 0;
+                ProgressText = $"{pct}%";
             }
         }
 
-        // ══════════════════════════════════════════
-        //  原有测试方法
-        // ══════════════════════════════════════════
+        private void UpdateRealtimeParamsFromOpc(System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.NodeId.Contains("TableReady"))
+                    RealtimeParams.TableReady = System.Convert.ToBoolean(node.CurrentValue ?? false);
+                else if (node.NodeId.Contains("SafetyDoor"))
+                    RealtimeParams.SafetyDoorClosed = System.Convert.ToBoolean(node.CurrentValue ?? false);
+                else if (node.NodeId.Contains("SpindleSpeed"))
+                    RealtimeParams.SpindleSpeed = System.Convert.ToDouble(node.CurrentValue ?? 0);
+                else if (node.NodeId.Contains("FeedRate"))
+                    RealtimeParams.FeedRate = System.Convert.ToDouble(node.CurrentValue ?? 0);
+                else if (node.NodeId.Contains("CurrentTool"))
+                    RealtimeParams.CurrentTool = System.Convert.ToInt32(node.CurrentValue ?? 0);
+            }
 
-        //private void ExecuteLoadRender()
-        //{
-        //    var outline = new Vec2[]
-        //    {
-        //        new Vec2(100,   0),
-        //        new Vec2(150,   0),
-        //        new Vec2(150, 200),
-        //        new Vec2(  0, 200),
-        //        new Vec2(  0, 100),
-        //        new Vec2(100, 100),
-        //    };
+            SpindleStatusColor = RealtimeParams.SpindleSpeed > 0 ? "#4CAF50" : "#F44336";
+            FeedRateStatusColor = RealtimeParams.FeedRate > 0 ? "#4CAF50" : "#F44336";
+            TableReadyColor = RealtimeParams.TableReady ? "#52C41A" : "#E60012";
+            SafetyDoorColor = RealtimeParams.SafetyDoorClosed ? "#52C41A" : "#E60012";
+        }
 
-        //    var wall = new MomWall("W-001", outline,
-        //                        thickness: 18f,
-        //                        baseElevation: 0f,
-        //                        material: "多层板");
+        /// <summary>OPC 断开时重置指示灯为中性灰色</summary>
+        private void RefreshParameterColors()
+        {
+            SpindleStatusColor = "#9E9E9E";
+            FeedRateStatusColor = "#9E9E9E";
+            TableReadyColor = "#9E9E9E";
+            SafetyDoorColor = "#9E9E9E";
+        }
 
-        //    wall
-        //        .AddGroove("G-001", MachineSide.Top,
-        //                   new Vec2(100, 50), new Vec2(150, 50),
-        //                   width: 18f, depth: 10f);
+        // ═══════════════ 分页 ═══════════════
 
-        //    wall.AddMepSlot("MS-001", MachineSide.Top, width: 20f)
-        //        .AddLine(new Vec2(50, 50), new Vec2(300, 50), depth: 12f)
-        //        .LineTo(new Vec2(300, 300), depth: 12f);
+        [RelayCommand]
+        private void PreviousPage()
+        {
+            if (PageIndex > 0)
+            {
+                PageIndex--;
+                RefreshPagedData();
+            }
+        }
 
-        //    wall.AddMepSlot("MS-002", MachineSide.Top, width: 15f)
-        //        .AddLine(new Vec2(350, 50), new Vec2(400, 50), depth: 8f)
-        //        .AddArc(center: new Vec2(400, 100),
-        //                 radius: 50f,
-        //                 startAngleDeg: 270f,
-        //                 endAngleDeg: 90f,
-        //                 depth: 10f,
-        //                 isClockwise: false)
-        //        .LineTo(new Vec2(350, 200), depth: 12f);
+        [RelayCommand]
+        private void NextPage()
+        {
+            if (PageIndex < TotalPages - 1)
+            {
+                PageIndex++;
+                RefreshPagedData();
+            }
+        }
 
-        //    wall.AddMepSlot("MS-003", MachineSide.Front, width: 25f)
-        //        .AddArcByThreePoints(
-        //            p1: new Vec2(100, 0),
-        //            pMid: new Vec2(200, 30),
-        //            p3: new Vec2(300, 0),
-        //            depth: 15f)
-        //        .LineTo(new Vec2(500, 0), depth: 15f);
+        private void RefreshPagedData()
+        {
+            TotalCount = PlcLineData.Count;
+            TotalPages = TotalCount > 0
+                ? (int)Math.Ceiling((double)TotalCount / DefaultPageSize)
+                : 1;
 
-        //    wall.AddGroove("G-001", MachineSide.Top,
-        //        startPt: new Vec2(0, 100),
-        //        endPt: new Vec2(600, 100),
-        //        width: 40f,
-        //        depth: 12f,
-        //        grooveType: GrooveType.SteelColumn);
+            CanPreviousPage = PageIndex > 0;
+            CanNextPage = PageIndex < TotalPages - 1;
 
-        //    wall.AddTopPlateGroove("G-002", MachineSide.Top,
-        //        startPt: new Vec2(0, 0),
-        //        endPt: new Vec2(600, 0),
-        //        width: 38f,
-        //        depth: 18f);
+            PagedPlcLineData.Clear();
+            var start = PageIndex * DefaultPageSize;
+            var end = Math.Min(start + DefaultPageSize, TotalCount);
 
-        //    wall.AddAsymmetricGroove("G-003", MachineSide.Top,
-        //        startPt: new Vec2(0, 200),
-        //        endPt: new Vec2(600, 200),
-        //        leftWidth: 30f,
-        //        rightWidth: 10f,
-        //        depth: 15f,
-        //        grooveType: GrooveType.XBraceSteel);
+            for (int i = start; i < end; i++)
+            {
+                PagedPlcLineData.Add(PlcLineData[i]);
+            }
+        }
 
-        //    wall.AddXBraceSteelGroove("G-004", MachineSide.Top,
-        //        startPt: new Vec2(100, 300),
-        //        endPt: new Vec2(500, 100),
-        //        leftWidth: 25f,
-        //        rightWidth: 15f,
-        //        depth: 12f);
+        // ═══════════════ 计时器 ═══════════════
+        private void OnTimerTick(object? sender, EventArgs e)
+        {
+            if (_isTimerRunning)
+            {
+                var elapsed = DateTime.Now - _machiningStartTime;
+                MachiningDurationText = $"{(int)elapsed.TotalHours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
+            }
+        }
 
-        //    wall.ActualLength = 1398f;
-        //    wall.ActualThickness = 2693f;
-        //    wall.PivotPoint = new Vec3(-50f, 148f, 0f);
-        //    wall.ResetActualDimensions();
-        //    wall.ResetPivotPoint();
+        private void StartTimer()
+        {
+            _machiningStartTime = DateTime.Now;
+            _isTimerRunning = true;
+            _machiningTimer.Start();
+        }
 
-        //    foreach (var f in wall.Features.OfType<Groove>())
-        //    {
-        //        Console.WriteLine(f.GetInfo());
-        //        var (p0, p1, p2, p3) = f.GetCorners();
-        //        Console.WriteLine($"  角点: P0={p0} P1={p1} P2={p2} P3={p3}");
-        //    }
+        private void StopTimer()
+        {
+            _isTimerRunning = false;
+            _machiningTimer.Stop();
+        }
 
-        //    _logger.LogInformation("\n【初始状态】");
-        //    wall.Print();
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+        private void ResetTimer()
+        {
+            StopTimer();
+            MachiningDurationText = "00:00:00";
+        }
 
-        //    _logger.LogInformation("\n【第一面加工 - 顶面 Top 特征】");
-        //    foreach (var f in wall.GetFeaturesByCurrentSide(MachineSide.Top))
-        //        _logger.LogInformation($"  {f.GetInfo()}");
+        // ═══════════════ 加工控制命令 ═══════════════
 
-        //    _logger.LogInformation("\n【执行翻面：绕 X 轴（Top -> Bottom）】");
-        //    wall.Flip(FlipAxis.AroundY);
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+        [RelayCommand]
+        private async Task StartAsync()
+        {
+            if (CurrentWall == null) return;
+            try
+            {
+                await _machiningAppService.StartMachiningAsync(CurrentWall.Id, OperatorName);
+                StartTimer();
+                UpdateButtonStates(ProcessStatus.加工中);
+                SetStatus("加工中", "#4CAF50");
+                _logger.LogInformation("开始加工: {WallId}", CurrentWall.WallId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "开始加工失败");
+                MessageBox.Show($"开始加工失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-        //    _logger.LogInformation("\n【第二面加工 - 翻面后顶面（原 Bottom）特征】");
-        //    foreach (var f in wall.GetFeaturesByCurrentSide(MachineSide.Top))
-        //        _logger.LogInformation($"  {f.GetInfo()}");
+        [RelayCommand]
+        private async Task PauseAsync()
+        {
+            if (CurrentWall == null) return;
+            try
+            {
+                await _machiningAppService.PauseMachiningAsync(CurrentWall.Id);
+                StopTimer();
+                UpdateButtonStates(ProcessStatus.暂停);
+                SetStatus("暂停", "#FF9800");
+                _logger.LogInformation("暂停加工: {WallId}", CurrentWall.WallId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "暂停加工失败");
+            }
+        }
 
-        //    _logger.LogInformation("\n【CNC 旋转：绕 Z 轴 90°】");
-        //    wall.Rotate(Vec3.UnitZ, 90f, pivot: new Vec3(50, 0, 0));
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
-        //    _logger.LogInformation($"\n旋转后顶点[0]: {wall.GetWorldVertices()[0]}");
+        [RelayCommand]
+        private async Task EmergencyStopAsync()
+        {
+            if (CurrentWall == null) return;
+            try
+            {
+                await _machiningAppService.EmergencyStopAsync(CurrentWall.Id);
+                StopTimer();
+                UpdateButtonStates(ProcessStatus.暂停);
+                SetStatus("急停", "#F44336");
+                _logger.LogWarning("急停: {WallId}", CurrentWall.WallId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "急停失败");
+                MessageBox.Show($"急停失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-        //    _logger.LogInformation("\n【CNC 平移：移到加工台坐标 (500, 200, 0)】");
-        //    wall.Translate(new Vec3(500f, 200f, 0f));
+        [RelayCommand]
+        private async Task ResetAsync()
+        {
+            if (CurrentWall == null) return;
+            try
+            {
+                await _machiningAppService.ResetMachiningAsync(CurrentWall.Id);
+                ResetTimer();
+                UpdateButtonStates(ProcessStatus.待加工);
+                SetStatus("待加工", "#9E9E9E");
+                _logger.LogInformation("复位: {WallId}", CurrentWall.WallId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "复位失败");
+            }
+        }
 
-        //    var (bmin, bmax) = wall.GetBoundingBox();
-        //    _logger.LogInformation($"包围盒 Min: {bmin}");
-        //    _logger.LogInformation($"包围盒 Max: {bmax}");
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+        [RelayCommand]
+        private async Task RegisterExceptionAsync()
+        {
+            if (CurrentWall == null)
+            {
+                _logger.LogWarning("异常登记失败：当前无选中墙体");
+                MessageBox.Show("请先在左侧加工队列中选择墙体", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
-        //    _logger.LogInformation("\n【特征世界坐标（CNC 路径）】");
-        //    foreach (var (feature, worldPos) in wall.GetFeaturesWorldPos())
-        //        _logger.LogInformation($"  {feature.Id,-6} → {worldPos}");
+            try
+            {
+                // 弹出异常登记窗口，不改变墙体加工状态
+                OpenMarkExceptionWindow(CurrentWall.WallId, "异常登记");
+                _logger.LogInformation("异常登记: {WallId}", CurrentWall.WallId);
+                await Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "异常登记弹出窗口失败");
+                MessageBox.Show($"打开窗口失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
-        //    _logger.LogInformation("\n【撤销平移】");
-        //    wall.UndoTransform();
-        //    _logger.LogInformation($"撤销后顶点[0]: {wall.GetWorldVertices()[0]}");
-        //    _logger.LogInformation($"剩余可撤销变换步数: {wall.UndoTransformSteps}");
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+        [RelayCommand]
+        private async Task MarkExceptionAsync()
+        {
+            if (CurrentWall == null) return;
+            try
+            {
+                await _machiningAppService.MarkExceptionAsync(CurrentWall.Id, OperatorName);
+                StopTimer();
+                UpdateButtonStates(ProcessStatus.中止);
+                SetStatus("异常", "#F44336");
+                _logger.LogWarning("标记异常: {WallId}", CurrentWall.WallId);
 
-        //    _logger.LogInformation("\n【撤销翻面】");
-        //    wall.UndoFlip();
-        //    wall.PrintWorldCoordinates("-------------当前世界坐标---------------");
+                // 弹出异常登记窗口
+                OpenMarkExceptionWindow(CurrentWall.WallId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "标记异常失败");
+            }
+        }
 
-        //    _logger.LogInformation("\n【SLERP 旋转插值（5 帧）】");
-        //    var qStart = Quaternion.Identity;
-        //    var qEnd = Quaternion.FromAxisAngle(Vec3.UnitY, MathF.PI / 2f);
-        //    for (int i = 0; i <= 5; i++)
-        //    {
-        //        float t = i / 5f;
-        //        var q = Quaternion.Slerp(qStart, qEnd, t);
-        //        _logger.LogInformation($"  t={t:F1} → {q}");
-        //    }
+        private void OpenMarkExceptionWindow(string wallId, string? title = null)
+        {
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                try
+                {
+                    // 通过 DI 解析 ViewModel 和 Window
+                    var vm = ActivatorUtilities.CreateInstance<MarkExceptionViewModel>(_serviceProvider);
+                    vm.Initialize(OperatorName, wallId, title);
 
-        //    _logger.LogInformation("\n完成。");
-        //}
+                    var window = ActivatorUtilities.CreateInstance<MarkExceptionWindow>(_serviceProvider, vm);
+                    window.Owner = Application.Current.MainWindow;
+                    window.ShowDialog();
 
+                    _logger.LogInformation("异常登记窗口已关闭");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "打开异常登记窗口失败");
+                }
+            });
+        }
+
+        [RelayCommand]
+        private async Task CompleteAsync()
+        {
+            if (CurrentWall == null) return;
+
+            var result = MessageBox.Show(
+                $"确认完成加工？\n墙体：{CurrentWall.WallId}\n操作人：{OperatorName}",
+                "确认完成", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                await _machiningAppService.CompleteMachiningAsync(CurrentWall.Id, OperatorName);
+                StopTimer();
+                UpdateButtonStates(ProcessStatus.待质检);
+                SetStatus("待质检", "#2196F3");
+                _logger.LogInformation("完成加工: {WallId}, 进入待质检", CurrentWall.WallId);
+
+                // 刷新队列
+                await LoadQueueAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "完成加工失败");
+                MessageBox.Show($"完成加工失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // ═══════════════ 状态管理 ═══════════════
+        private void UpdateButtonStates(ProcessStatus status)
+        {
+            CanStart = status == ProcessStatus.待加工 || status == ProcessStatus.暂停;
+            CanPause = status == ProcessStatus.加工中;
+            CanEmergencyStop = status == ProcessStatus.加工中;
+            CanReset = status == ProcessStatus.暂停 || status == ProcessStatus.中止;
+            CanMarkException = status == ProcessStatus.加工中 || status == ProcessStatus.暂停;
+            CanComplete = status == ProcessStatus.加工中;
+        }
+
+        private void SetStatus(string text, string indicatorColor)
+        {
+            StatusText = text;
+            StatusIndicatorColor = indicatorColor;
+            StatusBadgeBackground = GetBadgeBackground(text);
+        }
+
+        private static string GetBadgeBackground(string status) => status switch
+        {
+            "就绪" => "#1677FF",
+            "待加工" => "#95A5A6",
+            "加工中" => "#90D5FF",
+            "暂停" => "#FFD591",
+            "急停" => "#FFA39E",
+            "异常" => "#FFA39E",
+            "中止" => "#FFA39E",
+            "待质检" => "#FFD591",
+            "已质检" => "#B7EB8F",
+            "已完成" => "#B7EB8F",
+            _ => "#D9D9D9"
+        };
+
+        private static string GetStageColor(int status) => status switch
+        {
+            2 => "#BAE7FF",  // 加工中 - 浅蓝
+            3 => "#FFCCC7",  // 异常 - 浅红
+            4 => "#FFE7BA",  // 暂停 - 浅橙
+            5 => "#FFCCC7",  // 中止 - 浅红
+            6 => "#FFE7BA",  // 待质检 - 浅橙
+            7 => "#D9F7BE",  // 已质检 - 浅绿
+            8 => "#D9F7BE",  // 已完成 - 浅绿
+            _ => "#F5F5F5"
+        };
+
+        private void NavigateToExceptionReport(long wallId)
+        {
+            // 通过 MainPageViewModel 导航到异常报告页面
+            Application.Current?.Dispatcher.BeginInvoke(() =>
+            {
+                var mainWindow = Application.Current?.MainWindow as MainWindow;
+                var mainPageHost = mainWindow?.FindName("MainPageHost") as System.Windows.Controls.ContentControl;
+                var mainPage = mainPageHost?.Content as System.Windows.FrameworkElement;
+
+                if (mainPage?.DataContext is MainPageViewModel mainPageVm)
+                {
+                    mainPageVm.AddOrActivateTab("ExceptionReportPage", page =>
+                    {
+                        if (page is Views.ExceptionReportPage exPage
+                            && exPage.DataContext is ExceptionReportPageViewModel exVm)
+                        {
+                            exVm.OperatorName = OperatorName;
+                            _ = exVm.InitializeAsync(wallId, CurrentWall?.WallId ?? "");
+                        }
+                    });
+                }
+            });
+        }
     }
 }

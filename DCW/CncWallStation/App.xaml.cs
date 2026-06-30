@@ -159,6 +159,38 @@ namespace CncWallStation
                         INDEX IX_Opc_WallId (WallId)
                     );
                 ");
+
+                // 手动补建 MachiningException 表
+                db.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS MachiningException (
+                        Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        WallId BIGINT NOT NULL,
+                        ExceptionType INT NOT NULL,
+                        CustomType VARCHAR(128) NULL,
+                        Description MEDIUMTEXT NOT NULL,
+                        PhotoPaths TEXT NULL,
+                        Operator VARCHAR(64) NOT NULL,
+                        CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        IsResolved TINYINT(1) NOT NULL DEFAULT 0,
+                        INDEX IX_MachiningException_WallId (WallId),
+                        CONSTRAINT FK_MachiningException_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
+                    );
+                ");
+
+                // 手动补建 MachiningRecord 表
+                db.Database.ExecuteSqlRaw(@"
+                    CREATE TABLE IF NOT EXISTS MachiningRecord (
+                        Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        WallId BIGINT NOT NULL,
+                        Operator VARCHAR(64) NOT NULL,
+                        StartTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        EndTime TIMESTAMP NULL,
+                        TotalDurationSeconds BIGINT NULL,
+                        Status INT NOT NULL,
+                        INDEX IX_MachiningRecord_WallId (WallId),
+                        CONSTRAINT FK_MachiningRecord_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
+                    );
+                ");
             }
 
             var mainWindow = HostApp.Services.GetRequiredService<MainWindow>();
