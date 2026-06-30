@@ -294,7 +294,7 @@
 					<Separator/>
 					<MenuItem Header="{l:Loc ContextMenu_ViewBimRender}" Click="ContextMenu_ViewDetail"/>
 					<MenuItem Header="{l:Loc ContextMenu_ViewMomRender}" Click="ContextMenu_ViewMomRender"/>
-					<MenuItem Header="{l:Loc ContextMenu_EditJson}" Click="ContextMenu_EditJson"/>
+					<!--<MenuItem Header="{l:Loc ContextMenu_EditJson}" Click="ContextMenu_EditJson"/>-->
 				</ContextMenu>
 			</DataGrid.ContextMenu>
 

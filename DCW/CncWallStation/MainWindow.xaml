@@ -68,11 +68,11 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="MomDataRenderPage"/>
 
-                <!-- JSON编辑器 -->
-                <hc:SideMenuItem 
+                <!-- JSON编辑器-->
+                <!--<hc:SideMenuItem 
                 Header="{l:Loc Menu_JsonEditor}" 
                 Command="{Binding NavigateCommand}"
-                CommandParameter="JsonEditPage"/>
+                CommandParameter="JsonEditPage"/>-->
 
                 <hc:SideMenuItem 
                 Header="{l:Loc Menu_DataCheck}" 
