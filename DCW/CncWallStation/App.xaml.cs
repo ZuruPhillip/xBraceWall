@@ -188,29 +188,36 @@ namespace CncWallStation
                     );
                 ");
 
-                // MachiningException 表结构升级（幂等，逐条 try-catch 忽略已存在/不存在错误）
-                var alterStatements = new[]
+                // MachiningException 表结构升级（先查询已有列，仅补缺失列，避免 ERR 日志）
+                var existingColumns = db.Database.SqlQueryRaw<string>(
+                    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'MachiningException'"
+                ).ToHashSet();
+
+                // 旧表可能有 Operator 列需改名为 Registrant
+                if (existingColumns.Contains("Operator") && !existingColumns.Contains("Registrant"))
                 {
-                    "ALTER TABLE MachiningException CHANGE COLUMN Operator Registrant VARCHAR(64) NOT NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN OccurredAt DATETIME NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN FrequencyCount INT NOT NULL DEFAULT 1",
-                    "ALTER TABLE MachiningException ADD COLUMN RepairMethod VARCHAR(512) NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN Resolver VARCHAR(64) NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN RepairDuration DECIMAL(10,2) NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN CompletionTime DATETIME NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN ImprovementSuggestion TEXT NULL",
-                    "ALTER TABLE MachiningException ADD COLUMN Remarks TEXT NULL"
+                    db.Database.ExecuteSqlRaw(
+                        "ALTER TABLE MachiningException CHANGE COLUMN Operator Registrant VARCHAR(64) NOT NULL");
+                }
+
+                // 仅添加尚不存在的列
+                var columnsToAdd = new[]
+                {
+                    ("OccurredAt", "ALTER TABLE MachiningException ADD COLUMN OccurredAt DATETIME NULL"),
+                    ("FrequencyCount", "ALTER TABLE MachiningException ADD COLUMN FrequencyCount INT NOT NULL DEFAULT 1"),
+                    ("RepairMethod", "ALTER TABLE MachiningException ADD COLUMN RepairMethod VARCHAR(512) NULL"),
+                    ("Resolver", "ALTER TABLE MachiningException ADD COLUMN Resolver VARCHAR(64) NULL"),
+                    ("RepairDuration", "ALTER TABLE MachiningException ADD COLUMN RepairDuration DECIMAL(10,2) NULL"),
+                    ("CompletionTime", "ALTER TABLE MachiningException ADD COLUMN CompletionTime DATETIME NULL"),
+                    ("ImprovementSuggestion", "ALTER TABLE MachiningException ADD COLUMN ImprovementSuggestion TEXT NULL"),
+                    ("Remarks", "ALTER TABLE MachiningException ADD COLUMN Remarks TEXT NULL"),
                 };
-                foreach (var sql in alterStatements)
+
+                foreach (var (columnName, sql) in columnsToAdd)
                 {
-                    try
+                    if (!existingColumns.Contains(columnName))
                     {
                         db.Database.ExecuteSqlRaw(sql);
-                    }
-                    catch (Exception ex)
-                    {
-                        // 忽略列已存在(1060)、列不存在(1054) 等错误，保证幂等
-                        System.Diagnostics.Debug.WriteLine($"DDL 幂等跳过: {sql} => {ex.Message}");
                     }
                 }
 
