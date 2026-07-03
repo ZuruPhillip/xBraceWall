@@ -28,6 +28,7 @@ namespace CncWallStation.Plcs
             var grooves = new List<Groove>();
             var rebarSlots = new List<RebarSlot>();
             var cableSlots = new List<MepSlot>();
+            var boxes = new List<Pocket>();
 
             foreach (var f in wall.Features)
             {
@@ -36,9 +37,7 @@ namespace CncWallStation.Plcs
                     case Groove g: grooves.Add(g); break;
                     case Hole h: holes.Add(h); break;
                     case Pocket p:
-                        before = ctx.Output.Count;
-                        BoxHandler.Handle(p, ctx);
-                        AddGroupIfNotEmpty(groups, "BoxHandler", "开关盒", ctx.Output, before);
+                        boxes.Add(p);
                         break;
                     case RebarSlot r: rebarSlots.Add(r); break;
                     case Window w:
@@ -138,6 +137,13 @@ namespace CncWallStation.Plcs
                 AddGroupIfNotEmpty(groups, "XBraceHandler", "X斜槽", ctx.Output, before);
             }
 
+            //开关盒
+            if (boxes.Count > 0)
+            {
+                before = ctx.Output.Count;
+                BoxHandler.HandleBatch(boxes, ctx);
+                AddGroupIfNotEmpty(groups, "BoxHandler", "开关盒", ctx.Output, before);
+            }
             return groups;
         }
 

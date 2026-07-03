@@ -142,14 +142,6 @@
     <span class="param-val highlight" id="v-volume">—</span>
   </div>
   <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="param_front_area">正面面积</span></span>
-    <span class="param-val" id="v-area-front">—</span>
-  </div>
-  <div class="param-row">
-    <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="param_top_area">顶面面积</span></span>
-    <span class="param-val" id="v-area-top">—</span>
-  </div>
-  <div class="param-row">
     <span class="param-lbl"><span class="plbl-icon">🧱</span><span data-i18n="param_slices">砖块分片</span></span>
     <span class="param-val" id="v-slc">—</span>
   </div>
@@ -392,20 +384,6 @@
       volCm3Real >= 1e6 ? (volCm3Real / 1e6).toFixed(1) + ' m³'
       : volCm3Real >= 1000 ? (volCm3Real / 1000).toFixed(1) + ' dm³'
       : (+volCm3Real).toFixed(1) + ' cm³';
-
-    // 正面面积 (W * H，单位 mm²)
-    var areaFrontMm2 = W * H;
-    var areaFrontCm2 = areaFrontMm2 / 100; // mm² → cm²
-    document.getElementById('v-area-front').textContent =
-      areaFrontCm2 >= 10000 ? (areaFrontCm2 / 10000).toFixed(1) + ' m²'
-      : (+areaFrontCm2).toFixed(1) + ' cm²';
-
-    // 顶面面积 (W * TH，单位 mm²)
-    var areaTopMm2 = W * TH;
-    var areaTopCm2 = areaTopMm2 / 100;
-    document.getElementById('v-area-top').textContent =
-      areaTopCm2 >= 10000 ? (areaTopCm2 / 10000).toFixed(1) + ' m²'
-      : (+areaTopCm2).toFixed(1) + ' cm²';
 
     document.getElementById('v-slc').textContent = D.slices.length + ' ' + t('brick_unit');
     document.getElementById('v-ver').textContent = D.wallContour.length + ' ' + t('vertex_unit');
@@ -830,8 +808,7 @@
     dim_thickness: { zh: '厚度', en: 'Thickness' },
     param_material: { zh: '材质', en: 'Material' },
     param_volume: { zh: '毛体积', en: 'Gross Volume' },
-    param_front_area: { zh: '正面面积', en: 'Front Area' },
-    param_top_area: { zh: '顶面面积', en: 'Top Area' },
+
     param_slices: { zh: '砖块分片', en: 'Brick Slices' },
     param_vertices: { zh: '轮廓顶点', en: 'Contour Vertices' },
     param_rebar: { zh: '钢筋槽', en: 'Rebar Slots' },
