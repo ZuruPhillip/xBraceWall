@@ -27,11 +27,11 @@ namespace CncWallStation.Services.DataCheck
             { "bendingKeys", "折弯键" },
             { "mepCables", "MEP电缆" },
             { "mepDevices", "MEP设备" },
-            { "openingHoles", "开洞" },
-            { "tensionTie", "拉结件" },
+            { "openingHoles", "窗户" },
+            { "tensionTie", "拉紧钢筋" },
             { "xps", "XPS保温" },
-            { "aacSlices", "AAC切片" },
-            { "coreThickness", "芯层厚度" },
+            { "aacSlices", "AAC砖" },
+            { "coreThickness", "砖块厚度" },
             { "baseFields", "基础字段" }
         };
 

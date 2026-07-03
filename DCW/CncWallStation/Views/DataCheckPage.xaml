@@ -295,8 +295,8 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- Tab 2: 异常清单 -->
-                <TabItem Header="{l:Loc Tab_ErrorList}">
+                <!-- Tab 2: 异常清单（已隐藏） -->
+                <TabItem Header="{l:Loc Tab_ErrorList}" Visibility="Collapsed">
                     <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -350,8 +350,8 @@
                     </Grid>
                 </TabItem>
 
-                <!-- Tab 3: 历史记录 -->
-                <TabItem Header="{l:Loc Tab_History}">
+                <!-- Tab 3: 历史记录（已隐藏） -->
+                <TabItem Header="{l:Loc Tab_History}" Visibility="Collapsed">
                     <Grid Margin="15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -455,9 +455,9 @@
                 </TabItem>
             </TabControl>
 
-            <!-- 右：批量预检面板 -->
+            <!-- 右：批量预检面板（已隐藏） -->
             <Border Grid.Column="1" Width="320" Background="White" BorderBrush="#E0E0E0" BorderThickness="1,0,0,0"
-                    Visibility="{Binding IsBatchMode, Converter={StaticResource BoolToVisConverter}}">
+                    Visibility="Collapsed">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="15">
                         <TextBlock Text="{l:Loc Section_BatchCheck}" FontSize="16" FontWeight="Bold" Foreground="#333" Margin="0,0,0,15"/>
@@ -529,7 +529,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Visibility="Collapsed">
                     <Button Content="{l:Loc Button_ExportPdf}" Command="{Binding ExportPdfCommand}"
                             Width="150" Height="30" Margin="0,0,8,0" Style="{StaticResource ButtonDefault}"/>
                     <Button Content="{l:Loc Button_ExportExcel}" Command="{Binding ExportExcelCommand}"

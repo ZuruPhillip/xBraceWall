@@ -290,8 +290,8 @@
                     </DataGrid>
                 </TabItem>
 
-                <!-- Tab2: 3D 渲染 -->
-                <TabItem Header="{l:Loc Tab_3DRender}">
+                <!-- Tab2: 3D 渲染（已隐藏） -->
+                <TabItem Header="{l:Loc Tab_3DRender}" Visibility="Collapsed">
                     <Grid>
                         <wv2:WebView2 x:Name="PlcWebView"
                                       NavigationCompleted="PlcWebView_NavigationCompleted"

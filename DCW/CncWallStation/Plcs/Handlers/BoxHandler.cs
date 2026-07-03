@@ -4,6 +4,16 @@ namespace CncWallStation.Plcs.Handlers
 {
     public static class BoxHandler
     {
+        public static void HandleBatch(List<Pocket> boxes, PlcConvertContext ctx)
+        {
+            if (boxes.Count == 0) return;
+
+            foreach (var box in boxes)
+            {
+                Handle(box, ctx);
+            }
+        }
+
         public static void Handle(Pocket p, PlcConvertContext ctx)
         {
             float startX = p.LocalPos.X - p.Length / 2;

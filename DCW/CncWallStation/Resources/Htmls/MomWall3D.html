@@ -419,14 +419,6 @@
           <span class="param-val highlight" id="d-volume">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_frontarea">正面面积</span></span>
-          <span class="param-val" id="d-area-front">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_toparea">顶面面积</span></span>
-          <span class="param-val" id="d-area-top">—</span>
-        </div>
-        <div class="param-row">
           <span class="param-lbl"><span class="plbl-icon">⚖️</span><span data-i18n="mom_param_weight">估算重量</span></span>
           <span class="param-val warn" id="d-weight">—</span>
         </div>
@@ -1130,8 +1122,9 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     if (isPocket) {
       document.getElementById('mtt-startpt').parentElement.style.display = 'none';
       document.getElementById('mtt-endpt').parentElement.style.display = 'none';
-      // 中心点坐标（只表达 X, Y，从 box.cx/cy 换算为 mm）
+      // 位置坐标（只表达 X, Y，从 box.cx/cy 换算为 mm）
       document.getElementById('mtt-center-row').style.display = '';
+      document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = window.t('mom_position');
       document.getElementById('mtt-centerpt').textContent = `(${(+box.cx / S).toFixed(1)}, ${(+box.cy / S).toFixed(1)}) mm`;
       // 圆角半径特征数据（优先取 cornerRadius）
       const radius = feature.cornerRadius ?? feature.radius ?? feature.filletRadius ?? '—';
@@ -1577,9 +1570,6 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
   document.getElementById('d-material').textContent = data.material ?? 'AAC';
   const volM3=WL*WH*WT;
   document.getElementById('d-volume').textContent = volM3.toFixed(1) + ' m³';
-  const aF=WL*WH, aT=WL*WT;
-  document.getElementById('d-area-front').textContent = aF.toFixed(1) + ' m²';
-  document.getElementById('d-area-top').textContent   = aT.toFixed(1) + ' m²';
   const wKg=volM3*AAC_DENSITY;
   document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(1)+' t':wKg.toFixed(1)+' kg';
   document.getElementById('d-groove-count').textContent = grooves.length + ' ' + window.t('unit_pcs');
@@ -2182,8 +2172,6 @@ window.resetAllLayers = function() {
     mom_dim_t: { zh: '厚度', en: 'Thickness' },
     mom_param_material: { zh: '材质', en: 'Material' },
     mom_param_volume: { zh: '毛体积', en: 'Gross Volume' },
-    mom_param_frontarea: { zh: '正面面积', en: 'Front Area' },
-    mom_param_toparea: { zh: '顶面面积', en: 'Top Area' },
     mom_param_weight: { zh: '估算重量', en: 'Est. Weight' },
     mom_param_grooves: { zh: '凹槽总数', en: 'Groove Count' },
     mom_param_groovetypes: { zh: '凹槽类型', en: 'Groove Types' },
@@ -2240,6 +2228,7 @@ window.resetAllLayers = function() {
     mom_start: { zh: '起点', en: 'Start' },
     mom_end: { zh: '终点', en: 'End' },
     mom_center: { zh: '中心点', en: 'Center' },
+    mom_position: { zh: '位置', en: 'Position' },
     mom_radius: { zh: '圆角半径', en: 'Fillet Radius' },
     mom_arc_center: { zh: '圆心', en: 'Arc Center' },
     mom_arc_radius: { zh: '半径', en: 'Radius' },
