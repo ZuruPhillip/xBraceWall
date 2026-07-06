@@ -293,9 +293,11 @@ namespace CncWallStation.MomWallData
                 switch (feature)
                 {
                     case Groove groove:
-                        groove.LocalPos = t(groove.LocalPos);
-                        groove.StartPt = t(groove.StartPt);
-                        groove.EndPt = t(groove.EndPt);
+                        // 反射变换后起点/终点互换，需用临时变量交换回来
+                        var oldStartPt = groove.StartPt;
+                        groove.StartPt = t(groove.EndPt);
+                        groove.EndPt = t(oldStartPt);
+                        groove.LocalPos = groove.StartPt;
                         break;
 
                     case Hole hole:
@@ -317,8 +319,10 @@ namespace CncWallStation.MomWallData
                         {
                             if (mepSlot.Segments[i] is LineSegment line)
                             {
-                                line.StartPoint = t(line.StartPoint);
-                                line.EndPoint = t(line.EndPoint);
+                                // 反射变换后起点/终点互换，需用临时变量交换回来
+                                var oldStartPoint = line.StartPoint;
+                                line.StartPoint = t(line.EndPoint);
+                                line.EndPoint = t(oldStartPoint);
                             }
                             else if (mepSlot.Segments[i] is ArcSegment arc)
                             {
@@ -353,8 +357,10 @@ namespace CncWallStation.MomWallData
                         break;
 
                     case RebarSlot rebarSlot:
-                        rebarSlot.LocalPos = t(rebarSlot.LocalPos);
-                        rebarSlot.EndPos = t(rebarSlot.EndPos);
+                        // 反射变换后起点/终点互换，需用临时变量交换回来
+                        var oldStartPos = rebarSlot.LocalPos;
+                        rebarSlot.LocalPos = t(rebarSlot.EndPos);
+                        rebarSlot.EndPos = t(oldStartPos);
                         break;
 
                     default:
