@@ -240,6 +240,154 @@ namespace CncWallStation.MomWallData
             Width = maxY - minY;
         }
 
+        // ══════════════════════════════════════════════
+        // 原点变换
+        // ══════════════════════════════════════════════
+
+        /// <summary>
+        /// 原点变换：将砖块所有点绕当前 Outline 的 AABB 左下角沿 Z 轴顺时针旋转 180 度，
+        /// 再沿 X 轴正方向平移砖块长度、沿 Y 轴正方向平移砖块宽度，并将 PivotPoint 设为变换后新轮廓的左下角。
+        /// 所有特征点坐标同步变换（含 Groove/TopPlate/XBrace、MepSlot、RebarSlot、Hole/BendingKey、Pocket 等）。
+        /// Front/Back 面特征仅变换 X 分量（Y 分量实为高度 Z，绕 Z 轴旋转不变），
+        /// Left/Right 面特征仅变换 Y 分量（X 分量实为高度 Z）。
+        /// 此方法原地修改 Outline 和 Features 数据。
+        /// </summary>
+        public void ApplyOriginTransform()
+        {
+            if (Outline == null || Outline.Count == 0)
+                return;
+
+            // 获取当前轮廓的 AABB
+            var (minX, minY, maxX, maxY) = GetOutlineBounds();
+            float wallLength = maxX - minX;
+            float wallWidth = maxY - minY;
+
+            // ── 三种变换函数 ──────────────────────────────────
+            // 全变换：Top/Bottom 面（X,Y 均在 XY 平面内）
+            Vec2 TransformXY(Vec2 p) => new Vec2(2 * minX - p.X + wallLength, 2 * minY - p.Y + wallWidth);
+
+            // 仅 X 变换：Front/Back 面（Vec2.Y 实为 Z 高度，绕 Z 轴旋转不变）
+            Vec2 TransformXOnly(Vec2 p) => new Vec2(2 * minX - p.X + wallLength, p.Y);
+
+            // 仅 Y 变换：Left/Right 面（Vec2.X 实为 Z 高度，绕 Z 轴旋转不变）
+            Vec2 TransformYOnly(Vec2 p) => new Vec2(p.X, 2 * minY - p.Y + wallWidth);
+
+            // 根据特征所在初始面选择变换
+            Func<Vec2, Vec2> GetTransform(Feature f) => f.InitialSide switch
+            {
+                MachineSide.Front or MachineSide.Back => TransformXOnly,
+                MachineSide.Left or MachineSide.Right => TransformYOnly,
+                _ => TransformXY
+            };
+
+            // 1. 变换轮廓顶点（始终在 XY 平面）
+            for (int i = 0; i < Outline.Count; i++)
+                Outline[i] = TransformXY(Outline[i]);
+
+            // 2. 变换所有特征
+            foreach (var feature in Features)
+            {
+                var t = GetTransform(feature);
+                var side = feature.InitialSide;
+
+                switch (feature)
+                {
+                    case Groove groove:
+                        groove.LocalPos = t(groove.LocalPos);
+                        groove.StartPt = t(groove.StartPt);
+                        groove.EndPt = t(groove.EndPt);
+                        break;
+
+                    case Hole hole:
+                        hole.LocalPos = t(hole.LocalPos);
+                        // 腰孔方向角：按面修正
+                        if (hole.Shape == HoleShape.Slotted)
+                        {
+                            if (side is MachineSide.Front or MachineSide.Back)
+                                hole.SlotAngleDeg = 180f - hole.SlotAngleDeg;
+                            else if (side is MachineSide.Left or MachineSide.Right)
+                                hole.SlotAngleDeg = -hole.SlotAngleDeg;
+                            else
+                                hole.SlotAngleDeg += 180f;
+                        }
+                        break;
+
+                    case MepSlot mepSlot:
+                        for (int i = 0; i < mepSlot.Segments.Count; i++)
+                        {
+                            if (mepSlot.Segments[i] is LineSegment line)
+                            {
+                                line.StartPoint = t(line.StartPoint);
+                                line.EndPoint = t(line.EndPoint);
+                            }
+                            else if (mepSlot.Segments[i] is ArcSegment arc)
+                            {
+                                arc.Center = t(arc.Center);
+
+                                // 角度修正：不同面的反射/旋转效果不同
+                                if (side is MachineSide.Front or MachineSide.Back)
+                                {
+                                    // XZ 平面内 X 反射：θ → π - θ，方向反转
+                                    arc.StartAngle = MathF.PI - arc.StartAngle;
+                                    arc.EndAngle = MathF.PI - arc.EndAngle;
+                                    arc.IsClockwise = !arc.IsClockwise;
+                                }
+                                else if (side is MachineSide.Left or MachineSide.Right)
+                                {
+                                    // ZY 平面内 Y 反射：θ → -θ，方向反转
+                                    arc.StartAngle = -arc.StartAngle;
+                                    arc.EndAngle = -arc.EndAngle;
+                                    arc.IsClockwise = !arc.IsClockwise;
+                                }
+                                else
+                                {
+                                    // XY 平面内旋转 180°：θ → θ + π，方向不变
+                                    arc.StartAngle += MathF.PI;
+                                    arc.EndAngle += MathF.PI;
+                                }
+                            }
+                        }
+                        // 同步 LocalPos 到第一条段的起点
+                        if (mepSlot.Segments.Count > 0)
+                            mepSlot.LocalPos = mepSlot.Segments[0].StartPoint;
+                        break;
+
+                    case RebarSlot rebarSlot:
+                        rebarSlot.LocalPos = t(rebarSlot.LocalPos);
+                        rebarSlot.EndPos = t(rebarSlot.EndPos);
+                        break;
+
+                    default:
+                        // Pocket 等：只需变换 LocalPos
+                        feature.LocalPos = t(feature.LocalPos);
+                        break;
+                }
+            }
+
+            // 2.5 Front/Back 面特征交换：绕 Z 轴旋转 180° 后 Front↔Back 面对调，
+            //     同时需同步 Face（CurrentNormal），否则渲染引擎看不到变化
+            foreach (var feature in Features)
+            {
+                if (feature.InitialSide == MachineSide.Front)
+                {
+                    feature.InitialSide = MachineSide.Back;
+                    feature.RestoreFaceFromInitialSide();
+                }
+                else if (feature.InitialSide == MachineSide.Back)
+                {
+                    feature.InitialSide = MachineSide.Front;
+                    feature.RestoreFaceFromInitialSide();
+                }
+            }
+
+            // 3. 重新计算尺寸
+            RecalculateDimensions();
+
+            // 4. 设置 PivotPoint 为变换后新轮廓的左下角
+            var (newMinX, newMinY, _, _) = GetOutlineBounds();
+            PivotPoint = new Vec3(newMinX, newMinY, BaseElevation);
+        }
+
         private void ComputeObbDimensions()
         {
             if (Outline.Count < 3)

@@ -87,6 +87,29 @@ namespace CncWallStation.ViewModels
             set => SetProperty(ref _isPageLoaded, value);
         }
 
+        // ── 原点变换状态 ──
+
+        private string _originalMomJsonData = string.Empty;
+        private string _originalDObjectJson = string.Empty;
+
+        private bool _isOriginTransformed;
+        public bool IsOriginTransformed
+        {
+            get => _isOriginTransformed;
+            set
+            {
+                if (SetProperty(ref _isOriginTransformed, value))
+                    _ = OriginToggleChangedAsync();
+            }
+        }
+
+        private bool _isWallDataLoaded;
+        public bool IsWallDataLoaded
+        {
+            get => _isWallDataLoaded;
+            set => SetProperty(ref _isWallDataLoaded, value);
+        }
+
         // ──────────────────────────────────────────
         //  墙体搜索与选取
         // ──────────────────────────────────────────
@@ -374,6 +397,10 @@ namespace CncWallStation.ViewModels
                     return;
                 }
 
+                // ★ 保存原始 MomJSON 数据，供原点变换切换使用
+                _originalMomJsonData = detail.MomJsonData;
+                IsOriginTransformed = false;
+
                 StatusMessage = "🔄 正在解析 MomJSON 数据...";
 
                 // 反序列化 MomWall（需与序列化侧保持一致，枚举字段用字符串形式）
@@ -400,6 +427,10 @@ namespace CncWallStation.ViewModels
 
                 MapToDObject(momWall);
 
+                // ★ 保存原始渲染数据 JSON，供取消原点变换时恢复
+                _originalDObjectJson = _cachedDObjectJson;
+                IsWallDataLoaded = true;
+
                 IsRendering = true;
                 if (NavigateToHtml != null)
                     await NavigateToHtml();
@@ -412,6 +443,9 @@ namespace CncWallStation.ViewModels
                 StatusMessage = $"❌ 加载失败: {ex.Message}";
                 IsLoading = false;
                 IsRendering = false;
+                IsWallDataLoaded = false;
+                _originalMomJsonData = string.Empty;
+                _originalDObjectJson = string.Empty;
             }
         }
 
@@ -503,7 +537,10 @@ namespace CncWallStation.ViewModels
             IsLoading = false;
             IsRendering = false;
             IsPageLoaded = false;
+            IsWallDataLoaded = false;
             _cachedDObjectJson = string.Empty;
+            _originalMomJsonData = string.Empty;
+            _originalDObjectJson = string.Empty;
             StatusMessage = $"❌ 页面加载失败: {error}";
         }
 
@@ -790,6 +827,67 @@ namespace CncWallStation.ViewModels
             else
             {
                 StatusMessage = "⚠️ 页面尚未加载";
+            }
+        }
+
+        // ══════════════════════════════════════════
+        //  原点变换切换
+        // ══════════════════════════════════════════
+
+        private async Task OriginToggleChangedAsync()
+        {
+            if (!IsPageLoaded || ExecuteScriptAsync == null)
+                return;
+
+            if (_isOriginTransformed)
+            {
+                // 选中：从原始数据重新反序列化 → 变换 → 渲染
+                try
+                {
+                    if (string.IsNullOrEmpty(_originalMomJsonData))
+                        return;
+
+                    var options = new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+                    };
+
+                    var momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(_originalMomJsonData, options);
+                    if (momWall == null || momWall.Outline == null || momWall.Outline.Count == 0)
+                        return;
+
+                    // 恢复 Face
+                    foreach (var f in momWall.Features)
+                        f.RestoreFaceFromInitialSide();
+
+                    // 执行原点变换
+                    momWall.ApplyOriginTransform();
+
+                    // 映射渲染数据
+                    MapToDObject(momWall);
+
+                    // 注入 HTML 刷新
+                    var escaped = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                    await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                    StatusMessage = "✅ 原点变换完成";
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "原点变换失败");
+                    StatusMessage = $"❌ 原点变换失败: {ex.Message}";
+                    IsOriginTransformed = false;
+                }
+            }
+            else
+            {
+                // 取消选中：恢复原始渲染数据
+                if (!string.IsNullOrEmpty(_originalDObjectJson))
+                {
+                    var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                    await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                    StatusMessage = "✅ 已恢复原始数据";
+                }
             }
         }
 

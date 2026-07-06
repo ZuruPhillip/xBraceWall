@@ -11,7 +11,7 @@ namespace CncWallStation.Plcs.Handlers
             {
                 T = PlcTool.Mill,
                 F = PlcFeatureCode.WallDefine,
-                D = 0,
+                D = 1,
                 X0 = wall.ActualLength,
                 Y0 = wall.ActualWidth,
                 Z0 = wall.ActualThickness,
