@@ -65,10 +65,10 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="16,8,16,16">
 
-                <!-- 语言设置卡片 -->
+                <!-- 语言设置卡片（已隐藏：中英文切换按钮） -->
                 <Border Background="White" CornerRadius="8"
                         BorderBrush="#E8E8E8" BorderThickness="1"
-                        Padding="24,20">
+                        Padding="24,20" Visibility="Collapsed">
                     <StackPanel>
                         <TextBlock Text="{l:Loc Settings_Language}"
                                    FontSize="16" FontWeight="Bold"
