@@ -29,6 +29,18 @@ public class OpcUaConfig
     /// <summary>是否启动时自动连接</summary>
     public bool AutoConnect { get; set; }
 
+    /// <summary>订阅发布间隔（毫秒）</summary>
+    public int PublishingIntervalMs { get; set; } = 1000;
+
+    /// <summary>采样间隔（毫秒）</summary>
+    public int SamplingIntervalMs { get; set; } = 500;
+
+    /// <summary>通知节流间隔（毫秒）</summary>
+    public int NotifyThrottleMs { get; set; } = 200;
+
+    /// <summary>是否接受未信任的证书</summary>
+    public bool AcceptUntrustedCertificates { get; set; }
+
     /// <summary>
     /// 获取 OPC UA 连接 URL
     /// </summary>

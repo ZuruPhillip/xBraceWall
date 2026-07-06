@@ -408,7 +408,7 @@ namespace CncWallStation.Services.DataCheck
                     var hole = dto.OpeningHoles[i];
                     if (string.IsNullOrWhiteSpace(hole.Uuid))
                         errors.Add(CreateBimError(wallId, "openingHoles", "BIM_OPENING_HOLE_UUID_EMPTY",
-                            $"第{i + 1}个开洞Uuid为空", $"Opening hole #{i + 1} Uuid is empty", ErrorSeverity.Warning));
+                            $"第{i + 1}个窗户Uuid为空", $"Opening hole #{i + 1} Uuid is empty", ErrorSeverity.Warning));
                 }
             }
 
@@ -423,7 +423,7 @@ namespace CncWallStation.Services.DataCheck
             if (dto.AacSlices == null || dto.AacSlices.Count == 0)
             {
                 errors.Add(CreateBimError(wallId, "aacSlices", "BIM_AAC_SLICES_EMPTY",
-                    "AAC切片数据为空", "AAC slices data is empty", ErrorSeverity.Warning));
+                    "AAC砖数据为空", "AAC slices data is empty", ErrorSeverity.Warning));
             }
             else
             {

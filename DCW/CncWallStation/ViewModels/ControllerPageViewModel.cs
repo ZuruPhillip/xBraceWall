@@ -15,10 +15,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-
 namespace CncWallStation.ViewModels
 {
-    public partial class ControllerPageViewModel : ObservableObject
+    public partial class ControllerPageViewModel : ObservableObject, IDisposable
     {
         private readonly ILogger<ControllerPageViewModel> _logger;
         private readonly IOpcUaService _opcUaService;
@@ -29,6 +28,9 @@ namespace CncWallStation.ViewModels
         private readonly DispatcherTimer _machiningTimer;
         private DateTime _machiningStartTime;
         private bool _isTimerRunning;
+
+        // 释放标志
+        private bool _disposed;
 
         // 当前墙体数据
         [ObservableProperty] private WallInfoDto? _currentWall;
@@ -170,7 +172,7 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        private const int DefaultPlcLineCount = 100;
+        private const int DefaultPlcLineCount = 30;
 
         private async Task InitPlcLineDataAsync(long wallId)
         {
@@ -250,56 +252,66 @@ namespace CncWallStation.ViewModels
             Application.Current?.Dispatcher.BeginInvoke(() =>
             {
                 IsOpcConnected = status == OpcConnectionStatus.Connected;
-                if (!IsOpcConnected)
+                if (IsOpcConnected)
+                {
+                    // 连接成功后，如果 PLC 数据已初始化则自动恢复订阅
+                    if (PlcLineData.Count > 0)
+                        _ = SubscribePlcNodesAsync(PlcLineData.Count);
+                }
+                else
+                {
                     RefreshParameterColors();
+                }
             });
         }
 
         private void UpdatePlcLineDataFromOpc(System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
         {
-            var completedIndices = new System.Collections.Generic.List<int>();
-
             foreach (var node in nodes)
             {
-                var match = System.Text.RegularExpressions.Regex.Match(node.NodeId,
-                    @"LineDef\[(\d+)\]\.(\w+)");
-                if (!match.Success) continue;
-
-                int index = int.Parse(match.Groups[1].Value);
-                string header = match.Groups[2].Value;
-
-                if (index < 0 || index >= PlcLineData.Count) continue;
-
-                var line = PlcLineData[index];
-                var val = System.Convert.ToSingle(node.CurrentValue ?? 0f);
-
-                switch (header)
+                try
                 {
-                    case "T": line.T = (int)val; break;
-                    case "F": line.F = (int)val; break;
-                    case "D": line.D = (int)val; break;
-                    case "X0": line.X0 = val; break;
-                    case "Y0": line.Y0 = val; break;
-                    case "Z0": line.Z0 = val; break;
-                    case "X1": line.X1 = val; break;
-                    case "Y1": line.Y1 = val; break;
-                    case "Z1": line.Z1 = val; break;
+                    var match = System.Text.RegularExpressions.Regex.Match(node.NodeId,
+                        @"LineDef\[(\d+)\]\.(\w+)");
+                    if (!match.Success) continue;
+
+                    if (!int.TryParse(match.Groups[1].Value, out int index)) continue;
+                    string header = match.Groups[2].Value;
+
+                    if (index < 0 || index >= PlcLineData.Count) continue;
+
+                    var line = PlcLineData[index];
+                    var val = System.Convert.ToSingle(node.CurrentValue ?? 0f);
+
+                    switch (header)
+                    {
+                        case "T": line.T = (int)val; break;
+                        case "F": line.F = (int)val; break;
+                        case "D": line.D = (int)val; break;
+                        case "X0": line.X0 = val; break;
+                        case "Y0": line.Y0 = val; break;
+                        case "Z0": line.Z0 = val; break;
+                        case "X1": line.X1 = val; break;
+                        case "Y1": line.Y1 = val; break;
+                        case "Z1": line.Z1 = val; break;
+                    }
+
+                    // D=1 表示该行已加工完成（双向赋值，支持复位回退）
+                    if (header == "D")
+                        line.IsCompleted = (int)val == 1;
                 }
-
-                // 检查 D 值是否已完成（D=1 表示该行已加工）
-                if (header == "D" && (int)val == 1)
+                catch (Exception ex)
                 {
-                    line.IsCompleted = true;
-                    if (!completedIndices.Contains(index))
-                        completedIndices.Add(index);
+                    // 单个节点解析失败不中断整批更新
+                    _logger.LogDebug(ex, "解析 PLC 节点值失败: {NodeId}", node.NodeId);
                 }
             }
 
-            // 更新加工进度
-            if (completedIndices.Count > 0)
+            // ★ 基于全部行的累计完成状态计算进度，避免因批量聚合只含部分节点而乱跳/倒退
+            if (PlcLineData.Count > 0)
             {
-                var pct = PlcLineData.Count > 0
-                    ? (completedIndices.Count * 100 / PlcLineData.Count) : 0;
+                var completedCount = PlcLineData.Count(l => l.IsCompleted);
+                var pct = completedCount * 100 / PlcLineData.Count;
                 ProgressText = $"{pct}%";
             }
         }
@@ -646,6 +658,28 @@ namespace CncWallStation.ViewModels
                     });
                 }
             });
+        }
+
+        // ═══════════════ 释放 ═══════════════
+        /// <summary>
+        /// 解绑 OPC 单例事件与计时器，避免单例长期持有本 ViewModel 引用导致的
+        /// 内存泄漏与「幽灵回调」（旧页面实例仍被 OPC 数据更新触发）。
+        /// 页面关闭 / 导航移除时务必调用。
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            // 解绑 OPC 事件（关键：单例服务不再持有本实例）
+            _opcUaService.NodeValuesUpdated -= OnOpcNodeValuesUpdated;
+            _opcUaService.StatusChanged -= OnOpcStatusChanged;
+
+            // 停止并解绑计时器
+            _machiningTimer.Stop();
+            _machiningTimer.Tick -= OnTimerTick;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -9,15 +9,20 @@ using System.IO;
 namespace CncWallStation.Services.OpcUa;
 
 /// <summary>
-/// OPC UA 通讯服务实现（单例），管理全局唯一的 OPC UA 会话
-/// 特性：自动重连（指数退避）、批量读写、节点订阅、离线隔离、异常日志
+/// OPC UA 通讯服务实现（单例），管理全局唯一的 OPC UA 会话。
+/// 特性：自动重连（指数退避）、批量读写、节点订阅、离线隔离、批量聚合通知、异步释放。
+/// 注意：本服务不直接依赖 WPF，UI 线程切换由订阅方（ViewModel）负责。
 /// </summary>
-public class OpcUaService : IOpcUaService, IDisposable
+public class OpcUaService : IOpcUaService, IDisposable, IAsyncDisposable
 {
     private readonly ILogger<OpcUaService> _logger;
     private readonly IConfiguration _configuration;
     private readonly SemaphoreSlim _sessionLock = new(1, 1);
     private readonly object _statusLock = new();
+    private readonly object _reconnectLock = new();
+
+    /// <summary>业务读写获取会话锁的超时，避免重连期间无限阻塞。</summary>
+    private static readonly TimeSpan LockTimeout = TimeSpan.FromSeconds(5);
 
     private Session? _session;
     private Subscription? _subscription;
@@ -26,10 +31,14 @@ public class OpcUaService : IOpcUaService, IDisposable
     private OpcConnectionStatus _status = OpcConnectionStatus.Disconnected;
     private CancellationTokenSource? _reconnectCts;
     private bool _disposed;
-    private bool _isShuttingDown;
+    private volatile bool _isShuttingDown;
 
-    // 已订阅节点缓存，用于值更新通知
+    // 已订阅节点缓存
     private readonly ConcurrentDictionary<string, OpcNodeConfig> _subscribedNodes = new();
+
+    // 批量聚合通知：攒一批变化，定时统一推送，减轻 UI 压力
+    private readonly ConcurrentDictionary<string, OpcNodeConfig> _pendingUpdates = new();
+    private Timer? _notifyTimer;
 
     /// <inheritdoc />
     public OpcConnectionStatus Status
@@ -45,7 +54,10 @@ public class OpcUaService : IOpcUaService, IDisposable
             }
             if (old != value)
             {
-                _logger.LogInformation("OPC 连接状态变更: {OldStatus} → {NewStatus}", old, value);
+                if (value == OpcConnectionStatus.Connected)
+                    _logger.LogDebug("OPC 连接状态变更: {OldStatus} → {NewStatus}", old, value);
+                else
+                    _logger.LogInformation("OPC 连接状态变更: {OldStatus} → {NewStatus}", old, value);
                 StatusChanged?.Invoke(this, value);
             }
         }
@@ -86,20 +98,19 @@ public class OpcUaService : IOpcUaService, IDisposable
             return;
         }
 
-        await _sessionLock.WaitAsync(ct);
+        await _sessionLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             if (_session?.Connected == true)
             {
-                _logger.LogInformation("OPC UA 会话已连接，跳过重复连接");
+                _logger.LogDebug("OPC UA 会话已连接，跳过重复连接");
                 Status = OpcConnectionStatus.Connected;
                 return;
             }
 
             Status = OpcConnectionStatus.Connecting;
-            _logger.LogInformation("开始连接 OPC UA 服务器: {Endpoint}", _config.GetEndpointUrl());
+            _logger.LogDebug("开始连接 OPC UA 服务器: {Endpoint}", _config.GetEndpointUrl());
 
-            // 初始化 ApplicationConfiguration（仅首次需要）
             if (_appConfig == null)
             {
                 _appConfig = CreateApplicationConfiguration();
@@ -108,17 +119,16 @@ public class OpcUaService : IOpcUaService, IDisposable
                     _appConfig.CertificateValidator.CertificateValidation += OnCertificateValidation;
             }
 
-            // 创建会话
             var endpointDescription = CoreClientUtils.SelectEndpoint(
                 _config.GetEndpointUrl(), useSecurity: _config.SecurityPolicy != "None");
 
             var endpointConfig = EndpointConfiguration.Create(_appConfig);
-            var configureEndpoint = new ConfiguredEndpoint(null, endpointDescription, endpointConfig);
+            var configuredEndpoint = new ConfiguredEndpoint(null, endpointDescription, endpointConfig);
 
             _session = await Session.Create(
                 _appConfig,
-                configureEndpoint,
-                false,
+                configuredEndpoint,
+                updateBeforeConnect: false,
                 "CncWallStation",
                 (uint)_config.SessionTimeoutMs,
                 null,
@@ -126,22 +136,23 @@ public class OpcUaService : IOpcUaService, IDisposable
                 ct
             ).ConfigureAwait(false);
 
-            // 注册会话事件
             _session.KeepAliveInterval = _config.KeepAliveIntervalMs;
             _session.KeepAlive += OnKeepAlive;
             _session.SessionClosing += OnSessionClosing;
 
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "OPC UA 连接成功: Endpoint={Endpoint}, SessionTimeout={Timeout}ms",
                 _config.GetEndpointUrl(), _config.SessionTimeoutMs);
 
             Status = OpcConnectionStatus.Connected;
 
-            // 重连时恢复已有订阅
+            // 重连时恢复订阅（调用不加锁的内部方法，避免 SemaphoreSlim 重入死锁）
             if (!_subscribedNodes.IsEmpty)
-            {
-                await RestoreSubscriptionsAsync(ct).ConfigureAwait(false);
-            }
+                RestoreSubscriptionsInternal();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
@@ -158,10 +169,10 @@ public class OpcUaService : IOpcUaService, IDisposable
     /// <inheritdoc />
     public async Task DisconnectAsync()
     {
-        await _sessionLock.WaitAsync();
+        StopReconnect();
+        await _sessionLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            StopReconnect();
             await CleanupSessionAsync().ConfigureAwait(false);
             Status = OpcConnectionStatus.Disconnected;
             _logger.LogInformation("OPC UA 已手动断开");
@@ -175,13 +186,14 @@ public class OpcUaService : IOpcUaService, IDisposable
     /// <inheritdoc />
     public async Task<IReadOnlyList<DataValue>> ReadNodesAsync(IEnumerable<string> nodeIds, CancellationToken ct = default)
     {
+        var nodeIdsList = nodeIds.ToList();
+
         if (!IsConnected)
         {
-            _logger.LogWarning("OPC 离线，无法读取节点: Count={Count}", nodeIds.Count());
+            _logger.LogWarning("OPC 离线，无法读取节点: Count={Count}", nodeIdsList.Count);
             return Array.Empty<DataValue>();
         }
 
-        var nodeIdsList = nodeIds.ToList();
         try
         {
             var nodes = nodeIdsList.Select(id => new ReadValueId
@@ -190,10 +202,14 @@ public class OpcUaService : IOpcUaService, IDisposable
                 AttributeId = Attributes.Value
             }).ToList();
 
-            await _sessionLock.WaitAsync(ct).ConfigureAwait(false);
+            if (!await _sessionLock.WaitAsync(LockTimeout, ct).ConfigureAwait(false))
+            {
+                _logger.LogWarning("读取节点获取会话锁超时（可能正在重连）: Count={Count}", nodes.Count);
+                return Array.Empty<DataValue>();
+            }
             try
             {
-                if (_session == null)
+                if (_session == null || !_session.Connected)
                     return Array.Empty<DataValue>();
 
                 _logger.LogDebug("批量读取节点: Count={Count}", nodes.Count);
@@ -205,15 +221,20 @@ public class OpcUaService : IOpcUaService, IDisposable
                 for (int i = 0; i < response.Results.Count; i++)
                 {
                     results[i] = response.Results[i];
+                    if (!StatusCode.IsGood(results[i].StatusCode))
+                    {
+                        var nodeId = i < nodeIdsList.Count ? nodeIdsList[i] : "unknown";
+                        _logger.LogError("读取节点失败: NodeId={NodeId}, StatusCode={StatusCode}",
+                            nodeId, results[i].StatusCode);
+                    }
                 }
 
-                // 更新订阅缓存中的值
                 for (int i = 0; i < results.Length && i < nodeIdsList.Count; i++)
                 {
                     if (_subscribedNodes.TryGetValue(nodeIdsList[i], out var node))
                     {
                         node.CurrentValue = results[i].Value;
-                        node.LastUpdated = DateTime.Now;
+                        node.LastUpdated = DateTime.UtcNow;
                         node.SourceTimestamp = results[i].SourceTimestamp;
                         node.Quality = StatusCode.IsGood(results[i].StatusCode) ? "Good" : "Bad";
                     }
@@ -229,6 +250,7 @@ public class OpcUaService : IOpcUaService, IDisposable
                 _sessionLock.Release();
             }
         }
+        catch (OperationCanceledException) { return Array.Empty<DataValue>(); }
         catch (Exception ex)
         {
             _logger.LogError(ex, "批量读取节点失败: Count={Count}", nodeIdsList.Count);
@@ -247,6 +269,7 @@ public class OpcUaService : IOpcUaService, IDisposable
 
         try
         {
+            var keys = nodeValues.Keys.ToList();
             var writeValues = nodeValues.Select(kv => new WriteValue
             {
                 NodeId = new NodeId(kv.Key),
@@ -254,23 +277,26 @@ public class OpcUaService : IOpcUaService, IDisposable
                 Value = new DataValue(new Variant(kv.Value))
             }).ToList();
 
-            await _sessionLock.WaitAsync(ct).ConfigureAwait(false);
+            if (!await _sessionLock.WaitAsync(LockTimeout, ct).ConfigureAwait(false))
+            {
+                _logger.LogWarning("写入节点获取会话锁超时（可能正在重连）: Count={Count}", writeValues.Count);
+                return;
+            }
             try
             {
-                if (_session == null) return;
+                if (_session == null || !_session.Connected) return;
 
                 _logger.LogInformation("批量写入节点: Count={Count}", writeValues.Count);
                 var writeValueCollection = new WriteValueCollection(writeValues);
                 var response = await _session.WriteAsync(
                     null, writeValueCollection, ct).ConfigureAwait(false);
 
-                // 检查写入结果
                 for (int i = 0; i < response.Results.Count; i++)
                 {
                     if (!StatusCode.IsGood(response.Results[i]))
                     {
-                        _logger.LogWarning("节点写入失败: NodeId={NodeId}, Status={Status}",
-                            nodeValues.Keys.ElementAt(i), response.Results[i]);
+                        _logger.LogError("节点写入失败: NodeId={NodeId}, Status={Status}",
+                            i < keys.Count ? keys[i] : "unknown", response.Results[i]);
                     }
                 }
 
@@ -281,6 +307,7 @@ public class OpcUaService : IOpcUaService, IDisposable
                 _sessionLock.Release();
             }
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             _logger.LogError(ex, "批量写入节点失败: Count={Count}", nodeValues.Count);
@@ -304,12 +331,26 @@ public class OpcUaService : IOpcUaService, IDisposable
         await _sessionLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            // 创建或获取 Subscription
+            SubscribeNodesInternal(nodeList);
+        }
+        finally
+        {
+            _sessionLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// 订阅核心逻辑（不加锁）。调用方必须已持有 _sessionLock。
+    /// </summary>
+    private void SubscribeNodesInternal(List<OpcNodeConfig> nodeList)
+    {
+        try
+        {
             if (_subscription == null)
             {
-                _subscription = new Subscription
+                _subscription = new Subscription(_session!.DefaultSubscription)
                 {
-                    PublishingInterval = 1000,
+                    PublishingInterval = _config.PublishingIntervalMs,
                     KeepAliveCount = 10,
                     LifetimeCount = 30,
                     MaxNotificationsPerPublish = 100,
@@ -319,13 +360,12 @@ public class OpcUaService : IOpcUaService, IDisposable
 
                 _session!.AddSubscription(_subscription);
                 _subscription.Create();
-                _logger.LogInformation("OPC 订阅已创建: PublishingInterval=1000ms");
+                _logger.LogInformation("OPC 订阅已创建: PublishingInterval={Interval}ms",
+                    _config.PublishingIntervalMs);
             }
 
-            // 添加 MonitoredItems
             foreach (var node in nodeList)
             {
-                // 避免重复订阅
                 if (_subscribedNodes.ContainsKey(node.NodeId))
                 {
                     _logger.LogDebug("节点已订阅，跳过: {NodeId}", node.NodeId);
@@ -336,34 +376,13 @@ public class OpcUaService : IOpcUaService, IDisposable
                 {
                     StartNodeId = new NodeId(node.NodeId),
                     AttributeId = Attributes.Value,
-                    SamplingInterval = 500,
+                    SamplingInterval = _config.SamplingIntervalMs,
                     QueueSize = 10,
-                    DiscardOldest = true
+                    DiscardOldest = true,
+                    Handle = node  // 通过 Handle 携带节点信息，便于命名事件处理器读取
                 };
 
-                monitoredItem.Notification += (mi, e) =>
-                {
-                    var notification = e as MonitoredItemNotificationEventArgs;
-                    if (notification?.NotificationValue is not MonitoredItemNotification min) return;
-
-                    try
-                    {
-                        if (_subscribedNodes.TryGetValue(node.NodeId, out var cachedNode))
-                        {
-                            cachedNode.CurrentValue = min.Value.Value;
-                            cachedNode.LastUpdated = DateTime.Now;
-                            cachedNode.SourceTimestamp = min.Value.SourceTimestamp;
-                            cachedNode.Quality = StatusCode.IsGood(min.Value.StatusCode) ? "Good" : "Bad";
-
-                            // 触发值更新事件
-                            NodeValuesUpdated?.Invoke(this, new[] { cachedNode });
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "处理订阅通知异常: NodeId={NodeId}", node.NodeId);
-                    }
-                };
+                monitoredItem.Notification += OnMonitoredItemNotification;
 
                 _subscription.AddItem(monitoredItem);
                 _subscribedNodes[node.NodeId] = node;
@@ -372,16 +391,70 @@ public class OpcUaService : IOpcUaService, IDisposable
             }
 
             _subscription.ApplyChanges();
+            EnsureNotifyTimer();
             _logger.LogInformation("订阅更新完成: TotalCount={Count}", _subscribedNodes.Count);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "创建订阅失败: Count={Count}", nodeList.Count);
         }
-        finally
+    }
+
+    /// <summary>
+    /// 集中式订阅通知处理器（替代匿名闭包，便于解绑，防止事件泄漏）。
+    /// 变化先入待推送缓存，由定时器批量聚合后触发事件。
+    /// </summary>
+    private void OnMonitoredItemNotification(MonitoredItem monitoredItem, MonitoredItemNotificationEventArgs e)
+    {
+        if (e.NotificationValue is not MonitoredItemNotification min) return;
+        if (monitoredItem.Handle is not OpcNodeConfig node) return;
+
+        try
         {
-            _sessionLock.Release();
+            if (_subscribedNodes.TryGetValue(node.NodeId, out var cachedNode))
+            {
+                cachedNode.CurrentValue = min.Value.Value;
+                cachedNode.LastUpdated = DateTime.UtcNow;
+                cachedNode.SourceTimestamp = min.Value.SourceTimestamp;
+                cachedNode.Quality = StatusCode.IsGood(min.Value.StatusCode) ? "Good" : "Bad";
+
+                if (!StatusCode.IsGood(min.Value.StatusCode))
+                {
+                    _logger.LogError("订阅节点状态异常: NodeId={NodeId}, StatusCode={StatusCode}",
+                        node.NodeId, min.Value.StatusCode);
+                }
+
+                // 入待推送缓存（定时器聚合推送）
+                _pendingUpdates[cachedNode.NodeId] = cachedNode;
+            }
         }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "处理订阅通知异常: NodeId={NodeId}", node.NodeId);
+        }
+    }
+
+    /// <summary>
+    /// 启动批量聚合通知定时器（幂等）。
+    /// </summary>
+    private void EnsureNotifyTimer()
+    {
+        if (_notifyTimer != null) return;
+        var interval = _config.NotifyThrottleMs > 0 ? _config.NotifyThrottleMs : 200;
+        _notifyTimer = new Timer(_ =>
+        {
+            try
+            {
+                if (_pendingUpdates.IsEmpty) return;
+                var batch = _pendingUpdates.Values.ToList();
+                _pendingUpdates.Clear();
+                NodeValuesUpdated?.Invoke(this, batch);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "批量推送订阅通知异常");
+            }
+        }, null, dueTime: interval, period: interval);
     }
 
     /// <inheritdoc />
@@ -392,10 +465,9 @@ public class OpcUaService : IOpcUaService, IDisposable
             _sessionLock.Wait();
             try
             {
+                DisposeSubscriptionInternal();
                 _subscribedNodes.Clear();
-                _subscription?.Delete(true);
-                _subscription?.Dispose();
-                _subscription = null;
+                _pendingUpdates.Clear();
                 _logger.LogInformation("所有 OPC 订阅已取消");
             }
             finally
@@ -427,10 +499,13 @@ public class OpcUaService : IOpcUaService, IDisposable
             if (_session == null || !_session.Connected)
                 return false;
 
-            await _sessionLock.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false);
+            if (!await _sessionLock.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(false))
+                return false;
             try
             {
-                // 读取 ServerStatus 节点验证连接
+                if (_session == null || !_session.Connected)
+                    return false;
+
                 var nodes = new ReadValueIdCollection
                 {
                     new ReadValueId
@@ -461,13 +536,25 @@ public class OpcUaService : IOpcUaService, IDisposable
     // ══════════════════════════════════════════
 
     /// <summary>
-    /// 开始自动重连（指数退避策略）
+    /// 开始自动重连（指数退避）。加锁保护 _reconnectCts，且幂等防止多重重连。
     /// </summary>
     private void StartReconnect()
     {
-        StopReconnect();
-        _reconnectCts = new CancellationTokenSource();
-        var ct = _reconnectCts.Token;
+        CancellationToken ct;
+        lock (_reconnectLock)
+        {
+            if (_isShuttingDown) return;
+
+            if (_reconnectCts != null && !_reconnectCts.IsCancellationRequested)
+            {
+                _logger.LogDebug("重连任务已在进行，跳过重复启动");
+                return;
+            }
+
+            _reconnectCts?.Dispose();
+            _reconnectCts = new CancellationTokenSource();
+            ct = _reconnectCts.Token;
+        }
 
         _ = Task.Run(async () =>
         {
@@ -487,7 +574,7 @@ public class OpcUaService : IOpcUaService, IDisposable
                     if (IsConnected)
                     {
                         _logger.LogInformation("OPC 重连成功 (第 {Attempt} 次尝试)", attempt);
-                        return; // 重连成功，退出重连循环
+                        return;
                     }
                 }
                 catch (OperationCanceledException)
@@ -499,58 +586,66 @@ public class OpcUaService : IOpcUaService, IDisposable
                     _logger.LogWarning(ex, "OPC 重连尝试 #{Attempt} 失败", attempt);
                 }
 
-                // 指数退避：每次翻倍，上限为 MaxReconnectIntervalMs
                 delay = Math.Min(delay * 2, _config.MaxReconnectIntervalMs);
             }
         }, ct);
     }
 
-    /// <summary>
-    /// 停止重连
-    /// </summary>
+    /// <summary>停止重连（加锁）。</summary>
     private void StopReconnect()
     {
-        _reconnectCts?.Cancel();
-        _reconnectCts?.Dispose();
-        _reconnectCts = null;
+        lock (_reconnectLock)
+        {
+            try { _reconnectCts?.Cancel(); } catch (ObjectDisposedException) { }
+            _reconnectCts?.Dispose();
+            _reconnectCts = null;
+        }
     }
 
     /// <summary>
-    /// 恢复之前的订阅（重连后调用）
+    /// 恢复订阅（不加锁版本，供 ConnectAsync 已持锁时调用）。
     /// </summary>
-    private async Task RestoreSubscriptionsAsync(CancellationToken ct)
+    private void RestoreSubscriptionsInternal()
     {
         var nodes = _subscribedNodes.Values.ToList();
-        _subscribedNodes.Clear(); // 清空旧缓存，由 SubscribeNodesAsync 重新填充
-        _subscription?.Delete(true);
-        _subscription?.Dispose();
-        _subscription = null;
+        _subscribedNodes.Clear();
+        _pendingUpdates.Clear();
+        DisposeSubscriptionInternal();
 
         if (nodes.Count > 0)
         {
-            await SubscribeNodesAsync(nodes, ct).ConfigureAwait(false);
+            SubscribeNodesInternal(nodes);
             _logger.LogInformation("重连后恢复订阅: Count={Count}", nodes.Count);
         }
     }
 
     /// <summary>
-    /// 清理会话资源
+    /// 释放 Subscription 并解绑所有 MonitoredItem 事件（防泄漏）。调用方需已持锁。
     /// </summary>
-    private async Task CleanupSessionAsync()
+    private void DisposeSubscriptionInternal()
     {
+        if (_subscription == null) return;
         try
         {
-            if (_subscription != null)
-            {
-                _subscription.Delete(true);
-                _subscription.Dispose();
-                _subscription = null;
-            }
+            foreach (var item in _subscription.MonitoredItems)
+                item.Notification -= OnMonitoredItemNotification;
+            try { _subscription.Delete(true); } catch { /* 会话已失效时忽略 */ }
+            _subscription.Dispose();
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "清理订阅资源时异常");
+            _logger.LogWarning(ex, "释放订阅资源时异常");
         }
+        finally
+        {
+            _subscription = null;
+        }
+    }
+
+    /// <summary>清理会话资源。调用方需已持锁。</summary>
+    private async Task CleanupSessionAsync()
+    {
+        DisposeSubscriptionInternal();
 
         try
         {
@@ -560,9 +655,8 @@ public class OpcUaService : IOpcUaService, IDisposable
                 _session.SessionClosing -= OnSessionClosing;
 
                 if (_session.Connected)
-                {
                     await _session.CloseAsync().ConfigureAwait(false);
-                }
+
                 _session.Dispose();
                 _session = null;
             }
@@ -573,17 +667,15 @@ public class OpcUaService : IOpcUaService, IDisposable
         }
     }
 
-    /// <summary>
-    /// KeepAlive 回调——检测断线并触发重连
-    /// </summary>
+    /// <summary>KeepAlive 回调——检测断线并触发重连。</summary>
     private void OnKeepAlive(ISession sender, KeepAliveEventArgs e)
     {
-        if (e.Status == null || ServiceResult.IsBad(e.Status))
+        if (e.Status != null && ServiceResult.IsBad(e.Status))
         {
             _logger.LogWarning("OPC KeepAlive 异常: {Status}", e.Status);
             _ = Task.Run(async () =>
             {
-                await _sessionLock.WaitAsync();
+                await _sessionLock.WaitAsync().ConfigureAwait(false);
                 try
                 {
                     await CleanupSessionAsync().ConfigureAwait(false);
@@ -602,27 +694,25 @@ public class OpcUaService : IOpcUaService, IDisposable
         }
     }
 
-    /// <summary>
-    /// 会话关闭回调
-    /// </summary>
     private void OnSessionClosing(object? sender, EventArgs e)
-    {
-        _logger.LogWarning("OPC UA 会话即将关闭");
-    }
+        => _logger.LogWarning("OPC UA 会话即将关闭");
 
     /// <summary>
-    /// 证书验证回调（默认接受所有证书，生产环境需严格验证）
+    /// 证书验证回调。是否接受未信任证书由配置决定，默认生产环境严格校验。
     /// </summary>
     private void OnCertificateValidation(CertificateValidator validator, CertificateValidationEventArgs e)
     {
-        // 开发/测试环境接受所有证书，生产环境应替换为严格验证逻辑
-        e.Accept = true;
-        _logger.LogDebug("OPC 证书验证: Accept (开发模式)");
+        if (_config.AcceptUntrustedCertificates)
+        {
+            e.Accept = true;
+            _logger.LogWarning("OPC 证书验证: Accept（已配置接受未信任证书，请勿用于生产）");
+        }
+        else
+        {
+            _logger.LogError("OPC 证书验证失败（未信任）: {Subject}", e.Certificate?.Subject);
+        }
     }
 
-    /// <summary>
-    /// 创建 ApplicationConfiguration
-    /// </summary>
     private ApplicationConfiguration CreateApplicationConfiguration()
     {
         var config = new ApplicationConfiguration
@@ -647,9 +737,9 @@ public class OpcUaService : IOpcUaService, IDisposable
                         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                         "CncWallStation", "OPC", "trusted")
                 },
-                RejectSHA1SignedCertificates = false,
-                MinimumCertificateKeySize = 1024,
-                AutoAcceptUntrustedCertificates = true
+                RejectSHA1SignedCertificates = true,
+                MinimumCertificateKeySize = 2048,
+                AutoAcceptUntrustedCertificates = _config.AcceptUntrustedCertificates
             },
             TransportConfigurations = new TransportConfigurationCollection(),
             TransportQuotas = new TransportQuotas
@@ -670,29 +760,64 @@ public class OpcUaService : IOpcUaService, IDisposable
             TraceConfiguration = new TraceConfiguration
             {
                 DeleteOnLoad = true,
-                TraceMasks = 0 // 不启用 SDK 内部 Trace
+                TraceMasks = 0
             }
         };
 
-        // 确保证书目录存在
         Directory.CreateDirectory(config.SecurityConfiguration.ApplicationCertificate.StorePath);
         Directory.CreateDirectory(config.SecurityConfiguration.TrustedPeerCertificates.StorePath);
 
         return config;
     }
 
-    /// <summary>
-    /// 从 IConfiguration 绑定 OpcUaConfig
-    /// </summary>
     private OpcUaConfig BindConfig()
     {
         var config = new OpcUaConfig();
-        var section = _configuration.GetSection("OpcUa");
-        section.Bind(config);
+        _configuration.GetSection("OpcUa").Bind(config);
         return config;
     }
 
-    /// <inheritdoc />
+    // ══════════════════════════════════════════
+    //  释放
+    // ══════════════════════════════════════════
+
+    /// <summary>
+    /// 异步释放（WPF/Host 首选路径，不阻塞 UI 线程）。
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        _isShuttingDown = true;
+
+        StopReconnect();
+
+        _notifyTimer?.Dispose();
+        _notifyTimer = null;
+
+        try
+        {
+            if (await _sessionLock.WaitAsync(TimeSpan.FromSeconds(3)).ConfigureAwait(false))
+            {
+                try { await CleanupSessionAsync().ConfigureAwait(false); }
+                finally { _sessionLock.Release(); }
+            }
+        }
+        catch { /* 静默，避免影响进程退出 */ }
+        finally
+        {
+            _sessionLock.Dispose();
+        }
+
+        if (_appConfig?.CertificateValidator != null)
+            _appConfig.CertificateValidator.CertificateValidation -= OnCertificateValidation;
+
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// 同步释放兜底。用 Task.Run 把清理挪到线程池线程，避免 WPF UI 线程死锁。
+    /// </summary>
     public void Dispose()
     {
         if (_disposed) return;
@@ -701,21 +826,26 @@ public class OpcUaService : IOpcUaService, IDisposable
 
         StopReconnect();
 
+        _notifyTimer?.Dispose();
+        _notifyTimer = null;
+
         try
         {
-            _sessionLock.Wait(TimeSpan.FromSeconds(3));
-            CleanupSessionAsync().GetAwaiter().GetResult();
+            Task.Run(async () =>
+            {
+                if (await _sessionLock.WaitAsync(TimeSpan.FromSeconds(3)).ConfigureAwait(false))
+                {
+                    try { await CleanupSessionAsync().ConfigureAwait(false); }
+                    finally { _sessionLock.Release(); }
+                }
+            }).GetAwaiter().GetResult();
         }
-        catch
-        {
-            // 静默，避免影响进程退出
-        }
+        catch { /* 静默 */ }
         finally
         {
             _sessionLock.Dispose();
         }
 
-        _reconnectCts?.Dispose();
         if (_appConfig?.CertificateValidator != null)
             _appConfig.CertificateValidator.CertificateValidation -= OnCertificateValidation;
 
