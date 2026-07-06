@@ -1529,7 +1529,23 @@ canvas.addEventListener('mousemove', e => {
 
   const hits = raycaster.intersectObjects(allPickable, false);
   if (hits.length) {
-    const hit = hits[0].object;
+    // ★ 凹槽(Groove)是大尺寸透明腔体，可能遮挡其内部的孔/MEP/钢筋槽等小特征
+    //   （例如 TopPlate 顶板槽存在时无法选中其内的圆孔）。
+    //   当最近命中为凹槽时，在同一局部区域(墙厚一半范围内)优先选择非凹槽特征，
+    //   超出该范围则视为墙体背面的特征，不抢占正面凹槽的选中。
+    let hit = hits[0].object;
+    if (meshFeatureMap.has(hit)) {
+      const baseDist = hits[0].distance;
+      const pickRange = (_WT || 0.3) * 0.5;
+      for (let i = 1; i < hits.length; i++) {
+        if (hits[i].distance - baseDist > pickRange) break; // 已按距离升序，超出范围即可终止
+        const o = hits[i].object;
+        if (meshHoleMap.has(o) || meshMepMap.has(o) || meshRebarMap.has(o)) {
+          hit = o;
+          break;
+        }
+      }
+    }
     if (meshFeatureMap.has(hit)) {
       if (hoveredMepMesh || hoveredHoleMesh || hoveredRebarMesh) { unhighlightAll(); }
       highlightGrooveMesh(hit);
