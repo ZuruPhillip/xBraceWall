@@ -295,7 +295,7 @@
                                   AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
-                                  IsReadOnly="True"
+                                  IsReadOnly="False"
                                   MinHeight="150"
                                   MaxHeight="300"
                                   GridLinesVisibility="Horizontal"
@@ -304,19 +304,42 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{l:Loc Settings_GridNodeId}"
                                                     Binding="{Binding NodeId}"
-                                                    Width="200"/>
+                                                    Width="200"
+                                                    IsReadOnly="True"/>
                                 <DataGridTextColumn Header="{l:Loc Settings_GridDescription}"
                                                     Binding="{Binding Description}"
-                                                    Width="160"/>
-                                <DataGridCheckBoxColumn Header="{l:Loc Settings_GridWritable}"
-                                                        Binding="{Binding IsWritable}"
-                                                        Width="60"/>
+                                                    Width="160"
+                                                    IsReadOnly="True"/>
+                                <DataGridTemplateColumn Header="{l:Loc Settings_GridWritable}"
+                                                        Width="60">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsWritable, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center"
+                                                      IsHitTestVisible="True"
+                                                      ClickMode="Press"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="{l:Loc Settings_GridShowInRealtime}"
+                                                        Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsShowInRealtime, UpdateSourceTrigger=PropertyChanged}"
+                                                      HorizontalAlignment="Center"
+                                                      IsHitTestVisible="True"
+                                                      ClickMode="Press"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="{l:Loc Settings_GridValue}"
                                                     Binding="{Binding CurrentValue}"
-                                                    Width="120"/>
+                                                    Width="120"
+                                                    IsReadOnly="True"/>
                                 <DataGridTextColumn Header="{l:Loc Settings_GridUpdated}"
                                                     Binding="{Binding LastUpdated, StringFormat='yyyy-MM-dd HH:mm:ss'}"
-                                                    Width="160"/>
+                                                    Width="160"
+                                                    IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
 

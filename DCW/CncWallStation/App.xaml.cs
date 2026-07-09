@@ -101,10 +101,12 @@ namespace CncWallStation
                     services.AddSingleton<DataCheckValidatorFactory>();
                     services.AddSingleton<BimWallMapperFactory>();
 
-                    // OPC UA 通讯服务（单例）
-                    services.AddSingleton<IOpcUaService, OpcUaService>();
-
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
+
+                    // OPC UA 通讯服务（单例）——必须在 AddConventionalServices 之后注册，
+                    // 否则 AddDomainServices 会将 OpcUaService 覆盖为 Transient，
+                    // 导致各 ViewModel 拿到不同实例，StatusChanged 事件无法同步到状态栏。
+                    services.AddSingleton<IOpcUaService, OpcUaService>();
 
                     // MainPageViewModel 单例，确保 MainViewModel 和 MainPage 共享实例
                     services.AddSingleton<MainPageViewModel>();

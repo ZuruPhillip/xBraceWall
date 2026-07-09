@@ -1032,6 +1032,9 @@ Please enter new wall name:</value>
   <data name="Settings_GridWritable" xml:space="preserve">
     <value>Writable</value>
   </data>
+  <data name="Settings_GridShowInRealtime" xml:space="preserve">
+    <value>Show in Realtime</value>
+  </data>
   <data name="Settings_GridValue" xml:space="preserve">
     <value>Current Value</value>
   </data>

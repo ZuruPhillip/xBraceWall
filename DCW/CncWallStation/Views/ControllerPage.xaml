@@ -318,108 +318,33 @@
                     </Border>
 
                     <!-- 参数列表 -->
-                    <StackPanel Grid.Row="1" Margin="12,10">
-                        <!-- Table就位 -->
-                        <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
-                                Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="Table就位" Style="{StaticResource DetailLabelText}"/>
-                                    <TextBlock Text="{Binding RealtimeParams.TableReady}"
-                                               Foreground="#262626" FontSize="16" FontWeight="Bold"/>
-                                </StackPanel>
-                                <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
-                                        VerticalAlignment="Center"
-                                        Background="{Binding TableReadyColor, FallbackValue=#9E9E9E}"/>
-                            </Grid>
-                        </Border>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="12,10">
 
-                        <!-- 安全门 -->
-                        <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
-                                Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="安全门" Style="{StaticResource DetailLabelText}"/>
-                                    <TextBlock Text="{Binding RealtimeParams.SafetyDoorClosed}"
-                                               Foreground="#262626" FontSize="16" FontWeight="Bold"/>
-                                </StackPanel>
-                                <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
-                                        VerticalAlignment="Center"
-                                        Background="{Binding SafetyDoorColor, FallbackValue=#9E9E9E}"/>
-                            </Grid>
-                        </Border>
-
-                        <!-- 主轴转速 -->
-                        <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
-                                Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="主轴转速" Style="{StaticResource DetailLabelText}"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding RealtimeParams.SpindleSpeed, StringFormat={}{0:F0}}"
-                                                   Foreground="#262626" FontSize="16" FontWeight="Bold"/>
-                                        <TextBlock Text=" RPM" Foreground="#8C8C8C" FontSize="12"
-                                                   VerticalAlignment="Bottom" Margin="3,0,0,3"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
-                                        VerticalAlignment="Center"
-                                        Background="{Binding SpindleStatusColor, FallbackValue=#52C41A}"/>
-                            </Grid>
-                        </Border>
-
-                        <!-- 进给速度 -->
-                        <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
-                                Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="进给速度" Style="{StaticResource DetailLabelText}"/>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding RealtimeParams.FeedRate, StringFormat={}{0:F0}}"
-                                                   Foreground="#262626" FontSize="16" FontWeight="Bold"/>
-                                        <TextBlock Text=" mm/min" Foreground="#8C8C8C" FontSize="12"
-                                                   VerticalAlignment="Bottom" Margin="3,0,0,3"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
-                                        VerticalAlignment="Center"
-                                        Background="{Binding FeedRateStatusColor, FallbackValue=#52C41A}"/>
-                            </Grid>
-                        </Border>
-
-                        <!-- 当前刀具 -->
-                        <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
-                                Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <TextBlock Text="当前刀具" Style="{StaticResource DetailLabelText}"/>
-                                    <TextBlock Text="{Binding RealtimeParams.CurrentTool, StringFormat={}T{0}}"
-                                               Foreground="#262626" FontSize="16" FontWeight="Bold"/>
-                                </StackPanel>
-                                <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
-                                        VerticalAlignment="Center" Background="#1677FF"/>
-                            </Grid>
-                        </Border>
+                        <!-- 动态实时参数（用户在系统设置中勾选的节点） -->
+                        <ItemsControl ItemsSource="{Binding RealtimeNodes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
+                                            Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource DetailLabelText}"/>
+                                                <TextBlock Text="{Binding DisplayValue, TargetNullValue=--}"
+                                                           Foreground="#262626" FontSize="16" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding QualityColor, FallbackValue=#9E9E9E}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
                         <!-- 加工进度 -->
                         <Border Padding="12,10" CornerRadius="4"
@@ -431,7 +356,8 @@
                                            FontFamily="Consolas, Courier New"/>
                             </StackPanel>
                         </Border>
-                    </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </Border>
         </Grid>

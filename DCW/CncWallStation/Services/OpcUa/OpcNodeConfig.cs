@@ -16,6 +16,10 @@ public partial class OpcNodeConfig : ObservableObject
     /// <summary>是否可写</summary>
     public bool IsWritable { get; set; }
 
+    /// <summary>是否在控制页面"实时参数"面板中显示</summary>
+    [ObservableProperty]
+    private bool _isShowInRealtime;
+
     /// <summary>
     /// 当前值（订阅或读取后缓存的最新值）
     /// </summary>

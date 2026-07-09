@@ -4,13 +4,16 @@ using CncWallStation.Models.Enums;
 using CncWallStation.Services.Application;
 using CncWallStation.Services.OpcUa;
 using CncWallStation.Views;
+using Opc.Ua;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -32,6 +35,11 @@ namespace CncWallStation.ViewModels
         // 释放标志
         private bool _disposed;
 
+        // OPC 节点配置文件路径（与 SettingPageViewModel 共用同一文件）
+        private static readonly string NodesFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CncWallStation", "opc_nodes.json");
+
         // 当前墙体数据
         [ObservableProperty] private WallInfoDto? _currentWall;
         [ObservableProperty] private WallQueueItemDto? _selectedQueueItem;
@@ -39,8 +47,9 @@ namespace CncWallStation.ViewModels
         // 队列
         public ObservableCollection<WallQueueItemDto> WallQueue { get; } = new();
 
-        // 实时参数
-        [ObservableProperty] private RealtimeParamsDto _realtimeParams = new();
+        // 实时参数（用户在系统设置中勾选的节点，动态展示）
+        public ObservableCollection<RealtimeNodeItemDto> RealtimeNodes { get; } = new();
+        private readonly Dictionary<string, RealtimeNodeItemDto> _realtimeNodeMap = new();
 
         // PLC 数据
         public ObservableCollection<PlcLineDataDto> PlcLineData { get; } = new();
@@ -77,11 +86,6 @@ namespace CncWallStation.ViewModels
         [ObservableProperty] private bool _canMarkException;
         [ObservableProperty] private bool _canComplete;
 
-        // 参数状态
-        [ObservableProperty] private string _spindleStatusColor = "#9E9E9E";
-        [ObservableProperty] private string _feedRateStatusColor = "#9E9E9E";
-        [ObservableProperty] private string _tableReadyColor = "#9E9E9E";
-        [ObservableProperty] private string _safetyDoorColor = "#9E9E9E";
         [ObservableProperty] private string _stageBackground = "#334155";
 
         public ControllerPageViewModel(
@@ -114,6 +118,15 @@ namespace CncWallStation.ViewModels
         {
             try
             {
+                // 加载用户在系统设置中勾选的实时参数节点
+                LoadRealtimeNodesFromFile();
+
+                // 若 OPC 已连接，立即订阅实时参数节点（覆盖"先连接后打开控制页"的场景）
+                if (_opcUaService.IsConnected)
+                {
+                    await SubscribeRealtimeNodesAsync();
+                }
+
                 // 直接加载队列（触发 LoadWallAsync → Load3DWallDataAsync 完整管道）
                 await LoadQueueAsync();
             }
@@ -238,7 +251,7 @@ namespace CncWallStation.ViewModels
                 try
                 {
                     UpdatePlcLineDataFromOpc(nodes);
-                    UpdateRealtimeParamsFromOpc(nodes);
+                    UpdateRealtimeNodesFromOpc(nodes);
                 }
                 catch (Exception ex)
                 {
@@ -257,10 +270,17 @@ namespace CncWallStation.ViewModels
                     // 连接成功后，如果 PLC 数据已初始化则自动恢复订阅
                     if (PlcLineData.Count > 0)
                         _ = SubscribePlcNodesAsync(PlcLineData.Count);
+                    // 订阅用户勾选的实时参数节点
+                    _ = SubscribeRealtimeNodesAsync();
                 }
                 else
                 {
-                    RefreshParameterColors();
+                    // 断开时重置所有实时参数指示灯为中性灰色
+                    foreach (var dto in RealtimeNodes)
+                    {
+                        dto.DisplayValue = "--";
+                        dto.QualityColor = "#9E9E9E";
+                    }
                 }
             });
         }
@@ -316,35 +336,96 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        private void UpdateRealtimeParamsFromOpc(System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
+        /// <summary>根据 OPC 订阅回调更新实时参数节点显示值</summary>
+        private void UpdateRealtimeNodesFromOpc(System.Collections.Generic.IReadOnlyList<OpcNodeConfig> nodes)
         {
             foreach (var node in nodes)
             {
-                if (node.NodeId.Contains("TableReady"))
-                    RealtimeParams.TableReady = System.Convert.ToBoolean(node.CurrentValue ?? false);
-                else if (node.NodeId.Contains("SafetyDoor"))
-                    RealtimeParams.SafetyDoorClosed = System.Convert.ToBoolean(node.CurrentValue ?? false);
-                else if (node.NodeId.Contains("SpindleSpeed"))
-                    RealtimeParams.SpindleSpeed = System.Convert.ToDouble(node.CurrentValue ?? 0);
-                else if (node.NodeId.Contains("FeedRate"))
-                    RealtimeParams.FeedRate = System.Convert.ToDouble(node.CurrentValue ?? 0);
-                else if (node.NodeId.Contains("CurrentTool"))
-                    RealtimeParams.CurrentTool = System.Convert.ToInt32(node.CurrentValue ?? 0);
+                if (_realtimeNodeMap.TryGetValue(node.NodeId, out var dto))
+                {
+                    dto.DisplayValue = node.CurrentValue?.ToString() ?? "--";
+                    dto.QualityColor = node.Quality == "Good" ? "#52C41A" : "#E60012";
+                }
             }
-
-            SpindleStatusColor = RealtimeParams.SpindleSpeed > 0 ? "#4CAF50" : "#F44336";
-            FeedRateStatusColor = RealtimeParams.FeedRate > 0 ? "#4CAF50" : "#F44336";
-            TableReadyColor = RealtimeParams.TableReady ? "#52C41A" : "#E60012";
-            SafetyDoorColor = RealtimeParams.SafetyDoorClosed ? "#52C41A" : "#E60012";
         }
 
-        /// <summary>OPC 断开时重置指示灯为中性灰色</summary>
-        private void RefreshParameterColors()
+        /// <summary>从 opc_nodes.json 加载用户勾选了"实时显示"的节点到面板</summary>
+        /// <summary>
+        /// 重新从配置文件加载实时参数节点并订阅。
+        /// 供页面切换到控制页签时调用，确保用户在系统设置中的最新勾选同步生效。
+        /// </summary>
+        public async Task ReloadRealtimeNodesAsync()
         {
-            SpindleStatusColor = "#9E9E9E";
-            FeedRateStatusColor = "#9E9E9E";
-            TableReadyColor = "#9E9E9E";
-            SafetyDoorColor = "#9E9E9E";
+            LoadRealtimeNodesFromFile();
+            await SubscribeRealtimeNodesAsync();
+        }
+
+        private void LoadRealtimeNodesFromFile()
+        {
+            RealtimeNodes.Clear();
+            _realtimeNodeMap.Clear();
+
+            try
+            {
+                if (!File.Exists(NodesFilePath)) return;
+
+                var json = File.ReadAllText(NodesFilePath);
+                var nodes = JsonSerializer.Deserialize<List<OpcNodeConfig>>(json);
+                if (nodes == null) return;
+
+                foreach (var node in nodes.Where(n => n.IsShowInRealtime))
+                {
+                    var dto = new RealtimeNodeItemDto
+                    {
+                        NodeId = node.NodeId,
+                        Description = string.IsNullOrWhiteSpace(node.Description) ? node.NodeId : node.Description
+                    };
+                    RealtimeNodes.Add(dto);
+                    _realtimeNodeMap[node.NodeId] = dto;
+                }
+
+                _logger.LogInformation("加载实时参数节点: {Count} 个", RealtimeNodes.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "加载实时参数节点失败");
+            }
+        }
+
+        /// <summary>订阅用户勾选的实时参数节点（OPC 连接后调用）</summary>
+        private async Task SubscribeRealtimeNodesAsync()
+        {
+            if (_realtimeNodeMap.Count == 0) return;
+
+            try
+            {
+                var nodeIds = _realtimeNodeMap.Keys.ToList();
+                var nodes = nodeIds.Select(id => new OpcNodeConfig { NodeId = id }).ToList();
+
+                // 即使 OPC 未连接也调用 SubscribeNodesAsync —— 它会暂存节点，
+                // 在连接成功后由 RestoreSubscriptionsInternal 自动恢复订阅
+                await _opcUaService.SubscribeNodesAsync(nodes);
+                _logger.LogInformation("已订阅 {Count} 个实时参数节点", nodes.Count);
+
+                // 若已连接，立即读取一次当前值，避免等待订阅回调延迟
+                if (_opcUaService.IsConnected)
+                {
+                    var values = await _opcUaService.ReadNodesAsync(nodeIds);
+                    for (int i = 0; i < nodeIds.Count && i < values.Count; i++)
+                    {
+                        if (_realtimeNodeMap.TryGetValue(nodeIds[i], out var dto))
+                        {
+                            dto.DisplayValue = values[i].Value?.ToString() ?? "--";
+                            dto.QualityColor = StatusCode.IsGood(values[i].StatusCode) ? "#52C41A" : "#E60012";
+                        }
+                    }
+                    _logger.LogDebug("已读取 {Count} 个实时参数节点初始值", nodeIds.Count);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "订阅实时参数节点失败");
+            }
         }
 
         // ═══════════════ 分页 ═══════════════

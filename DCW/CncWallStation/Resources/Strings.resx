@@ -358,6 +358,7 @@
   <data name="Settings_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
   <data name="Settings_GridDescription" xml:space="preserve"><value>描述</value></data>
   <data name="Settings_GridWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Settings_GridShowInRealtime" xml:space="preserve"><value>实时显示</value></data>
   <data name="Settings_GridValue" xml:space="preserve"><value>当前值</value></data>
   <data name="Settings_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
 

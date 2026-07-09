@@ -74,6 +74,26 @@ namespace CncWallStation.Models.Dtos
     }
 
     /// <summary>
+    /// 实时参数节点 DTO（控制页面"实时参数"面板动态绑定）
+    /// </summary>
+    public partial class RealtimeNodeItemDto : ObservableObject
+    {
+        /// <summary>OPC 节点 ID</summary>
+        public string NodeId { get; set; } = string.Empty;
+
+        /// <summary>显示名称（取自节点描述，无则用 NodeId）</summary>
+        public string Description { get; set; } = string.Empty;
+
+        /// <summary>当前值的显示文本</summary>
+        [ObservableProperty]
+        private string _displayValue = "--";
+
+        /// <summary>质量指示灯颜色：Good=#52C41A, Bad=#E60012, 无数据=#9E9E9E</summary>
+        [ObservableProperty]
+        private string _qualityColor = "#9E9E9E";
+    }
+
+    /// <summary>
     /// PLC 数据行 DTO（用于 PLC 数据 Tab 的 DataGrid 绑定）
     /// </summary>
     public partial class PlcLineDataDto : ObservableObject

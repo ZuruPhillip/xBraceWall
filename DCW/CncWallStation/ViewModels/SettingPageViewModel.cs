@@ -1,19 +1,22 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CncWallStation.Localization;
+using CncWallStation.Models.Enums;
 using CncWallStation.Services.OpcUa;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
 
 namespace CncWallStation.ViewModels;
 
-public partial class SettingPageViewModel : ObservableObject
+public partial class SettingPageViewModel : ObservableObject, IDisposable
 {
     private readonly IOpcUaService _opcUaService = null!;
     private readonly ILogger<SettingPageViewModel> _logger = null!;
+    private bool _disposed;
     private static readonly string NodesFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "CncWallStation", "opc_nodes.json");
@@ -68,6 +71,7 @@ public partial class SettingPageViewModel : ObservableObject
     {
         _opcUaService = opcUaService;
         _logger = logger;
+        _opcUaService.StatusChanged += OnOpcStatusChanged;
     }
 
     /// <summary>
@@ -82,7 +86,18 @@ public partial class SettingPageViewModel : ObservableObject
             OpcPort = config.Port;
             OpcAutoConnect = config.AutoConnect;
 
-            LoadNodesFromFile();
+            // 仅在首次加载时从文件读取节点，避免清除已被 OpcUaService 订阅的 OpcNodeConfig 对象
+            // （OpcUaService 按 NodeId 去重，新对象无法替换旧对象，会导致"当前值"不再更新）
+            if (OpcNodes.Count == 0)
+            {
+                LoadNodesFromFile();
+            }
+
+            // 若 OPC 已连接，立即订阅当前节点列表以获取实时值
+            if (_opcUaService.IsConnected && OpcNodes.Count > 0)
+            {
+                _ = _opcUaService.SubscribeNodesAsync(OpcNodes.ToList());
+            }
 
             _logger.LogInformation("OPC 设置页配置已加载");
         }
@@ -166,8 +181,15 @@ public partial class SettingPageViewModel : ObservableObject
             IsWritable = NewNodeIsWritable
         };
 
+        node.PropertyChanged += OnNodePropertyChanged;
         OpcNodes.Add(node);
         SaveNodesToFile();
+
+        // 若 OPC 已连接，立即订阅新节点
+        if (_opcUaService.IsConnected)
+        {
+            _ = _opcUaService.SubscribeNodesAsync(new[] { node });
+        }
 
         // 清空输入
         NewNodeId = string.Empty;
@@ -192,6 +214,7 @@ public partial class SettingPageViewModel : ObservableObject
         if (result == MessageBoxResult.Yes)
         {
             _logger.LogInformation("OPC 节点已删除: {NodeId}", SelectedOpcNode.NodeId);
+            SelectedOpcNode.PropertyChanged -= OnNodePropertyChanged;
             OpcNodes.Remove(SelectedOpcNode);
             SelectedOpcNode = null;
             SaveNodesToFile();
@@ -212,6 +235,8 @@ public partial class SettingPageViewModel : ObservableObject
 
         if (result == MessageBoxResult.Yes)
         {
+            foreach (var n in OpcNodes)
+                n.PropertyChanged -= OnNodePropertyChanged;
             OpcNodes.Clear();
             SaveNodesToFile();
             _logger.LogInformation("所有 OPC 节点已清空");
@@ -281,7 +306,10 @@ public partial class SettingPageViewModel : ObservableObject
     {
         try
         {
+            foreach (var n in OpcNodes)
+                n.PropertyChanged -= OnNodePropertyChanged;
             OpcNodes.Clear();
+
             if (File.Exists(NodesFilePath))
             {
                 var json = File.ReadAllText(NodesFilePath);
@@ -289,7 +317,10 @@ public partial class SettingPageViewModel : ObservableObject
                 if (nodes != null)
                 {
                     foreach (var node in nodes)
+                    {
+                        node.PropertyChanged += OnNodePropertyChanged;
                         OpcNodes.Add(node);
+                    }
                 }
                 _logger.LogDebug("已加载 {Count} 个 OPC 节点配置", OpcNodes.Count);
             }
@@ -297,6 +328,27 @@ public partial class SettingPageViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "加载 OPC 节点配置文件失败");
+        }
+    }
+
+    /// <summary>
+    /// 节点属性变更时自动持久化（如用户勾选"实时显示"）。
+    /// </summary>
+    private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(OpcNodeConfig.IsShowInRealtime))
+            SaveNodesToFile();
+    }
+
+    /// <summary>
+    /// OPC 连接状态变更：连接成功后自动订阅当前节点列表，使"当前值"列实时更新。
+    /// </summary>
+    private void OnOpcStatusChanged(object? sender, OpcConnectionStatus status)
+    {
+        if (status == OpcConnectionStatus.Connected && OpcNodes.Count > 0)
+        {
+            _ = _opcUaService.SubscribeNodesAsync(OpcNodes.ToList());
+            _logger.LogDebug("OPC 连接成功，已订阅 {Count} 个节点", OpcNodes.Count);
         }
     }
 
@@ -316,5 +368,25 @@ public partial class SettingPageViewModel : ObservableObject
         {
             _logger.LogError(ex, "保存 OPC 节点配置文件失败");
         }
+    }
+
+    // ══════════════════════════════════════════
+    //  释放
+    // ══════════════════════════════════════════
+
+    /// <summary>
+    /// 解绑 OPC 单例事件，避免页面关闭后仍被回调导致内存泄漏。
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        _opcUaService.StatusChanged -= OnOpcStatusChanged;
+
+        foreach (var n in OpcNodes)
+            n.PropertyChanged -= OnNodePropertyChanged;
+
+        GC.SuppressFinalize(this);
     }
 }
