@@ -131,16 +131,6 @@
                               IsChecked="{Binding IsGrooveVisible}"
                               ToolTip="{l:Loc Tooltip_ToggleCavity}"
                               Margin="2,0,2,0"/>
-                <ToggleButton Content="{l:Loc Toggle_MepSlot}"
-                              Style="{StaticResource LayerToggleStyle}"
-                              IsChecked="{Binding IsMepVisible}"
-                              ToolTip="{l:Loc Tooltip_ToggleMep}"
-                              Margin="2,0,2,0"/>
-                <ToggleButton Content="{l:Loc Toggle_Rebar}"
-                              Style="{StaticResource LayerToggleStyle}"
-                              IsChecked="{Binding IsRebarVisible}"
-                              ToolTip="{l:Loc Tooltip_ToggleRebarMom}"
-                              Margin="2,0,2,0"/>
                 <ToggleButton Content="{l:Loc Toggle_Dim}"
                               Style="{StaticResource LayerToggleStyle}"
                               IsChecked="{Binding IsDimVisible}"

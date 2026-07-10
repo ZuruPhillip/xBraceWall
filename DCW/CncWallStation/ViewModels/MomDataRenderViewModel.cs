@@ -218,28 +218,6 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        private bool _isMepVisible = true;
-        public bool IsMepVisible
-        {
-            get => _isMepVisible;
-            set
-            {
-                if (SetProperty(ref _isMepVisible, value))
-                    ExecuteLayerToggle("mep", value);
-            }
-        }
-
-        private bool _isRebarVisible = true;
-        public bool IsRebarVisible
-        {
-            get => _isRebarVisible;
-            set
-            {
-                if (SetProperty(ref _isRebarVisible, value))
-                    ExecuteLayerToggle("rebar", value);
-            }
-        }
-
         private bool _isDimVisible = true;
         public bool IsDimVisible
         {

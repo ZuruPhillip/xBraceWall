@@ -142,12 +142,9 @@
   <data name="PageTitle_MomRender" xml:space="preserve"><value>MOM 数据渲染</value></data>
   <data name="Button_LoadMomRender" xml:space="preserve"><value>▶ 加载渲染</value></data>
   <data name="Toggle_Cavity" xml:space="preserve"><value>腔体</value></data>
-  <data name="Toggle_MepSlot" xml:space="preserve"><value>MEP槽</value></data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve"><value>加载墙体MomJSON数据并渲染3D CSG场景</value></data>
   <data name="Tooltip_ToggleWallMom" xml:space="preserve"><value>切换墙体主体图层</value></data>
   <data name="Tooltip_ToggleCavity" xml:space="preserve"><value>切换切削腔体图层</value></data>
-  <data name="Tooltip_ToggleMep" xml:space="preserve"><value>切换MEP管槽图层</value></data>
-  <data name="Tooltip_ToggleRebarMom" xml:space="preserve"><value>切换钢筋槽图层</value></data>
   <data name="Tooltip_ToggleDimMom" xml:space="preserve"><value>切换尺寸标注图层</value></data>
   <data name="Placeholder_MomTitle" xml:space="preserve"><value>AAC 墙体 CSG 三维渲染</value></data>
   <data name="Placeholder_MomSubtitle" xml:space="preserve"><value>MOM 数据可视化引擎 · CSG 布尔运算</value></data>

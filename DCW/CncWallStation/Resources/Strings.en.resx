@@ -462,9 +462,6 @@
   <data name="Toggle_Cavity" xml:space="preserve">
     <value>Cavity</value>
   </data>
-  <data name="Toggle_MepSlot" xml:space="preserve">
-    <value>MEP Slot</value>
-  </data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve">
     <value>Load wall MomJSON data and render 3D CSG scene</value>
   </data>
@@ -473,12 +470,6 @@
   </data>
   <data name="Tooltip_ToggleCavity" xml:space="preserve">
     <value>Toggle cavity layer</value>
-  </data>
-  <data name="Tooltip_ToggleMep" xml:space="preserve">
-    <value>Toggle MEP slot layer</value>
-  </data>
-  <data name="Tooltip_ToggleRebarMom" xml:space="preserve">
-    <value>Toggle rebar slot layer</value>
   </data>
   <data name="Tooltip_ToggleDimMom" xml:space="preserve">
     <value>Toggle dimension layer</value>
