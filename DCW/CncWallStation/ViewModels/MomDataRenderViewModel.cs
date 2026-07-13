@@ -11,6 +11,7 @@ using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -87,10 +88,24 @@ namespace CncWallStation.ViewModels
             set => SetProperty(ref _isPageLoaded, value);
         }
 
-        // ── 原点变换状态 ──
+        // ── 翻面 / 原点变换状态 ──
 
         private string _originalMomJsonData = string.Empty;
         private string _originalDObjectJson = string.Empty;
+
+        /// <summary>重建渲染并发锁，确保翻面/原点变换串行执行</summary>
+        private readonly SemaphoreSlim _rebuildLock = new SemaphoreSlim(1, 1);
+
+        private bool _isFlipped;
+        public bool IsFlipped
+        {
+            get => _isFlipped;
+            set
+            {
+                if (SetProperty(ref _isFlipped, value))
+                    _ = RebuildRenderAsync();
+            }
+        }
 
         private bool _isOriginTransformed;
         public bool IsOriginTransformed
@@ -99,7 +114,7 @@ namespace CncWallStation.ViewModels
             set
             {
                 if (SetProperty(ref _isOriginTransformed, value))
-                    _ = OriginToggleChangedAsync();
+                    _ = RebuildRenderAsync();
             }
         }
 
@@ -375,9 +390,13 @@ namespace CncWallStation.ViewModels
                     return;
                 }
 
-                // ★ 保存原始 MomJSON 数据，供原点变换切换使用
+                // ★ 保存原始 MomJSON 数据，供翻面/原点变换切换使用
                 _originalMomJsonData = detail.MomJsonData;
-                IsOriginTransformed = false;
+                // 重置翻面和原点变换状态（通过 backing field 避免触发 RebuildRenderAsync）
+                _isFlipped = false;
+                _isOriginTransformed = false;
+                OnPropertyChanged(nameof(IsFlipped));
+                OnPropertyChanged(nameof(IsOriginTransformed));
 
                 StatusMessage = "🔄 正在解析 MomJSON 数据...";
 
@@ -519,6 +538,11 @@ namespace CncWallStation.ViewModels
             _cachedDObjectJson = string.Empty;
             _originalMomJsonData = string.Empty;
             _originalDObjectJson = string.Empty;
+            // 重置 toggle 状态（通过 backing field 避免触发 RebuildRenderAsync）
+            _isFlipped = false;
+            _isOriginTransformed = false;
+            OnPropertyChanged(nameof(IsFlipped));
+            OnPropertyChanged(nameof(IsOriginTransformed));
             StatusMessage = $"❌ 页面加载失败: {error}";
         }
 
@@ -809,63 +833,96 @@ namespace CncWallStation.ViewModels
         }
 
         // ══════════════════════════════════════════
-        //  原点变换切换
+        //  统一重建渲染（翻面 + 原点变换可组合，并发保护）
         // ══════════════════════════════════════════
 
-        private async Task OriginToggleChangedAsync()
+        /// <summary>
+        /// 统一重建渲染方法：从原始 MomJsonData 出发，按 IsFlipped → IsOriginTransformed
+        /// 顺序依次应用变换，避免重复加载 wallData。
+        /// 使用 SemaphoreSlim 确保快速连续点击时方法串行执行。
+        /// </summary>
+        private async Task RebuildRenderAsync()
         {
             if (!IsPageLoaded || ExecuteScriptAsync == null)
                 return;
 
-            if (_isOriginTransformed)
+            await _rebuildLock.WaitAsync();
+            try
             {
-                // 选中：从原始数据重新反序列化 → 变换 → 渲染
-                try
+                // 两个开关都关闭时，恢复原始渲染数据
+                if (!IsFlipped && !IsOriginTransformed)
                 {
-                    if (string.IsNullOrEmpty(_originalMomJsonData))
-                        return;
-
-                    var options = new System.Text.Json.JsonSerializerOptions
+                    if (!string.IsNullOrEmpty(_originalDObjectJson))
                     {
-                        PropertyNameCaseInsensitive = true,
-                        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-                    };
+                        var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                        await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                        StatusMessage = "✅ 已恢复原始数据";
+                    }
+                    return;
+                }
 
-                    var momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(_originalMomJsonData, options);
-                    if (momWall == null || momWall.Outline == null || momWall.Outline.Count == 0)
-                        return;
+                if (string.IsNullOrEmpty(_originalMomJsonData))
+                    return;
 
-                    // 恢复 Face
-                    foreach (var f in momWall.Features)
-                        f.RestoreFaceFromInitialSide();
+                StatusMessage = "🔄 正在重建渲染数据...";
 
-                    // 执行原点变换
+                // 从原始 MomJSON 反序列化
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+                };
+
+                var momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(_originalMomJsonData, options);
+                if (momWall == null || momWall.Outline == null || momWall.Outline.Count == 0)
+                    return;
+
+                // 恢复 Face（Face 标记为 [JsonIgnore]，需从 InitialSide 重建）
+                foreach (var f in momWall.Features)
+                    f.RestoreFaceFromInitialSide();
+
+                // 按序应用变换：翻面 → 原点变换
+                if (IsFlipped)
+                    momWall.ApplyFlipAroundY();
+
+                if (IsOriginTransformed)
                     momWall.ApplyOriginTransform();
 
-                    // 映射渲染数据
-                    MapToDObject(momWall);
+                // 映射渲染数据并注入 HTML
+                MapToDObject(momWall);
 
-                    // 注入 HTML 刷新
-                    var escaped = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
-                    await ExecuteScriptAsync($"loadWallData('{escaped}')");
-                    StatusMessage = "✅ 原点变换完成";
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "原点变换失败");
-                    StatusMessage = $"❌ 原点变换失败: {ex.Message}";
-                    IsOriginTransformed = false;
-                }
+                var escapedJson = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                await ExecuteScriptAsync($"loadWallData('{escapedJson}')");
+
+                // 构建状态消息
+                var modes = new List<string>();
+                if (IsFlipped) modes.Add("翻面");
+                if (IsOriginTransformed) modes.Add("原点变换");
+                StatusMessage = $"✅ {string.Join("+", modes)}完成";
             }
-            else
+            catch (Exception ex)
             {
-                // 取消选中：恢复原始渲染数据
+                _logger.LogError(ex, "重建渲染失败");
+                StatusMessage = $"❌ 重建渲染失败: {ex.Message}";
+                // 回退 toggle 状态（通过 backing field 避免再次触发 RebuildRenderAsync）
+                _isFlipped = false;
+                _isOriginTransformed = false;
+                OnPropertyChanged(nameof(IsFlipped));
+                OnPropertyChanged(nameof(IsOriginTransformed));
+                // 尝试恢复原始渲染数据
                 if (!string.IsNullOrEmpty(_originalDObjectJson))
                 {
-                    var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
-                    await ExecuteScriptAsync($"loadWallData('{escaped}')");
-                    StatusMessage = "✅ 已恢复原始数据";
+                    try
+                    {
+                        var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                        await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                    }
+                    catch (Exception) { /* 忽略恢复失败 */ }
                 }
+            }
+            finally
+            {
+                _rebuildLock.Release();
             }
         }
 

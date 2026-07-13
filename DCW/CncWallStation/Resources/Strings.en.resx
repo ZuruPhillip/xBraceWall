@@ -751,7 +751,7 @@
     <value>Floor: </value>
   </data>
   <data name="Label_ActualDimensions" xml:space="preserve">
-    <value>Actual Dims</value>
+    <value>Blank Dims</value>
   </data>
   <data name="Label_ActualLength" xml:space="preserve">
     <value>L:</value>

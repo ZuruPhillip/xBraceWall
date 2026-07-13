@@ -92,10 +92,54 @@ namespace CncWallStation.Services.Application
                 Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
             };
 
+            // ★ 正面：仅原点变换
+            var momWallFront = DeserializeMomWall(wall.MomJsonData, options);
+            momWallFront.ApplyOriginTransform();
+
+            // 按切削面分类特征为正面/反面
+            float wallThickness = momWallFront.Thickness;
+            var frontFeatures = momWallFront.Features
+                .Where(f => FeatureSideClassifier.IsFront(f, wallThickness))
+                .ToList();
+
+            // 记录反面特征 ID（在原始分类下属于反面的特征）
+            var backFeatureIds = momWallFront.Features
+                .Where(f => !FeatureSideClassifier.IsFront(f, wallThickness))
+                .Select(f => f.Id)
+                .ToHashSet();
+
+            // ★ 反面：翻面 + 原点变换，按 ID 匹配选取反面特征（坐标为翻面后的值）
+            var momWallBack = DeserializeMomWall(wall.MomJsonData, options);
+            momWallBack.ApplyFlipAroundY();
+            momWallBack.ApplyOriginTransform();
+
+            var backFeatures = momWallBack.Features
+                .Where(f => backFeatureIds.Contains(f.Id))
+                .ToList();
+
+            _logger.LogInformation(
+                "PLC 特征分类: WallId={WallId}, 正面特征={FrontCount}, 反面特征={BackCount}",
+                wallId, frontFeatures.Count, backFeatures.Count);
+
+            // ★ 正反面分别生成 PLC 指令（正面 D=1，反面 D=5）
+            var result = new PlcGenerationResult
+            {
+                FrontGroups = WallPlcConverter.ConvertGrouped(momWallFront, frontFeatures, 1),
+                BackGroups = WallPlcConverter.ConvertGrouped(momWallBack, backFeatures, 5)
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// 从 JSON 反序列化 MomWall 并恢复 Face（Face 标记为 [JsonIgnore]，需从 InitialSide 重建）
+        /// </summary>
+        private MomWall DeserializeMomWall(string jsonData, JsonSerializerOptions options)
+        {
             MomWall? momWall;
             try
             {
-                momWall = JsonSerializer.Deserialize<MomWall>(wall.MomJsonData, options);
+                momWall = JsonSerializer.Deserialize<MomWall>(jsonData, options);
 
                 if (momWall != null)
                 {
@@ -112,30 +156,7 @@ namespace CncWallStation.Services.Application
             if (momWall == null)
                 throw new InvalidOperationException("MomJsonData 反序列化失败，可能存在数据损坏。请重新执行管线操作。");
 
-            // ★ 原点变换：使特征坐标和切削面为变换后的值
-            momWall.ApplyOriginTransform();
-
-            // ★ 按切削面分类特征为正面/反面
-            float wallThickness = momWall.Thickness;
-            var frontFeatures = momWall.Features
-                .Where(f => FeatureSideClassifier.IsFront(f, wallThickness))
-                .ToList();
-            var backFeatures = momWall.Features
-                .Where(f => !FeatureSideClassifier.IsFront(f, wallThickness))
-                .ToList();
-
-            _logger.LogInformation(
-                "PLC 特征分类: WallId={WallId}, 正面特征={FrontCount}, 反面特征={BackCount}",
-                wallId, frontFeatures.Count, backFeatures.Count);
-
-            // ★ 正反面分别生成 PLC 指令（正面 D=1，反面 D=5）
-            var result = new PlcGenerationResult
-            {
-                FrontGroups = WallPlcConverter.ConvertGrouped(momWall, frontFeatures, 1),
-                BackGroups = WallPlcConverter.ConvertGrouped(momWall, backFeatures, 5)
-            };
-
-            return result;
+            return momWall;
         }
 
         /// <inheritdoc/>

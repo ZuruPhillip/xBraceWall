@@ -59,17 +59,17 @@ namespace CncWallStation.ViewModels
         [ObservableProperty]
         private bool _isAudited;
 
-        // ==================== 墙体实际尺寸 ====================
+        // ==================== 墙体毛坯尺寸 ====================
 
-        /// <summary>墙体实际长度（mm），同步写入 WallHandler 分组 X0</summary>
+        /// <summary>墙体毛坯长度（mm），仅同步写入正面 WallHandler 分组 X0</summary>
         [ObservableProperty]
         private float _wallActualLength;
 
-        /// <summary>墙体实际宽度（mm），同步写入 WallHandler 分组 Y0</summary>
+        /// <summary>墙体毛坯宽度（mm），仅同步写入正面 WallHandler 分组 Y0</summary>
         [ObservableProperty]
         private float _wallActualWidth;
 
-        /// <summary>墙体实际高度/厚度（mm），同步写入 WallHandler 分组 Z0</summary>
+        /// <summary>墙体毛坯高度/厚度（mm），同步写入正反面 WallHandler 分组 Z0</summary>
         [ObservableProperty]
         private float _wallActualHeight;
 
@@ -78,17 +78,17 @@ namespace CncWallStation.ViewModels
 
         partial void OnWallActualLengthChanged(float value)
         {
-            if (!_isSyncingDimensions) SyncWallDimensions();
+            if (!_isSyncingDimensions) SyncWallDimensionsFrontOnly();
         }
 
         partial void OnWallActualWidthChanged(float value)
         {
-            if (!_isSyncingDimensions) SyncWallDimensions();
+            if (!_isSyncingDimensions) SyncWallDimensionsFrontOnly();
         }
 
         partial void OnWallActualHeightChanged(float value)
         {
-            if (!_isSyncingDimensions) SyncWallDimensions();
+            if (!_isSyncingDimensions) SyncWallDimensionsBothSides();
         }
 
         // ==================== 特征分组 ====================
@@ -662,16 +662,23 @@ namespace CncWallStation.ViewModels
         // ==================== 内部方法 ====================
 
         /// <summary>
-        /// 将实际尺寸同步到正反两组 WallHandler 分组中所有指令的 X0/Y0/Z0
+        /// 长度/宽度变更：仅同步到正面 WallHandler 分组（反面 X0/Y0 保持 0）
         /// </summary>
-        private void SyncWallDimensions()
+        private void SyncWallDimensionsFrontOnly()
         {
             if (!IsWallLoaded) return;
-
-            // 更新正面和反面两组的 WallHandler 指令
             UpdateWallHandlerDimensions(_frontGroupDtos);
-            UpdateWallHandlerDimensions(_backGroupDtos);
+            RecalculateStatistics();
+        }
 
+        /// <summary>
+        /// 高度变更：同步到正反面 WallHandler 分组的 Z0
+        /// </summary>
+        private void SyncWallDimensionsBothSides()
+        {
+            if (!IsWallLoaded) return;
+            UpdateWallHandlerZ0(_frontGroupDtos);
+            UpdateWallHandlerZ0(_backGroupDtos);
             RecalculateStatistics();
         }
 
@@ -688,8 +695,19 @@ namespace CncWallStation.ViewModels
             }
         }
 
+        private void UpdateWallHandlerZ0(List<PlcFeatureGroupDto> groups)
+        {
+            var wallGroup = groups.FirstOrDefault(g => g.HandlerName == "WallHandler");
+            if (wallGroup == null) return;
+
+            foreach (var inst in wallGroup.Instructions)
+            {
+                inst.Z0 = WallActualHeight;
+            }
+        }
+
         /// <summary>
-        /// 从 WallHandler 分组第一条指令中读取实际尺寸初始值
+        /// 从 WallHandler 分组第一条指令中读取毛坯尺寸初始值
         /// </summary>
         private void ReadWallDimensionsFromInstructions()
         {

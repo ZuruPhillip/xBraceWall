@@ -2223,32 +2223,55 @@ function showError(msg){
 /// <summary>
 /// 从 C# 注入数据直接渲染（跳过上传界面）
 /// 调用方式（C#）：await ExecuteScriptAsync($"loadWallData('{escapedJson}')");
+///
+/// 并发保护：使用 _isBuilding 标志 + _pendingJson 确保同一时间只有一个
+/// buildWall 在执行。快速连续调用时仅渲染最新数据，避免 RebarSlot/Hole/BendingKey
+/// 等可视化网格因并发 buildWall 交错执行而重复添加到场景。
 /// </summary>
+let _isBuilding = false;
+let _pendingJson = null;
+
 window.loadWallData = async function(jsonStr) {
+  // 始终更新为最新数据
+  _pendingJson = jsonStr;
+
+  // 如果已有 buildWall 在执行，直接返回；当前构建完成后会自动消费 _pendingJson
+  if (_isBuilding) return;
+
+  _isBuilding = true;
   try {
-    var data = JSON.parse(jsonStr);
-    if (!data) throw new Error('JSON 解析结果为空');
+    while (_pendingJson !== null) {
+      const currentJson = _pendingJson;
+      _pendingJson = null;
 
-    // 显示加载遮罩
-    document.getElementById('loading').classList.remove('hidden');
-    setLoadingText('正在从服务器加载数据...');
-    await tick();
+      try {
+        var data = JSON.parse(currentJson);
+        if (!data) throw new Error('JSON 解析结果为空');
 
-    // 确保 features 字段存在
-    if (!Array.isArray(data.features)) {
-      data.features = [];
+        // 显示加载遮罩
+        document.getElementById('loading').classList.remove('hidden');
+        setLoadingText('正在从服务器加载数据...');
+        await tick();
+
+        // 确保 features 字段存在
+        if (!Array.isArray(data.features)) {
+          data.features = [];
+        }
+
+        // 调用现有 buildWall 引擎
+        await buildWall(data);
+
+        // 隐藏加载遮罩、显示 3D UI
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('panel3d').style.display = 'block';
+      } catch(e) {
+        console.error('[loadWallData]', e);
+        document.getElementById('loading').classList.add('hidden');
+        showError('C# 数据注入失败：' + e.message);
+      }
     }
-
-    // 调用现有 buildWall 引擎
-    await buildWall(data);
-
-    // 隐藏加载遮罩、显示 3D UI
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('panel3d').style.display = 'block';
-  } catch(e) {
-    console.error('[loadWallData]', e);
-    document.getElementById('loading').classList.add('hidden');
-    showError('C# 数据注入失败：' + e.message);
+  } finally {
+    _isBuilding = false;
   }
 };
 

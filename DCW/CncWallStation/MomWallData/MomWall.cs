@@ -394,6 +394,184 @@ namespace CncWallStation.MomWallData
             PivotPoint = new Vec3(newMinX, newMinY, BaseElevation);
         }
 
+        // ══════════════════════════════════════════════
+        // 绕 Y 轴翻面（面特定坐标变换）
+        // ══════════════════════════════════════════════
+
+        /// <summary>
+        /// 绕 Y 轴翻面变换：基于当前 MomWall 数据重新计算所有特征坐标。
+        ///
+        /// 坐标变换规则：
+        /// - Outline（XY 平面）：X 轴镜像，Y 不变
+        /// - Top/Bottom 面特征（XY 平面）：X 镜像，Y 不变；面互换 Top↔Bottom
+        /// - Front/Back 面特征（XZ 平面，Vec2.Y=Z 高度）：X = wallLength - X，Y(=Z) = wallThickness - Y；面不变
+        /// - Left/Right 面特征（YZ 平面，Vec2.X=Z 高度）：X(=Z) = wallThickness - X，Y 不变；面互换 Left↔Right
+        ///
+        /// 翻面后原点坐标 = 新轮廓底面左下角 (minX, minY)。
+        /// 此方法原地修改 Outline 和 Features 数据，供 PLC 指令页面复用。
+        /// </summary>
+        public void ApplyFlipAroundY()
+        {
+            if (Outline == null || Outline.Count == 0)
+                return;
+
+            // 获取当前轮廓的 AABB
+            var (minX, minY, maxX, maxY) = GetOutlineBounds();
+            float wallLength = maxX - minX;
+            float wallThickness = Thickness;
+
+            // ── 三种面特定变换函数 ──────────────────────────
+            // Top/Bottom 面（XY 平面）：仅 X 镜像
+            Vec2 TransformTopBottom(Vec2 p) => new Vec2(minX + maxX - p.X, p.Y);
+
+            // Front/Back 面（XZ 平面，Vec2.Y 实为 Z 高度）：X 镜像 + Z 镜像
+            Vec2 TransformFrontBack(Vec2 p) => new Vec2(minX + maxX - p.X, wallThickness - p.Y);
+
+            // Left/Right 面（YZ 平面，Vec2.X 实为 Z 高度）：仅 Z 镜像
+            Vec2 TransformLeftRight(Vec2 p) => new Vec2(wallThickness - p.X, p.Y);
+
+            // 根据特征所在初始面选择变换
+            Func<Vec2, Vec2> GetTransform(Feature f) => f.InitialSide switch
+            {
+                MachineSide.Front or MachineSide.Back => TransformFrontBack,
+                MachineSide.Left or MachineSide.Right => TransformLeftRight,
+                _ => TransformTopBottom
+            };
+
+            // 1. 变换轮廓顶点（始终在 XY 平面，仅 X 镜像）
+            for (int i = 0; i < Outline.Count; i++)
+                Outline[i] = TransformTopBottom(Outline[i]);
+
+            // 2. 变换所有特征
+            foreach (var feature in Features)
+            {
+                var t = GetTransform(feature);
+                var side = feature.InitialSide;
+
+                switch (feature)
+                {
+                    case Groove groove:
+                        // 反射变换后起点/终点互换，需用临时变量交换回来
+                        var oldStartPt = groove.StartPt;
+                        groove.StartPt = t(groove.EndPt);
+                        groove.EndPt = t(oldStartPt);
+                        groove.LocalPos = groove.StartPt;
+                        break;
+
+                    case Hole hole:
+                        hole.LocalPos = t(hole.LocalPos);
+                        // 腰孔方向角：按面修正
+                        if (hole.Shape == HoleShape.Slotted)
+                        {
+                            if (side is MachineSide.Front or MachineSide.Back)
+                                hole.SlotAngleDeg += 180f;
+                            else if (side is MachineSide.Left or MachineSide.Right)
+                                hole.SlotAngleDeg = -hole.SlotAngleDeg;
+                            else
+                                hole.SlotAngleDeg = 180f - hole.SlotAngleDeg;
+                        }
+                        break;
+
+                    case MepSlot mepSlot:
+                        for (int i = 0; i < mepSlot.Segments.Count; i++)
+                        {
+                            if (mepSlot.Segments[i] is LineSegment line)
+                            {
+                                // 反射变换后起点/终点互换，需用临时变量交换回来
+                                var oldStartPoint = line.StartPoint;
+                                line.StartPoint = t(line.EndPoint);
+                                line.EndPoint = t(oldStartPoint);
+                            }
+                            else if (mepSlot.Segments[i] is ArcSegment arc)
+                            {
+                                arc.Center = t(arc.Center);
+
+                                // 角度修正：不同面的镜像效果不同
+                                if (side is MachineSide.Front or MachineSide.Back)
+                                {
+                                    // XZ 平面内 X+Z 双镜像 = 180°旋转：θ → θ + π，方向不变
+                                    arc.StartAngle += MathF.PI;
+                                    arc.EndAngle += MathF.PI;
+                                }
+                                else if (side is MachineSide.Left or MachineSide.Right)
+                                {
+                                    // ZY 平面内 Z 反射：θ → -θ，方向反转
+                                    arc.StartAngle = -arc.StartAngle;
+                                    arc.EndAngle = -arc.EndAngle;
+                                    arc.IsClockwise = !arc.IsClockwise;
+                                }
+                                else
+                                {
+                                    // XY 平面内 X 反射：θ → π - θ，方向反转
+                                    arc.StartAngle = MathF.PI - arc.StartAngle;
+                                    arc.EndAngle = MathF.PI - arc.EndAngle;
+                                    arc.IsClockwise = !arc.IsClockwise;
+                                }
+                            }
+                        }
+                        // 同步 LocalPos 到第一条段的起点
+                        if (mepSlot.Segments.Count > 0)
+                            mepSlot.LocalPos = mepSlot.Segments[0].StartPoint;
+                        break;
+
+                    case RebarSlot rebarSlot:
+                        // 反射变换后起点/终点互换，需用临时变量交换回来
+                        var oldStartPos = rebarSlot.LocalPos;
+                        rebarSlot.LocalPos = t(rebarSlot.EndPos);
+                        rebarSlot.EndPos = t(oldStartPos);
+                        break;
+
+                    default:
+                        // Pocket 等：只需变换 LocalPos
+                        feature.LocalPos = t(feature.LocalPos);
+                        break;
+                }
+            }
+
+            // 3. 面互换：Top↔Bottom，Left↔Right（Front/Back 不变）
+            foreach (var feature in Features)
+            {
+                switch (feature.InitialSide)
+                {
+                    case MachineSide.Top:
+                        feature.InitialSide = MachineSide.Bottom;
+                        feature.RestoreFaceFromInitialSide();
+                        break;
+                    case MachineSide.Bottom:
+                        feature.InitialSide = MachineSide.Top;
+                        feature.RestoreFaceFromInitialSide();
+                        break;
+                    case MachineSide.Left:
+                        feature.InitialSide = MachineSide.Right;
+                        feature.RestoreFaceFromInitialSide();
+                        break;
+                    case MachineSide.Right:
+                        feature.InitialSide = MachineSide.Left;
+                        feature.RestoreFaceFromInitialSide();
+                        break;
+                }
+            }
+
+            // 4. 重新计算尺寸
+            RecalculateDimensions();
+
+            // 5. 设置原点为翻面后新轮廓的底面左下角
+            var (newMinX, newMinY, _, _) = GetOutlineBounds();
+            MachineOrigin = new Vec2(newMinX, newMinY);
+            FlipCount++;
+            _bboxDirty = true;
+
+            // 6. PivotPoint 若未手动覆盖，自动跟随新左下角（无需额外处理）
+            //    若已手动覆盖，同步做 X 镜像重映射
+            if (_pivotPoint.HasValue)
+            {
+                _pivotPoint = new Vec3(
+                    minX + maxX - _pivotPoint.Value.X,
+                    _pivotPoint.Value.Y,
+                    _pivotPoint.Value.Z);
+            }
+        }
+
         private void ComputeObbDimensions()
         {
             if (Outline.Count < 3)

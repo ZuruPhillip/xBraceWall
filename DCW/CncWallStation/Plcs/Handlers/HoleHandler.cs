@@ -114,7 +114,7 @@ namespace CncWallStation.Plcs.Handlers
             float z0 = first.Face.InitialSide switch
             {
                 MachineSide.Front => wallThickness - first.LocalPos.Y,
-                MachineSide.Back => first.LocalPos.Y,
+                MachineSide.Back => wallThickness - first.LocalPos.Y,
                 MachineSide.Top => 0f,
                 _ => throw new NotSupportedException(
                          $"Unsupported face: {first.Face.InitialSide}")
