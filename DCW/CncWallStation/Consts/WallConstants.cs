@@ -293,8 +293,15 @@
 
         /// <summary>纵向钢筋槽切割深度（mm）</summary>
         public const float VerticalRebarSlotDepth = 35f;
+
         /// <summary>钢筋槽宽度（mm）</summary>
         public const float RebarSlotWidth = 8f;
+
+        /// <summary>Studs距边缘距离（mm）</summary>
+        public const float StudEdgeDistance = 107f;
+
+        /// <summary>Studs直径（mm）</summary>
+        public const float StudDiameter = 25f;
         #endregion
 
 

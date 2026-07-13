@@ -179,6 +179,7 @@ namespace CncWallStation.Services.Application
                     Y1 = item.Y1,
                     Z1 = item.Z1,
                     SortOrder = sortOrder++,
+                    Side = item.Side,
                     HandlerName = item.HandlerName,
                     FeatureName = item.FeatureName,
                     UpdatedBy = updatedBy,

@@ -113,8 +113,8 @@ namespace CncWallStation.Plcs.Handlers
             //    Top   （墙正面进刀）   ：Z0 = 0（从墙正面切入）
             float z0 = first.Face.InitialSide switch
             {
-                MachineSide.Front => first.LocalPos.Y,
-                MachineSide.Back => wallThickness - first.LocalPos.Y,
+                MachineSide.Front => wallThickness - first.LocalPos.Y,
+                MachineSide.Back => first.LocalPos.Y,
                 MachineSide.Top => 0f,
                 _ => throw new NotSupportedException(
                          $"Unsupported face: {first.Face.InitialSide}")
@@ -154,10 +154,10 @@ namespace CncWallStation.Plcs.Handlers
             }
             else if (side == MachineSide.Back)
             {
-                if (Match(diameter, DIAMETER_20))
-                    return (PlcTool.SlotCutter, PlcFeatureCode.FaceHoleCode);  // T8 F9
+                if (Match(diameter, DIAMETER_25))
+                    return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9
                 if (Match(diameter, DIAMETER_12))
-                    return (PlcTool.FaceHole, PlcFeatureCode.FaceHoleCode);  // T10 F9
+                    return (PlcTool.SmallDrill, PlcFeatureCode.BottomHole);   // T9 F9
             }
             else if (side == MachineSide.Top)
             {

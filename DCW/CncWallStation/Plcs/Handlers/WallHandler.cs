@@ -18,8 +18,9 @@ namespace CncWallStation.Plcs.Handlers
                 T = PlcTool.Mill,
                 F = PlcFeatureCode.WallDefine,
                 D = d,
-                X0 = wall.ActualLength,
-                Y0 = wall.ActualWidth,
+                // 反面(D=5)时 X0/Y0 置零
+                X0 = d == 5 ? 0 : wall.ActualLength,
+                Y0 = d == 5 ? 0 : wall.ActualWidth,
                 Z0 = wall.ActualThickness,
                 X1 = wall.Length,
                 Y1 = wall.Width,
