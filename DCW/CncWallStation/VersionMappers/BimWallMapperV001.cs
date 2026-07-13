@@ -497,7 +497,7 @@ namespace CncWallStation.VersionMappers
                     side: side,
                     startPos: startPos,
                     endPos: endPos,
-                    diameter: rebar.Diameter,
+                    diameter: WallConstants.RebarSlotWidth,
                     depth: depth,
                     direction: direction)
                 {

@@ -293,6 +293,8 @@
 
         /// <summary>纵向钢筋槽切割深度（mm）</summary>
         public const float VerticalRebarSlotDepth = 35f;
+        /// <summary>钢筋槽宽度（mm）</summary>
+        public const float RebarSlotWidth = 8f;
         #endregion
 
 
