@@ -59,7 +59,7 @@ namespace CncWallStation.Plcs.Handlers
                     h => (h.LocalPos.X, h.LocalPos.Y),
                     TOL))
                 {
-                    EmitInstruction(chain, grp.Key, ctx);
+                    EmitInstruction(chain, grp.Key, ctx, wall.Thickness);
                 }
             }
         }
@@ -79,6 +79,10 @@ namespace CncWallStation.Plcs.Handlers
                 (side == MachineSide.Front && Match(d, DIAMETER_25)) ||
                 // ② 侧面 Φ12 → T9
                 (side == MachineSide.Front && Match(d, DIAMETER_12)) ||
+                // ① 侧面 Φ25 → T3
+                (side == MachineSide.Back && Match(d, DIAMETER_25)) ||
+                // ② 侧面 Φ12 → T9
+                (side == MachineSide.Back && Match(d, DIAMETER_12)) ||
                 // ③ 顶面 Φ20 → T8
                 (side == MachineSide.Top && Match(d, DIAMETER_20)) ||
                 // ④ 顶面 Φ12 → T10
@@ -97,7 +101,7 @@ namespace CncWallStation.Plcs.Handlers
         // ══════════════════════════════════════════════════════
 
         private static void EmitInstruction(
-            CollinearMerger.Chain<Hole> chain, HoleKey key, PlcConvertContext ctx)
+            CollinearMerger.Chain<Hole> chain, HoleKey key, PlcConvertContext ctx, float wallThickness)
         {
             var first = chain.First;
 
@@ -110,6 +114,7 @@ namespace CncWallStation.Plcs.Handlers
             float z0 = first.Face.InitialSide switch
             {
                 MachineSide.Front => first.LocalPos.Y,
+                MachineSide.Back => wallThickness - first.LocalPos.Y,
                 MachineSide.Top => 0f,
                 _ => throw new NotSupportedException(
                          $"Unsupported face: {first.Face.InitialSide}")
@@ -146,6 +151,13 @@ namespace CncWallStation.Plcs.Handlers
                     return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9
                 if (Match(diameter, DIAMETER_12))
                     return (PlcTool.SmallDrill, PlcFeatureCode.BottomHole);   // T9 F9
+            }
+            else if (side == MachineSide.Back)
+            {
+                if (Match(diameter, DIAMETER_20))
+                    return (PlcTool.SlotCutter, PlcFeatureCode.FaceHoleCode);  // T8 F9
+                if (Match(diameter, DIAMETER_12))
+                    return (PlcTool.FaceHole, PlcFeatureCode.FaceHoleCode);  // T10 F9
             }
             else if (side == MachineSide.Top)
             {

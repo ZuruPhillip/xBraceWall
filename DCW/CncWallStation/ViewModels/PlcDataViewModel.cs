@@ -93,8 +93,43 @@ namespace CncWallStation.ViewModels
 
         // ==================== 特征分组 ====================
 
-        /// <summary>所有特征分组</summary>
+        /// <summary>正面特征分组 DTO 列表</summary>
+        private List<PlcFeatureGroupDto> _frontGroupDtos = new();
+
+        /// <summary>反面特征分组 DTO 列表</summary>
+        private List<PlcFeatureGroupDto> _backGroupDtos = new();
+
+        /// <summary>当前显示的特征分组（根据 SelectedSide 切换）</summary>
         public ObservableCollection<PlcFeatureGroupDto> FeatureGroups { get; } = new();
+
+        /// <summary>当前选中正反面（0=正面, 1=反面）</summary>
+        [ObservableProperty]
+        private int _selectedSide;
+
+        /// <summary>响应正反面切换，刷新 FeatureGroups</summary>
+        partial void OnSelectedSideChanged(int value)
+        {
+            RefreshFeatureGroups();
+            _ = Render3DAsync();
+        }
+
+        /// <summary>根据 SelectedSide 刷新 FeatureGroups 和 CurrentInstructions</summary>
+        private void RefreshFeatureGroups()
+        {
+            var source = SelectedSide == 0 ? _frontGroupDtos : _backGroupDtos;
+
+            FeatureGroups.Clear();
+            CurrentInstructions.Clear();
+            SelectedGroup = null;
+
+            foreach (var dto in source)
+            {
+                FeatureGroups.Add(dto);
+            }
+
+            ReadWallDimensionsFromInstructions();
+            RecalculateStatistics();
+        }
 
         /// <summary>当前选中特征组</summary>
         [ObservableProperty]
@@ -302,9 +337,13 @@ namespace CncWallStation.ViewModels
 
             try
             {
-                // 1. 扁平化所有分组的指令，从 0 开始编号索引 i
+                // 1. 扁平化所有分组的指令（正面在前、反面在后），从 0 开始编号索引 i
                 var allInstructions = new List<PlcInstructionDto>();
-                foreach (var group in FeatureGroups)
+                foreach (var group in _frontGroupDtos)
+                {
+                    allInstructions.AddRange(group.Instructions);
+                }
+                foreach (var group in _backGroupDtos)
                 {
                     allInstructions.AddRange(group.Instructions);
                 }
@@ -413,20 +452,17 @@ namespace CncWallStation.ViewModels
         {
             if (WallInfo == null) return;
 
-            // 生成分组指令（写入 PlcInstructionEntity 表）
-            var groups = await _plcDataAppService.GeneratePlcInstructionsGroupedAsync(WallInfo.Id);
+            // 生成分组指令（含原点变换、正反面分类）
+            var result = await _plcDataAppService.GeneratePlcInstructionsGroupedAsync(WallInfo.Id);
 
-            // 转换为 DTO
-            LoadFeatureGroups(groups);
-
-            // 统计
-            RecalculateStatistics();
+            // 转换为 DTO（正反面分别填充）
+            LoadFeatureGroups(result);
 
             // 渲染 3D
             await Render3DAsync();
         }
 
-        /// <summary>保存草稿</summary>
+        /// <summary>保存草稿（正反两面一起保存）</summary>
         [RelayCommand]
         private async Task SaveDraftAsync()
         {
@@ -437,8 +473,9 @@ namespace CncWallStation.ViewModels
                 var updatedBy = Environment.UserName;
                 var entities = new List<PlcInstructionEntity>();
 
+                // 正面指令（Side=0）在前
                 int sortOrder = 0;
-                foreach (var group in FeatureGroups)
+                foreach (var group in _frontGroupDtos)
                 {
                     foreach (var inst in group.Instructions)
                     {
@@ -455,6 +492,32 @@ namespace CncWallStation.ViewModels
                             Y1 = inst.Y1,
                             Z1 = inst.Z1,
                             SortOrder = sortOrder++,
+                            Side = 0,
+                            HandlerName = group.HandlerName,
+                            FeatureName = group.FeatureName
+                        });
+                    }
+                }
+
+                // 反面指令（Side=1）在后
+                foreach (var group in _backGroupDtos)
+                {
+                    foreach (var inst in group.Instructions)
+                    {
+                        entities.Add(new PlcInstructionEntity
+                        {
+                            WallId = WallInfo.Id,
+                            T = inst.T,
+                            F = inst.F,
+                            D = inst.D,
+                            X0 = inst.X0,
+                            Y0 = inst.Y0,
+                            Z0 = inst.Z0,
+                            X1 = inst.X1,
+                            Y1 = inst.Y1,
+                            Z1 = inst.Z1,
+                            SortOrder = sortOrder++,
+                            Side = 1,
                             HandlerName = group.HandlerName,
                             FeatureName = group.FeatureName
                         });
@@ -490,11 +553,14 @@ namespace CncWallStation.ViewModels
             IsWallLoaded = false;
             IsAudited = false;
             SearchWallId = string.Empty;
+            _frontGroupDtos.Clear();
+            _backGroupDtos.Clear();
             FeatureGroups.Clear();
             CurrentInstructions.Clear();
             Statistics = new PlcStatisticsDto();
             SelectedGroup = null;
             SelectedInstruction = null;
+            SelectedSide = 0;
 
             _isSyncingDimensions = true;
             WallActualLength = 0;
@@ -596,14 +662,22 @@ namespace CncWallStation.ViewModels
         // ==================== 内部方法 ====================
 
         /// <summary>
-        /// 将实际尺寸同步到 WallHandler 分组中所有指令的 X0/Y0/Z0
+        /// 将实际尺寸同步到正反两组 WallHandler 分组中所有指令的 X0/Y0/Z0
         /// </summary>
         private void SyncWallDimensions()
         {
             if (!IsWallLoaded) return;
 
-            var wallGroup = FeatureGroups
-                .FirstOrDefault(g => g.HandlerName == "WallHandler");
+            // 更新正面和反面两组的 WallHandler 指令
+            UpdateWallHandlerDimensions(_frontGroupDtos);
+            UpdateWallHandlerDimensions(_backGroupDtos);
+
+            RecalculateStatistics();
+        }
+
+        private void UpdateWallHandlerDimensions(List<PlcFeatureGroupDto> groups)
+        {
+            var wallGroup = groups.FirstOrDefault(g => g.HandlerName == "WallHandler");
             if (wallGroup == null) return;
 
             foreach (var inst in wallGroup.Instructions)
@@ -612,9 +686,6 @@ namespace CncWallStation.ViewModels
                 inst.Y0 = WallActualWidth;
                 inst.Z0 = WallActualHeight;
             }
-
-            // 更新统计（实际尺寸变化可能影响切削面积计算）
-            RecalculateStatistics();
         }
 
         /// <summary>
@@ -640,11 +711,23 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        private void LoadFeatureGroups(List<Plcs.PlcFeatureGroup> groups)
+        private void LoadFeatureGroups(Plcs.PlcGenerationResult result)
         {
-            FeatureGroups.Clear();
-            CurrentInstructions.Clear();
+            _frontGroupDtos = ConvertToDtos(result.FrontGroups);
+            _backGroupDtos = ConvertToDtos(result.BackGroups);
 
+            // 默认显示正面
+            _isSyncingDimensions = true;
+            SelectedSide = 0;
+            _isSyncingDimensions = false;
+
+            RefreshFeatureGroups();
+        }
+
+        /// <summary>将 PlcFeatureGroup 列表转换为 DTO 列表</summary>
+        private List<PlcFeatureGroupDto> ConvertToDtos(List<Plcs.PlcFeatureGroup> groups)
+        {
+            var dtos = new List<PlcFeatureGroupDto>();
             var isEn = Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en");
 
             foreach (var group in groups)
@@ -656,7 +739,6 @@ namespace CncWallStation.ViewModels
                     dtoInstructions.Add(PlcInstructionDto.FromPlcInstruction(inst, sortOrder++));
                 }
 
-                // 根据当前语言从映射表中查找特征名称
                 string? nameEn = null;
                 string? name = null;
                 bool found = isEn
@@ -666,32 +748,45 @@ namespace CncWallStation.ViewModels
                     ? (isEn ? nameEn! : name!)
                     : group.FeatureName;
 
-                var dto = new PlcFeatureGroupDto
+                dtos.Add(new PlcFeatureGroupDto
                 {
                     HandlerName = group.HandlerName,
                     FeatureName = featureName,
                     InstructionCount = group.Instructions.Count,
                     Instructions = dtoInstructions
-                };
-                FeatureGroups.Add(dto);
+                });
             }
 
-            ReadWallDimensionsFromInstructions();
+            return dtos;
         }
 
         private void LoadInstructionsFromEntities(List<PlcInstructionEntity> entities)
         {
-            FeatureGroups.Clear();
-            CurrentInstructions.Clear();
+            // 按 Side 分组（0=正面, 1=反面），旧数据无 Side 默认为 0
+            var frontEntities = entities.Where(e => e.Side == 0).ToList();
+            var backEntities = entities.Where(e => e.Side == 1).ToList();
 
-            // 按 HandlerName 分组
-            var grouped = entities
-                .GroupBy(e => e.HandlerName)
-                .ToList();
+            _frontGroupDtos = ConvertEntitiesToDtos(frontEntities);
+            _backGroupDtos = ConvertEntitiesToDtos(backEntities);
+
+            // 默认显示正面
+            _isSyncingDimensions = true;
+            SelectedSide = 0;
+            _isSyncingDimensions = false;
+
+            RefreshFeatureGroups();
+        }
+
+        /// <summary>将实体列表按 HandlerName 分组并转换为 DTO 列表</summary>
+        private List<PlcFeatureGroupDto> ConvertEntitiesToDtos(List<PlcInstructionEntity> entities)
+        {
+            var dtos = new List<PlcFeatureGroupDto>();
+            var isEn = Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+
+            var grouped = entities.GroupBy(e => e.HandlerName).ToList();
 
             foreach (var group in grouped)
             {
-                var isEn = Localization.LocalizationService.Instance.CurrentLanguage.StartsWith("en");
                 string? nameEn = null;
                 string? name = null;
                 bool found = isEn
@@ -723,17 +818,16 @@ namespace CncWallStation.ViewModels
                     })
                     .ToList();
 
-                var dto = new PlcFeatureGroupDto
+                dtos.Add(new PlcFeatureGroupDto
                 {
                     HandlerName = group.Key,
                     FeatureName = featureName,
                     InstructionCount = instructions.Count,
                     Instructions = instructions
-                };
-                FeatureGroups.Add(dto);
+                });
             }
 
-            ReadWallDimensionsFromInstructions();
+            return dtos;
         }
 
         private void RecalculateStatistics()

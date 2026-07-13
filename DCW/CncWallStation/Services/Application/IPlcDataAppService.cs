@@ -13,10 +13,10 @@ namespace CncWallStation.Services.Application
         Task<WallInfoDto?> GetWallInfoAsync(string wallId);
 
         /// <summary>
-        /// 按 Handler 分组生成 PLC 指令，并写入 PlcInstructionEntity 表
-        /// 返回分组结果
+        /// 按 Handler 分组生成 PLC 指令（含原点变换、正反面分类）
+        /// 返回正反两组分组结果
         /// </summary>
-        Task<List<PlcFeatureGroup>> GeneratePlcInstructionsGroupedAsync(long wallId);
+        Task<PlcGenerationResult> GeneratePlcInstructionsGroupedAsync(long wallId);
 
         /// <summary>从 PLC 指令表加载已保存的指令</summary>
         Task<List<PlcInstructionEntity>> LoadInstructionsAsync(long wallId);

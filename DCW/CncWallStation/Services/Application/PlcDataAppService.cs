@@ -66,7 +66,7 @@ namespace CncWallStation.Services.Application
         }
 
         /// <inheritdoc/>
-        public async Task<List<PlcFeatureGroup>> GeneratePlcInstructionsGroupedAsync(long wallId)
+        public async Task<PlcGenerationResult> GeneratePlcInstructionsGroupedAsync(long wallId)
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
@@ -112,8 +112,30 @@ namespace CncWallStation.Services.Application
             if (momWall == null)
                 throw new InvalidOperationException("MomJsonData 反序列化失败，可能存在数据损坏。请重新执行管线操作。");
 
-            var groups = WallPlcConverter.ConvertGrouped(momWall);
-            return groups;
+            // ★ 原点变换：使特征坐标和切削面为变换后的值
+            momWall.ApplyOriginTransform();
+
+            // ★ 按切削面分类特征为正面/反面
+            float wallThickness = momWall.Thickness;
+            var frontFeatures = momWall.Features
+                .Where(f => FeatureSideClassifier.IsFront(f, wallThickness))
+                .ToList();
+            var backFeatures = momWall.Features
+                .Where(f => !FeatureSideClassifier.IsFront(f, wallThickness))
+                .ToList();
+
+            _logger.LogInformation(
+                "PLC 特征分类: WallId={WallId}, 正面特征={FrontCount}, 反面特征={BackCount}",
+                wallId, frontFeatures.Count, backFeatures.Count);
+
+            // ★ 正反面分别生成 PLC 指令（正面 D=1，反面 D=5）
+            var result = new PlcGenerationResult
+            {
+                FrontGroups = WallPlcConverter.ConvertGrouped(momWall, frontFeatures, 1),
+                BackGroups = WallPlcConverter.ConvertGrouped(momWall, backFeatures, 5)
+            };
+
+            return result;
         }
 
         /// <inheritdoc/>

@@ -42,6 +42,11 @@ namespace CncWallStation.Models.Entities
         /// <summary>排序序号</summary>
         public int SortOrder { get; set; }
 
+        /// <summary>
+        /// 正反面标识（0=正面, 1=反面）
+        /// </summary>
+        public int Side { get; set; }
+
         /// <summary>Handler 名称（如 "WallHandler"）</summary>
         public string HandlerName { get; set; } = string.Empty;
 

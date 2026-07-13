@@ -36,6 +36,9 @@ namespace CncWallStation.EntityFrameworkCore
 
                 entity.HasIndex(e => e.WallId).HasDatabaseName("IX_PlcInstruction_WallId");
                 entity.HasIndex(e => new { e.WallId, e.SortOrder }).HasDatabaseName("IX_PlcInstruction_WallId_SortOrder");
+                entity.HasIndex(e => new { e.WallId, e.Side }).HasDatabaseName("IX_PlcInstruction_WallId_Side");
+
+                entity.Property(e => e.Side).HasDefaultValue(0);
 
                 entity.Property(e => e.HandlerName).HasMaxLength(64);
                 entity.Property(e => e.FeatureName).HasMaxLength(64);

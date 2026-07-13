@@ -39,6 +39,7 @@ namespace CncWallStation.Services.Application
                     T INT NOT NULL,
                     F INT NOT NULL,
                     D INT NOT NULL,
+                    Side INT NOT NULL DEFAULT 0,
                     X0 FLOAT NOT NULL,
                     Y0 FLOAT NOT NULL,
                     Z0 FLOAT NOT NULL,
@@ -52,8 +53,33 @@ namespace CncWallStation.Services.Application
                     UpdatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     INDEX IX_PlcInstruction_WallId (WallId),
                     INDEX IX_PlcInstruction_WallId_SortOrder (WallId, SortOrder),
+                    INDEX IX_PlcInstruction_WallId_Side (WallId, Side),
                     CONSTRAINT FK_PlcInstruction_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
                 );", cancellationToken);
+
+            // ===== PlcInstruction 升级：为已存在的表补 Side 列 =====
+            var plcExistingColumns = db.Database.SqlQueryRaw<string>(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'PlcInstruction'"
+            ).ToHashSet();
+
+            if (!plcExistingColumns.Contains("Side"))
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "ALTER TABLE PlcInstruction ADD COLUMN Side INT NOT NULL DEFAULT 0",
+                    cancellationToken);
+            }
+
+            // 检查并补建 WallId+Side 索引
+            var plcSideIndexExists = db.Database.SqlQueryRaw<int>(
+                "SELECT COUNT(*) AS Value FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'PlcInstruction' AND INDEX_NAME = 'IX_PlcInstruction_WallId_Side'"
+            ).AsEnumerable().FirstOrDefault();
+
+            if (plcSideIndexExists == 0)
+            {
+                await db.Database.ExecuteSqlRawAsync(
+                    "CREATE INDEX IX_PlcInstruction_WallId_Side ON PlcInstruction (WallId, Side)",
+                    cancellationToken);
+            }
 
             // ===== Opc =====
             await db.Database.ExecuteSqlRawAsync(@"
