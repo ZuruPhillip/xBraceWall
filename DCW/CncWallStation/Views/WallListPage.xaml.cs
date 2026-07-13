@@ -420,6 +420,112 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
+    /// <summary>优先级 → 描边主色（白底+彩色描边+彩色文字风格）</summary>
+    public class PriorityToOutlineBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int p)
+            {
+                if (p >= 2) return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")); // 高
+                if (p >= 1) return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F39C12")); // 中
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1890FF"));              // 低（蓝色）
+            }
+            return value is ProcessPriority ep ? ep switch
+            {
+                ProcessPriority.高 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E74C3C")),
+                ProcessPriority.中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F39C12")),
+                ProcessPriority.低 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1890FF")),
+                _ => new SolidColorBrush(Colors.Gray)
+            } : new SolidColorBrush(Colors.Gray);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>生产状态 → 浅色背景（淡彩背景+深色文字风格）</summary>
+    public class StatusToLightBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is ProcessStatus s ? s switch
+            {
+                ProcessStatus.待校验 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE7BA")), // 浅橙
+                ProcessStatus.待加工 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E6F4FF")), // 浅蓝
+                ProcessStatus.加工中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BAE7FF")), // 浅青
+                ProcessStatus.异常   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFCCC7")), // 浅红
+                ProcessStatus.暂停   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF7E6")), // 浅黄
+                ProcessStatus.中止   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFE7BA")), // 浅橙
+                ProcessStatus.待质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF7E6")), // 浅黄
+                ProcessStatus.已质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#BAE7FF")), // 浅青
+                ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D9F7BE")), // 浅绿
+                _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F5F5F5"))
+            } : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F5F5F5"));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>生产状态 → 深色文字（淡彩背景+深色文字风格）</summary>
+    public class StatusToDarkBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is ProcessStatus s ? s switch
+            {
+                ProcessStatus.待校验 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#AD4E00")), // 深橙
+                ProcessStatus.待加工 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0050B3")), // 深蓝
+                ProcessStatus.加工中 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0050B3")), // 深蓝
+                ProcessStatus.异常   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A8071A")), // 深红
+                ProcessStatus.暂停   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#AD4E00")), // 深橙
+                ProcessStatus.中止   => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#A8071A")), // 深红
+                ProcessStatus.待质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#AD4E00")), // 深橙
+                ProcessStatus.已质检 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0050B3")), // 深蓝
+                ProcessStatus.已完成 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#237804")), // 深绿
+                _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8C8C8C"))
+            } : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#8C8C8C"));
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>审核状态 → 浅色背景</summary>
+    public class AuditStatusToLightBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int s = value is int i ? i : 0;
+            return s switch
+            {
+                1 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D9F7BE")), // 已审核 - 浅绿
+                _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF7E6"))  // 未审核 - 浅黄
+            };
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
+    /// <summary>审核状态 → 深色文字</summary>
+    public class AuditStatusToDarkBrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int s = value is int i ? i : 0;
+            return s switch
+            {
+                1 => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#237804")), // 已审核 - 深绿
+                _ => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#AD4E00"))  // 未审核 - 深橙
+            };
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
     /// <summary>审核状态 → 中/英文</summary>
     public class AuditStatusToTextConverter : IValueConverter
     {

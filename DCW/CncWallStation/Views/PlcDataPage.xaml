@@ -241,10 +241,21 @@
             <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center"
                           VerticalAlignment="Stretch" Background="Transparent" />
 
-            <!-- 右侧主内容：TabControl -->
-            <TabControl Grid.Column="2" SelectedIndex="{Binding SelectedTabIndex}"
-                        Background="White"
-                        Style="{StaticResource TabControlCapsule}">
+
+            <!-- 右侧面板：TabControl + 审核图片 -->
+            <Grid Grid.Column="2">
+                <!-- 审核水印图片（表头下方右上角，与 ControllerPage "未连接"图片大小一致） -->
+                <Image Source="pack://application:,,,/Resources/Images/audit.png"
+                       Width="150" Height="90"
+                       HorizontalAlignment="Right" VerticalAlignment="Top"
+                       Margin="0,80,12,0" Opacity="1"
+                       Visibility="{Binding IsAudited, Converter={StaticResource BoolToVisibilityConverter}}"
+                       Panel.ZIndex="1"/>
+
+                <!-- 右侧主内容：TabControl -->
+                <TabControl SelectedIndex="{Binding SelectedTabIndex}"
+                            Background="White"
+                            Style="{StaticResource TabControlCapsule}">
                 <!-- Tab1: 指令表格 -->
                 <TabItem Header="{l:Loc Tab_InstructionData}">
                     <DataGrid ItemsSource="{Binding CurrentInstructions}"
@@ -316,6 +327,7 @@
                     </Grid>
                 </TabItem>
             </TabControl>
+            </Grid>
         </Grid>
 
         <!-- ==================== Row4: 状态栏 ==================== -->
