@@ -22,7 +22,7 @@ namespace CncWallStation.ViewModels
         private readonly IDbContextFactory<AppDbContext> _dbContextFactory;
         private readonly ILogger<PlcDataViewModel> _logger;
 
-        private const string OPC_NODE_ID_PREFIX = "ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.LineDef";
+        private const string OPC_NODE_ID_PREFIX = "ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.Line_Def";
 
         /// <summary>指令行头字母：T, F, D, X0, Y0, Z0, X1, Y1, Z1</summary>
         private static readonly string[] LineHeaders = { "T", "F", "D", "X0", "Y0", "Z0", "X1", "Y1", "Z1" };

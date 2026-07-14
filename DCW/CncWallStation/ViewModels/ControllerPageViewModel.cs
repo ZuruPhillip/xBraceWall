@@ -215,12 +215,11 @@ namespace CncWallStation.ViewModels
 
         private async Task SubscribePlcNodesAsync(int count)
         {
-            if (!_opcUaService.IsConnected) return;
-
+            //if (!_opcUaService.IsConnected) return;
             try
             {
                 var nodes = new System.Collections.Generic.List<OpcNodeConfig>();
-                string[] headers = { "T", "F", "D", "X0", "Y0", "Z0", "X1", "Y1", "Z1" };
+                string[] headers = { "T", "F", "D", "X[0]", "Y[0]", "Z[0]", "X[1]", "Y[1]", "Z[1]" };
 
                 for (int i = 0; i < count; i++)
                 {
@@ -228,12 +227,14 @@ namespace CncWallStation.ViewModels
                     {
                         nodes.Add(new OpcNodeConfig
                         {
-                            NodeId = $"ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.LineDef[{i}].{h}",
+                            NodeId = $"ns=2;s=unit/MCCUnit_35.InDATA_CNC_P.Line_Def[{i}].{h}",
                             Description = $"L{i}.{h}"
                         });
                     }
                 }
 
+                // 即使 OPC 未连接也调用 SubscribeNodesAsync —— 它会暂存节点，
+                // 在连接成功后由 RestoreSubscriptionsInternal 自动恢复订阅
                 await _opcUaService.SubscribeNodesAsync(nodes);
                 _logger.LogInformation("已订阅 {Count} 个 PLC 节点", nodes.Count);
             }
@@ -292,7 +293,7 @@ namespace CncWallStation.ViewModels
                 try
                 {
                     var match = System.Text.RegularExpressions.Regex.Match(node.NodeId,
-                        @"LineDef\[(\d+)\]\.(\w+)");
+                        @"Line_Def\[(\d+)\]\.(\w+(?:\[\d+\])?)");
                     if (!match.Success) continue;
 
                     if (!int.TryParse(match.Groups[1].Value, out int index)) continue;
@@ -308,12 +309,12 @@ namespace CncWallStation.ViewModels
                         case "T": line.T = (int)val; break;
                         case "F": line.F = (int)val; break;
                         case "D": line.D = (int)val; break;
-                        case "X0": line.X0 = val; break;
-                        case "Y0": line.Y0 = val; break;
-                        case "Z0": line.Z0 = val; break;
-                        case "X1": line.X1 = val; break;
-                        case "Y1": line.Y1 = val; break;
-                        case "Z1": line.Z1 = val; break;
+                        case "X[0]": line.X0 = val; break;
+                        case "Y[0]": line.Y0 = val; break;
+                        case "Z[0]": line.Z0 = val; break;
+                        case "X[1]": line.X1 = val; break;
+                        case "Y[1]": line.Y1 = val; break;
+                        case "Z[1]": line.Z1 = val; break;
                     }
 
                     // D=1 表示该行已加工完成（双向赋值，支持复位回退）
