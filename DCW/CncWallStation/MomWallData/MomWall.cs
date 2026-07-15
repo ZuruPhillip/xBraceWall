@@ -418,17 +418,18 @@ namespace CncWallStation.MomWallData
             // 获取当前轮廓的 AABB
             var (minX, minY, maxX, maxY) = GetOutlineBounds();
             float wallLength = maxX - minX;
+            float wallHeight = maxY - minY;
             float wallThickness = Thickness;
 
             // ── 三种面特定变换函数 ──────────────────────────
-            // Top/Bottom 面（XY 平面）：仅 X 镜像
-            Vec2 TransformTopBottom(Vec2 p) => new Vec2(minX + maxX - p.X, p.Y);
+            // Top/Bottom 面（XY 平面）：仅 Y 镜像
+            Vec2 TransformTopBottom(Vec2 p) => new Vec2(p.X, minY + maxY - p.Y);
 
-            // Front/Back 面（XZ 平面，Vec2.Y 实为 Z 高度）：X 镜像 + Z 镜像
-            Vec2 TransformFrontBack(Vec2 p) => new Vec2(minX + maxX - p.X, wallThickness - p.Y);
+            // Front/Back 面（XZ 平面，Vec2.Y 实为 Z 高度）：仅 Z 镜像
+            Vec2 TransformFrontBack(Vec2 p) => new Vec2(p.X, wallThickness - p.Y);
 
-            // Left/Right 面（YZ 平面，Vec2.X 实为 Z 高度）：仅 Z 镜像
-            Vec2 TransformLeftRight(Vec2 p) => new Vec2(wallThickness - p.X, p.Y);
+            // Left/Right 面（YZ 平面，Vec2.X 实为 Z 高度）：Y 镜像 + Z 镜像
+            Vec2 TransformLeftRight(Vec2 p) => new Vec2(wallThickness - p.X, minY + maxY - p.Y);
 
             // 根据特征所在初始面选择变换
             Func<Vec2, Vec2> GetTransform(Feature f) => f.InitialSide switch
@@ -438,7 +439,7 @@ namespace CncWallStation.MomWallData
                 _ => TransformTopBottom
             };
 
-            // 1. 变换轮廓顶点（始终在 XY 平面，仅 X 镜像）
+            // 1. 变换轮廓顶点（始终在 XY 平面，仅 Y 镜像）
             for (int i = 0; i < Outline.Count; i++)
                 Outline[i] = TransformTopBottom(Outline[i]);
 
@@ -460,13 +461,13 @@ namespace CncWallStation.MomWallData
 
                     case Hole hole:
                         hole.LocalPos = t(hole.LocalPos);
-                        // 腰孔方向角：按面修正
+                        // 腰孔方向角：按面修正（绕X轴镜像）
                         if (hole.Shape == HoleShape.Slotted)
                         {
                             if (side is MachineSide.Front or MachineSide.Back)
-                                hole.SlotAngleDeg += 180f;
-                            else if (side is MachineSide.Left or MachineSide.Right)
                                 hole.SlotAngleDeg = -hole.SlotAngleDeg;
+                            else if (side is MachineSide.Left or MachineSide.Right)
+                                hole.SlotAngleDeg += 180f;
                             else
                                 hole.SlotAngleDeg = 180f - hole.SlotAngleDeg;
                         }
@@ -486,25 +487,25 @@ namespace CncWallStation.MomWallData
                             {
                                 arc.Center = t(arc.Center);
 
-                                // 角度修正：不同面的镜像效果不同
+                                // 角度修正：绕X轴镜像，不同面的镜像效果不同
                                 if (side is MachineSide.Front or MachineSide.Back)
                                 {
-                                    // XZ 平面内 X+Z 双镜像 = 180°旋转：θ → θ + π，方向不变
-                                    arc.StartAngle += MathF.PI;
-                                    arc.EndAngle += MathF.PI;
-                                }
-                                else if (side is MachineSide.Left or MachineSide.Right)
-                                {
-                                    // ZY 平面内 Z 反射：θ → -θ，方向反转
+                                    // XZ 平面内 Z 反射：θ → -θ，方向反转
                                     arc.StartAngle = -arc.StartAngle;
                                     arc.EndAngle = -arc.EndAngle;
                                     arc.IsClockwise = !arc.IsClockwise;
                                 }
+                                else if (side is MachineSide.Left or MachineSide.Right)
+                                {
+                                    // YZ 平面内 Y+Z 双镜像 = 180°旋转：θ → θ + π，方向不变
+                                    arc.StartAngle += MathF.PI;
+                                    arc.EndAngle += MathF.PI;
+                                }
                                 else
                                 {
-                                    // XY 平面内 X 反射：θ → π - θ，方向反转
-                                    arc.StartAngle = MathF.PI - arc.StartAngle;
-                                    arc.EndAngle = MathF.PI - arc.EndAngle;
+                                    // XY 平面内 Y 反射：θ → -θ，方向反转
+                                    arc.StartAngle = -arc.StartAngle;
+                                    arc.EndAngle = -arc.EndAngle;
                                     arc.IsClockwise = !arc.IsClockwise;
                                 }
                             }
@@ -519,6 +520,13 @@ namespace CncWallStation.MomWallData
                         var oldStartPos = rebarSlot.LocalPos;
                         rebarSlot.LocalPos = t(rebarSlot.EndPos);
                         rebarSlot.EndPos = t(oldStartPos);
+                        // 绕X轴翻面后，确保横向钢筋 StartPos.X < EndPos.X、纵向钢筋 StartPos.Y < EndPos.Y
+                        if ((rebarSlot.Direction == RebarSlotDirection.Horizontal && rebarSlot.LocalPos.X > rebarSlot.EndPos.X)
+                            || (rebarSlot.Direction == RebarSlotDirection.Vertical && rebarSlot.LocalPos.Y > rebarSlot.EndPos.Y))
+                        {
+                            (rebarSlot.LocalPos, rebarSlot.EndPos) = (rebarSlot.EndPos, rebarSlot.LocalPos);
+                            (rebarSlot.StartThreading, rebarSlot.EndThreading) = (rebarSlot.EndThreading, rebarSlot.StartThreading);
+                        }
                         break;
 
                     default:
@@ -528,7 +536,7 @@ namespace CncWallStation.MomWallData
                 }
             }
 
-            // 3. 面互换：Top↔Bottom，Left↔Right（Front/Back 不变）
+            // 3. 面互换：Top↔Bottom，Front↔Back（Left/Right 不变）
             foreach (var feature in Features)
             {
                 switch (feature.InitialSide)
@@ -541,12 +549,12 @@ namespace CncWallStation.MomWallData
                         feature.InitialSide = MachineSide.Top;
                         feature.RestoreFaceFromInitialSide();
                         break;
-                    case MachineSide.Left:
-                        feature.InitialSide = MachineSide.Right;
+                    case MachineSide.Front:
+                        feature.InitialSide = MachineSide.Back;
                         feature.RestoreFaceFromInitialSide();
                         break;
-                    case MachineSide.Right:
-                        feature.InitialSide = MachineSide.Left;
+                    case MachineSide.Back:
+                        feature.InitialSide = MachineSide.Front;
                         feature.RestoreFaceFromInitialSide();
                         break;
                 }
@@ -562,12 +570,12 @@ namespace CncWallStation.MomWallData
             _bboxDirty = true;
 
             // 6. PivotPoint 若未手动覆盖，自动跟随新左下角（无需额外处理）
-            //    若已手动覆盖，同步做 X 镜像重映射
+            //    若已手动覆盖，同步做 Y 镜像重映射
             if (_pivotPoint.HasValue)
             {
                 _pivotPoint = new Vec3(
-                    minX + maxX - _pivotPoint.Value.X,
-                    _pivotPoint.Value.Y,
+                    _pivotPoint.Value.X,
+                    minY + maxY - _pivotPoint.Value.Y,
                     _pivotPoint.Value.Z);
             }
         }
