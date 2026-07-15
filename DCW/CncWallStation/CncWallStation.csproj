@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\Images\appIcon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\appIcon.ico" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="SharpVectors.Reloaded" Version="1.8.4" />
@@ -55,6 +60,7 @@
 
 	<!-- 嵌入式图片资源（WPF Image.Source 需要 Resource 构建操作） -->
 	<ItemGroup>
+		<Resource Include="Resources\Images\appIcon.ico" />
 		<Resource Include="Resources\Images\disconnected.png" />
 		<Resource Include="Resources\Images\audit.png" />
 	</ItemGroup>
