@@ -5,96 +5,453 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CncWallStation.Views"
       xmlns:l="clr-namespace:CncWallStation.Localization"
+      xmlns:conv="clr-namespace:CncWallStation.Converters"
       mc:Ignorable="d" 
-      d:DesignHeight="600" d:DesignWidth="1200"
-      Title="{l:Loc PageTitle_Controller}">
+      d:DesignHeight="800" d:DesignWidth="1400"
+      Title="{l:Loc PageTitle_Controller}"
+      FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
 
     <Page.Resources>
-        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="MinWidth" Value="120"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="Margin" Value="4,0"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="#2563EB"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1D4ED8"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#94A3B8"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#1E40AF"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button"
-               BasedOn="{StaticResource ToolbarButtonStyle}">
-            <Setter Property="Background" Value="#475569"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#334155"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#94A3B8"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <!-- 布尔值转颜色 -->
+        <conv:BoolToColorConverter x:Key="BoolToColorConverter"
+            TrueColor="#52C41A" FalseColor="#E60012"/>
+        <!-- 布尔值转可见性 -->
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <!-- 反向布尔值转可见性（True→Collapsed, False→Visible） -->
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
     </Page.Resources>
 
-    <Grid Margin="8" Background="#F5F5F5">
+    <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ==================== Row0: 标题栏 ==================== -->
-        <Border Grid.Row="0" Padding="10" Margin="0,0,0,6"
+        <!-- ═══════════════ Row0: 顶部状态栏 ═══════════════ -->
+        <Border Grid.Row="0" Margin="8,8,8,6" Padding="16,12"
                 Background="White" CornerRadius="4"
                 BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Width="4" Height="20" Background="#1890FF" CornerRadius="2" Margin="0,0,10,0" />
-                <TextBlock Text="{l:Loc PageTitle_Controller}" FontSize="18" FontWeight="Bold"
-                           Foreground="#333" VerticalAlignment="Center" />
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 蓝色竖条 -->
+                <Border Grid.Column="0" Width="4" Height="24" Background="#1890FF"
+                        CornerRadius="2" VerticalAlignment="Center" Margin="0,0,12,0"/>
+
+                <!-- 墙体ID -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding CurrentWall.WallId, FallbackValue=---}"
+                               Style="{StaticResource DetailValueText}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 分隔线 -->
+                <Border Grid.Column="2" Width="1" Height="20" Background="#F0F0F0" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                <!-- 项目号 -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="项目号" Style="{StaticResource DetailLabelText}"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding CurrentWall.ProjectName, FallbackValue=---}"
+                               Foreground="#595959" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 楼层 -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding CurrentWall.Floor, StringFormat={}{0}F, FallbackValue=---}"
+                               Foreground="#595959" FontSize="13" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 阶段标签 -->
+                <Border Grid.Column="5" CornerRadius="3" Padding="8,3" Margin="0,0,16,0"
+                        VerticalAlignment="Center"
+                        Background="{Binding StageBackground, FallbackValue=#E6F4FF}">
+                    <TextBlock Text="{Binding CurrentWall.PipelineStageText, FallbackValue=待加载}"
+                               Foreground="#1677FF" FontSize="12" FontWeight="SemiBold"/>
+                </Border>
+
+                <!-- 版本 -->
+                <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <TextBlock Text="版本" Style="{StaticResource DetailLabelText}"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding CurrentWall.SchemaVersion, FallbackValue=---}"
+                               Foreground="#595959" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 导入时间 -->
+                <StackPanel Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}"
+                               VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding CurrentWall.ImportTime, StringFormat='yyyy-MM-dd HH:mm', FallbackValue=---}"
+                               Foreground="#595959" FontSize="12" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- ==================== Row1: 按钮区域 ==================== -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="10">
+        <!-- ═══════════════ Row1: 主内容区 ═══════════════ -->
+        <Grid Grid.Row="1" Margin="8,0,8,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
 
-            <Button Content="{l:Loc Button_Test}"
-                    Width="190"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Command="{Binding WallRotationTestCommand}"
-                    ToolTip="{l:Loc Tooltip_TestBtn}"/>
+            <!-- ========== Col0: 左侧墙体队列 ========== -->
+            <Border Grid.Column="0" Background="White" CornerRadius="4"
+                    BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,6,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-            <Button Content="{l:Loc Button_GenerateWallData}"
-                    Width="190"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Command="{Binding WallDataGenerateCommand}"
-                    ToolTip="{l:Loc Tooltip_GenerateWallData}"/>
+                    <!-- 队列标题 -->
+                    <Border Grid.Row="0" Padding="12,10"
+                            BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="3" Height="14" Background="#1890FF"
+                                    CornerRadius="2" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="加工队列" Foreground="#262626"
+                                       FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
-        </StackPanel>
+                    <!-- 队列列表 -->
+                    <ListBox Grid.Row="1" ItemsSource="{Binding WallQueue}"
+                             SelectedItem="{Binding SelectedQueueItem, Mode=TwoWay}"
+                             Background="Transparent" BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border Background="Transparent" Padding="0">
+                                                <ContentPresenter/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" Margin="0"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent" BorderThickness="0,0,0,1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                                    <Setter Property="Background" Value="#E6F4FF"/>
+                                                    <Setter Property="BorderBrush" Value="#1677FF"/>
+                                                    <Setter Property="BorderThickness" Value="3,0,0,0"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Text="{Binding WallId}"
+                                                   Foreground="#262626" FontSize="13" FontWeight="SemiBold"
+                                                   Margin="0,0,0,4"/>
+
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                            <TextBlock Foreground="#8C8C8C" FontSize="11">
+                                                <Run Text="{Binding ProjectName}"/><Run Text=" - "/><Run Text="{Binding Floor, StringFormat={}{0}F层}"/>
+                                            </TextBlock>
+                                            <Border CornerRadius="3" Padding="5,2" Margin="8,0,0,0"
+                                                    VerticalAlignment="Center">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="2">
+                                                                <Setter Property="Background" Value="#E6F4FF"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="1">
+                                                                <Setter Property="Background" Value="#F5F5F5"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Priority}" Value="0">
+                                                                <Setter Property="Background" Value="#FAFAFA"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock Text="{Binding PriorityText}" FontSize="10"
+                                                           Foreground="#595959"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- ========== Col1: 中部 PLC加工数据 ========== -->
+            <Border Grid.Column="1" Background="White" CornerRadius="4"
+                    BorderBrush="#E0E0E0" BorderThickness="1" Margin="6,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- DataGrid + 未连接遮罩层叠区域 -->
+                    <Grid Grid.Row="0">
+                        <DataGrid ItemsSource="{Binding PagedPlcLineData}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  Style="{StaticResource LightDataGridStyle}"
+                                  BorderThickness="0,1,0,0"
+                                  EnableRowVirtualization="True"
+                                  ScrollViewer.CanContentScroll="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="50"/>
+                                <DataGridTextColumn Header="T" Binding="{Binding T}" Width="60"/>
+                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="60"/>
+                                <DataGridTextColumn Header="D" Binding="{Binding D}" Width="60"/>
+                                <DataGridTextColumn Header="X0" Binding="{Binding X0, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridTextColumn Header="Y0" Binding="{Binding Y0, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridTextColumn Header="Z0" Binding="{Binding Z0, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridTextColumn Header="X1" Binding="{Binding X1, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridTextColumn Header="Y1" Binding="{Binding Y1, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridTextColumn Header="Z1" Binding="{Binding Z1, StringFormat={}{0:F1}}" Width="85"/>
+                                <DataGridCheckBoxColumn Header="已加工" Binding="{Binding IsCompleted}" Width="70"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 未连接提示图片（右上角显示，避开标题行） -->
+                        <Image Source="/Resources/Images/disconnected.png"
+                               Width="150" Height="90"
+                               HorizontalAlignment="Right" VerticalAlignment="Top"
+                               Margin="0,38,12,0"
+                               Visibility="{Binding IsOpcConnected, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                               Opacity="1"
+                               IsHitTestVisible="False"/>
+                    </Grid>
+
+                    <!-- 分页控件 -->
+                    <Border Grid.Row="1" Padding="8,6"
+                            Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="共 " Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding TotalCount}" Foreground="#1677FF" FontSize="12"
+                                           FontWeight="Bold" VerticalAlignment="Center"/>
+                                <TextBlock Text=" 条" Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+                                <Button Content="上一页" Height="26" MinWidth="60"
+                                        Command="{Binding PreviousPageCommand}"
+                                        IsEnabled="{Binding CanPreviousPage}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        FontSize="11" Padding="8,2"/>
+                                <TextBlock Foreground="#595959" FontSize="12" VerticalAlignment="Center" Margin="12,0">
+                                    <Run Text="第 "/>
+                                    <Run Text="{Binding DisplayPageIndex, Mode=OneWay}" FontWeight="Bold" Foreground="#1677FF"/>
+                                    <Run Text=" / "/>
+                                    <Run Text="{Binding TotalPages, Mode=OneWay}" Foreground="#8C8C8C"/>
+                                    <Run Text=" 页"/>
+                                </TextBlock>
+                                <Button Content="下一页" Height="26" MinWidth="60"
+                                        Command="{Binding NextPageCommand}"
+                                        IsEnabled="{Binding CanNextPage}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        FontSize="11" Padding="8,2"/>
+                            </StackPanel>
+
+                            <!-- 右侧占位，保持居中 -->
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ========== Col2: 右侧参数面板 ========== -->
+            <Border Grid.Column="2" Background="White" CornerRadius="4"
+                    BorderBrush="#E0E0E0" BorderThickness="1" Margin="6,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 面板标题 -->
+                    <Border Grid.Row="0" Padding="12,10"
+                            BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="3" Height="14" Background="#1890FF"
+                                    CornerRadius="2" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="实时参数" Foreground="#262626"
+                                       FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 参数列表 -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="12,10">
+
+                        <!-- 动态实时参数（用户在系统设置中勾选的节点） -->
+                        <ItemsControl ItemsSource="{Binding RealtimeNodes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="4"
+                                            Background="#FAFAFA" BorderBrush="#F0F0F0" BorderThickness="1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource DetailLabelText}"/>
+                                                <TextBlock Text="{Binding DisplayValue, TargetNullValue=--}"
+                                                           Foreground="#262626" FontSize="16" FontWeight="Bold"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding QualityColor, FallbackValue=#9E9E9E}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 加工进度 -->
+                        <Border Padding="12,10" CornerRadius="4"
+                                Background="#E6F4FF" BorderBrush="#1677FF" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="加工进度" Style="{StaticResource DetailLabelText}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{Binding ProgressText}" Foreground="#1677FF"
+                                           FontSize="24" FontWeight="Bold"
+                                           FontFamily="Consolas, Courier New"/>
+                            </StackPanel>
+                        </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════ Row2: 底部控制栏 ═══════════════ -->
+        <Border Grid.Row="2" Background="White" CornerRadius="4" Margin="8,0,8,8"
+                BorderBrush="#E0E0E0" BorderThickness="1" Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 左侧：加工时长 + 操作人 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,32,0">
+                        <TextBlock Text="加工时长" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
+                        <TextBlock Text="{Binding MachiningDurationText}"
+                                   Foreground="#1677FF" FontSize="24" FontWeight="Bold"
+                                   FontFamily="Consolas, Courier New"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="操作人" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding OperatorName, UpdateSourceTrigger=PropertyChanged}"
+                                 Foreground="#262626" FontSize="13"
+                                 Style="{StaticResource BaseTextBoxStyle}"
+                                 Width="130"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 中间：状态标签 -->
+                <Border Grid.Column="1" CornerRadius="4" Padding="16,6"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{Binding StatusBadgeBackground, FallbackValue=#E6F4FF}"
+                        BorderBrush="{Binding StatusBadgeBackground, FallbackValue=#E6F4FF}"
+                        BorderThickness="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="10" Height="10" CornerRadius="5" Margin="0,0,10,0"
+                                VerticalAlignment="Center"
+                                Background="{Binding StatusIndicatorColor, FallbackValue=#BFBFBF}"/>
+                        <TextBlock Text="{Binding StatusText, FallbackValue=就绪}"
+                                   Foreground="#FFFFFF" FontSize="14" FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 右侧：控制按钮组 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- 开始加工 -->
+                    <Button Content="开始" Height="34" MinWidth="70" Margin="0,0,6,0"
+                            Command="{Binding StartCommand}"
+                            IsEnabled="{Binding CanStart}"
+                            Style="{StaticResource PrimaryButtonStyle}"/>
+
+                    <!-- 暂停 -->
+                    <Button Content="暂停" Height="34" MinWidth="70" Margin="0,0,6,0"
+                            Command="{Binding PauseCommand}"
+                            IsEnabled="{Binding CanPause}"
+                            Style="{StaticResource WarningButtonStyle}"/>
+
+                    <!-- 急停 -->
+                    <Button Content="急停" Height="34" MinWidth="70" Margin="0,0,6,0"
+                            Command="{Binding EmergencyStopCommand}"
+                            IsEnabled="{Binding CanEmergencyStop}"
+                            Style="{StaticResource DangerButtonStyle}"
+                            FontSize="14" FontWeight="Bold"/>
+
+                    <!-- 复位 -->
+                    <Button Content="复位" Height="34" MinWidth="70" Margin="0,0,6,0"
+                            Command="{Binding ResetCommand}"
+                            IsEnabled="{Binding CanReset}"
+                            Style="{StaticResource BaseButtonStyle}"/>
+
+                    <!-- 异常登记 -->
+                    <Button Content="异常登记" Height="34" MinWidth="90" Margin="0,0,6,0"
+                            Command="{Binding RegisterExceptionCommand}"
+                            Style="{StaticResource BaseButtonStyle}"
+                            Foreground="#8C8C8C" FontWeight="SemiBold"/>
+
+                    <!-- 标记异常 -->
+                    <Button Content="标记异常" Height="34" MinWidth="90" Margin="0,0,6,0"
+                            Command="{Binding MarkExceptionCommand}"
+                            IsEnabled="{Binding CanMarkException}"
+                            Style="{StaticResource BaseButtonStyle}"
+                            Foreground="#E67E22" FontWeight="SemiBold"/>
+
+                    <!-- 完成加工 -->
+                    <Button Content="完成" Height="34" MinWidth="70"
+                            Command="{Binding CompleteCommand}"
+                            IsEnabled="{Binding CanComplete}"
+                            Style="{StaticResource PrimaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

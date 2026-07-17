@@ -419,14 +419,6 @@
           <span class="param-val highlight" id="d-volume">—</span>
         </div>
         <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_frontarea">正面面积</span></span>
-          <span class="param-val" id="d-area-front">—</span>
-        </div>
-        <div class="param-row">
-          <span class="param-lbl"><span class="plbl-icon">📐</span><span data-i18n="mom_param_toparea">顶面面积</span></span>
-          <span class="param-val" id="d-area-top">—</span>
-        </div>
-        <div class="param-row">
           <span class="param-lbl"><span class="plbl-icon">⚖️</span><span data-i18n="mom_param_weight">估算重量</span></span>
           <span class="param-val warn" id="d-weight">—</span>
         </div>
@@ -595,23 +587,32 @@ function setLayerVisible(key, val) {
   const legendItem = document.querySelector(`.legend-item[data-layer="${key}"]`);
   if (legendItem) legendItem.classList.toggle('off', !val);
 
-  // ★ 腔体开关联动：当 holeRound / holeSlotted 切换时，墙体也需要同步恢复/显示孔洞
-  if (key === 'holeRound' || key === 'holeSlotted') {
+  // ★ 腔体开关联动所有切削腔体叠加可视化：点击"腔体"时同步显示/隐藏
+  //   圆孔(holeRound)、剪力钉孔(holeSlotted)、钢筋槽(rebar)、MEP槽(mep) 的叠加腔体
+  if (key === 'groove') {
+    for (const subKey of ['holeRound', 'holeSlotted', 'rebar', 'mep']) {
+      if (layers[subKey]) layers[subKey].visible = val;
+      const subLegend = document.querySelector(`.legend-item[data-layer="${subKey}"]`);
+      if (subLegend) subLegend.classList.toggle('off', !val);
+    }
+  }
+
+  // ★ 墙体 CSG 切割始终保留（与 xBraceSteel 一致），图层开关仅控制叠加可视化
+  if (key === 'holeRound' || key === 'holeSlotted' || key === 'rebar' || key === 'groove') {
     updateWallHoleDisplay();
   }
 }
 
-/// 根据 holeRound / holeSlotted 图层状态，同步墙体 mesh 的 geometry（有孔 / 无孔）
+/// 墙体 geometry 始终使用最完整版本（含所有 CSG 切割），图层开关仅控制叠加可视化
 function updateWallHoleDisplay() {
   if (!layers.wall) return;
   const wallMesh = layers.wall.children[0];
   if (!wallMesh) return;
-  const pre  = wallMesh.userData.geoPreHole;
-  const post = wallMesh.userData.geoPostHole;
-  if (!pre || !post) return;
-
-  const showHoles = layerState.holeRound || layerState.holeSlotted;
-  wallMesh.geometry = showHoles ? post : pre;
+  const pre   = wallMesh.userData.geoPreHole;
+  const post  = wallMesh.userData.geoPostHole;
+  const rebar = wallMesh.userData.geoPostRebar;
+  // 始终使用最完整的 geometry（凹槽 + 孔 + 钢筋槽），CSG 切割永久保留
+  wallMesh.geometry = rebar || post || pre || wallMesh.geometry;
 }
 function clearScene() {
   Object.keys(layers).forEach(k => { if (layers[k]) { scene.remove(layers[k]); layers[k] = null; } });
@@ -905,8 +906,8 @@ function buildArcSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth) {
   return { mesh, line };
 }
 
-/// 构建 RebarSlot 槽体可视化（叠加渲染，非 CSG 减法）
-function buildRebarSlotMesh(rebarFeature, WL, WH, WT) {
+/// 计算 RebarSlot 盒体参数（供 CSG 减法与可视化共用）
+function computeRebarSlotBoxParams(rebarFeature, WL, WH, WT) {
   const normal = rebarFeature.currentNormal ?? {x:0,y:0,z:1};
   const diameter = (rebarFeature.diameter ?? 20) * S;
   const depth    = (rebarFeature.depth    ?? 50) * S;
@@ -943,6 +944,15 @@ function buildRebarSlotMesh(rebarFeature, WL, WH, WT) {
     // 左/右侧面：YZ 平面内
     if (dz > dy) { bx = depth; by = diameter; bz = length; } else { bx = depth; by = length; bz = diameter; }
   }
+
+  return { center, bx, by, bz, diameter, depth, normal };
+}
+
+/// 构建 RebarSlot 槽体可视化（叠加渲染，非 CSG 减法）
+function buildRebarSlotMesh(rebarFeature, WL, WH, WT) {
+  const p = computeRebarSlotBoxParams(rebarFeature, WL, WH, WT);
+  if (!p) return null;
+  const { center, bx, by, bz, normal } = p;
 
   // 槽体 mesh
   const geo = new THREE.BoxGeometry(Math.max(bx, 0.001), Math.max(by, 0.001), Math.max(bz, 0.001));
@@ -1130,8 +1140,9 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     if (isPocket) {
       document.getElementById('mtt-startpt').parentElement.style.display = 'none';
       document.getElementById('mtt-endpt').parentElement.style.display = 'none';
-      // 中心点坐标（只表达 X, Y，从 box.cx/cy 换算为 mm）
+      // 位置坐标（只表达 X, Y，从 box.cx/cy 换算为 mm）
       document.getElementById('mtt-center-row').style.display = '';
+      document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = window.t('mom_position');
       document.getElementById('mtt-centerpt').textContent = `(${(+box.cx / S).toFixed(1)}, ${(+box.cy / S).toFixed(1)}) mm`;
       // 圆角半径特征数据（优先取 cornerRadius）
       const radius = feature.cornerRadius ?? feature.radius ?? feature.filletRadius ?? '—';
@@ -1536,7 +1547,23 @@ canvas.addEventListener('mousemove', e => {
 
   const hits = raycaster.intersectObjects(allPickable, false);
   if (hits.length) {
-    const hit = hits[0].object;
+    // ★ 凹槽(Groove)是大尺寸透明腔体，可能遮挡其内部的孔/MEP/钢筋槽等小特征
+    //   （例如 TopPlate 顶板槽存在时无法选中其内的圆孔）。
+    //   当最近命中为凹槽时，在同一局部区域(墙厚一半范围内)优先选择非凹槽特征，
+    //   超出该范围则视为墙体背面的特征，不抢占正面凹槽的选中。
+    let hit = hits[0].object;
+    if (meshFeatureMap.has(hit)) {
+      const baseDist = hits[0].distance;
+      const pickRange = (_WT || 0.3) * 0.5;
+      for (let i = 1; i < hits.length; i++) {
+        if (hits[i].distance - baseDist > pickRange) break; // 已按距离升序，超出范围即可终止
+        const o = hits[i].object;
+        if (meshHoleMap.has(o) || meshMepMap.has(o) || meshRebarMap.has(o)) {
+          hit = o;
+          break;
+        }
+      }
+    }
     if (meshFeatureMap.has(hit)) {
       if (hoveredMepMesh || hoveredHoleMesh || hoveredRebarMesh) { unhighlightAll(); }
       highlightGrooveMesh(hit);
@@ -1577,9 +1604,6 @@ function fillInfoPanel(data, WL, WH, WT, grooves, typeCount, mepSlots, holes, re
   document.getElementById('d-material').textContent = data.material ?? 'AAC';
   const volM3=WL*WH*WT;
   document.getElementById('d-volume').textContent = volM3.toFixed(1) + ' m³';
-  const aF=WL*WH, aT=WL*WT;
-  document.getElementById('d-area-front').textContent = aF.toFixed(1) + ' m²';
-  document.getElementById('d-area-top').textContent   = aT.toFixed(1) + ' m²';
   const wKg=volM3*AAC_DENSITY;
   document.getElementById('d-weight').textContent = wKg>=1000?(wKg/1000).toFixed(1)+' t':wKg.toFixed(1)+' kg';
   document.getElementById('d-groove-count').textContent = grooves.length + ' ' + window.t('unit_pcs');
@@ -1726,8 +1750,9 @@ async function buildWall(data) {
   // 墙体主体
   const wallGroup=new THREE.Group();
   const wallMesh = new THREE.Mesh(wallBrush.geometry, wallMat);
-  wallMesh.userData.geoPreHole  = wallGeoPreHole;   // 待后续存储有孔版本后使用
-  wallMesh.userData.geoPostHole = null;              // hole CSG 完成后填充
+  wallMesh.userData.geoPreHole   = wallGeoPreHole;   // 待后续存储有孔版本后使用
+  wallMesh.userData.geoPostHole  = null;              // hole CSG 完成后填充
+  wallMesh.userData.geoPostRebar = null;              // rebar CSG 完成后填充
   wallGroup.add(wallMesh);
   scene.add(wallGroup); layers.wall=wallGroup;
 
@@ -1899,6 +1924,97 @@ async function buildWall(data) {
   // 更新墙体 mesh 为有孔版本（初始状态）
   wallMesh.geometry = wallBrush.geometry;
 
+  // ── RebarSlot 特征 CSG 布尔减法 ──
+  const rebarSlots = allFeatures.filter(f =>
+    f.featureType === 'RebarSlot' || f.$type === 'RebarSlot'
+  );
+  if (rebarSlots.length > 0) {
+    setLoadingText(`RebarSlot CSG 布尔运算（${rebarSlots.length} 条）...`);
+    await tick();
+  }
+  let rebarFailN = 0;
+  for (let ri = 0; ri < rebarSlots.length; ri++) {
+    const rf = rebarSlots[ri];
+    try {
+      const p = computeRebarSlotBoxParams(rf, WL, WH, WT);
+      if (!p) { console.warn(`[RebarSlot CSG] #${ri} 零尺寸跳过`); continue; }
+      const { center, bx, by, bz } = p;
+      const cb = new Brush(
+        new THREE.BoxGeometry(
+          Math.max(bx, 0.001) + 0.001,
+          Math.max(by, 0.001) + 0.001,
+          Math.max(bz, 0.001) + 0.001
+        ),
+        wallMat
+      );
+      cb.position.copy(center);
+      cb.updateMatrixWorld(true);
+      const r = evaluator.evaluate(wallBrush, cb, SUBTRACTION);
+      r.position.set(0, 0, 0); r.updateMatrixWorld(true); wallBrush = r;
+      console.log(`[RebarSlot] #${ri} box CSG done, bx=${(bx / S).toFixed(1)} by=${(by / S).toFixed(1)} bz=${(bz / S).toFixed(1)}`);
+    } catch (e) {
+      rebarFailN++;
+      console.warn(`[RebarSlot CSG] #${ri}`, e.message);
+    }
+    if (ri % 5 === 4) { setLoadingText(`RebarSlot CSG ${ri + 1}/${rebarSlots.length}...`); await tick(); }
+  }
+
+  // ── MepSlot 特征 CSG 布尔减法 ──
+  if (mepSlots.length > 0) {
+    setLoadingText(`MepSlot CSG 布尔运算（${mepSlots.length} 条）...`);
+    await tick();
+  }
+  let mepFailN = 0, mepSegIdx = 0;
+  for (const mepFeature of mepSlots) {
+    const segs = mepFeature.segments ?? [];
+    const maxDepth = segs.reduce((m, s) => Math.max(m, s.depth ?? 0), 0);
+    for (let si = 0; si < segs.length; si++) {
+      const seg     = segs[si];
+      const segType = (seg.$segmentType ?? seg.type ?? 'line').toLowerCase();
+      let result = null;
+      if (segType === 'line') {
+        result = buildLineSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth);
+      } else if (segType === 'arc') {
+        result = buildArcSegmentMesh(seg, mepFeature, WL, WH, WT, maxDepth);
+      }
+      if (!result) continue;
+      try {
+        const srcGeo = result.mesh.geometry;
+        const p = srcGeo.parameters;
+        let brushGeo;
+        if (srcGeo instanceof THREE.BoxGeometry) {
+          brushGeo = new THREE.BoxGeometry(
+            (p.width  ?? 0.001) + 0.001,
+            (p.height ?? 0.001) + 0.001,
+            (p.depth  ?? 0.001) + 0.001
+          );
+        } else if (srcGeo instanceof THREE.TubeGeometry) {
+          brushGeo = new THREE.TubeGeometry(
+            p.path, p.tubularSegments,
+            (p.radius ?? 0.002) + 0.001, p.radialSegments, p.closed
+          );
+        } else { continue; }
+        const cb = new Brush(brushGeo, wallMat);
+        cb.position.copy(result.mesh.position);
+        cb.updateMatrixWorld(true);
+        const r = evaluator.evaluate(wallBrush, cb, SUBTRACTION);
+        r.position.set(0, 0, 0); r.updateMatrixWorld(true); wallBrush = r;
+      } catch (e) {
+        mepFailN++;
+        console.warn(`[MepSlot CSG] seg#${mepSegIdx}`, e.message);
+      }
+      mepSegIdx++;
+      if (mepSegIdx % 5 === 4) { setLoadingText(`MepSlot CSG ${mepSegIdx}...`); await tick(); }
+    }
+  }
+  console.log('[buildWall] MepSlot CSG done. segments:', mepSegIdx, 'failures:', mepFailN);
+
+  // ★ 保存含凹槽+孔+钢筋槽+MEP槽的墙体 geometry（最完整版本）
+  wallMesh.userData.geoPostRebar = wallBrush.geometry.clone();
+  // 更新墙体 mesh 为全切割版本（初始 rebar 图层为 ON）
+  wallMesh.geometry = wallBrush.geometry;
+  console.log('[buildWall] RebarSlot CSG done. count:', rebarSlots.length, 'failures:', rebarFailN);
+
   // ── Hole 腔体可视化（拆分为圆孔 / 腰孔两个独立图层） ──
   const holeRoundGroup   = new THREE.Group();
   const holeSlottedGroup = new THREE.Group();
@@ -2047,10 +2163,7 @@ async function buildWall(data) {
 
   scene.add(mepGroup); layers.mep = mepGroup;
 
-  // ── RebarSlot 渲染（叠加可视化，非 CSG 减法）──
-  const rebarSlots = allFeatures.filter(f =>
-    f.featureType === 'RebarSlot' || f.$type === 'RebarSlot'
-  );
+  // ── RebarSlot 渲染（叠加可视化，CSG 减法已在上方完成）──
   if (rebarSlots.length > 0) {
     setLoadingText(`渲染钢筋槽（${rebarSlots.length} 条）...`);
     await tick();
@@ -2110,32 +2223,55 @@ function showError(msg){
 /// <summary>
 /// 从 C# 注入数据直接渲染（跳过上传界面）
 /// 调用方式（C#）：await ExecuteScriptAsync($"loadWallData('{escapedJson}')");
+///
+/// 并发保护：使用 _isBuilding 标志 + _pendingJson 确保同一时间只有一个
+/// buildWall 在执行。快速连续调用时仅渲染最新数据，避免 RebarSlot/Hole/BendingKey
+/// 等可视化网格因并发 buildWall 交错执行而重复添加到场景。
 /// </summary>
+let _isBuilding = false;
+let _pendingJson = null;
+
 window.loadWallData = async function(jsonStr) {
+  // 始终更新为最新数据
+  _pendingJson = jsonStr;
+
+  // 如果已有 buildWall 在执行，直接返回；当前构建完成后会自动消费 _pendingJson
+  if (_isBuilding) return;
+
+  _isBuilding = true;
   try {
-    var data = JSON.parse(jsonStr);
-    if (!data) throw new Error('JSON 解析结果为空');
+    while (_pendingJson !== null) {
+      const currentJson = _pendingJson;
+      _pendingJson = null;
 
-    // 显示加载遮罩
-    document.getElementById('loading').classList.remove('hidden');
-    setLoadingText('正在从服务器加载数据...');
-    await tick();
+      try {
+        var data = JSON.parse(currentJson);
+        if (!data) throw new Error('JSON 解析结果为空');
 
-    // 确保 features 字段存在
-    if (!Array.isArray(data.features)) {
-      data.features = [];
+        // 显示加载遮罩
+        document.getElementById('loading').classList.remove('hidden');
+        setLoadingText('正在从服务器加载数据...');
+        await tick();
+
+        // 确保 features 字段存在
+        if (!Array.isArray(data.features)) {
+          data.features = [];
+        }
+
+        // 调用现有 buildWall 引擎
+        await buildWall(data);
+
+        // 隐藏加载遮罩、显示 3D UI
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('panel3d').style.display = 'block';
+      } catch(e) {
+        console.error('[loadWallData]', e);
+        document.getElementById('loading').classList.add('hidden');
+        showError('C# 数据注入失败：' + e.message);
+      }
     }
-
-    // 调用现有 buildWall 引擎
-    await buildWall(data);
-
-    // 隐藏加载遮罩、显示 3D UI
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('panel3d').style.display = 'block';
-  } catch(e) {
-    console.error('[loadWallData]', e);
-    document.getElementById('loading').classList.add('hidden');
-    showError('C# 数据注入失败：' + e.message);
+  } finally {
+    _isBuilding = false;
   }
 };
 
@@ -2182,8 +2318,6 @@ window.resetAllLayers = function() {
     mom_dim_t: { zh: '厚度', en: 'Thickness' },
     mom_param_material: { zh: '材质', en: 'Material' },
     mom_param_volume: { zh: '毛体积', en: 'Gross Volume' },
-    mom_param_frontarea: { zh: '正面面积', en: 'Front Area' },
-    mom_param_toparea: { zh: '顶面面积', en: 'Top Area' },
     mom_param_weight: { zh: '估算重量', en: 'Est. Weight' },
     mom_param_grooves: { zh: '凹槽总数', en: 'Groove Count' },
     mom_param_groovetypes: { zh: '凹槽类型', en: 'Groove Types' },
@@ -2240,6 +2374,7 @@ window.resetAllLayers = function() {
     mom_start: { zh: '起点', en: 'Start' },
     mom_end: { zh: '终点', en: 'End' },
     mom_center: { zh: '中心点', en: 'Center' },
+    mom_position: { zh: '位置', en: 'Position' },
     mom_radius: { zh: '圆角半径', en: 'Fillet Radius' },
     mom_arc_center: { zh: '圆心', en: 'Arc Center' },
     mom_arc_radius: { zh: '半径', en: 'Radius' },

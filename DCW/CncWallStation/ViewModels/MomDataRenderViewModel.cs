@@ -11,6 +11,7 @@ using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -85,6 +86,43 @@ namespace CncWallStation.ViewModels
         {
             get => _isPageLoaded;
             set => SetProperty(ref _isPageLoaded, value);
+        }
+
+        // ── 翻面 / 原点变换状态 ──
+
+        private string _originalMomJsonData = string.Empty;
+        private string _originalDObjectJson = string.Empty;
+
+        /// <summary>重建渲染并发锁，确保翻面/原点变换串行执行</summary>
+        private readonly SemaphoreSlim _rebuildLock = new SemaphoreSlim(1, 1);
+
+        private bool _isFlipped;
+        public bool IsFlipped
+        {
+            get => _isFlipped;
+            set
+            {
+                if (SetProperty(ref _isFlipped, value))
+                    _ = RebuildRenderAsync();
+            }
+        }
+
+        private bool _isOriginTransformed;
+        public bool IsOriginTransformed
+        {
+            get => _isOriginTransformed;
+            set
+            {
+                if (SetProperty(ref _isOriginTransformed, value))
+                    _ = RebuildRenderAsync();
+            }
+        }
+
+        private bool _isWallDataLoaded;
+        public bool IsWallDataLoaded
+        {
+            get => _isWallDataLoaded;
+            set => SetProperty(ref _isWallDataLoaded, value);
         }
 
         // ──────────────────────────────────────────
@@ -192,28 +230,6 @@ namespace CncWallStation.ViewModels
             {
                 if (SetProperty(ref _isGrooveVisible, value))
                     ExecuteLayerToggle("groove", value);
-            }
-        }
-
-        private bool _isMepVisible = true;
-        public bool IsMepVisible
-        {
-            get => _isMepVisible;
-            set
-            {
-                if (SetProperty(ref _isMepVisible, value))
-                    ExecuteLayerToggle("mep", value);
-            }
-        }
-
-        private bool _isRebarVisible = true;
-        public bool IsRebarVisible
-        {
-            get => _isRebarVisible;
-            set
-            {
-                if (SetProperty(ref _isRebarVisible, value))
-                    ExecuteLayerToggle("rebar", value);
             }
         }
 
@@ -374,6 +390,14 @@ namespace CncWallStation.ViewModels
                     return;
                 }
 
+                // ★ 保存原始 MomJSON 数据，供翻面/原点变换切换使用
+                _originalMomJsonData = detail.MomJsonData;
+                // 重置翻面和原点变换状态（通过 backing field 避免触发 RebuildRenderAsync）
+                _isFlipped = false;
+                _isOriginTransformed = false;
+                OnPropertyChanged(nameof(IsFlipped));
+                OnPropertyChanged(nameof(IsOriginTransformed));
+
                 StatusMessage = "🔄 正在解析 MomJSON 数据...";
 
                 // 反序列化 MomWall（需与序列化侧保持一致，枚举字段用字符串形式）
@@ -400,6 +424,10 @@ namespace CncWallStation.ViewModels
 
                 MapToDObject(momWall);
 
+                // ★ 保存原始渲染数据 JSON，供取消原点变换时恢复
+                _originalDObjectJson = _cachedDObjectJson;
+                IsWallDataLoaded = true;
+
                 IsRendering = true;
                 if (NavigateToHtml != null)
                     await NavigateToHtml();
@@ -412,6 +440,9 @@ namespace CncWallStation.ViewModels
                 StatusMessage = $"❌ 加载失败: {ex.Message}";
                 IsLoading = false;
                 IsRendering = false;
+                IsWallDataLoaded = false;
+                _originalMomJsonData = string.Empty;
+                _originalDObjectJson = string.Empty;
             }
         }
 
@@ -503,7 +534,15 @@ namespace CncWallStation.ViewModels
             IsLoading = false;
             IsRendering = false;
             IsPageLoaded = false;
+            IsWallDataLoaded = false;
             _cachedDObjectJson = string.Empty;
+            _originalMomJsonData = string.Empty;
+            _originalDObjectJson = string.Empty;
+            // 重置 toggle 状态（通过 backing field 避免触发 RebuildRenderAsync）
+            _isFlipped = false;
+            _isOriginTransformed = false;
+            OnPropertyChanged(nameof(IsFlipped));
+            OnPropertyChanged(nameof(IsOriginTransformed));
             StatusMessage = $"❌ 页面加载失败: {error}";
         }
 
@@ -790,6 +829,100 @@ namespace CncWallStation.ViewModels
             else
             {
                 StatusMessage = "⚠️ 页面尚未加载";
+            }
+        }
+
+        // ══════════════════════════════════════════
+        //  统一重建渲染（翻面 + 原点变换可组合，并发保护）
+        // ══════════════════════════════════════════
+
+        /// <summary>
+        /// 统一重建渲染方法：从原始 MomJsonData 出发，按 IsFlipped → IsOriginTransformed
+        /// 顺序依次应用变换，避免重复加载 wallData。
+        /// 使用 SemaphoreSlim 确保快速连续点击时方法串行执行。
+        /// </summary>
+        private async Task RebuildRenderAsync()
+        {
+            if (!IsPageLoaded || ExecuteScriptAsync == null)
+                return;
+
+            await _rebuildLock.WaitAsync();
+            try
+            {
+                // 两个开关都关闭时，恢复原始渲染数据
+                if (!IsFlipped && !IsOriginTransformed)
+                {
+                    if (!string.IsNullOrEmpty(_originalDObjectJson))
+                    {
+                        var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                        await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                        StatusMessage = "✅ 已恢复原始数据";
+                    }
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(_originalMomJsonData))
+                    return;
+
+                StatusMessage = "🔄 正在重建渲染数据...";
+
+                // 从原始 MomJSON 反序列化
+                var options = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+                };
+
+                var momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(_originalMomJsonData, options);
+                if (momWall == null || momWall.Outline == null || momWall.Outline.Count == 0)
+                    return;
+
+                // 恢复 Face（Face 标记为 [JsonIgnore]，需从 InitialSide 重建）
+                foreach (var f in momWall.Features)
+                    f.RestoreFaceFromInitialSide();
+
+                // 按序应用变换：翻面 → 原点变换
+                if (IsFlipped)
+                    momWall.ApplyFlipAroundY();
+
+                if (IsOriginTransformed)
+                    momWall.ApplyOriginTransform();
+
+                // 映射渲染数据并注入 HTML
+                MapToDObject(momWall);
+
+                var escapedJson = _cachedDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                await ExecuteScriptAsync($"loadWallData('{escapedJson}')");
+
+                // 构建状态消息
+                var modes = new List<string>();
+                if (IsFlipped) modes.Add("翻面");
+                if (IsOriginTransformed) modes.Add("原点变换");
+                StatusMessage = $"✅ {string.Join("+", modes)}完成";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "重建渲染失败");
+                StatusMessage = $"❌ 重建渲染失败: {ex.Message}";
+                // 回退 toggle 状态（通过 backing field 避免再次触发 RebuildRenderAsync）
+                _isFlipped = false;
+                _isOriginTransformed = false;
+                OnPropertyChanged(nameof(IsFlipped));
+                OnPropertyChanged(nameof(IsOriginTransformed));
+                // 尝试恢复原始渲染数据
+                if (!string.IsNullOrEmpty(_originalDObjectJson))
+                {
+                    try
+                    {
+                        var escaped = _originalDObjectJson.Replace("\\", "\\\\").Replace("'", "\\'");
+                        await ExecuteScriptAsync($"loadWallData('{escaped}')");
+                    }
+                    catch (Exception) { /* 忽略恢复失败 */ }
+                }
+            }
+            finally
+            {
+                _rebuildLock.Release();
             }
         }
 

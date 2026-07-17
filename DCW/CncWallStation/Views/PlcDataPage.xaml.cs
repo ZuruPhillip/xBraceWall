@@ -205,4 +205,26 @@ namespace CncWallStation.Views
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotSupportedException();
     }
+
+    /// <summary>int → bool 转换器（PlcDataPage 专用，用于 RadioButton 绑定 int 属性）</summary>
+    public class PlcIntToBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int intVal && parameter is string paramStr && int.TryParse(paramStr, out int paramVal))
+                return intVal == paramVal;
+            if (value is int intVal2 && parameter is int paramVal2)
+                return intVal2 == paramVal2;
+            return false;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool b && b && parameter is string paramStr && int.TryParse(paramStr, out int paramVal))
+                return paramVal;
+            if (value is bool b2 && b2 && parameter is int paramVal2)
+                return paramVal2;
+            return System.Windows.Data.Binding.DoNothing;
+        }
+    }
 }

@@ -235,7 +235,7 @@ namespace CncWallStation.VersionMappers
 
                 var studs = topPlate.Studs;
                 string pn = string.IsNullOrWhiteSpace(studs.Pn) ? "noPn" : studs.Pn!;
-                float radius = studs.HoleDiameter / 2f;
+                float radius = WallConstants.StudDiameter / 2f;
 
                 for (int j = 0; j < studs.Points.Count; j++)
                 {
@@ -248,7 +248,7 @@ namespace CncWallStation.VersionMappers
                         : $"Studs-{pn}-{j:D2}";
 
                     // ── 中心点（Front 面：X=墙长，Z=墙高）────
-                    var center = new Vec2((float)point.X, (float)point.Y);
+                    var center = new Vec2((float)point.X, WallConstants.StudEdgeDistance);
 
                     // ── 构造圆孔 Feature ──────────────────────
                     var hole = Hole.CreateRound(
@@ -497,7 +497,7 @@ namespace CncWallStation.VersionMappers
                     side: side,
                     startPos: startPos,
                     endPos: endPos,
-                    diameter: rebar.Diameter,
+                    diameter: WallConstants.RebarSlotWidth,
                     depth: depth,
                     direction: direction)
                 {

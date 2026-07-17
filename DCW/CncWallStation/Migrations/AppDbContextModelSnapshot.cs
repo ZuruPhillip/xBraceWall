@@ -75,6 +75,230 @@ namespace CncWallStation.Migrations
                     b.ToTable("DataCheckRecord", (string)null);
                 });
 
+            modelBuilder.Entity("CncWallStation.Models.Entities.MachiningExceptionEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("CompletionTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CustomType")
+                        .HasColumnType("VARCHAR(128)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("MEDIUMTEXT");
+
+                    b.Property<int>("ExceptionType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FrequencyCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImprovementSuggestion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("PhotoPaths")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Registrant")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(64)");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("RepairDuration")
+                        .HasColumnType("DECIMAL(10,2)");
+
+                    b.Property<string>("RepairMethod")
+                        .HasColumnType("VARCHAR(512)");
+
+                    b.Property<string>("Resolver")
+                        .HasColumnType("VARCHAR(64)");
+
+                    b.Property<long>("WallId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WallId")
+                        .HasDatabaseName("IX_MachiningException_WallId");
+
+                    b.ToTable("MachiningException", (string)null);
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.MachiningRecordEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("EndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Operator")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(64)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("TotalDurationSeconds")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WallId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WallId")
+                        .HasDatabaseName("IX_MachiningRecord_WallId");
+
+                    b.ToTable("MachiningRecord", (string)null);
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.OpcWriteRecordEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("GroupId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("NodeId")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<long>("WallId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId")
+                        .HasDatabaseName("IX_Opc_GroupId");
+
+                    b.HasIndex("WallId")
+                        .HasDatabaseName("IX_Opc_WallId");
+
+                    b.ToTable("Opc", (string)null);
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.PlcInstructionEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("D")
+                        .HasColumnType("int");
+
+                    b.Property<int>("F")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FeatureName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("HandlerName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("Side")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("T")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<long>("WallId")
+                        .HasColumnType("bigint");
+
+                    b.Property<float>("X0")
+                        .HasColumnType("float");
+
+                    b.Property<float>("X1")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Y0")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Y1")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Z0")
+                        .HasColumnType("float");
+
+                    b.Property<float>("Z1")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WallId")
+                        .HasDatabaseName("IX_PlcInstruction_WallId");
+
+                    b.HasIndex("WallId", "Side")
+                        .HasDatabaseName("IX_PlcInstruction_WallId_Side");
+
+                    b.HasIndex("WallId", "SortOrder")
+                        .HasDatabaseName("IX_PlcInstruction_WallId_SortOrder");
+
+                    b.ToTable("PlcInstruction", (string)null);
+                });
+
             modelBuilder.Entity("CncWallStation.Models.Entities.ProjectEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -96,13 +320,10 @@ namespace CncWallStation.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
-                    b.Property<bool>("IsLatest")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<string>("ProjectNumber")
+                    b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -114,17 +335,9 @@ namespace CncWallStation.Migrations
                     b.Property<int>("TotalWalls")
                         .HasColumnType("int");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("IsLatest");
-
-                    b.HasIndex("ProjectNumber");
-
-                    b.HasIndex("ProjectNumber", "Version")
-                        .IsUnique();
+                    b.HasIndex("ProjectName");
 
                     b.ToTable("Project", (string)null);
                 });
@@ -200,9 +413,17 @@ namespace CncWallStation.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<int>("AuditStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("BimJsonData")
                         .IsRequired()
                         .HasColumnType("MEDIUMTEXT");
+
+                    b.Property<DateTime?>("EndProductionTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Floor")
                         .HasColumnType("int");
@@ -211,6 +432,11 @@ namespace CncWallStation.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("MomJsonData")
                         .HasColumnType("MEDIUMTEXT");
@@ -224,10 +450,20 @@ namespace CncWallStation.Migrations
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ProjectNumber")
+                    b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
+
+                    b.Property<string>("SchemaVersion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasDefaultValue("V0.0.0");
+
+                    b.Property<DateTime?>("StartProductionTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -246,7 +482,18 @@ namespace CncWallStation.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
 
+                    b.Property<string>("WallName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("AuditStatus")
+                        .HasDatabaseName("IX_Wall_AuditStatus");
+
+                    b.HasIndex("EndProductionTime")
+                        .HasDatabaseName("IX_Wall_EndProductionTime");
 
                     b.HasIndex("Floor")
                         .HasDatabaseName("IX_Wall_Floor");
@@ -254,23 +501,29 @@ namespace CncWallStation.Migrations
                     b.HasIndex("ImportTime")
                         .HasDatabaseName("IX_Wall_ImportTime");
 
+                    b.HasIndex("IsDeleted")
+                        .HasDatabaseName("IX_Wall_IsDeleted");
+
                     b.HasIndex("PipelineStage")
                         .HasDatabaseName("IX_Wall_PipelineStage");
 
                     b.HasIndex("Priority")
                         .HasDatabaseName("IX_Wall_Priority");
 
-                    b.HasIndex("ProjectNumber")
-                        .HasDatabaseName("IX_Wall_ProjectNumber");
+                    b.HasIndex("ProjectName")
+                        .HasDatabaseName("IX_Wall_ProjectName");
 
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_Wall_Status");
 
+                    b.HasIndex("WallName")
+                        .HasDatabaseName("IX_Wall_WallName");
+
                     b.HasIndex("ProjectId", "WallId")
                         .IsUnique();
 
-                    b.HasIndex("ProjectNumber", "Status", "Floor")
-                        .HasDatabaseName("IX_Wall_ProjectNumber_Status_Floor");
+                    b.HasIndex("ProjectName", "Status", "Floor")
+                        .HasDatabaseName("IX_Wall_ProjectName_Status_Floor");
 
                     b.ToTable("Wall", (string)null);
                 });
@@ -279,6 +532,35 @@ namespace CncWallStation.Migrations
                 {
                     b.HasOne("CncWallStation.Models.Entities.WallEntity", "Wall")
                         .WithMany("DataCheckRecords")
+                        .HasForeignKey("WallId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Wall");
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.MachiningExceptionEntity", b =>
+                {
+                    b.HasOne("CncWallStation.Models.Entities.WallEntity", null)
+                        .WithMany()
+                        .HasForeignKey("WallId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.MachiningRecordEntity", b =>
+                {
+                    b.HasOne("CncWallStation.Models.Entities.WallEntity", null)
+                        .WithMany()
+                        .HasForeignKey("WallId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CncWallStation.Models.Entities.PlcInstructionEntity", b =>
+                {
+                    b.HasOne("CncWallStation.Models.Entities.WallEntity", "Wall")
+                        .WithMany()
                         .HasForeignKey("WallId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

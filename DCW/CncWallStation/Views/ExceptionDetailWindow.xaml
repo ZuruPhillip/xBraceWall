@@ -1,0 +1,270 @@
+<Window x:Class="CncWallStation.Views.ExceptionDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:conv="clr-namespace:CncWallStation.Converters"
+        Title="{Binding Title, FallbackValue=异常详情}"
+        Width="600" Height="720"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
+
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </Window.Resources>
+
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════════ 表单内容 ═══════════════ -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="16,16,16,8">
+            <StackPanel>
+
+                <!-- 基本信息 -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
+                    <StackPanel>
+                        <TextBlock Text="基本信息" Foreground="#262626" FontSize="13" FontWeight="Bold"
+                                   Margin="0,0,0,10"/>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="墙体编号" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding WallIdStr}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center" FontWeight="SemiBold"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="2" Text="登记人" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding RegistrantName}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="登记时间" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CreatedAt}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="故障频次" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding FrequencyCount}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="发生时间" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <!-- 查看模式：只读显示 -->
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding OccurredAt}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"
+                                       Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                            <!-- 编辑模式：可编辑 DatePicker + 时分秒 TextBox -->
+                            <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal"
+                                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <DatePicker SelectedDate="{Binding OccurredAtValue, UpdateSourceTrigger=PropertyChanged}"
+                                            Height="26" Width="160" VerticalContentAlignment="Center"/>
+                                <TextBox Text="{Binding OccurredAtTime, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="80" Height="26" FontSize="12"
+                                         VerticalContentAlignment="Center"
+                                         Margin="8,0,0,0"/>
+                            </StackPanel>
+       
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="状态" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding StatusText}"
+                                       VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsResolved}" Value="True">
+                                                <Setter Property="Foreground" Value="#52C41A"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsResolved}" Value="False">
+                                                <Setter Property="Foreground" Value="#FA8C16"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- 异常类型 -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="异常类型" Foreground="#8C8C8C"
+                                   FontSize="12" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding ExceptionTypes}"
+                                  SelectedValue="{Binding SelectedExceptionType}"
+                                  DisplayMemberPath="Name" SelectedValuePath="Value"
+                                  IsEnabled="{Binding IsEditMode}"
+                                  Style="{StaticResource BaseComboBoxStyle}"
+                                  Background="White" Foreground="#262626"
+                                  BorderBrush="#D9D9D9" Height="28"/>
+                        <TextBox Grid.Column="2" Margin="12,0,0,0"
+                                 Text="{Binding CustomExceptionType, UpdateSourceTrigger=PropertyChanged}"
+                                 Foreground="#262626" Background="White"
+                                 BorderBrush="#D9D9D9" Height="28"
+                                 VerticalContentAlignment="Center"
+                                 IsReadOnly="{Binding IsEditMode, Converter={StaticResource InverseBoolConverter}}"
+                                 Visibility="{Binding IsCustomTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </Grid>
+                </Border>
+
+                <!-- 现场照片 -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="现场照片" Foreground="#8C8C8C" FontSize="12"
+                                       VerticalAlignment="Center" Width="80"/>
+                            <Button Content="选择照片" Width="80" Height="28"
+                                    Command="{Binding UploadPhotoCommand}"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    FontSize="11" Padding="8,2"
+                                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <Button Content="清除" Width="50" Height="28" Margin="6,0,0,0"
+                                    Command="{Binding ClearPhotosCommand}"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    FontSize="11" Padding="8,2"
+                                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </StackPanel>
+                        <WrapPanel Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding PhotoPreviews}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="80" Height="60" Margin="0,0,6,4"
+                                                CornerRadius="4" Background="#F5F5F5"
+                                                BorderBrush="#D9D9D9" BorderThickness="1">
+                                            <Image Source="{Binding}" Stretch="Uniform"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="暂无照片" Foreground="#8C8C8C" FontSize="11"
+                                       VerticalAlignment="Center" Margin="4,0,0,0"
+                                       Visibility="{Binding HasPhotos, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}"/>
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 故障描述 -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="故障描述" Foreground="#8C8C8C"
+                                   FontSize="12" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                                 Foreground="#262626" Background="White"
+                                 BorderBrush="#D9D9D9"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 VerticalContentAlignment="Top"
+                                 VerticalScrollBarVisibility="Auto"
+                                 MinHeight="100"
+                                 IsReadOnly="{Binding IsEditMode, Converter={StaticResource InverseBoolConverter}}"/>
+                    </Grid>
+                </Border>
+
+                <!-- 维修信息（已解决时显示） -->
+                <Border Background="White" CornerRadius="4" Padding="16"
+                        BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,8"
+                        Visibility="{Binding IsResolved, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="维修信息" Foreground="#262626" FontSize="13" FontWeight="Bold"
+                                   Margin="0,0,0,10"/>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="维修方法" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding RepairMethod}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center" TextWrapping="Wrap"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="解决人员" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Resolver}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="维修耗时" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding RepairDurationText}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="完成时间" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding CompletionTime}"
+                                       Foreground="#262626" FontSize="12" VerticalAlignment="Center"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="改善建议" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                       Text="{Binding ImprovementSuggestion}"
+                                       Foreground="#262626" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,6"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="备注" Foreground="#8C8C8C"
+                                       FontSize="12" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+                                       Text="{Binding Remarks}"
+                                       Foreground="#262626" FontSize="12" TextWrapping="Wrap"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ═══════════════ 底部按钮 ═══════════════ -->
+        <Border Grid.Row="1" Background="White" Padding="16,12"
+                BorderBrush="#F0F0F0" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="保存" Width="80" Height="32" Margin="0,0,8,0"
+                        Command="{Binding SaveCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Button Content="关闭" Width="80" Height="32"
+                        Command="{Binding CloseCommand}"
+                        Style="{StaticResource BaseButtonStyle}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

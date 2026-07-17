@@ -162,6 +162,9 @@
   <data name="TabHeader_Controller" xml:space="preserve">
     <value>Controller</value>
   </data>
+  <data name="TabHeader_ExceptionReport" xml:space="preserve">
+    <value>Exception Report</value>
+  </data>
   <data name="TabHeader_JsonEditor" xml:space="preserve">
     <value>JSON Editor</value>
   </data>
@@ -459,9 +462,6 @@
   <data name="Toggle_Cavity" xml:space="preserve">
     <value>Cavity</value>
   </data>
-  <data name="Toggle_MepSlot" xml:space="preserve">
-    <value>MEP Slot</value>
-  </data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve">
     <value>Load wall MomJSON data and render 3D CSG scene</value>
   </data>
@@ -470,12 +470,6 @@
   </data>
   <data name="Tooltip_ToggleCavity" xml:space="preserve">
     <value>Toggle cavity layer</value>
-  </data>
-  <data name="Tooltip_ToggleMep" xml:space="preserve">
-    <value>Toggle MEP slot layer</value>
-  </data>
-  <data name="Tooltip_ToggleRebarMom" xml:space="preserve">
-    <value>Toggle rebar slot layer</value>
   </data>
   <data name="Tooltip_ToggleDimMom" xml:space="preserve">
     <value>Toggle dimension layer</value>
@@ -757,7 +751,7 @@
     <value>Floor: </value>
   </data>
   <data name="Label_ActualDimensions" xml:space="preserve">
-    <value>Actual Dims</value>
+    <value>Blank Dims</value>
   </data>
   <data name="Label_ActualLength" xml:space="preserve">
     <value>L:</value>
@@ -964,5 +958,115 @@
   <data name="Dlg_RenameWallPrompt" xml:space="preserve">
     <value>Wall ID: {0}
 Please enter new wall name:</value>
+  </data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  OPC UA Settings                          -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Settings_OpcConnection" xml:space="preserve">
+    <value>OPC UA Connection</value>
+  </data>
+  <data name="Settings_OpcConnectionDesc" xml:space="preserve">
+    <value>Configure PLC OPC UA server address and port</value>
+  </data>
+  <data name="Settings_OpcIpAddress" xml:space="preserve">
+    <value>IP Address:</value>
+  </data>
+  <data name="Settings_OpcPort" xml:space="preserve">
+    <value>Port:</value>
+  </data>
+  <data name="Settings_OpcAutoConnect" xml:space="preserve">
+    <value>Auto-connect on startup</value>
+  </data>
+  <data name="Settings_SaveOpcConfig" xml:space="preserve">
+    <value>Save Config</value>
+  </data>
+  <data name="Settings_ConnectOpc" xml:space="preserve">
+    <value>Connect OPC</value>
+  </data>
+  <data name="Settings_DisconnectOpc" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="Settings_OpcNodeManagement" xml:space="preserve">
+    <value>OPC Node Management</value>
+  </data>
+  <data name="Settings_OpcNodeManagementDesc" xml:space="preserve">
+    <value>Configure OPC UA node addresses for read/write and monitoring</value>
+  </data>
+  <data name="Settings_AddNode" xml:space="preserve">
+    <value>Add New Node</value>
+  </data>
+  <data name="Settings_NodeIdPlaceholder" xml:space="preserve">
+    <value>NodeId, e.g. ns=3;s="VarName"</value>
+  </data>
+  <data name="Settings_NodeDescriptionPlaceholder" xml:space="preserve">
+    <value>Node description/alias</value>
+  </data>
+  <data name="Settings_NodeWritable" xml:space="preserve">
+    <value>Writable</value>
+  </data>
+  <data name="Settings_AddNodeBtn" xml:space="preserve">
+    <value>Add Node</value>
+  </data>
+  <data name="Settings_DeleteNode" xml:space="preserve">
+    <value>Delete Selected</value>
+  </data>
+  <data name="Settings_ClearAllNodes" xml:space="preserve">
+    <value>Clear All</value>
+  </data>
+  <data name="Settings_GridNodeId" xml:space="preserve">
+    <value>NodeId</value>
+  </data>
+  <data name="Settings_GridDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Settings_GridWritable" xml:space="preserve">
+    <value>Writable</value>
+  </data>
+  <data name="Settings_GridShowInRealtime" xml:space="preserve">
+    <value>Show in Realtime</value>
+  </data>
+  <data name="Settings_GridValue" xml:space="preserve">
+    <value>Current Value</value>
+  </data>
+  <data name="Settings_GridUpdated" xml:space="preserve">
+    <value>Last Updated</value>
+  </data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  ControllerPage - OPC Monitor             -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Controller_OpcMonitor" xml:space="preserve">
+    <value>OPC Node Monitor</value>
+  </data>
+  <data name="Controller_OpcMonitorDesc" xml:space="preserve">
+    <value>Real-time display of configured node current values</value>
+  </data>
+  <data name="Controller_LoadNodes" xml:space="preserve">
+    <value>Load Nodes</value>
+  </data>
+  <data name="Controller_RefreshValues" xml:space="preserve">
+    <value>Refresh Values</value>
+  </data>
+  <data name="Controller_SubscribeAll" xml:space="preserve">
+    <value>Subscribe All</value>
+  </data>
+  <data name="Controller_GridNodeId" xml:space="preserve">
+    <value>NodeId</value>
+  </data>
+  <data name="Controller_GridDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Controller_GridValue" xml:space="preserve">
+    <value>Current Value</value>
+  </data>
+  <data name="Controller_GridQuality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="Controller_GridWritable" xml:space="preserve">
+    <value>Writable</value>
+  </data>
+  <data name="Controller_GridUpdated" xml:space="preserve">
+    <value>Last Updated</value>
   </data>
 </root>

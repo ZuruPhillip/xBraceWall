@@ -10,17 +10,29 @@ namespace CncWallStation.Plcs
     public static class WallPlcConverter
     {
         /// <summary>
-        /// 按 Handler 分组生成 PLC 指令，返回分组结果
-        /// 与 Convert 方法逻辑一致，但额外按 Handler 调用顺序划分分组
+        /// 按 Handler 分组生成 PLC 指令，返回分组结果（全部特征，D=1）
         /// </summary>
         public static List<PlcFeatureGroup> ConvertGrouped(MomWall wall)
+        {
+            return ConvertGrouped(wall, wall.Features, 1);
+        }
+
+        /// <summary>
+        /// 按 Handler 分组生成 PLC 指令，返回分组结果
+        /// 使用指定的特征列表和墙定义 D 值
+        /// </summary>
+        /// <param name="wall">墙体数据（提供尺寸信息）</param>
+        /// <param name="features">参与转换的特征列表（已按正反面筛选）</param>
+        /// <param name="wallDefineD">墙定义 D 值（正面=1，反面=5）</param>
+        public static List<PlcFeatureGroup> ConvertGrouped(
+            MomWall wall, List<Feature> features, int wallDefineD)
         {
             var ctx = new PlcConvertContext();
             var groups = new List<PlcFeatureGroup>();
 
             // ========== 1. 墙定义 ==========
             int before = ctx.Output.Count;
-            WallHandler.Handle(wall, ctx);
+            WallHandler.Handle(wall, ctx, wallDefineD);
             AddGroupIfNotEmpty(groups, "WallHandler", "墙定义", ctx.Output, before);
 
             // 收集 Features 按类型分发
@@ -28,17 +40,16 @@ namespace CncWallStation.Plcs
             var grooves = new List<Groove>();
             var rebarSlots = new List<RebarSlot>();
             var cableSlots = new List<MepSlot>();
+            var boxes = new List<Pocket>();
 
-            foreach (var f in wall.Features)
+            foreach (var f in features)
             {
                 switch (f)
                 {
                     case Groove g: grooves.Add(g); break;
                     case Hole h: holes.Add(h); break;
                     case Pocket p:
-                        before = ctx.Output.Count;
-                        BoxHandler.Handle(p, ctx);
-                        AddGroupIfNotEmpty(groups, "BoxHandler", "开关盒", ctx.Output, before);
+                        boxes.Add(p);
                         break;
                     case RebarSlot r: rebarSlots.Add(r); break;
                     case Window w:
@@ -138,6 +149,13 @@ namespace CncWallStation.Plcs
                 AddGroupIfNotEmpty(groups, "XBraceHandler", "X斜槽", ctx.Output, before);
             }
 
+            //开关盒
+            if (boxes.Count > 0)
+            {
+                before = ctx.Output.Count;
+                BoxHandler.HandleBatch(boxes, ctx);
+                AddGroupIfNotEmpty(groups, "BoxHandler", "开关盒", ctx.Output, before);
+            }
             return groups;
         }
 

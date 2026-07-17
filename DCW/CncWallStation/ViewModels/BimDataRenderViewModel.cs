@@ -1,6 +1,7 @@
 ﻿using BimWallData;
 using BimWallData.V000;
 using CncWallStation.Commands;
+using CncWallStation.Consts;
 using CncWallStation.Localization;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Services.Application;
@@ -581,7 +582,7 @@ namespace CncWallStation.ViewModels
                         endX = rod.EndPoint.X,
                         endY = rod.EndPoint.Y,
                         endZ = rod.EndPoint.Z,
-                        diameter = rebar.Diameter,
+                        diameter = WallConstants.RebarSlotWidth,
                         horizontalDepth = rebar.HorizontalDepth,
                         verticalDepth = rebar.VerticalDepth,
                         pn = rebar.Pn

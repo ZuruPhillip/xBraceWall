@@ -22,27 +22,34 @@
 		<local:PipelineStageToTextConverter x:Key="PipelineStageToTextConverter"/>
 		<local:AuditStatusToBrushConverter x:Key="AuditStatusToBrushConverter"/>
 		<local:AuditStatusToTextConverter x:Key="AuditStatusToTextConverter"/>
+		<local:PriorityToOutlineBrushConverter x:Key="PriorityToOutlineBrushConverter"/>
+		<local:StatusToLightBrushConverter x:Key="StatusToLightBrushConverter"/>
+		<local:StatusToDarkBrushConverter x:Key="StatusToDarkBrushConverter"/>
+		<local:AuditStatusToLightBrushConverter x:Key="AuditStatusToLightBrushConverter"/>
+		<local:AuditStatusToDarkBrushConverter x:Key="AuditStatusToDarkBrushConverter"/>
 		<local:IsLatestToTextConverter x:Key="IsLatestToTextConverter"/>
 		<local:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
 		<local:BoolInvertConverter x:Key="BoolInvertConverter"/>
 
-		<!-- 优先级 Tag 模板（纯色背景 + 白色文字） -->
+		<!-- 优先级 Tag 模板（左侧风格：白底 + 彩色描边 + 彩色文字） -->
 		<DataTemplate x:Key="PriorityTagTemplate">
 			<Border CornerRadius="3" Margin="2" Padding="6,2"
-					Background="{Binding Priority, Converter={StaticResource PriorityToBrushConverter}}">
+					Background="White"
+					BorderBrush="{Binding Priority, Converter={StaticResource PriorityToOutlineBrushConverter}}"
+					BorderThickness="1">
 				<TextBlock Text="{Binding Priority, Converter={StaticResource PriorityIntToTextConverter}}"
-						   Foreground="White"
+						   Foreground="{Binding Priority, Converter={StaticResource PriorityToOutlineBrushConverter}}"
 						   FontSize="12" FontWeight="SemiBold"
 						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Border>
 		</DataTemplate>
 
-		<!-- 状态 Tag 模板（纯色背景 + 白色文字） -->
+		<!-- 状态 Tag 模板（右侧风格：浅色背景 + 深色文字） -->
 		<DataTemplate x:Key="StatusTagTemplate">
 			<Border CornerRadius="3" Margin="2" Padding="6,2"
-					Background="{Binding Status, Converter={StaticResource StatusToBrushConverter}}">
+					Background="{Binding Status, Converter={StaticResource StatusToLightBrushConverter}}">
 				<TextBlock Text="{Binding Status, Converter={StaticResource StatusToTextConverter}}"
-						   Foreground="White"
+						   Foreground="{Binding Status, Converter={StaticResource StatusToDarkBrushConverter}}"
 						   FontSize="12" FontWeight="SemiBold"
 						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Border>
@@ -59,12 +66,12 @@
 			</Border>
 		</DataTemplate>
 
-		<!-- 审核状态 Tag 模板 -->
+		<!-- 审核状态 Tag 模板（右侧风格：浅色背景 + 深色文字） -->
 		<DataTemplate x:Key="AuditStatusTagTemplate">
 			<Border CornerRadius="3" Margin="2" Padding="6,2"
-					Background="{Binding AuditStatus, Converter={StaticResource AuditStatusToBrushConverter}}">
+					Background="{Binding AuditStatus, Converter={StaticResource AuditStatusToLightBrushConverter}}">
 				<TextBlock Text="{Binding AuditStatusText}"
-						   Foreground="White"
+						   Foreground="{Binding AuditStatus, Converter={StaticResource AuditStatusToDarkBrushConverter}}"
 						   FontSize="12" FontWeight="SemiBold"
 						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Border>

@@ -13,6 +13,13 @@ public partial class SettingPage : Page
         InitializeComponent();
         _viewModel = viewModel;
         DataContext = _viewModel;
+
+        Loaded += OnPageLoaded;
+    }
+
+    private void OnPageLoaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        _viewModel.LoadConfig();
     }
 
     private void OnChineseClicked(object sender, MouseButtonEventArgs e)

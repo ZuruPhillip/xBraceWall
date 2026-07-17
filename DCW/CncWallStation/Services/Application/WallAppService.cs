@@ -72,6 +72,20 @@ namespace CncWallStation.Services.Application
 
             var totalCount = await query.CountAsync();
 
+            // 无数据时提前返回，避免无效排序和分页操作
+            if (totalCount == 0)
+            {
+                return new PagedResultDto<WallDto>
+                {
+                    TotalCount = 0,
+                    Items = new List<WallDto>()
+                };
+            }
+
+            // 确保分页参数有效
+            var page = Math.Max(1, input.Page);
+            var pageSize = Math.Max(1, input.PageSize);
+
             // 排序
             query = input.SortField?.ToLower() switch
             {
@@ -106,8 +120,8 @@ namespace CncWallStation.Services.Application
 
             // 分页 + Include 导航属性
             var entities = await query
-                .Skip((input.Page - 1) * input.PageSize)
-                .Take(input.PageSize)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Include(w => w.Project)
                 .Include(w => w.ValidationErrors)
                 .ToListAsync();

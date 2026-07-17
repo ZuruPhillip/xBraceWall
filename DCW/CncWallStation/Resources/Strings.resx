@@ -16,6 +16,7 @@
   <data name="Menu_DataCheck" xml:space="preserve"><value>数据预检</value></data>
   <data name="Menu_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
   <data name="Menu_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="Menu_ExceptionReport" xml:space="preserve"><value>异常报告</value></data>
   <data name="Menu_Quality" xml:space="preserve"><value>质量控制</value></data>
   <data name="Menu_Report" xml:space="preserve"><value>报表分析</value></data>
   <data name="Menu_Settings" xml:space="preserve"><value>系统设置</value></data>
@@ -25,6 +26,7 @@
   <data name="TabHeader_BimRender" xml:space="preserve"><value>BIM模型渲染</value></data>
   <data name="TabHeader_MomRender" xml:space="preserve"><value>MOM模型渲染</value></data>
   <data name="TabHeader_Controller" xml:space="preserve"><value>控制页面</value></data>
+  <data name="TabHeader_ExceptionReport" xml:space="preserve"><value>异常报告</value></data>
   <data name="TabHeader_JsonEditor" xml:space="preserve"><value>JSON编辑器</value></data>
   <data name="TabHeader_DataCheck" xml:space="preserve"><value>数据预检</value></data>
   <data name="TabHeader_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
@@ -140,12 +142,9 @@
   <data name="PageTitle_MomRender" xml:space="preserve"><value>MOM 数据渲染</value></data>
   <data name="Button_LoadMomRender" xml:space="preserve"><value>▶ 加载渲染</value></data>
   <data name="Toggle_Cavity" xml:space="preserve"><value>腔体</value></data>
-  <data name="Toggle_MepSlot" xml:space="preserve"><value>MEP槽</value></data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve"><value>加载墙体MomJSON数据并渲染3D CSG场景</value></data>
   <data name="Tooltip_ToggleWallMom" xml:space="preserve"><value>切换墙体主体图层</value></data>
   <data name="Tooltip_ToggleCavity" xml:space="preserve"><value>切换切削腔体图层</value></data>
-  <data name="Tooltip_ToggleMep" xml:space="preserve"><value>切换MEP管槽图层</value></data>
-  <data name="Tooltip_ToggleRebarMom" xml:space="preserve"><value>切换钢筋槽图层</value></data>
   <data name="Tooltip_ToggleDimMom" xml:space="preserve"><value>切换尺寸标注图层</value></data>
   <data name="Placeholder_MomTitle" xml:space="preserve"><value>AAC 墙体 CSG 三维渲染</value></data>
   <data name="Placeholder_MomSubtitle" xml:space="preserve"><value>MOM 数据可视化引擎 · CSG 布尔运算</value></data>
@@ -255,7 +254,7 @@
   <data name="Label_AuditInfo" xml:space="preserve"><value>审核: </value></data>
   <data name="Label_ProjectInfo" xml:space="preserve"><value>项目号: </value></data>
   <data name="Label_FloorInfo" xml:space="preserve"><value>楼层: </value></data>
-  <data name="Label_ActualDimensions" xml:space="preserve"><value>实际尺寸</value></data>
+  <data name="Label_ActualDimensions" xml:space="preserve"><value>毛坯尺寸</value></data>
   <data name="Label_ActualLength" xml:space="preserve"><value>长:</value></data>
   <data name="Label_ActualWidth" xml:space="preserve"><value>宽:</value></data>
   <data name="Label_ActualHeight" xml:space="preserve"><value>高:</value></data>
@@ -332,4 +331,46 @@
   <data name="Dlg_RenameWallTitle" xml:space="preserve"><value>修改墙体名称</value></data>
   <data name="Dlg_RenameWallPrompt" xml:space="preserve"><value>墙体ID: {0}
 请输入新的墙体名称:</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  OPC UA 设置                               -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Settings_OpcConnection" xml:space="preserve"><value>OPC UA 连接设置</value></data>
+  <data name="Settings_OpcConnectionDesc" xml:space="preserve"><value>配置 PLC 设备的 OPC UA 服务器地址和端口</value></data>
+  <data name="Settings_OpcIpAddress" xml:space="preserve"><value>IP 地址:</value></data>
+  <data name="Settings_OpcPort" xml:space="preserve"><value>端口:</value></data>
+  <data name="Settings_OpcAutoConnect" xml:space="preserve"><value>启动时自动连接</value></data>
+  <data name="Settings_SaveOpcConfig" xml:space="preserve"><value>保存配置</value></data>
+  <data name="Settings_ConnectOpc" xml:space="preserve"><value>连接 OPC</value></data>
+  <data name="Settings_DisconnectOpc" xml:space="preserve"><value>断开连接</value></data>
+  <data name="Settings_OpcNodeManagement" xml:space="preserve"><value>OPC 节点管理</value></data>
+  <data name="Settings_OpcNodeManagementDesc" xml:space="preserve"><value>配置需要读写和监控的 OPC UA 节点地址</value></data>
+  <data name="Settings_AddNode" xml:space="preserve"><value>添加新节点</value></data>
+  <data name="Settings_NodeIdPlaceholder" xml:space="preserve"><value>NodeId，如 ns=3;s=&quot;VarName&quot;</value></data>
+  <data name="Settings_NodeDescriptionPlaceholder" xml:space="preserve"><value>节点描述/别名</value></data>
+  <data name="Settings_NodeWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Settings_AddNodeBtn" xml:space="preserve"><value>添加节点</value></data>
+  <data name="Settings_DeleteNode" xml:space="preserve"><value>删除选中</value></data>
+  <data name="Settings_ClearAllNodes" xml:space="preserve"><value>清空全部</value></data>
+  <data name="Settings_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="Settings_GridDescription" xml:space="preserve"><value>描述</value></data>
+  <data name="Settings_GridWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Settings_GridShowInRealtime" xml:space="preserve"><value>实时显示</value></data>
+  <data name="Settings_GridValue" xml:space="preserve"><value>当前值</value></data>
+  <data name="Settings_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!--  ControllerPage - OPC 监控                -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="Controller_OpcMonitor" xml:space="preserve"><value>OPC 节点监控</value></data>
+  <data name="Controller_OpcMonitorDesc" xml:space="preserve"><value>实时显示已配置节点的当前值</value></data>
+  <data name="Controller_LoadNodes" xml:space="preserve"><value>加载节点列表</value></data>
+  <data name="Controller_RefreshValues" xml:space="preserve"><value>刷新数值</value></data>
+  <data name="Controller_SubscribeAll" xml:space="preserve"><value>订阅全部</value></data>
+  <data name="Controller_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="Controller_GridDescription" xml:space="preserve"><value>描述</value></data>
+  <data name="Controller_GridValue" xml:space="preserve"><value>当前值</value></data>
+  <data name="Controller_GridQuality" xml:space="preserve"><value>质量</value></data>
+  <data name="Controller_GridWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="Controller_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
 </root>

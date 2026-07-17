@@ -17,6 +17,9 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<ValidationErrorEntity> ValidationErrors => Set<ValidationErrorEntity>();
         public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
         public DbSet<PlcInstructionEntity> PlcInstructions => Set<PlcInstructionEntity>();
+        public DbSet<OpcWriteRecordEntity> OpcWriteRecords => Set<OpcWriteRecordEntity>();
+        public DbSet<MachiningExceptionEntity> MachiningExceptions => Set<MachiningExceptionEntity>();
+        public DbSet<MachiningRecordEntity> MachiningRecords => Set<MachiningRecordEntity>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +36,9 @@ namespace CncWallStation.EntityFrameworkCore
 
                 entity.HasIndex(e => e.WallId).HasDatabaseName("IX_PlcInstruction_WallId");
                 entity.HasIndex(e => new { e.WallId, e.SortOrder }).HasDatabaseName("IX_PlcInstruction_WallId_SortOrder");
+                entity.HasIndex(e => new { e.WallId, e.Side }).HasDatabaseName("IX_PlcInstruction_WallId_Side");
+
+                entity.Property(e => e.Side).HasDefaultValue(0);
 
                 entity.Property(e => e.HandlerName).HasMaxLength(64);
                 entity.Property(e => e.FeatureName).HasMaxLength(64);
@@ -46,6 +52,27 @@ namespace CncWallStation.EntityFrameworkCore
                     .WithMany()
                     .HasForeignKey(e => e.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== Opc 表配置 ====================
+            modelBuilder.Entity<OpcWriteRecordEntity>(entity =>
+            {
+                entity.ToTable("Opc");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.GroupId).HasDatabaseName("IX_Opc_GroupId");
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_Opc_WallId");
+
+                entity.Property(e => e.GroupId).HasMaxLength(64).IsRequired();
+                entity.Property(e => e.NodeId).HasMaxLength(256).IsRequired();
+                entity.Property(e => e.Value).HasMaxLength(128).IsRequired();
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ==================== Project 表配置 ====================
@@ -178,6 +205,44 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.HasOne(r => r.Wall)
                     .WithMany(w => w.DataCheckRecords)
                     .HasForeignKey(r => r.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== MachiningException 表配置 ====================
+            modelBuilder.Entity<MachiningExceptionEntity>(entity =>
+            {
+                entity.ToTable("MachiningException");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_MachiningException_WallId");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne<WallEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.WallId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // ==================== MachiningRecord 表配置 ====================
+            modelBuilder.Entity<MachiningRecordEntity>(entity =>
+            {
+                entity.ToTable("MachiningRecord");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                entity.HasIndex(e => e.WallId).HasDatabaseName("IX_MachiningRecord_WallId");
+
+                entity.HasOne<WallEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.WallId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }

@@ -131,20 +131,29 @@
                               IsChecked="{Binding IsGrooveVisible}"
                               ToolTip="{l:Loc Tooltip_ToggleCavity}"
                               Margin="2,0,2,0"/>
-                <ToggleButton Content="{l:Loc Toggle_MepSlot}"
-                              Style="{StaticResource LayerToggleStyle}"
-                              IsChecked="{Binding IsMepVisible}"
-                              ToolTip="{l:Loc Tooltip_ToggleMep}"
-                              Margin="2,0,2,0"/>
-                <ToggleButton Content="{l:Loc Toggle_Rebar}"
-                              Style="{StaticResource LayerToggleStyle}"
-                              IsChecked="{Binding IsRebarVisible}"
-                              ToolTip="{l:Loc Tooltip_ToggleRebarMom}"
-                              Margin="2,0,2,0"/>
                 <ToggleButton Content="{l:Loc Toggle_Dim}"
                               Style="{StaticResource LayerToggleStyle}"
                               IsChecked="{Binding IsDimVisible}"
                               ToolTip="{l:Loc Tooltip_ToggleDimMom}"
+                              Margin="2,0,0,0"/>
+
+                <Separator Width="1" Height="20" Background="#F0F0F0"
+                           Margin="8,0,8,0"/>
+
+                <!-- 原点变换 ToggleButton -->
+                <ToggleButton Content="原点变换"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsOriginTransformed}"
+                              IsEnabled="{Binding IsWallDataLoaded}"
+                              ToolTip="基于当前MomJsonData数据做旋转和平移变换，方便与原数据对比"
+                              Margin="0,0,2,0"/>
+
+                <!-- 翻面 ToggleButton -->
+                <ToggleButton Content="翻面"
+                              Style="{StaticResource LayerToggleStyle}"
+                              IsChecked="{Binding IsFlipped}"
+                              IsEnabled="{Binding IsWallDataLoaded}"
+                              ToolTip="基于当前MomJsonData数据绕X轴翻面，重新计算反面坐标"
                               Margin="2,0,0,0"/>
 
                 <Separator Width="1" Height="20" Background="#F0F0F0"

@@ -21,10 +21,13 @@ namespace CncWallStation.Models
 		待校验 = 0,
 		待加工 = 1,
 		加工中 = 2,
-		已完成 = 3,
-		异常 = 4,
-		已质检 = 5
-	}
+		异常 = 3,
+		暂停 = 4,
+		中止 = 5,
+		待质检 = 6,
+        已质检 = 7,
+        已完成 = 8,
+    }
 
 	/// <summary>
 	/// ProcessPriority 扩展方法
@@ -61,6 +64,9 @@ namespace CncWallStation.Models
 			ProcessStatus.已完成 => "已完成",
 			ProcessStatus.异常 => "异常",
 			ProcessStatus.已质检 => "已质检",
+			ProcessStatus.暂停 => "暂停",
+			ProcessStatus.中止 => "中止",
+			ProcessStatus.待质检 => "待质检",
 			_ => "未知"
 		};
 
@@ -72,6 +78,9 @@ namespace CncWallStation.Models
 			ProcessStatus.已完成 => "Completed",
 			ProcessStatus.异常 => "Error",
 			ProcessStatus.已质检 => "Inspected",
+			ProcessStatus.暂停 => "Paused",
+			ProcessStatus.中止 => "Aborted",
+			ProcessStatus.待质检 => "Pending QC",
 			_ => "Unknown"
 		};
 	}

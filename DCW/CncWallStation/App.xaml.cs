@@ -6,6 +6,7 @@ using CncWallStation.Services.Application;
 using CncWallStation.Services.Configs;
 using CncWallStation.Services.DataCheck;
 using CncWallStation.Services.Mappings;
+using CncWallStation.Services.OpcUa;
 using CncWallStation.VersionMappers;
 using CncWallStation.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace CncWallStation
 {
@@ -27,8 +30,10 @@ namespace CncWallStation
 
         public App()
         {
+            // ==================== 全局异常处理 ====================
+            RegisterGlobalExceptionHandlers();
+
             HostApp = Host.CreateDefaultBuilder()
-                //显式配置 ContentRoot 和加载配置文件
                 .UseContentRoot(AppContext.BaseDirectory)
                 .ConfigureAppConfiguration((context, config) =>
                 {
@@ -40,25 +45,26 @@ namespace CncWallStation
                 })
                 .UseSerilog((context, services, config) =>
                 {
+                    // 日志级别与配置从 appsettings.json 的 Serilog 节点读取；
+                    // 缺省时给出合理默认，Async 包裹避免阻塞。
                     config
-                        .MinimumLevel.Debug()
+                        .ReadFrom.Configuration(context.Configuration)
                         .Enrich.FromLogContext()
                         .WriteTo.Async(a => a.Console(
                             outputTemplate:
-                            "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-                        ))
+                            "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"))
                         .WriteTo.Async(a => a.File(
                             "logs/log-.txt",
                             rollingInterval: RollingInterval.Day,
                             retainedFileCountLimit: 30,
+                            fileSizeLimitBytes: 50 * 1024 * 1024,
+                            rollOnFileSizeLimit: true,
                             outputTemplate:
-                            "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}"
-                        ));
+                            "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Exception}"));
                 })
                 .ConfigureServices((context, services) =>
                 {
                     // ==================== 数据库 ====================
-                    // 从 appsettings.json 读取连接字符串
                     var connectionString = context.Configuration.GetConnectionString("Default")
                         ?? throw new InvalidOperationException(
                             "未找到连接字符串 'ConnectionStrings:Default'，请检查 appsettings.json");
@@ -77,7 +83,7 @@ namespace CncWallStation
                             });
                     });
 
-                    // ==================== AutoMapper 配置 ====================
+                    // ==================== AutoMapper ====================
                     services.AddSingleton(sp =>
                     {
                         var config = new MapperConfiguration(cfg =>
@@ -88,71 +94,104 @@ namespace CncWallStation
                         return config.CreateMapper();
                     });
 
-                    //服务注册
+                    // ==================== 服务注册 ====================
                     services.AddTransient<MainWindow>();
                     services.AddTransient<BimJsonDeserializer>();
                     services.AddSingleton<JsonKeyTranslationConfig>();
                     services.AddSingleton<DataCheckValidatorFactory>();
                     services.AddSingleton<BimWallMapperFactory>();
+
                     services.AddConventionalServices(Assembly.GetExecutingAssembly());
 
-                    // MainPageViewModel 需单例，确保 MainViewModel 和 MainPage 共享同一实例
+                    // OPC UA 通讯服务（单例）——必须在 AddConventionalServices 之后注册，
+                    // 否则 AddDomainServices 会将 OpcUaService 覆盖为 Transient，
+                    // 导致各 ViewModel 拿到不同实例，StatusChanged 事件无法同步到状态栏。
+                    services.AddSingleton<IOpcUaService, OpcUaService>();
+
+                    // MainPageViewModel 单例，确保 MainViewModel 和 MainPage 共享实例
                     services.AddSingleton<MainPageViewModel>();
 
+                    // 异常报告 PDF 导出服务
+                    services.AddTransient<ExceptionReportExportService>();
+
+                    // 数据库初始化 HostedService（启动时执行建表/升级）
+                    services.AddHostedService<DatabaseInitializerHostedService>();
                 })
                 .Build();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            // 加载上次保存的语言偏好
-            LocalizationService.Instance.LoadSavedLanguage();
-
-            HostApp.StartAsync().GetAwaiter().GetResult();
-
-            using (var scope = HostApp.Services.CreateScope())
+            try
             {
-                var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-                using var db = factory.CreateDbContext();
-                db.Database.EnsureCreated();
+                // 加载上次保存的语言偏好
+                LocalizationService.Instance.LoadSavedLanguage();
 
-                // EnsureCreated 在 DB 已存在时不会新增表，手动补建 PlcInstruction 表
-                db.Database.ExecuteSqlRaw(@"
-                    CREATE TABLE IF NOT EXISTS PlcInstruction (
-                        Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                        WallId BIGINT NOT NULL,
-                        T INT NOT NULL,
-                        F INT NOT NULL,
-                        D INT NOT NULL,
-                        X0 FLOAT NOT NULL,
-                        Y0 FLOAT NOT NULL,
-                        Z0 FLOAT NOT NULL,
-                        X1 FLOAT NOT NULL,
-                        Y1 FLOAT NOT NULL,
-                        Z1 FLOAT NOT NULL,
-                        SortOrder INT NOT NULL,
-                        HandlerName VARCHAR(64) NOT NULL,
-                        FeatureName VARCHAR(64) NOT NULL,
-                        UpdatedBy VARCHAR(64) NULL,
-                        UpdatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        INDEX IX_PlcInstruction_WallId (WallId),
-                        INDEX IX_PlcInstruction_WallId_SortOrder (WallId, SortOrder),
-                        CONSTRAINT FK_PlcInstruction_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
-                    );
-                ");
+                // 启动 Host（会执行 DatabaseInitializerHostedService.StartAsync）
+                await HostApp.StartAsync();
+
+                var mainWindow = HostApp.Services.GetRequiredService<MainWindow>();
+                mainWindow.Show();
+
+                base.OnStartup(e);
             }
-
-            var mainWindow = HostApp.Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-
-            base.OnStartup(e);
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "应用启动失败");
+                MessageBox.Show(
+                    $"应用启动失败，请检查数据库连接与配置。\n\n{ex.Message}",
+                    "启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(1);
+            }
         }
 
-        protected override void OnExit(ExitEventArgs e)
+        protected override async void OnExit(ExitEventArgs e)
         {
-            HostApp.StopAsync().GetAwaiter().GetResult();
-            Log.CloseAndFlush();
+            try
+            {
+                // StopAsync 停止 HostedService；DisposeAsync 释放容器单例（含 OPC 会话）。
+                await HostApp.StopAsync(TimeSpan.FromSeconds(5));
+                await ((IAsyncDisposable)HostApp).DisposeAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "应用退出时释放 Host 异常");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
             base.OnExit(e);
+        }
+
+        // ══════════════════════════════════════════
+        //  全局异常处理
+        // ══════════════════════════════════════════
+        private void RegisterGlobalExceptionHandlers()
+        {
+            // UI 线程未处理异常
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+
+            // 非 UI 线程未处理异常（通常无法恢复）
+            AppDomain.CurrentDomain.UnhandledException += (s, args) =>
+                Log.Fatal(args.ExceptionObject as Exception, "非 UI 线程未处理异常");
+
+            // 未观测的 Task 异常（OPC 的 fire-and-forget 重连/KeepAlive 尤其相关）
+            TaskScheduler.UnobservedTaskException += (s, args) =>
+            {
+                Log.Error(args.Exception, "未观测的 Task 异常");
+                args.SetObserved();
+            };
+        }
+
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Log.Error(e.Exception, "UI 线程未处理异常");
+            MessageBox.Show(
+                $"发生错误：\n{e.Exception.Message}",
+                "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+            e.Handled = true;  // 阻止应用崩溃（视业务需要可移除）
         }
     }
 }

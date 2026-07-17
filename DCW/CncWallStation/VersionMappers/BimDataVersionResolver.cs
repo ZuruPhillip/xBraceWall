@@ -19,10 +19,11 @@ namespace CncWallStation.VersionMappers
         {
             var bimWallData = JObject.Parse(json);
             var schema = bimWallData["schema"]?.ToString();
-            if (string.IsNullOrEmpty(schema)) return "V0.0.0";
+            if (string.IsNullOrEmpty(schema)) return "0.0.0";
 
             var match = Regex.Match(schema, @"v(\d+\.\d+\.\d+)");
-            return match.Success ? match.Groups[1].Value : "V0.0.0";
+            return "0.0.0";
+            //return match.Success ? match.Groups[1].Value : "V0.0.0";
         }
     }
 }

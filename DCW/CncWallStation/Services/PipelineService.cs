@@ -417,21 +417,21 @@ namespace CncWallStation.Services
                     });
                 }
 
-                if (root.TryGetProperty("momFeatures", out var momFeatures))
+                if (root.TryGetProperty("features", out var features))
                 {
-                    if (momFeatures.ValueKind != System.Text.Json.JsonValueKind.Array)
+                    if (features.ValueKind != System.Text.Json.JsonValueKind.Array)
                     {
                         errors.Add(new ValidationErrorEntry
                         {
                             Stage = PipelineStage.ValidatingMom,
                             ErrorCode = "MOM_FEATURES_NOT_ARRAY",
-                            ErrorMessage = "MomJSON 中 'momFeatures' 字段必须是数组"
+                            ErrorMessage = "MomJSON 中 'features' 字段必须是数组"
                         });
                     }
                     else
                     {
                         int idx = 0;
-                        foreach (var feature in momFeatures.EnumerateArray())
+                        foreach (var feature in features.EnumerateArray())
                         {
                             if (feature.ValueKind != System.Text.Json.JsonValueKind.Object)
                             {
@@ -439,7 +439,7 @@ namespace CncWallStation.Services
                                 {
                                     Stage = PipelineStage.ValidatingMom,
                                     ErrorCode = "MOM_FEATURE_NOT_OBJECT",
-                                    ErrorMessage = $"momFeatures[{idx}] 不是有效对象"
+                                    ErrorMessage = $"features[{idx}] 不是有效对象"
                                 });
                             }
                             idx++;
@@ -452,17 +452,7 @@ namespace CncWallStation.Services
                     {
                         Stage = PipelineStage.ValidatingMom,
                         ErrorCode = "MOM_NO_FEATURES",
-                        ErrorMessage = "MomJSON 缺少 'momFeatures' 字段"
-                    });
-                }
-
-                if (!root.TryGetProperty("convertedAt", out _))
-                {
-                    errors.Add(new ValidationErrorEntry
-                    {
-                        Stage = PipelineStage.ValidatingMom,
-                        ErrorCode = "MOM_NO_CONVERTEDAT",
-                        ErrorMessage = "MomJSON 缺少 'convertedAt' 元数据"
+                        ErrorMessage = "MomJSON 缺少 'features' 字段"
                     });
                 }
             }

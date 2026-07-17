@@ -1,5 +1,6 @@
 ﻿using CncWallStation.Features;
 using CncWallStation.MomWallData;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace CncWallStation.Plcs.Handlers
 {
@@ -66,7 +67,7 @@ namespace CncWallStation.Plcs.Handlers
             CollinearMerger.Chain<Hole> chain, BendingKeyKey key, MomWall wall, PlcConvertContext ctx)
         {
             var first = chain.First;
-
+            var side = first.InitialSide;
             ctx.Emit(new PlcInstruction
             {
                 T = PlcTool.LargeDrill,            // T3
@@ -74,7 +75,7 @@ namespace CncWallStation.Plcs.Handlers
                 D = chain.CopyCount,
                 X0 = first.LocalPos.X,
                 Y0 = 0,
-                Z0 = first.LocalPos.Y,    //距离底面尺寸
+                Z0 = side == MachineSide.Front ? (wall.Thickness - first.LocalPos.Y) : first.LocalPos.Y,    //距离表面尺寸
                 X1 = chain.Dx,
                 Y1 = key.Depth,           // 孔深
                 Z1 = 0                    // 条孔长
