@@ -1075,13 +1075,21 @@ namespace CncWallStation.ViewModels
                 _filteredItems = MapDtosToWallListItems(entities);
 
                 TotalItems = (int)pagedResult.TotalCount;
-                TotalPages = (int)Math.Ceiling((double)TotalItems / PageSize);
+                TotalPages = TotalItems > 0
+                    ? (int)Math.Ceiling((double)TotalItems / PageSize)
+                    : 0;
 
-                if (CurrentPage > TotalPages)
-                    CurrentPage = Math.Max(1, TotalPages);
+                if (TotalPages == 0)
+                {
+                    CurrentPage = 1;
+                }
+                else if (CurrentPage > TotalPages)
+                {
+                    CurrentPage = TotalPages;
+                }
 
-                HasPreviousPage = CurrentPage > 1;
-                HasNextPage = CurrentPage < TotalPages;
+                HasPreviousPage = TotalPages > 0 && CurrentPage > 1;
+                HasNextPage = TotalPages > 0 && CurrentPage < TotalPages;
                 IsEmpty = TotalItems == 0;
 
                 RefreshDisplay();
