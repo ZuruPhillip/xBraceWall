@@ -272,6 +272,7 @@ namespace CncWallStation.ViewModels
                 int syncCount = 0;
                 int skipAuditedCount = 0;
                 int failCount = 0;
+                int skipLgsWallCount = 0;
                 var hostName = Environment.MachineName;
                 var importedBy = Environment.UserName;
 
@@ -302,6 +303,14 @@ namespace CncWallStation.ViewModels
 
                         // 提取墙体名称
                         var wallName = ExtractWallName(jsonContent);
+
+                        // 判断是否为 LGS Wall（含有 tracks 或 nogs 字段）
+                        if (IsLgsWall(jsonContent))
+                        {
+                            skipLgsWallCount++;
+                            _logger.LogInformation("LGS Wall 已过滤: WallId={WallId}, File={FileName}", wallId, fileName);
+                            continue;
+                        }
 
                         if (auditedWallIds.Contains(wallId))
                         {
@@ -353,16 +362,23 @@ namespace CncWallStation.ViewModels
                 }
 
                 var statusMsg = $"导入完成：新增 {newCount}，同步更新 {syncCount}";
+                if (skipLgsWallCount > 0)
+                    statusMsg += $"，过滤LGS墙体 {skipLgsWallCount}";
                 if (skipAuditedCount > 0)
                     statusMsg += $"，跳过已审核 {skipAuditedCount}";
                 if (failCount > 0)
                     statusMsg += $"，失败 {failCount}";
                 ImportProgressMessage = statusMsg;
 
-                if (skipAuditedCount > 0)
+                if (skipAuditedCount > 0 || skipLgsWallCount > 0)
                 {
+                    var detailMsg = "";
+                    if (skipLgsWallCount > 0)
+                        detailMsg += $"已过滤 {skipLgsWallCount} 面 LGS Wall 墙体（含 tracks/nogs 字段的轻钢龙骨墙体不导入）。\n";
+                    if (skipAuditedCount > 0)
+                        detailMsg += "已审核的墙体已被保护，未覆盖其数据。";
                     MessageBox.Show(
-                        statusMsg + "\n\n已审核的墙体已被保护，未覆盖其数据。",
+                        statusMsg + "\n\n" + detailMsg,
                         "导入结果", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
@@ -370,8 +386,8 @@ namespace CncWallStation.ViewModels
                 await ApplyFiltersAsync();
                 await UpdateAvailableFloorsAsync();
 
-                _logger.LogInformation("批量导入完成: 项目={ProjectName}, 新增{New}, 同步{Sync}, 跳过已审核{Skip}, 失败{Fail}",
-                    projectName, newCount, syncCount, skipAuditedCount, failCount);
+                _logger.LogInformation("批量导入完成: 项目={ProjectName}, 新增{New}, 同步{Sync}, 过滤LGS{Lgs}, 跳过已审核{Skip}, 失败{Fail}",
+                    projectName, newCount, syncCount, skipLgsWallCount, skipAuditedCount, failCount);
             }
             catch (Exception ex)
             {
@@ -412,6 +428,15 @@ namespace CncWallStation.ViewModels
                 var wallName = ExtractWallName(jsonContent);
                 var importedBy = Environment.UserName;
                 var hostName = Environment.MachineName;
+
+                // 判断是否为 LGS Wall（含有 tracks 或 nogs 字段）
+                if (IsLgsWall(jsonContent))
+                {
+                    MessageBox.Show($"墙体 \"{wallId}\" 为 LGS Wall，不允许导入。\n\n请使用专门的 LGS 墙体导入流程。",
+                        "LGS Wall 已过滤", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _logger.LogInformation("LGS Wall 已过滤（单墙导入）: WallId={WallId}", wallId);
+                    return;
+                }
 
                 // 检查是否已审核
                 var auditedIds = await _wallAppService.GetAuditedWallIdsAsync(new[] { wallId });
@@ -1203,6 +1228,25 @@ namespace CncWallStation.ViewModels
             }
             catch { }
             return string.Empty;
+        }
+
+        // ==================== 判断是否为 LGS Wall ====================
+        /// <summary>
+        /// 判断 JSON 内容对应的墙体是否为 LGS Wall（轻钢龙骨墙体）。
+        /// LGS Wall 判断条件：JSON 根对象中含有 "tracks" 或 "nogs" 字段。
+        /// </summary>
+        private static bool IsLgsWall(string jsonContent)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(jsonContent);
+                var root = doc.RootElement;
+                return root.TryGetProperty("tracks", out _) || root.TryGetProperty("nogs", out _);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // ==================== 导出 CSV ====================
