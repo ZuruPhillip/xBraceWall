@@ -248,9 +248,9 @@
                 <Image Source="pack://application:,,,/Resources/Images/audit.png"
                        Width="150" Height="90"
                        HorizontalAlignment="Right" VerticalAlignment="Top"
-                       Margin="0,80,12,0" Opacity="1"
+                       Margin="0,-100,12,0" Opacity="1"
                        Visibility="{Binding IsAudited, Converter={StaticResource BoolToVisibilityConverter}}"
-                       Panel.ZIndex="1"/>
+                       Panel.ZIndex="1" RenderTransformOrigin="0.674,0.5"/>
 
                 <!-- 右侧主内容：TabControl -->
                 <TabControl SelectedIndex="{Binding SelectedTabIndex}"

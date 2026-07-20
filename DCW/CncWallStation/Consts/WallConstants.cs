@@ -110,7 +110,7 @@
         /// <summary>
         /// 胶水密封槽标准切削深度（mm）
         /// </summary>
-        public const float GlueSealGrooveDepth = 8f;
+        public const float GlueSealGrooveDepth = 15f;
 
         // ══════════════════════════════════════════════════════════
         // Mep Cable基础尺寸
@@ -282,12 +282,6 @@
         /// </summary>
         public const float ProppingSideSlotDepth = 30f;// 沿 Y 轴
 
-        /// <summary>胶缝/密封条距边缘距离（mm）</summary>
-        public const float GlueSealEdgeDistance = 107f;
-
-        /// <summary>胶缝/密封条槽深度（mm）</summary>
-        public const float GlueSealDepth = 15f;
-
         /// <summary>横向钢筋槽切割深度（mm）</summary>
         public const float HorizontalRebarSlotDepth = 28f;
 
@@ -306,9 +300,6 @@
 
 
         #region PLC 刀具参数
-
-        /// <summary>胶缝/密封条刀具厚度（mm）</summary>
-        public const float GlueSealToolThickness = 12f;
 
         public const float SlotToolDiameter = 20f;
 
