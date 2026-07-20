@@ -22,8 +22,7 @@ namespace CncWallStation.VersionMappers
             if (string.IsNullOrEmpty(schema)) return "0.0.0";
 
             var match = Regex.Match(schema, @"v(\d+\.\d+\.\d+)");
-            return "0.0.0";
-            //return match.Success ? match.Groups[1].Value : "V0.0.0";
+            return match.Success ? match.Groups[1].Value : "0.0.0";
         }
     }
 }
