@@ -189,7 +189,10 @@ namespace CncWallStation.VersionMappers
             if (topPlates == null || topPlates.Count == 0)
                 return;
 
-            var topPlateStartPtY = momWallData.Thickness - WallConstants.TopPlateGrooveWidth / 2;
+            // 根据墙厚决定顶板宽度
+            float topPlateWidth = GetTopPlateWidth(momWallData.Thickness);
+
+            var topPlateStartPtY = momWallData.Thickness - topPlateWidth / 2;
             var topPlateStartPt = new Vec2(0, topPlateStartPtY);
             var topPlateEndPt = new Vec2(momWallData.Length, topPlateStartPtY);
 
@@ -198,11 +201,24 @@ namespace CncWallStation.VersionMappers
                     side: MachineSide.Front,
                     startPt: topPlateStartPt,
                     endPt: topPlateEndPt,
-                    width: WallConstants.TopPlateGrooveWidth,
+                    width: topPlateWidth,
                     depth: WallConstants.TopPlateGrooveDepth,
                     grooveType: GrooveType.TopPlate);
 
             momWallData.Features.Add(topPlateGroove);
+        }
+
+        /// <summary>
+        /// 根据墙厚决定顶板槽宽度
+        ///   thickness &lt; 200 → 140
+        ///   200 ≤ thickness &lt; 300 → 240
+        ///   thickness ≥ 300 → 240（默认）
+        /// </summary>
+        private static float GetTopPlateWidth(float thickness)
+        {
+            if (thickness < 200f)
+                return 140f;
+            return 240f;
         }
 
         /// <summary>
