@@ -31,6 +31,7 @@ namespace CncWallStation.Plcs.Handlers
             GrooveSide side = g.InitialSide switch
             {
                 MachineSide.Front => GrooveSide.Top,
+                MachineSide.Back => GrooveSide.Bottom,
                 _ => GrooveSide.None
             };
             if (side == GrooveSide.None)
@@ -45,11 +46,11 @@ namespace CncWallStation.Plcs.Handlers
 
             ctx.Emit(new PlcInstruction
             {
-                T = PlcTool.SlotCutter,    // T8
-                F = 10, //F10
+                T = PlcTool.StepCutter,    // T4
+                F = PlcFeatureCode.StepBtm_Auto, //F5
                 D = 0,
                 X0 = 0f,
-                Y0 = wallWidth - WallConstants.TopPlateGrooveDepth,
+                Y0 = 0f,
                 Z0 = 0f,
                 X1 = wallLength,// 墙长度
                 Y1 = WallConstants.TopPlateGrooveDepth,                     
