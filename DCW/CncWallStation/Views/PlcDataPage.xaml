@@ -113,9 +113,6 @@
                         Command="{Binding SaveDraftCommand}"
                         IsEnabled="{Binding IsAudited, Converter={StaticResource BoolInverseConverter}}"
                         Style="{StaticResource ButtonDefault}" />
-                <Button Content="{l:Loc Button_ClearPanel}" Width="110" Height="30" Margin="6,0,0,0"
-                        Command="{Binding ClearPanelCommand}"
-                        Style="{StaticResource ButtonDefault}" />
             </StackPanel>
         </Border>
 

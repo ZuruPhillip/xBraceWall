@@ -263,7 +263,6 @@
   <data name="Button_SendCommand" xml:space="preserve"><value>下发指令</value></data>
   <data name="Button_Regenerate" xml:space="preserve"><value>重新生成</value></data>
   <data name="Button_SaveDraft" xml:space="preserve"><value>保存草稿</value></data>
-  <data name="Button_ClearPanel" xml:space="preserve"><value>清空面板</value></data>
   <data name="Section_ProcessingStats" xml:space="preserve"><value>加工统计</value></data>
   <data name="Stat_TotalInstructions" xml:space="preserve"><value>总指令</value></data>
   <data name="Stat_ToolChanges" xml:space="preserve"><value>换刀次数</value></data>

@@ -777,9 +777,6 @@
   <data name="Button_SaveDraft" xml:space="preserve">
     <value>Save Draft</value>
   </data>
-  <data name="Button_ClearPanel" xml:space="preserve">
-    <value>Clear</value>
-  </data>
   <data name="Section_ProcessingStats" xml:space="preserve">
     <value>Processing Stats</value>
   </data>

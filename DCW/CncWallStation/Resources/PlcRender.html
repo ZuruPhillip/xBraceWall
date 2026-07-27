@@ -136,7 +136,14 @@
 
         // ==================== 渲染指令 ====================
         window.renderInstructions = function(instructionsJson) {
-            clearInstructions();
+            clearHighlight();
+            instructionObjects.forEach(obj => {
+                scene.remove(obj.mesh);
+                obj.mesh.geometry.dispose();
+                obj.mesh.material.dispose();
+            });
+            instructionObjects = [];
+            document.getElementById('legend').innerHTML = '';
 
             let instructions;
             try {
@@ -239,16 +246,6 @@
             }
         };
 
-        window.clearInstructions = function() {
-            clearHighlight();
-            instructionObjects.forEach(obj => {
-                scene.remove(obj.mesh);
-                obj.mesh.geometry.dispose();
-                obj.mesh.material.dispose();
-            });
-            instructionObjects = [];
-            document.getElementById('legend').innerHTML = '';
-        };
 
         // ==================== 动画循环 ====================
         function animate() {

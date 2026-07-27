@@ -545,34 +545,6 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        /// <summary>清空面板</summary>
-        [RelayCommand]
-        private void ClearPanel()
-        {
-            WallInfo = null;
-            IsWallLoaded = false;
-            IsAudited = false;
-            SearchWallId = string.Empty;
-            _frontGroupDtos.Clear();
-            _backGroupDtos.Clear();
-            FeatureGroups.Clear();
-            CurrentInstructions.Clear();
-            Statistics = new PlcStatisticsDto();
-            SelectedGroup = null;
-            SelectedInstruction = null;
-            SelectedSide = 0;
-
-            _isSyncingDimensions = true;
-            WallActualLength = 0;
-            WallActualWidth = 0;
-            WallActualHeight = 0;
-            _isSyncingDimensions = false;
-
-            _ = Clear3DAsync();
-
-            _logger.LogInformation("清空PLC面板");
-        }
-
         /// <summary>切换选中特征组</summary>
         [RelayCommand]
         private void SelectGroup(PlcFeatureGroupDto? group)
@@ -635,9 +607,6 @@ namespace CncWallStation.ViewModels
             var json = JsonSerializer.Serialize(allInstructions);
             var script = $"renderInstructions({json});";
 
-            // 先清空再渲染
-            await ExecuteScriptAsync("clearInstructions();");
-            await Task.Delay(200);
             await ExecuteScriptAsync(script);
         }
 
@@ -651,12 +620,6 @@ namespace CncWallStation.ViewModels
         {
             if (ExecuteScriptAsync == null) return;
             await ExecuteScriptAsync("clearHighlight();");
-        }
-
-        private async Task Clear3DAsync()
-        {
-            if (ExecuteScriptAsync == null) return;
-            await ExecuteScriptAsync("clearInstructions();");
         }
 
         // ==================== 内部方法 ====================
