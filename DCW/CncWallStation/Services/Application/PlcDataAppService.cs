@@ -7,9 +7,7 @@ using CncWallStation.MomWallData;
 using CncWallStation.Plcs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace CncWallStation.Services.Application
 {
@@ -83,17 +81,9 @@ namespace CncWallStation.Services.Application
                     "请先在 WallListPage 中对该墙体【执行管线】操作，完成 BimJSON → MomJSON 转换后再试。");
 
             // ★ 用 System.Text.Json，匹配 Feature 基类上的 [JsonPolymorphic] / [JsonDerivedType]
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,               // 格式化缩进
-                Encoder = JavaScriptEncoder   // 保留中文，不转义
-                                         .UnsafeRelaxedJsonEscaping,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            };
 
             // ★ 正面：仅原点变换
-            var momWallFront = DeserializeMomWall(wall.MomJsonData, options);
+            var momWallFront = DeserializeMomWall(wall.MomJsonData);
             momWallFront.ApplyOriginTransform();
 
             // 按切削面分类特征为正面/反面
@@ -109,7 +99,7 @@ namespace CncWallStation.Services.Application
                 .ToHashSet();
 
             // ★ 反面：翻面 + 原点变换，按 ID 匹配选取反面特征（坐标为翻面后的值）
-            var momWallBack = DeserializeMomWall(wall.MomJsonData, options);
+            var momWallBack = DeserializeMomWall(wall.MomJsonData);
             momWallBack.ApplyFlipAroundY();
             momWallBack.ApplyOriginTransform();
 
@@ -134,12 +124,12 @@ namespace CncWallStation.Services.Application
         /// <summary>
         /// 从 JSON 反序列化 MomWall 并恢复 Face（Face 标记为 [JsonIgnore]，需从 InitialSide 重建）
         /// </summary>
-        private MomWall DeserializeMomWall(string jsonData, JsonSerializerOptions options)
+        private MomWall DeserializeMomWall(string jsonData)
         {
             MomWall? momWall;
             try
             {
-                momWall = JsonSerializer.Deserialize<MomWall>(jsonData, options);
+                momWall = JsonSerializer.Deserialize<MomWall>(jsonData, SharedJsonOptions.Instance);
 
                 if (momWall != null)
                 {

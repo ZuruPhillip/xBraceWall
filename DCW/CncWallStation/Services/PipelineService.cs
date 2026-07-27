@@ -5,9 +5,7 @@ using CncWallStation.Models.Enums;
 using CncWallStation.VersionMappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace CncWallStation.Services
 {
@@ -346,19 +344,7 @@ namespace CncWallStation.Services
                 var momWall = mapper.Map(bimJsonData);
 
                 // ── 3. 序列化 ─────────────────────────────────────────
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,               // 格式化缩进
-                    Encoder = JavaScriptEncoder   // 保留中文，不转义
-                                         .UnsafeRelaxedJsonEscaping,
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-                };
-
-
-                string momWallJson = JsonSerializer.Serialize(momWall, options);
-
-                var momJson = JsonSerializer.Serialize(momWall, options);
+                var momJson = JsonSerializer.Serialize(momWall, SharedJsonOptions.Instance);
 
                 return (true, momJson, null);
             }

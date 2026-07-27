@@ -1,10 +1,10 @@
 using BimWallData.V001;
-using CncWallStation.Features;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
 using CncWallStation.MomWallData;
 using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace CncWallStation.Services.DataCheck
 {
@@ -159,11 +159,13 @@ namespace CncWallStation.Services.DataCheck
             MomWall? momWall = null;
             try
             {
-                var settings = new JsonSerializerSettings
+                momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(momJsonData, SharedJsonOptions.Instance);
+
+                if (momWall != null)
                 {
-                    Converters = new List<JsonConverter> { new FeatureJsonConverter() }
-                };
-                momWall = JsonConvert.DeserializeObject<MomWall>(momJsonData, settings);
+                    foreach (var f in momWall.Features)
+                        f.RestoreFaceFromInitialSide();
+                }
             }
             catch (Exception ex)
             {

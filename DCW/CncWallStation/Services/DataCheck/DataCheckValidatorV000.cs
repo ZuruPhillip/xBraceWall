@@ -1,5 +1,4 @@
 using BimWallData.V000;
-using CncWallStation.Features;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
 using CncWallStation.Models.Enums;
@@ -145,11 +144,13 @@ namespace CncWallStation.Services.DataCheck
             MomWall? momWall = null;
             try
             {
-                var settings = new JsonSerializerSettings
+                momWall = System.Text.Json.JsonSerializer.Deserialize<MomWall>(momJsonData, SharedJsonOptions.Instance);
+
+                if (momWall != null)
                 {
-                    Converters = new List<JsonConverter> { new FeatureJsonConverter() }
-                };
-                momWall = JsonConvert.DeserializeObject<MomWall>(momJsonData, settings);
+                    foreach (var f in momWall.Features)
+                        f.RestoreFaceFromInitialSide();
+                }
             }
             catch (Exception ex)
             {
@@ -261,7 +262,7 @@ namespace CncWallStation.Services.DataCheck
 
             if (dto.CoreHeight <= 0)
                 errors.Add(CreateBimError(wallId, "aacWallElevation", "BIM_CORE_HEIGHT_INVALID",
-                    $"芯层高度无效（当前{ dto.CoreHeight}），需大于0",
+                    $"芯层高度无效（当前{dto.CoreHeight}），需大于0",
                     $"Core height invalid ({dto.CoreHeight}), must be greater than 0",
                     ErrorSeverity.Error));
 

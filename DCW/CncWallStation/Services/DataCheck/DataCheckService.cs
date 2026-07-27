@@ -6,6 +6,7 @@ using CncWallStation.VersionMappers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace CncWallStation.Services.DataCheck
 {
@@ -184,7 +185,7 @@ namespace CncWallStation.Services.DataCheck
                     {
                         var mapper = _mapperFactory.GetMapper(version);
                         var momWall = mapper.Map(wall.BimJsonData);
-                        var momJson = Newtonsoft.Json.JsonConvert.SerializeObject(momWall);
+                        var momJson = JsonSerializer.Serialize(momWall, SharedJsonOptions.Instance);
                         wallToUpdate.UpdateMomJsonData(momJson);
                         _logger.LogInformation("Converted 阶段：已生成 MomJson 写入 Wall.MomJsonData");
                     }
