@@ -15,7 +15,9 @@ namespace CncWallStation.Plcs
         /// <para>分类规则：</para>
         /// <para>- Top → 正面</para>
         /// <para>- Bottom → 反面</para>
-        /// <para>- Front/Back/Left/Right/Custom → 起点Y值 > 墙体厚度一半 → 正面，否则反面</para>
+        /// <para>- Front/Back 面的 Hole（含 Round/Slotted）→ 确保 origin transform 后生产面为 Back（底面）：
+        ///   Front 面 → 正面（D=1），Back 面 → 反面（D=5）</para>
+        /// <para>- 其他面（Left/Right/Custom）及非 Hole 特征 → 起点Y值 > 墙体厚度一半 → 正面，否则反面</para>
         /// </summary>
         /// <param name="feature">加工特征</param>
         /// <param name="wallThickness">墙体厚度（mm）</param>
@@ -26,6 +28,7 @@ namespace CncWallStation.Plcs
             {
                 MachineSide.Top => true,
                 MachineSide.Bottom => false,
+                MachineSide.Front or MachineSide.Back when feature is Hole => feature.InitialSide == MachineSide.Back,
                 _ => GetStartPointY(feature) > wallThickness * 0.5f
             };
         }

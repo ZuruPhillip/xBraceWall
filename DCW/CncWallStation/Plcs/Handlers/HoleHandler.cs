@@ -113,7 +113,7 @@ namespace CncWallStation.Plcs.Handlers
             //    Top   （墙正面进刀）   ：Z0 = 0（从墙正面切入）
             float z0 = first.Face.InitialSide switch
             {
-                MachineSide.Front => wallThickness - first.LocalPos.Y,
+                MachineSide.Front => first.LocalPos.Y,
                 MachineSide.Back => wallThickness - first.LocalPos.Y,
                 MachineSide.Top => 0f,
                 _ => throw new NotSupportedException(

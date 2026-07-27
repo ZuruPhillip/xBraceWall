@@ -75,7 +75,7 @@ namespace CncWallStation.Plcs.Handlers
                 D = chain.CopyCount,
                 X0 = first.LocalPos.X,
                 Y0 = 0,
-                Z0 = side == MachineSide.Front ? (wall.Thickness - first.LocalPos.Y) : first.LocalPos.Y,    //距离表面尺寸
+                Z0 = side == MachineSide.Front ? first.LocalPos.Y : (wall.Thickness - first.LocalPos.Y),    //距离表面尺寸
                 X1 = chain.Dx,
                 Y1 = key.Depth,           // 孔深
                 Z1 = 0                    // 条孔长
