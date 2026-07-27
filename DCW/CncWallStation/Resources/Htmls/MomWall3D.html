@@ -1132,8 +1132,12 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-len').textContent  = feature.length != null ? (+feature.length).toFixed(1) : (+box.gx / S).toFixed(1);
     document.getElementById('mtt-wid').textContent  = feature.width  != null ? (+feature.width).toFixed(1)  : (+box.gy / S).toFixed(1);
     document.getElementById('mtt-dep').textContent  = feature.depth  != null ? (+feature.depth).toFixed(1)  : (+box.gz / S).toFixed(1);
+    document.getElementById('mtt-len').parentElement.style.display = '';
+    document.getElementById('mtt-wid').parentElement.style.display = '';
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
+    // 重置起点标签
+    document.getElementById('mtt-startpt').parentElement.querySelector('.mtkey').textContent = window.t('mom_start');
     // 起点/终点坐标（pocket 类型隐藏，改为中心点）
     const sp = feature.startPt;
     const ep = feature.endPt;
@@ -1173,12 +1177,16 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-len').textContent  = feature.totalLength != null ? (+feature.totalLength).toFixed(1) : '—';
     document.getElementById('mtt-wid').textContent  = (seg.overrideWidth ?? feature.width) != null ? (+(seg.overrideWidth ?? feature.width)).toFixed(1) : '—';
     document.getElementById('mtt-dep').textContent  = seg.depth != null ? (+seg.depth).toFixed(1) : '—';
+    document.getElementById('mtt-len').parentElement.style.display = '';
+    document.getElementById('mtt-wid').parentElement.style.display = '';
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
     document.getElementById('mtt-sub').textContent = `段 #${extra.segIndex + 1} / ${feature.segments?.length ?? 1} · ${(seg.$segmentType ?? seg.type ?? 'line').toUpperCase()}`;
     // 恢复起点/终点显示，隐藏 pocket 专属行
     document.getElementById('mtt-startpt').parentElement.style.display = '';
     document.getElementById('mtt-endpt').parentElement.style.display = '';
+    // 重置起点标签
+    document.getElementById('mtt-startpt').parentElement.querySelector('.mtkey').textContent = window.t('mom_start');
     document.getElementById('mtt-center-row').style.display = 'none';
     document.getElementById('mtt-radius-row').style.display = 'none';
     // 起点/终点：line 用 segment 坐标，arc 用 feature 整体端点
@@ -1220,12 +1228,18 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     // 直径 / 半径
     const r = feature.radius != null ? (+feature.radius) : null;
     const d = r != null ? (r * 2) : (feature.diameter != null ? (+feature.diameter) : null);
-    // 长度值取自 SlotLength（剪力钉孔）/ 直径（圆孔）
-    document.getElementById('mtt-len').textContent = isSlotted
-      ? (feature.slotLength != null ? (+feature.slotLength).toFixed(1) + ' mm' : '—')
-      : (d != null ? d.toFixed(1) + ' mm' : '—');
-    document.getElementById('mtt-wid').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
     document.getElementById('mtt-dep').textContent = feature.depth != null ? (+feature.depth).toFixed(1) + ' mm' : '—';
+
+    // 长度/宽度：BendingKey（腰孔）展示，圆孔隐藏
+    if (isSlotted) {
+      document.getElementById('mtt-len').textContent = feature.slotLength != null ? (+feature.slotLength).toFixed(1) + ' mm' : '—';
+      document.getElementById('mtt-wid').textContent = d != null ? d.toFixed(1) + ' mm' : '—';
+      document.getElementById('mtt-len').parentElement.style.display = '';
+      document.getElementById('mtt-wid').parentElement.style.display = '';
+    } else {
+      document.getElementById('mtt-len').parentElement.style.display = 'none';
+      document.getElementById('mtt-wid').parentElement.style.display = 'none';
+    }
 
     // 孔专属行
     document.getElementById('mtt-hole-shape').textContent = isRound ? window.t('hole_shape_round') : window.t('hole_shape_slotted');
@@ -1234,7 +1248,10 @@ function showMomTooltip(mesh, mouseX, mouseY) {
 
     // 显示/隐藏行
     document.getElementById('mtt-startpt').parentElement.style.display = isSlotted ? 'none' : '';
-    document.getElementById('mtt-endpt').parentElement.style.display = isSlotted ? 'none' : '';
+    // 圆孔："起点" → "位置"
+    document.getElementById('mtt-startpt').parentElement.querySelector('.mtkey').textContent = window.t('mom_position');
+    // 移除终点行
+    document.getElementById('mtt-endpt').parentElement.style.display = 'none';
     document.getElementById('mtt-center-row').style.display = isSlotted ? '' : 'none';
     document.getElementById('mtt-radius-row').style.display = 'none';
     document.getElementById('mtt-arc-row1').style.display = 'none';
@@ -1247,20 +1264,16 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
     document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
 
-    // 剪力钉孔显示中心点（取自 localPos），圆孔显示起点/终点
+    // 剪力钉孔显示中心点（取自 localPos），圆孔显示位置
     if (isSlotted) {
       const lp = feature.localPos;
       document.getElementById('mtt-centerpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
     } else {
       const lp = feature.localPos;
       document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
-      document.getElementById('mtt-endpt').textContent = feature.throughHole ? window.t('hole_through') : window.t('hole_blind');
     }
     document.getElementById('mtt-sub').textContent = '';
   } else if (featureType === 'RebarSlot') {
-    // 判断方向
-    const dir = feature.direction;
-    const dirLabel = (dir === 'Vertical' || dir === 1) ? window.t('rebar_vertical') : window.t('rebar_horizontal');
     const dia = feature.diameter ?? 0;
     const len = feature.length ?? 0;
     const dep = feature.depth ?? 0;
@@ -1269,15 +1282,18 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-len').textContent  = (+len).toFixed(1);
     document.getElementById('mtt-wid').textContent  = (+dia).toFixed(1);
     document.getElementById('mtt-dep').textContent  = (+dep).toFixed(1);
+    document.getElementById('mtt-len').parentElement.style.display = '';
+    document.getElementById('mtt-wid').parentElement.style.display = '';
     document.getElementById('mtt-face').textContent = normalLabel(feature.currentNormal ?? {x:0,y:0,z:1});
     document.getElementById('mtt-side').textContent = feature.currentSide ?? feature.initialSide ?? '—';
 
     // 起点/终点
-    const lp = feature.localPos;
+    const lp1 = feature.localPos;
     const ep = feature.endPos;
     document.getElementById('mtt-startpt').parentElement.style.display = '';
     document.getElementById('mtt-endpt').parentElement.style.display = '';
-    document.getElementById('mtt-startpt').textContent = lp ? `(${(+(lp.x??0)).toFixed(1)}, ${(+(lp.y??0)).toFixed(1)})` : '—';
+    document.getElementById('mtt-startpt').parentElement.querySelector('.mtkey').textContent = window.t('mom_start');
+    document.getElementById('mtt-startpt').textContent = lp1 ? `(${(+(lp1.x??0)).toFixed(1)}, ${(+(lp1.y??0)).toFixed(1)})` : '—';
     document.getElementById('mtt-endpt').textContent   = ep ? `(${(+(ep.x??0)).toFixed(1)}, ${(+(ep.y??0)).toFixed(1)})` : '—';
 
     // 隐藏非 RebarSlot 专属行
@@ -1290,10 +1306,10 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-hole-slotlen-row').style.display = 'none';
     document.getElementById('mtt-hole-slotangle-row').style.display = 'none';
 
-    // 方向（复用 mtt-center-row）
+    // 位置（复用 mtt-center-row）
     document.getElementById('mtt-center-row').style.display = '';
-    document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = window.t('seg_direction');
-    document.getElementById('mtt-centerpt').textContent = dirLabel;
+    document.getElementById('mtt-center-row').querySelector('.mtkey').textContent = window.t('mom_position');
+    document.getElementById('mtt-centerpt').textContent = lp1 ? `(${(+(lp1.x??0)).toFixed(1)}, ${(+(lp1.y??0)).toFixed(1)})` : '—';
     document.getElementById('mtt-sub').textContent = '';
   }
 
