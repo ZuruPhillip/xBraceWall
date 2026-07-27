@@ -1130,7 +1130,21 @@ namespace CncWallStation.ViewModels
         // ==================== 刷新当前页数据 ====================
         private void RefreshDisplay()
         {
-            DisplayItems = new ObservableCollection<WallListItem>(_filteredItems);
+            // 复用 ObservableCollection，避免每次 new 导致 DataGrid 整体重建可视化树
+            var existing = DisplayItems;
+            var newItems = _filteredItems;
+
+            // 先同步 IsSelected 状态（保留用户已选中的勾选状态）
+            var selectedIds = new HashSet<long>(existing.Where(x => x.IsSelected).Select(x => x.Id));
+
+            existing.Clear();
+            foreach (var item in newItems)
+            {
+                if (selectedIds.Contains(item.Id))
+                    item.IsSelected = true;
+                existing.Add(item);
+            }
+
             UpdateIsAllSelected();
         }
 
@@ -1175,15 +1189,14 @@ namespace CncWallStation.ViewModels
 
         private void UpdateIsAllSelected()
         {
-            var currentPage = DisplayItems.ToList();
-            if (currentPage.Count == 0)
+            if (DisplayItems.Count == 0)
             {
                 IsAllSelected = false;
                 return;
             }
 
-            var selectedCount = currentPage.Count(x => x.IsSelected);
-            IsAllSelected = selectedCount == currentPage.Count
+            var selectedCount = DisplayItems.Count(x => x.IsSelected);
+            IsAllSelected = selectedCount == DisplayItems.Count
                 ? true
                 : selectedCount == 0
                     ? false

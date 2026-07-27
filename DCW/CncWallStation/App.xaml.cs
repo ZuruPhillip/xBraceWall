@@ -73,7 +73,9 @@ namespace CncWallStation
                     {
                         options.UseMySql(
                             connectionString,
-                            ServerVersion.AutoDetect(connectionString),
+                            // 写死版本号避免启动时同步连接探测（ServerVersion.AutoDetect 会拖慢冷启动）
+                            // 如果 MySQL 版本不是 8.0，请修改此处版本号
+                            new MySqlServerVersion(new Version(8, 0, 32)),
                             mysqlOptions =>
                             {
                                 mysqlOptions.EnableRetryOnFailure(

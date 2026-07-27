@@ -41,7 +41,7 @@ namespace CncWallStation.Services.Application
 
             // LINQ 筛选条件
             if (!string.IsNullOrWhiteSpace(input.ProjectName))
-                query = query.Where(w => w.ProjectName.Contains(input.ProjectName));
+                query = query.Where(w => w.ProjectName.StartsWith(input.ProjectName));
 
             if (!string.IsNullOrWhiteSpace(input.WallName))
                 query = query.Where(w => w.WallName.Contains(input.WallName));
@@ -50,7 +50,7 @@ namespace CncWallStation.Services.Application
                 query = query.Where(w => w.Floor == input.Floor.Value);
 
             if (!string.IsNullOrWhiteSpace(input.WallId))
-                query = query.Where(w => w.WallId.Contains(input.WallId));
+                query = query.Where(w => w.WallId.StartsWith(input.WallId));
 
             if (input.Statuses is { Count: > 0 })
                 query = query.Where(w => input.Statuses.Contains(w.Status));
@@ -86,48 +86,68 @@ namespace CncWallStation.Services.Application
             var page = Math.Max(1, input.Page);
             var pageSize = Math.Max(1, input.PageSize);
 
-            // 排序
+            // 排序（去掉 ?? 表达式，避免索引失效）
             query = input.SortField?.ToLower() switch
             {
                 "projectname" => input.SortAscending
-                    ? query.OrderBy(w => w.ProjectName)
-                    : query.OrderByDescending(w => w.ProjectName),
+                    ? query.OrderBy(w => w.ProjectName).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.ProjectName).ThenBy(w => w.Id),
                 "wallname" => input.SortAscending
-                    ? query.OrderBy(w => w.WallName)
-                    : query.OrderByDescending(w => w.WallName),
+                    ? query.OrderBy(w => w.WallName).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.WallName).ThenBy(w => w.Id),
                 "floor" => input.SortAscending
-                    ? query.OrderBy(w => w.Floor)
-                    : query.OrderByDescending(w => w.Floor),
+                    ? query.OrderBy(w => w.Floor).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.Floor).ThenBy(w => w.Id),
                 "wallid" => input.SortAscending
-                    ? query.OrderBy(w => w.WallId)
-                    : query.OrderByDescending(w => w.WallId),
+                    ? query.OrderBy(w => w.WallId).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.WallId).ThenBy(w => w.Id),
                 "priority" => input.SortAscending
-                    ? query.OrderBy(w => w.Priority)
-                    : query.OrderByDescending(w => w.Priority),
+                    ? query.OrderBy(w => w.Priority).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.Priority).ThenBy(w => w.Id),
                 "status" => input.SortAscending
-                    ? query.OrderBy(w => w.Status)
-                    : query.OrderByDescending(w => w.Status),
+                    ? query.OrderBy(w => w.Status).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.Status).ThenBy(w => w.Id),
                 "auditstatus" => input.SortAscending
-                    ? query.OrderBy(w => w.AuditStatus)
-                    : query.OrderByDescending(w => w.AuditStatus),
+                    ? query.OrderBy(w => w.AuditStatus).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.AuditStatus).ThenBy(w => w.Id),
                 "pipelinestage" => input.SortAscending
-                    ? query.OrderBy(w => w.PipelineStage)
-                    : query.OrderByDescending(w => w.PipelineStage),
+                    ? query.OrderBy(w => w.PipelineStage).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.PipelineStage).ThenBy(w => w.Id),
                 _ => input.SortAscending
-                    ? query.OrderByDescending(w => w.EndProductionTime ?? DateTime.MinValue)
-                    : query.OrderBy(w => w.EndProductionTime ?? DateTime.MinValue)
+                    ? query.OrderBy(w => w.EndProductionTime).ThenBy(w => w.Id)
+                    : query.OrderByDescending(w => w.EndProductionTime).ThenBy(w => w.Id)
             };
 
-            // 分页 + Include 导航属性
-            var entities = await query
+            // 投影查询：直接 Select 到 WallDto，绕开 BimJsonData/MomJsonData 两个 MEDIUMTEXT 大字段
+            // 同时通过子查询获取 ValidationErrorSummary，避免 Include 集合导航造成的笛卡尔积放大
+            var dtos = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Include(w => w.Project)
-                .Include(w => w.ValidationErrors)
+                .Select(w => new WallDto
+                {
+                    Id = w.Id,
+                    ProjectName = w.ProjectName,
+                    WallId = w.WallId,
+                    WallName = w.WallName,
+                    Floor = w.Floor,
+                    PipelineStage = w.PipelineStage,
+                    Priority = w.Priority,
+                    Status = w.Status,
+                    AuditStatus = w.AuditStatus,
+                    SchemaVersion = w.SchemaVersion,
+                    StartProductionTime = w.StartProductionTime,
+                    EndProductionTime = w.EndProductionTime,
+                    ImportTime = w.ImportTime,
+                    UpdatedAt = w.UpdatedAt,
+                    UpdatedBy = w.UpdatedBy,
+                    IsDeleted = w.IsDeleted,
+                    // 摘要下推到数据库：只取最近一条校验错误，避免 JOIN 大字段
+                    ValidationErrorSummary = w.ValidationErrors
+                        .OrderByDescending(e => e.CreatedAt)
+                        .Select(e => e.ErrorMessage)
+                        .FirstOrDefault()
+                })
                 .ToListAsync();
-
-            // IMapper 批量映射 Entity → DTO
-            var dtos = _mapper.Map<List<WallDto>>(entities);
 
             return new PagedResultDto<WallDto>
             {

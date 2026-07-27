@@ -119,6 +119,12 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.HasIndex(w => w.AuditStatus).HasDatabaseName("IX_Wall_AuditStatus");
                 entity.HasIndex(w => w.WallName).HasDatabaseName("IX_Wall_WallName");
                 entity.HasIndex(w => w.IsDeleted).HasDatabaseName("IX_Wall_IsDeleted");
+                // 复合索引：覆盖默认排序场景（IsDeleted + EndProductionTime + Id），避免全表扫描
+                entity.HasIndex(w => new { w.IsDeleted, w.EndProductionTime, w.Id })
+                    .HasDatabaseName("IX_Wall_IsDeleted_EndProductionTime_Id");
+                // 复合索引：覆盖项目名+楼层查询场景
+                entity.HasIndex(w => new { w.ProjectName, w.Floor })
+                    .HasDatabaseName("IX_Wall_ProjectName_Floor");
                 entity.HasIndex(w => new { w.ProjectName, w.Status, w.Floor })
                     .HasDatabaseName("IX_Wall_ProjectName_Status_Floor");
 
