@@ -196,7 +196,7 @@ namespace CncWallStation.ViewModels
 
                 for (int i = 0; i < count; i++)
                 {
-                    PlcLineData.Add(new PlcLineDataDto { Index = i });
+                    PlcLineData.Add(new PlcLineDataDto { Index = i + 1 });
                 }
 
                 // 订阅 PLC 节点

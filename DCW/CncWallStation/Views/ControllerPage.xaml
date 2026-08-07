@@ -104,113 +104,13 @@
         <!-- ═══════════════ Row1: 主内容区 ═══════════════ -->
         <Grid Grid.Row="1" Margin="8,0,8,6">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="230"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ========== Col0: 左侧墙体队列 ========== -->
+            <!-- ========== Col0: 中部 PLC加工数据 ========== -->
             <Border Grid.Column="0" Background="White" CornerRadius="4"
                     BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,6,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- 队列标题 -->
-                    <Border Grid.Row="0" Padding="12,10"
-                            BorderBrush="#F0F0F0" BorderThickness="0,0,0,1">
-                        <StackPanel Orientation="Horizontal">
-                            <Border Width="3" Height="14" Background="#1890FF"
-                                    CornerRadius="2" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="加工队列" Foreground="#262626"
-                                       FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- 队列列表 -->
-                    <ListBox Grid.Row="1" ItemsSource="{Binding WallQueue}"
-                             SelectedItem="{Binding SelectedQueueItem, Mode=TwoWay}"
-                             Background="Transparent" BorderThickness="0"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <Border Background="Transparent" Padding="0">
-                                                <ContentPresenter/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Padding="12,10" Margin="0"
-                                        Background="Transparent"
-                                        BorderBrush="Transparent" BorderThickness="0,0,0,1">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
-                                                    <Setter Property="Background" Value="#E6F4FF"/>
-                                                    <Setter Property="BorderBrush" Value="#1677FF"/>
-                                                    <Setter Property="BorderThickness" Value="3,0,0,0"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Row="0" Text="{Binding WallId}"
-                                                   Foreground="#262626" FontSize="13" FontWeight="SemiBold"
-                                                   Margin="0,0,0,4"/>
-
-                                        <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                            <TextBlock Foreground="#8C8C8C" FontSize="11">
-                                                <Run Text="{Binding ProjectName}"/><Run Text=" - "/><Run Text="{Binding Floor, StringFormat={}{0}F层}"/>
-                                            </TextBlock>
-                                            <Border CornerRadius="3" Padding="5,2" Margin="8,0,0,0"
-                                                    VerticalAlignment="Center">
-                                                <Border.Style>
-                                                    <Style TargetType="Border">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="2">
-                                                                <Setter Property="Background" Value="#E6F4FF"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="1">
-                                                                <Setter Property="Background" Value="#F5F5F5"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding Priority}" Value="0">
-                                                                <Setter Property="Background" Value="#FAFAFA"/>
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Border.Style>
-                                                <TextBlock Text="{Binding PriorityText}" FontSize="10"
-                                                           Foreground="#595959"/>
-                                            </Border>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Grid>
-            </Border>
-
-            <!-- ========== Col1: 中部 PLC加工数据 ========== -->
-            <Border Grid.Column="1" Background="White" CornerRadius="4"
-                    BorderBrush="#E0E0E0" BorderThickness="1" Margin="6,0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
@@ -228,17 +128,16 @@
                                   EnableRowVirtualization="True"
                                   ScrollViewer.CanContentScroll="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="50"/>
-                                <DataGridTextColumn Header="T" Binding="{Binding T}" Width="60"/>
-                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="60"/>
-                                <DataGridTextColumn Header="D" Binding="{Binding D}" Width="60"/>
+                                <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="80"/>
+                                <DataGridTextColumn Header="T" Binding="{Binding T}" Width="85"/>
+                                <DataGridTextColumn Header="F" Binding="{Binding F}" Width="85"/>
+                                <DataGridTextColumn Header="D" Binding="{Binding D}" Width="85"/>
                                 <DataGridTextColumn Header="X0" Binding="{Binding X0, StringFormat={}{0:F1}}" Width="85"/>
                                 <DataGridTextColumn Header="Y0" Binding="{Binding Y0, StringFormat={}{0:F1}}" Width="85"/>
                                 <DataGridTextColumn Header="Z0" Binding="{Binding Z0, StringFormat={}{0:F1}}" Width="85"/>
                                 <DataGridTextColumn Header="X1" Binding="{Binding X1, StringFormat={}{0:F1}}" Width="85"/>
                                 <DataGridTextColumn Header="Y1" Binding="{Binding Y1, StringFormat={}{0:F1}}" Width="85"/>
                                 <DataGridTextColumn Header="Z1" Binding="{Binding Z1, StringFormat={}{0:F1}}" Width="85"/>
-                                <DataGridCheckBoxColumn Header="已加工" Binding="{Binding IsCompleted}" Width="70"/>
                             </DataGrid.Columns>
                         </DataGrid>
 
@@ -297,8 +196,8 @@
                 </Grid>
             </Border>
 
-            <!-- ========== Col2: 右侧参数面板 ========== -->
-            <Border Grid.Column="2" Background="White" CornerRadius="4"
+            <!-- ========== Col1: 右侧参数面板 ========== -->
+            <Border Grid.Column="1" Background="White" CornerRadius="4"
                     BorderBrush="#E0E0E0" BorderThickness="1" Margin="6,0,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
