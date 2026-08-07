@@ -4,6 +4,7 @@ using CncWallStation.Features.MepSlots;
 using CncWallStation.Features.Props;
 using CncWallStation.MomWallData;
 using CncWallStation.Plcs.Handlers;
+using Microsoft.Extensions.Logging;
 
 namespace CncWallStation.Plcs
 {
@@ -24,8 +25,10 @@ namespace CncWallStation.Plcs
         /// <param name="wall">墙体数据（提供尺寸信息）</param>
         /// <param name="features">参与转换的特征列表（已按正反面筛选）</param>
         /// <param name="wallDefineD">墙定义 D 值（正面=1，反面=5）</param>
+        /// <param name="logger">可选日志；用于电缆槽分段异常记录</param>
         public static List<PlcFeatureGroup> ConvertGrouped(
-            MomWall wall, List<Feature> features, int wallDefineD)
+            MomWall wall, List<Feature> features, int wallDefineD,
+            ILogger? logger = null)
         {
             var ctx = new PlcConvertContext();
             var groups = new List<PlcFeatureGroup>();
@@ -99,7 +102,13 @@ namespace CncWallStation.Plcs
             if (cableSlots.Count > 0)
             {
                 before = ctx.Output.Count;
-                CableHandler.HandleBatch(cableSlots, ctx);
+
+                // 对每个 MepSlot 进行分段处理，生成分段集合后批量发射指令
+                var cablePartitions = new List<MepSlot>();
+                foreach (var slot in cableSlots)
+                    cablePartitions.AddRange(MepSlotPartitioner.Partition(slot, logger));
+
+                CableHandler.HandleBatch(cablePartitions, ctx);
                 AddGroupIfNotEmpty(groups, "CableHandler", "电缆槽", ctx.Output, before);
             }
 

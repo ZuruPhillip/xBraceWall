@@ -114,8 +114,8 @@ namespace CncWallStation.Services.Application
             // ★ 正反面分别生成 PLC 指令（正面 D=1，反面 D=5）
             var result = new PlcGenerationResult
             {
-                FrontGroups = WallPlcConverter.ConvertGrouped(momWallFront, frontFeatures, 1),
-                BackGroups = WallPlcConverter.ConvertGrouped(momWallBack, backFeatures, 5)
+                FrontGroups = WallPlcConverter.ConvertGrouped(momWallFront, frontFeatures, 1, _logger),
+                BackGroups = WallPlcConverter.ConvertGrouped(momWallBack, backFeatures, 5, _logger)
             };
 
             return result;
