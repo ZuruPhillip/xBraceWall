@@ -234,6 +234,49 @@ namespace CncWallStation.Features.MepSlots
         }
 
         // ══════════════════════════════════════════════════
+        // 路径方向归一化
+        // ══════════════════════════════════════════════════
+
+        /// <summary>
+        /// 归一化路径方向为从下到上（起点 Y &lt; 终点 Y）。
+        /// 若当前路径起点 Y &gt; 终点 Y，则反转整段列表顺序并逐段反向，
+        /// 保持各段首尾连续性不变。
+        /// </summary>
+        public void NormalizeBottomUp()
+        {
+            if (Segments.Count == 0) return;
+
+            float startY = Segments[0].StartPoint.Y;
+            float endY = Segments[^1].EndPoint.Y;
+
+            // 已是下到上（起点 Y <= 终点 Y），无需反转
+            if (startY <= endY) return;
+
+            // 反转段列表顺序
+            Segments.Reverse();
+
+            // 逐段反向
+            for (int i = 0; i < Segments.Count; i++)
+            {
+                Segments[i] = Segments[i] switch
+                {
+                    LineSegment line => new LineSegment(line.EndPoint, line.StartPoint, line.Depth)
+                    { OverrideWidth = line.OverrideWidth },
+                    ArcSegment arc => new ArcSegment(
+                        arc.Center, arc.Radius,
+                        arc.EndAngle * 180f / MathF.PI,
+                        arc.StartAngle * 180f / MathF.PI,
+                        arc.Depth, !arc.IsClockwise)
+                    { OverrideWidth = arc.OverrideWidth },
+                    _ => Segments[i]
+                };
+            }
+
+            // 同步 LocalPos 到新第一段起点
+            SyncLocalPos();
+        }
+
+        // ══════════════════════════════════════════════════
         // 翻面重映射（重写基类）
         // ══════════════════════════════════════════════════
 

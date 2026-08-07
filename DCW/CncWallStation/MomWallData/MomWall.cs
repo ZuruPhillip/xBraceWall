@@ -319,10 +319,9 @@ namespace CncWallStation.MomWallData
                         {
                             if (mepSlot.Segments[i] is LineSegment line)
                             {
-                                // 反射变换后起点/终点互换，需用临时变量交换回来
-                                var oldStartPoint = line.StartPoint;
-                                line.StartPoint = t(line.EndPoint);
-                                line.EndPoint = t(oldStartPoint);
+                                // 直接变换坐标，不交换起终点（由 NormalizeBottomUp 统一处理方向）
+                                line.StartPoint = t(line.StartPoint);
+                                line.EndPoint = t(line.EndPoint);
                             }
                             else if (mepSlot.Segments[i] is ArcSegment arc)
                             {
@@ -351,9 +350,8 @@ namespace CncWallStation.MomWallData
                                 }
                             }
                         }
-                        // 同步 LocalPos 到第一条段的起点
-                        if (mepSlot.Segments.Count > 0)
-                            mepSlot.LocalPos = mepSlot.Segments[0].StartPoint;
+                        // 归一化路径方向：确保从下到上（起点 Y < 终点 Y），同时同步 LocalPos
+                        mepSlot.NormalizeBottomUp();
                         break;
 
                     case RebarSlot rebarSlot:
@@ -478,10 +476,9 @@ namespace CncWallStation.MomWallData
                         {
                             if (mepSlot.Segments[i] is LineSegment line)
                             {
-                                // 反射变换后起点/终点互换，需用临时变量交换回来
-                                var oldStartPoint = line.StartPoint;
-                                line.StartPoint = t(line.EndPoint);
-                                line.EndPoint = t(oldStartPoint);
+                                // 直接变换坐标，不交换起终点（由 NormalizeBottomUp 统一处理方向）
+                                line.StartPoint = t(line.StartPoint);
+                                line.EndPoint = t(line.EndPoint);
                             }
                             else if (mepSlot.Segments[i] is ArcSegment arc)
                             {
@@ -510,9 +507,8 @@ namespace CncWallStation.MomWallData
                                 }
                             }
                         }
-                        // 同步 LocalPos 到第一条段的起点
-                        if (mepSlot.Segments.Count > 0)
-                            mepSlot.LocalPos = mepSlot.Segments[0].StartPoint;
+                        // 归一化路径方向：确保从下到上（起点 Y < 终点 Y），同时同步 LocalPos
+                        mepSlot.NormalizeBottomUp();
                         break;
 
                     case RebarSlot rebarSlot:
