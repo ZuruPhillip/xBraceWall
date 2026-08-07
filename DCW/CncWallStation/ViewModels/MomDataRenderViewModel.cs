@@ -682,6 +682,8 @@ namespace CncWallStation.ViewModels
                         StartAngleDeg = arc.StartAngleDeg,
                         EndAngleDeg = arc.EndAngleDeg,
                         isClockwise = arc.IsClockwise,
+                        startPoint = new { x = arc.StartPoint.X, y = arc.StartPoint.Y },
+                        endPoint = new { x = arc.EndPoint.X, y = arc.EndPoint.Y },
                         depth = arc.Depth,
                         length = arc.Length,
                         overrideWidth = arc.OverrideWidth

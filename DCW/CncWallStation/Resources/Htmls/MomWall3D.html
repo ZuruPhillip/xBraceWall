@@ -1189,7 +1189,7 @@ function showMomTooltip(mesh, mouseX, mouseY) {
     document.getElementById('mtt-startpt').parentElement.querySelector('.mtkey').textContent = window.t('mom_start');
     document.getElementById('mtt-center-row').style.display = 'none';
     document.getElementById('mtt-radius-row').style.display = 'none';
-    // 起点/终点：line 用 segment 坐标，arc 用 feature 整体端点
+    // 起点/终点：统一使用 segment 自身坐标
     if (segType === 'arc') {
       if (seg.center) {
         document.getElementById('mtt-arc-center').textContent = `(${(+(seg.center.x??0)).toFixed(1)}, ${(+(seg.center.y??0)).toFixed(1)})`;
@@ -1200,11 +1200,8 @@ function showMomTooltip(mesh, mouseX, mouseY) {
         document.getElementById('mtt-arc-row1').style.display = 'none';
         document.getElementById('mtt-arc-row2').style.display = 'none';
       }
-      // arc 的起点/终点显示 feature 整体路径端点
-      const ps = feature.pathStart;
-      const pe = feature.pathEnd;
-      document.getElementById('mtt-startpt').textContent = ps ? `(${(+(ps.x??0)).toFixed(1)}, ${(+(ps.y??0)).toFixed(1)})` : '—';
-      document.getElementById('mtt-endpt').textContent   = pe ? `(${(+(pe.x??0)).toFixed(1)}, ${(+(pe.y??0)).toFixed(1)})` : '—';
+      document.getElementById('mtt-startpt').textContent = seg.startPoint ? `(${(+(seg.startPoint.x??0)).toFixed(1)}, ${(+(seg.startPoint.y??0)).toFixed(1)})` : '—';
+      document.getElementById('mtt-endpt').textContent   = seg.endPoint   ? `(${(+(seg.endPoint.x??0)).toFixed(1)}, ${(+(seg.endPoint.y??0)).toFixed(1)})` : '—';
     } else {
       document.getElementById('mtt-arc-row1').style.display = 'none';
       document.getElementById('mtt-arc-row2').style.display = 'none';
