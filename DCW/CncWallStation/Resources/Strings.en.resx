@@ -141,6 +141,9 @@
   <data name="Menu_Controller" xml:space="preserve">
     <value>Controller</value>
   </data>
+  <data name="Menu_ExceptionReport" xml:space="preserve">
+    <value>Exception Report</value>
+  </data>
   <data name="Menu_Quality" xml:space="preserve">
     <value>Quality Control</value>
   </data>
@@ -461,6 +464,18 @@
   </data>
   <data name="Toggle_Cavity" xml:space="preserve">
     <value>Cavity</value>
+  </data>
+  <data name="Toggle_OriginTransform" xml:space="preserve">
+    <value>Origin Transform</value>
+  </data>
+  <data name="Toggle_Flip" xml:space="preserve">
+    <value>Flip</value>
+  </data>
+  <data name="Tooltip_OriginTransform" xml:space="preserve">
+    <value>Rotate and translate based on current MomJsonData for comparison with original data</value>
+  </data>
+  <data name="Tooltip_Flip" xml:space="preserve">
+    <value>Flip around X axis based on current MomJsonData and recalculate back-face coordinates</value>
   </data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve">
     <value>Load wall MomJSON data and render 3D CSG scene</value>

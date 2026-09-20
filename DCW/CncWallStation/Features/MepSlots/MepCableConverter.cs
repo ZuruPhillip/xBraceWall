@@ -1,5 +1,6 @@
 ﻿using BimWallData.V000;
 using BimWallData.V001;
+using BimWallData.V002;
 using CncWallStation.Consts;
 using CncWallStation.MomWallData;
 using Infrastructure.Maths;
@@ -548,5 +549,131 @@ namespace CncWallStation.Features.MepSlots
       遍历 buildCmds → MepSlot.AddLine / AddArc / LineTo
       • CmdTaperLine → 拆成10小段模拟渐变
          */
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // V002 版本入口：将单个 MepCableCutout 转换并写入 MomWall
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// V002 版本：将 mepCableCutouts 中的单条 cutout 转换为 MepSlot。
+        ///
+        /// 与 V000/V001 的差异：
+        ///   • point 已含 frontFace / type（waffleBox / corner / device）
+        ///   • 槽宽 / 槽深由 cutout.Width / cutout.Depth 提供，而非全局常量
+        ///   • 坐标来自 PointXyDto（XY 平面，Z 为墙厚方向，不参与定位）
+        /// </summary>
+        public static void ConvertV002Cutout(
+            BimMepCableCutoutDtoV002? cutout,
+            MomWall momWallData)
+        {
+            if (cutout == null) return;
+            if (cutout.Points == null || cutout.Points.Count < 2) return;
+
+            // ── 过滤无效点 ───────────────────────────────────────────────────
+            var pts = cutout.Points
+                .Where(p => p.Position != null)
+                .ToList();
+
+            if (pts.Count < 2) return;
+
+            // ── 验证 waffleBox / device 只能为端点 ───────────────────────────
+            for (int i = 1; i < pts.Count - 1; i++)
+            {
+                string? t = pts[i].Type?.ToLowerInvariant();
+                if (t == "wafflebox")
+                    throw new InvalidOperationException(
+                        $"[MepCableCutout {cutout.Sn}] waffleBox 点(index={i})不是端点");
+                if (t == "device")
+                    throw new InvalidOperationException(
+                        $"[MepCableCutout {cutout.Sn}] device 点(index={i})不是端点");
+            }
+
+            // ── 加工面 ───────────────────────────────────────────────────────
+            bool isFront = pts[0].FrontFace;
+            MachineSide side = isFront ? MachineSide.Top : MachineSide.Bottom;
+
+            // ── 特征 ID ──────────────────────────────────────────────────────
+            string id = $"MepCableCutout-{cutout.Sn}";
+
+            // ── 槽宽 / 槽深由 cutout 提供 ─────────────────────────────────────
+            float slotWidth = cutout.Width > 0f ? cutout.Width : WallConstants.MepCableSlotWidth;
+            float slotDepth = cutout.Depth > 0f ? cutout.Depth : WallConstants.MepCableSlotDepth;
+
+            // ── 将 DTO 点转为 Vec2 及 Type ────────────────────────────────────
+            var positions = pts
+                .Select(p => new Vec2((float)p.Position!.X, (float)p.Position.Y))
+                .ToArray();
+
+            var types = pts
+                .Select(p => p.Type?.ToLowerInvariant() ?? "")
+                .ToArray();
+
+            int n = positions.Length;
+
+            // ── Step1: 构造原始折线段列表（深度统一为 cutout 深度）────────────
+            var rawLines = new List<RawLine>();
+            for (int i = 0; i < n - 1; i++)
+                rawLines.Add(new RawLine(positions[i], positions[i + 1], slotDepth));
+
+            // ── Step2/3: 处理 corner 倒角 ────────────────────────────────────
+            var buildCmds = new List<IBuildCmd>();
+            ProcessCorners(rawLines, positions, types,
+                           WallConstants.MepCableSlotCornerRadius, buildCmds);
+
+            // ── Step4: 两端特殊段覆盖 ────────────────────────────────────────
+            string startType = types[0];
+            string endType = types[n - 1];
+
+            ApplyEndType(buildCmds, startType, isStartEnd: true,
+                         WallConstants.WaffleBoxLength,
+                         WallConstants.WaffleBoxWidth,
+                         slotWidth,
+                         WallConstants.DeviceTaperLen,
+                         WallConstants.DeviceDepth,
+                         slotDepth);
+
+            ApplyEndType(buildCmds, endType, isStartEnd: false,
+                         WallConstants.WaffleBoxLength,
+                         WallConstants.WaffleBoxWidth,
+                         slotWidth,
+                         WallConstants.DeviceTaperLen,
+                         WallConstants.DeviceDepth,
+                         slotDepth);
+
+            // ── Step5: 写入 MepSlot ──────────────────────────────────────────
+            if (buildCmds.Count == 0) return;
+
+            var slot = momWallData.AddMepSlot(id, side, width: slotWidth);
+            bool first = true;
+
+            foreach (var cmd in buildCmds)
+            {
+                switch (cmd)
+                {
+                    case CmdLine cl:
+                        if (first) { slot.AddLine(cl.Start, cl.End, cl.Depth); first = false; }
+                        else { slot.LineTo(cl.End, cl.Depth); }
+                        break;
+
+                    case CmdWideLine cwl:
+                        if (first) { slot.AddLine(cwl.Start, cwl.End, cwl.Depth); first = false; }
+                        else { slot.LineTo(cwl.End, cwl.Depth); }
+                        slot.Segments[^1].OverrideWidth = cwl.Width;
+                        break;
+
+                    case CmdTaperLine ctl:
+                        BuildTaperLines(slot, ctl, first);
+                        first = false;
+                        break;
+
+                    case CmdArc ca:
+                        slot.AddArc(ca.Center, ca.Radius,
+                                    ca.StartAngleDeg, ca.EndAngleDeg,
+                                    ca.Depth, ca.IsClockwise);
+                        if (first) first = false;
+                        break;
+                }
+            }
+        }
     }
 }

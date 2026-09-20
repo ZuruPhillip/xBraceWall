@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <Folder Include="V001\" />
+    <Folder Include="V002\" />
   </ItemGroup>
 
   <ItemGroup>

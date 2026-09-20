@@ -142,6 +142,10 @@
   <data name="PageTitle_MomRender" xml:space="preserve"><value>MOM 数据渲染</value></data>
   <data name="Button_LoadMomRender" xml:space="preserve"><value>▶ 加载渲染</value></data>
   <data name="Toggle_Cavity" xml:space="preserve"><value>腔体</value></data>
+  <data name="Toggle_OriginTransform" xml:space="preserve"><value>原点变换</value></data>
+  <data name="Toggle_Flip" xml:space="preserve"><value>翻面</value></data>
+  <data name="Tooltip_OriginTransform" xml:space="preserve"><value>基于当前MomJsonData数据做旋转和平移变换，方便与原数据对比</value></data>
+  <data name="Tooltip_Flip" xml:space="preserve"><value>基于当前MomJsonData数据绕X轴翻面，重新计算反面坐标</value></data>
   <data name="Tooltip_LoadMomRender" xml:space="preserve"><value>加载墙体MomJSON数据并渲染3D CSG场景</value></data>
   <data name="Tooltip_ToggleWallMom" xml:space="preserve"><value>切换墙体主体图层</value></data>
   <data name="Tooltip_ToggleCavity" xml:space="preserve"><value>切换切削腔体图层</value></data>
