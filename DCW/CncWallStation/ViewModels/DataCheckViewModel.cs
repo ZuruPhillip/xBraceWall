@@ -213,6 +213,18 @@ namespace CncWallStation.ViewModels
 
             // 初始化批量预检版本选项（基于当前语言）
             InitBatchFilterVersionOptions();
+
+            // 语言切换时刷新特征类别名称（中/英文）
+            LocalizationService.Instance.CultureChanged += OnCultureChanged;
+        }
+
+        private void OnCultureChanged(object? sender, string cultureName)
+        {
+            // 重新赋值集合，触发 FeatureCategoryNameConverter 重新求值
+            if (BimFeatureResults.Count > 0)
+                BimFeatureResults = new ObservableCollection<FeatureCategoryResult>(BimFeatureResults);
+            if (MomFeatureResults.Count > 0)
+                MomFeatureResults = new ObservableCollection<FeatureCategoryResult>(MomFeatureResults);
         }
 
         private void InitBatchFilterVersionOptions()

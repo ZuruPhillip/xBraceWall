@@ -1,4 +1,5 @@
-﻿using CncWallStation.Models;
+﻿using CncWallStation.Localization;
+using CncWallStation.Models;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Enums;
 using CncWallStation.Services.Application;
@@ -72,8 +73,8 @@ namespace CncWallStation.ViewModels
 
         // 加工状态
         [ObservableProperty] private string _machiningDurationText = "00:00:00";
-        [ObservableProperty] private string _operatorName = "操作员";
-        [ObservableProperty] private string _statusText = "就绪";
+        [ObservableProperty] private string _operatorName = LocalizationService.Instance["Column_Operator"];
+        [ObservableProperty] private string _statusText = LocalizationService.Instance["CheckStatus_Ready"];
         [ObservableProperty] private string _statusBadgeBackground = "#1677FF";
         [ObservableProperty] private string _statusIndicatorColor = "#FFFFFF";
         [ObservableProperty] private string _progressText = "0%";
@@ -511,13 +512,14 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.StartMachiningAsync(CurrentWall.Id, OperatorName);
                 StartTimer();
                 UpdateButtonStates(ProcessStatus.加工中);
-                SetStatus("加工中", "#4CAF50");
+                SetStatus(ProcessStatus.加工中, "#4CAF50");
                 _logger.LogInformation("开始加工: {WallId}", CurrentWall.WallId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "开始加工失败");
-                MessageBox.Show($"开始加工失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Controller_MsgStartFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -530,7 +532,7 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.PauseMachiningAsync(CurrentWall.Id);
                 StopTimer();
                 UpdateButtonStates(ProcessStatus.暂停);
-                SetStatus("暂停", "#FF9800");
+                SetStatus(ProcessStatus.暂停, "#FF9800");
                 _logger.LogInformation("暂停加工: {WallId}", CurrentWall.WallId);
             }
             catch (Exception ex)
@@ -548,13 +550,14 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.EmergencyStopAsync(CurrentWall.Id);
                 StopTimer();
                 UpdateButtonStates(ProcessStatus.暂停);
-                SetStatus("急停", "#F44336");
+                SetEmergencyStopStatus("#F44336");
                 _logger.LogWarning("急停: {WallId}", CurrentWall.WallId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "急停失败");
-                MessageBox.Show($"急停失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Controller_MsgEmergencyStopFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -567,7 +570,7 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.ResetMachiningAsync(CurrentWall.Id);
                 ResetTimer();
                 UpdateButtonStates(ProcessStatus.待加工);
-                SetStatus("待加工", "#9E9E9E");
+                SetStatus(ProcessStatus.待加工, "#9E9E9E");
                 _logger.LogInformation("复位: {WallId}", CurrentWall.WallId);
             }
             catch (Exception ex)
@@ -582,21 +585,23 @@ namespace CncWallStation.ViewModels
             if (CurrentWall == null)
             {
                 _logger.LogWarning("异常登记失败：当前无选中墙体");
-                MessageBox.Show("请先在左侧加工队列中选择墙体", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(LocalizationService.Instance["Controller_MsgSelectWallFirst"],
+                    LocalizationService.Instance["Msg_Title_Info"], MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
             try
             {
                 // 弹出异常登记窗口，不改变墙体加工状态
-                OpenMarkExceptionWindow(CurrentWall.WallId, "异常登记");
+                OpenMarkExceptionWindow(CurrentWall.WallId, LocalizationService.Instance["Controller_RegisterException"]);
                 _logger.LogInformation("异常登记: {WallId}", CurrentWall.WallId);
                 await Task.CompletedTask;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "异常登记弹出窗口失败");
-                MessageBox.Show($"打开窗口失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Controller_MsgOpenWindowFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -609,7 +614,7 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.MarkExceptionAsync(CurrentWall.Id, OperatorName);
                 StopTimer();
                 UpdateButtonStates(ProcessStatus.中止);
-                SetStatus("异常", "#F44336");
+                SetStatus(ProcessStatus.异常, "#F44336");
                 _logger.LogWarning("标记异常: {WallId}", CurrentWall.WallId);
 
                 // 弹出异常登记窗口
@@ -650,8 +655,8 @@ namespace CncWallStation.ViewModels
             if (CurrentWall == null) return;
 
             var result = MessageBox.Show(
-                $"确认完成加工？\n墙体：{CurrentWall.WallId}\n操作人：{OperatorName}",
-                "确认完成", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                string.Format(LocalizationService.Instance["Controller_MsgConfirmComplete"], CurrentWall.WallId, OperatorName),
+                LocalizationService.Instance["Controller_MsgConfirmCompleteTitle"], MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result != MessageBoxResult.Yes) return;
 
@@ -660,7 +665,7 @@ namespace CncWallStation.ViewModels
                 await _machiningAppService.CompleteMachiningAsync(CurrentWall.Id, OperatorName);
                 StopTimer();
                 UpdateButtonStates(ProcessStatus.待质检);
-                SetStatus("待质检", "#2196F3");
+                SetStatus(ProcessStatus.待质检, "#2196F3");
                 _logger.LogInformation("完成加工: {WallId}, 进入待质检", CurrentWall.WallId);
 
                 // 刷新队列
@@ -669,7 +674,8 @@ namespace CncWallStation.ViewModels
             catch (Exception ex)
             {
                 _logger.LogError(ex, "完成加工失败");
-                MessageBox.Show($"完成加工失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(LocalizationService.Instance["Controller_MsgCompleteFailed"], ex.Message),
+                    LocalizationService.Instance["Msg_Title_Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -684,26 +690,45 @@ namespace CncWallStation.ViewModels
             CanComplete = status == ProcessStatus.加工中;
         }
 
-        private void SetStatus(string text, string indicatorColor)
+        private void SetStatus(ProcessStatus status, string indicatorColor)
         {
-            StatusText = text;
+            StatusText = GetStatusText(status);
             StatusIndicatorColor = indicatorColor;
-            StatusBadgeBackground = GetBadgeBackground(text);
+            StatusBadgeBackground = GetBadgeBackground(status);
         }
 
-        private static string GetBadgeBackground(string status) => status switch
+        private void SetEmergencyStopStatus(string indicatorColor)
         {
-            "就绪" => "#1677FF",
-            "待加工" => "#95A5A6",
-            "加工中" => "#90D5FF",
-            "暂停" => "#FFD591",
-            "急停" => "#FFA39E",
-            "异常" => "#FFA39E",
-            "中止" => "#FFA39E",
-            "待质检" => "#FFD591",
-            "已质检" => "#B7EB8F",
-            "已完成" => "#B7EB8F",
-            _ => "#D9D9D9"
+            StatusText = LocalizationService.Instance["Status_EmergencyStop"];
+            StatusIndicatorColor = indicatorColor;
+            StatusBadgeBackground = GetBadgeBackground(ProcessStatus.异常);
+        }
+
+        private static string GetStatusText(ProcessStatus status) => status switch
+        {
+            ProcessStatus.待校验 => LocalizationService.Instance["Status_PendingValidation"],
+            ProcessStatus.待加工 => LocalizationService.Instance["Status_Queued"],
+            ProcessStatus.加工中 => LocalizationService.Instance["Status_Processing"],
+            ProcessStatus.暂停 => LocalizationService.Instance["Status_Paused"],
+            ProcessStatus.异常 => LocalizationService.Instance["Status_Error"],
+            ProcessStatus.中止 => LocalizationService.Instance["Status_Aborted"],
+            ProcessStatus.待质检 => LocalizationService.Instance["Status_PendingQC"],
+            ProcessStatus.已质检 => LocalizationService.Instance["Status_Inspected"],
+            ProcessStatus.已完成 => LocalizationService.Instance["Status_Completed"],
+            _ => LocalizationService.Instance["CheckStatus_Ready"]
+        };
+
+        private static string GetBadgeBackground(ProcessStatus status) => status switch
+        {
+            ProcessStatus.待加工 => "#95A5A6",
+            ProcessStatus.加工中 => "#90D5FF",
+            ProcessStatus.暂停 => "#FFD591",
+            ProcessStatus.异常 => "#FFA39E",
+            ProcessStatus.中止 => "#FFA39E",
+            ProcessStatus.待质检 => "#FFD591",
+            ProcessStatus.已质检 => "#B7EB8F",
+            ProcessStatus.已完成 => "#B7EB8F",
+            _ => "#1677FF"
         };
 
         private static string GetStageColor(int status) => status switch

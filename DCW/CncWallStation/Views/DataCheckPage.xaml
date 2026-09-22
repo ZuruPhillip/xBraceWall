@@ -20,6 +20,7 @@
         <local:BoolInvertConverter x:Key="BoolInvertConverter"/>
         <local:ScoreToColorConverter x:Key="ScoreToColorConverter"/>
         <local:IsPassedToColorConverter x:Key="IsPassedToColorConverter"/>
+        <local:FeatureCategoryNameConverter x:Key="FeatureCategoryNameConverter"/>
     </Page.Resources>
 
     <Grid Background="#F5F5F5">
@@ -218,7 +219,7 @@
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           IsReadOnly="True" RowHeight="32">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding CategoryNameCn}" Width="120"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding Converter={StaticResource FeatureCategoryNameConverter}}" Width="120"/>
                                         <DataGridTextColumn Header="{l:Loc Column_CheckItems}" Binding="{Binding CheckItemCount}" Width="70"/>
                                         <DataGridTextColumn Header="{l:Loc Severity_Critical}" Binding="{Binding CriticalCount}" Width="60">
                                             <DataGridTextColumn.ElementStyle>
@@ -281,7 +282,7 @@
                                           CanUserAddRows="False" CanUserDeleteRows="False"
                                           IsReadOnly="True" RowHeight="32">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding CategoryNameCn}" Width="120"/>
+                                        <DataGridTextColumn Header="{l:Loc Column_FeatureName}" Binding="{Binding Converter={StaticResource FeatureCategoryNameConverter}}" Width="120"/>
                                         <DataGridTextColumn Header="{l:Loc Column_CheckItems}" Binding="{Binding CheckItemCount}" Width="70"/>
                                         <DataGridTextColumn Header="{l:Loc Severity_Critical}" Binding="{Binding CriticalCount}" Width="60"/>
                                         <DataGridTextColumn Header="{l:Loc Severity_Error}" Binding="{Binding ErrorCount}" Width="60"/>

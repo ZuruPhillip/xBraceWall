@@ -100,4 +100,21 @@ namespace CncWallStation.Views
             => throw new NotImplementedException();
     }
 
+    /// <summary>特征类别结果 → 当前语言对应的类别名称（中文/英文）</summary>
+    public class FeatureCategoryNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Models.Dtos.FeatureCategoryResult result)
+            {
+                bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
+                return isEn ? result.CategoryNameEn : result.CategoryNameCn;
+            }
+            return string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            => throw new NotImplementedException();
+    }
+
 }

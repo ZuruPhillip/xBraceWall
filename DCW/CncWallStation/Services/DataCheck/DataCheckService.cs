@@ -83,6 +83,7 @@ namespace CncWallStation.Services.DataCheck
                     {
                         CategoryName = "BimValidation",
                         CategoryNameCn = "Bim校验异常",
+                        CategoryNameEn = "Bim Validation Error",
                         CheckItemCount = 1,
                         CriticalCount = 1,
                         Score = 0,
@@ -123,6 +124,7 @@ namespace CncWallStation.Services.DataCheck
                         {
                             CategoryName = "MomValidation",
                             CategoryNameCn = "Mom校验异常",
+                            CategoryNameEn = "Mom Validation Error",
                             CheckItemCount = 1,
                             CriticalCount = 1,
                             Score = 0,

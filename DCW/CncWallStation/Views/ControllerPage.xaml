@@ -50,7 +50,7 @@
 
                 <!-- 墙体ID -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
-                    <TextBlock Text="墙体ID" Style="{StaticResource DetailLabelText}"
+                    <TextBlock Text="{l:Loc Common_WallId}" Style="{StaticResource DetailLabelText}"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding CurrentWall.WallId, FallbackValue=---}"
                                Style="{StaticResource DetailValueText}" VerticalAlignment="Center"/>
@@ -61,7 +61,7 @@
 
                 <!-- 项目号 -->
                 <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
-                    <TextBlock Text="项目号" Style="{StaticResource DetailLabelText}"
+                    <TextBlock Text="{l:Loc Controller_ProjectNo}" Style="{StaticResource DetailLabelText}"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding CurrentWall.ProjectName, FallbackValue=---}"
                                Foreground="#595959" FontSize="13" VerticalAlignment="Center"/>
@@ -69,7 +69,7 @@
 
                 <!-- 楼层 -->
                 <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,24,0">
-                    <TextBlock Text="楼层" Style="{StaticResource DetailLabelText}"
+                    <TextBlock Text="{l:Loc Common_Floor}" Style="{StaticResource DetailLabelText}"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding CurrentWall.Floor, StringFormat={}{0}F, FallbackValue=---}"
                                Foreground="#595959" FontSize="13" VerticalAlignment="Center"/>
@@ -79,13 +79,13 @@
                 <Border Grid.Column="5" CornerRadius="3" Padding="8,3" Margin="0,0,16,0"
                         VerticalAlignment="Center"
                         Background="{Binding StageBackground, FallbackValue=#E6F4FF}">
-                    <TextBlock Text="{Binding CurrentWall.PipelineStageText, FallbackValue=待加载}"
+                    <TextBlock Text="{Binding CurrentWall.PipelineStageText, FallbackValue={l:Loc Controller_Loading}}"
                                Foreground="#1677FF" FontSize="12" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- 版本 -->
                 <StackPanel Grid.Column="6" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <TextBlock Text="版本" Style="{StaticResource DetailLabelText}"
+                    <TextBlock Text="{l:Loc Common_Version}" Style="{StaticResource DetailLabelText}"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding CurrentWall.SchemaVersion, FallbackValue=---}"
                                Foreground="#595959" FontSize="12" VerticalAlignment="Center"/>
@@ -93,7 +93,7 @@
 
                 <!-- 导入时间 -->
                 <StackPanel Grid.Column="7" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="导入时间" Style="{StaticResource DetailLabelText}"
+                    <TextBlock Text="{l:Loc Common_ImportTime}" Style="{StaticResource DetailLabelText}"
                                VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding CurrentWall.ImportTime, StringFormat='yyyy-MM-dd HH:mm', FallbackValue=---}"
                                Foreground="#595959" FontSize="12" VerticalAlignment="Center"/>
@@ -163,27 +163,27 @@
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
-                                <TextBlock Text="共 " Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{l:Loc Pagination_Total}" Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding TotalCount}" Foreground="#1677FF" FontSize="12"
                                            FontWeight="Bold" VerticalAlignment="Center"/>
-                                <TextBlock Text=" 条" Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{l:Loc Controller_ItemsUnit}" Foreground="#8C8C8C" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
-                                <Button Content="上一页" Height="26" MinWidth="60"
+                                <Button Content="{l:Loc Controller_PrevPage}" Height="26" MinWidth="60"
                                         Command="{Binding PreviousPageCommand}"
                                         IsEnabled="{Binding CanPreviousPage}"
                                         Style="{StaticResource BaseButtonStyle}"
                                         FontSize="11" Padding="8,2"/>
                                 <TextBlock Foreground="#595959" FontSize="12" VerticalAlignment="Center" Margin="12,0">
-                                    <Run Text="第 "/>
+                                    <Run Text="{l:Loc Pagination_Page}"/>
                                     <Run Text="{Binding DisplayPageIndex, Mode=OneWay}" FontWeight="Bold" Foreground="#1677FF"/>
-                                    <Run Text=" / "/>
+                                    <Run Text="{l:Loc Pagination_Separator}"/>
                                     <Run Text="{Binding TotalPages, Mode=OneWay}" Foreground="#8C8C8C"/>
-                                    <Run Text=" 页"/>
+                                    <Run Text="{l:Loc Pagination_PageSuffix}"/>
                                 </TextBlock>
-                                <Button Content="下一页" Height="26" MinWidth="60"
+                                <Button Content="{l:Loc Controller_NextPage}" Height="26" MinWidth="60"
                                         Command="{Binding NextPageCommand}"
                                         IsEnabled="{Binding CanNextPage}"
                                         Style="{StaticResource BaseButtonStyle}"
@@ -211,7 +211,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Border Width="3" Height="14" Background="#1890FF"
                                     CornerRadius="2" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="实时参数" Foreground="#262626"
+                            <TextBlock Text="{l:Loc Controller_RealtimeParams}" Foreground="#262626"
                                        FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
@@ -249,7 +249,7 @@
                         <Border Padding="12,10" CornerRadius="4"
                                 Background="#E6F4FF" BorderBrush="#1677FF" BorderThickness="1">
                             <StackPanel>
-                                <TextBlock Text="加工进度" Style="{StaticResource DetailLabelText}" Margin="0,0,0,4"/>
+                                <TextBlock Text="{l:Loc Controller_Progress}" Style="{StaticResource DetailLabelText}" Margin="0,0,0,4"/>
                                 <TextBlock Text="{Binding ProgressText}" Foreground="#1677FF"
                                            FontSize="24" FontWeight="Bold"
                                            FontFamily="Consolas, Courier New"/>
@@ -274,13 +274,13 @@
                 <!-- 左侧：加工时长 + 操作人 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <StackPanel Margin="0,0,32,0">
-                        <TextBlock Text="加工时长" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
+                        <TextBlock Text="{l:Loc Controller_Duration}" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
                         <TextBlock Text="{Binding MachiningDurationText}"
                                    Foreground="#1677FF" FontSize="24" FontWeight="Bold"
                                    FontFamily="Consolas, Courier New"/>
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock Text="操作人" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
+                        <TextBlock Text="{l:Loc Controller_Operator}" Style="{StaticResource DetailLabelText}" Margin="0,0,0,2"/>
                         <TextBox Text="{Binding OperatorName, UpdateSourceTrigger=PropertyChanged}"
                                  Foreground="#262626" FontSize="13"
                                  Style="{StaticResource BaseTextBoxStyle}"
@@ -298,7 +298,7 @@
                         <Border Width="10" Height="10" CornerRadius="5" Margin="0,0,10,0"
                                 VerticalAlignment="Center"
                                 Background="{Binding StatusIndicatorColor, FallbackValue=#BFBFBF}"/>
-                        <TextBlock Text="{Binding StatusText, FallbackValue=就绪}"
+                        <TextBlock Text="{Binding StatusText, FallbackValue={l:Loc CheckStatus_Ready}}"
                                    Foreground="#FFFFFF" FontSize="14" FontWeight="Bold"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
@@ -307,45 +307,45 @@
                 <!-- 右侧：控制按钮组 -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <!-- 开始加工 -->
-                    <Button Content="开始" Height="34" MinWidth="70" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_Start}" Height="34" MinWidth="70" Margin="0,0,6,0"
                             Command="{Binding StartCommand}"
                             IsEnabled="{Binding CanStart}"
                             Style="{StaticResource PrimaryButtonStyle}"/>
 
                     <!-- 暂停 -->
-                    <Button Content="暂停" Height="34" MinWidth="70" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_Pause}" Height="34" MinWidth="70" Margin="0,0,6,0"
                             Command="{Binding PauseCommand}"
                             IsEnabled="{Binding CanPause}"
                             Style="{StaticResource WarningButtonStyle}"/>
 
                     <!-- 急停 -->
-                    <Button Content="急停" Height="34" MinWidth="70" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_EmergencyStop}" Height="34" MinWidth="70" Margin="0,0,6,0"
                             Command="{Binding EmergencyStopCommand}"
                             IsEnabled="{Binding CanEmergencyStop}"
                             Style="{StaticResource DangerButtonStyle}"
                             FontSize="14" FontWeight="Bold"/>
 
                     <!-- 复位 -->
-                    <Button Content="复位" Height="34" MinWidth="70" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_Reset}" Height="34" MinWidth="70" Margin="0,0,6,0"
                             Command="{Binding ResetCommand}"
                             IsEnabled="{Binding CanReset}"
                             Style="{StaticResource BaseButtonStyle}"/>
 
                     <!-- 异常登记 -->
-                    <Button Content="异常登记" Height="34" MinWidth="90" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_RegisterException}" Height="34" MinWidth="90" Margin="0,0,6,0"
                             Command="{Binding RegisterExceptionCommand}"
                             Style="{StaticResource BaseButtonStyle}"
                             Foreground="#8C8C8C" FontWeight="SemiBold"/>
 
                     <!-- 标记异常 -->
-                    <Button Content="标记异常" Height="34" MinWidth="90" Margin="0,0,6,0"
+                    <Button Content="{l:Loc Controller_MarkException}" Height="34" MinWidth="90" Margin="0,0,6,0"
                             Command="{Binding MarkExceptionCommand}"
                             IsEnabled="{Binding CanMarkException}"
                             Style="{StaticResource BaseButtonStyle}"
                             Foreground="#E67E22" FontWeight="SemiBold"/>
 
                     <!-- 完成加工 -->
-                    <Button Content="完成" Height="34" MinWidth="70"
+                    <Button Content="{l:Loc Controller_Complete}" Height="34" MinWidth="70"
                             Command="{Binding CompleteCommand}"
                             IsEnabled="{Binding CanComplete}"
                             Style="{StaticResource PrimaryButtonStyle}"/>

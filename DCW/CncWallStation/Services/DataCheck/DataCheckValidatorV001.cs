@@ -35,7 +35,37 @@ namespace CncWallStation.Services.DataCheck
             { "waffleSlabLinks", "华夫板链接" },
             { "aacSlices", "AAC砖" },
             { "coreThickness", "砖块厚度" },
-            { "baseFields", "基础字段" }
+            { "baseFields", "基础字段" },
+            { "WallGeometry", "墙体几何" },
+            { "BasicProperties", "基础属性" },
+            { "Features", "特征" },
+            { "Transform", "变换" },
+            { "MomJson", "MomJSON解析" }
+        };
+
+        private static readonly Dictionary<string, string> FeatureNameEnMap = new()
+        {
+            { "aacWallElevation", "Wall Elevation" },
+            { "columnAssemblies", "Column Assemblies" },
+            { "rebars", "Rebars" },
+            { "topPlate", "Top Plate" },
+            { "shearKeys", "Shear Keys" },
+            { "mepCables", "MEP Cables" },
+            { "mepDevices", "MEP Devices" },
+            { "openingHoles", "Openings" },
+            { "tensionTie", "Tension Tie" },
+            { "xps", "XPS Insulation" },
+            { "faceFinishes", "Face Finishes" },
+            { "proppingConnectors", "Propping Connectors" },
+            { "waffleSlabLinks", "Waffle Slab Links" },
+            { "aacSlices", "AAC Blocks" },
+            { "coreThickness", "Core Thickness" },
+            { "baseFields", "Base Fields" },
+            { "WallGeometry", "Wall Geometry" },
+            { "BasicProperties", "Basic Properties" },
+            { "Features", "Features" },
+            { "Transform", "Transform" },
+            { "MomJson", "Mom JSON Parsing" }
         };
 
         // ==================== BimData 校验 ====================
@@ -55,6 +85,7 @@ namespace CncWallStation.Services.DataCheck
                 {
                     CategoryName = "baseFields",
                     CategoryNameCn = "基础字段",
+                    CategoryNameEn = "Base Fields",
                     CheckItemCount = 1,
                     CriticalCount = 1,
                     Score = 0,
@@ -82,6 +113,7 @@ namespace CncWallStation.Services.DataCheck
                 {
                     CategoryName = "baseFields",
                     CategoryNameCn = "基础字段",
+                    CategoryNameEn = "Base Fields",
                     CheckItemCount = 1,
                     CriticalCount = 1,
                     Score = 0,
@@ -173,6 +205,7 @@ namespace CncWallStation.Services.DataCheck
                 {
                     CategoryName = "MomJson",
                     CategoryNameCn = "MomJSON解析",
+                    CategoryNameEn = "Mom JSON Parsing",
                     CheckItemCount = 1,
                     CriticalCount = 1,
                     Score = 0,
@@ -199,6 +232,7 @@ namespace CncWallStation.Services.DataCheck
                 {
                     CategoryName = "MomJson",
                     CategoryNameCn = "MomJSON解析",
+                    CategoryNameEn = "Mom JSON Parsing",
                     CheckItemCount = 1,
                     CriticalCount = 1,
                     Score = 0,
@@ -724,6 +758,7 @@ namespace CncWallStation.Services.DataCheck
             {
                 CategoryName = categoryName,
                 CategoryNameCn = FeatureNameCnMap.TryGetValue(categoryName, out var cn) ? cn : categoryName,
+                CategoryNameEn = FeatureNameEnMap.TryGetValue(categoryName, out var en) ? en : categoryName,
                 CheckItemCount = checkCount,
                 CriticalCount = errors.Count(e => e.Severity == ErrorSeverity.Critical),
                 ErrorCount = errors.Count(e => e.Severity == ErrorSeverity.Error),

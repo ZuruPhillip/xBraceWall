@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CncWallStation.Localization;
+using CncWallStation.Models.Enums;
 
 namespace CncWallStation.Models.Dtos
 {
@@ -87,7 +89,10 @@ namespace CncWallStation.Models.Dtos
         public string SchemaVersion { get; set; } = "V0.0.0";
         public int AuditStatus { get; set; }
         public bool IsAudited => AuditStatus == 1;
-        public string AuditStatusText => IsAudited ? "已审核" : "未审核";
+        public string AuditStatusText =>
+            LocalizationService.Instance.CurrentLanguage.StartsWith("en")
+                ? AuditStatusExtensions.FromInt(AuditStatus).ToDisplayTextEn()
+                : AuditStatusExtensions.FromInt(AuditStatus).ToDisplayText();
         public string ProjectName { get; set; } = string.Empty;
         public int Floor { get; set; }
         public string BimJsonData { get; set; } = string.Empty;

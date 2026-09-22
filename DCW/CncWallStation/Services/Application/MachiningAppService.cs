@@ -1,4 +1,5 @@
 using CncWallStation.EntityFrameworkCore;
+using CncWallStation.Localization;
 using CncWallStation.Models;
 using CncWallStation.Models.Dtos;
 using CncWallStation.Models.Entities;
@@ -65,6 +66,7 @@ namespace CncWallStation.Services.Application
                 return null;
             }
 
+            bool isEn = LocalizationService.Instance.CurrentLanguage.StartsWith("en");
             return new WallInfoDto
             {
                 Id = wall.Id,
@@ -76,12 +78,12 @@ namespace CncWallStation.Services.Application
                 Floor = wall.Floor,
                 BimJsonData = wall.BimJsonData,
                 MomJsonData = wall.MomJsonData,
-                PipelineStage = wall.PipelineStage.ToDisplayText(),
-                PipelineStageText = wall.PipelineStage.ToDisplayText(),
+                PipelineStage = isEn ? wall.PipelineStage.ToDisplayTextEn() : wall.PipelineStage.ToDisplayText(),
+                PipelineStageText = isEn ? wall.PipelineStage.ToDisplayTextEn() : wall.PipelineStage.ToDisplayText(),
                 Priority = wall.Priority,
                 ImportTime = wall.ImportTime,
                 Status = wall.Status,
-                StatusText = ((ProcessStatus)wall.Status).ToDisplayText(),
+                StatusText = isEn ? ((ProcessStatus)wall.Status).ToDisplayTextEn() : ((ProcessStatus)wall.Status).ToDisplayText(),
                 UpdatedBy = wall.UpdatedBy
             };
         }

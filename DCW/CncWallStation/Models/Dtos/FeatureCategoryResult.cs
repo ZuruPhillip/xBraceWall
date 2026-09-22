@@ -14,6 +14,9 @@ namespace CncWallStation.Models.Dtos
         /// <summary>特征类别中文名称</summary>
         public string CategoryNameCn { get; set; } = string.Empty;
 
+        /// <summary>特征类别英文名称</summary>
+        public string CategoryNameEn { get; set; } = string.Empty;
+
         /// <summary>检查项总数</summary>
         public int CheckItemCount { get; set; }
 

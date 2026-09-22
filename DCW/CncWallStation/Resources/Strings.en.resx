@@ -519,6 +519,107 @@
   <data name="Tooltip_GenerateWallData" xml:space="preserve">
     <value>Convert BimWall to WallData</value>
   </data>
+  <data name="Controller_ProjectNo" xml:space="preserve">
+    <value>Project No.</value>
+  </data>
+  <data name="Controller_Loading" xml:space="preserve">
+    <value>Loading...</value>
+  </data>
+  <data name="Controller_PrevPage" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Controller_NextPage" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Controller_ItemsUnit" xml:space="preserve">
+    <value> items</value>
+  </data>
+  <data name="Controller_RealtimeParams" xml:space="preserve">
+    <value>Realtime Parameters</value>
+  </data>
+  <data name="Controller_Progress" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="Controller_Duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="Controller_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="Controller_Start" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="Controller_Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="Controller_EmergencyStop" xml:space="preserve">
+    <value>E-Stop</value>
+  </data>
+  <data name="Controller_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Controller_RegisterException" xml:space="preserve">
+    <value>Log Exception</value>
+  </data>
+  <data name="Controller_MarkException" xml:space="preserve">
+    <value>Mark Exception</value>
+  </data>
+  <data name="Controller_Complete" xml:space="preserve">
+    <value>Complete</value>
+  </data>
+  <data name="Status_PendingValidation" xml:space="preserve">
+    <value>Pending</value>
+  </data>
+  <data name="Status_Queued" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="Status_Processing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="Status_Paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="Status_EmergencyStop" xml:space="preserve">
+    <value>E-Stop</value>
+  </data>
+  <data name="Status_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Status_Aborted" xml:space="preserve">
+    <value>Aborted</value>
+  </data>
+  <data name="Status_PendingQC" xml:space="preserve">
+    <value>Pending QC</value>
+  </data>
+  <data name="Status_Inspected" xml:space="preserve">
+    <value>Inspected</value>
+  </data>
+  <data name="Status_Completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="Controller_MsgStartFailed" xml:space="preserve">
+    <value>Failed to start machining: {0}</value>
+  </data>
+  <data name="Controller_MsgEmergencyStopFailed" xml:space="preserve">
+    <value>Failed to emergency stop: {0}</value>
+  </data>
+  <data name="Controller_MsgCompleteFailed" xml:space="preserve">
+    <value>Failed to complete machining: {0}</value>
+  </data>
+  <data name="Controller_MsgOpenWindowFailed" xml:space="preserve">
+    <value>Failed to open window: {0}</value>
+  </data>
+  <data name="Controller_MsgSelectWallFirst" xml:space="preserve">
+    <value>Please select a wall from the queue on the left first</value>
+  </data>
+  <data name="Controller_MsgConfirmComplete" xml:space="preserve">
+    <value>Confirm complete machining?
+Wall: {0}
+Operator: {1}</value>
+  </data>
+  <data name="Controller_MsgConfirmCompleteTitle" xml:space="preserve">
+    <value>Confirm Completion</value>
+  </data>
   <data name="PageTitle_JsonEditor" xml:space="preserve">
     <value>JSON Editor</value>
   </data>
@@ -776,6 +877,15 @@
   </data>
   <data name="Label_ActualHeight" xml:space="preserve">
     <value>H:</value>
+  </data>
+  <data name="Label_MachiningSide" xml:space="preserve">
+    <value>Machining Side:</value>
+  </data>
+  <data name="Label_FrontSide" xml:space="preserve">
+    <value>Front</value>
+  </data>
+  <data name="Label_BackSide" xml:space="preserve">
+    <value>Back</value>
   </data>
   <data name="Placeholder_PlcSearch" xml:space="preserve">
     <value>Enter Wall ID and press Enter</value>

@@ -165,6 +165,49 @@
   <data name="Tooltip_TestBtn" xml:space="preserve"><value>加载AAC墙体3D渲染页面</value></data>
   <data name="Tooltip_GenerateWallData" xml:space="preserve"><value>BimWall转换为WallData数据</value></data>
 
+  <!--  ControllerPage - 顶部状态栏 -->
+  <data name="Controller_ProjectNo" xml:space="preserve"><value>项目号</value></data>
+  <data name="Controller_Loading" xml:space="preserve"><value>待加载</value></data>
+  <!--  ControllerPage - 分页 -->
+  <data name="Controller_PrevPage" xml:space="preserve"><value>上一页</value></data>
+  <data name="Controller_NextPage" xml:space="preserve"><value>下一页</value></data>
+  <data name="Controller_ItemsUnit" xml:space="preserve"><value> 条</value></data>
+  <!--  ControllerPage - 参数面板 -->
+  <data name="Controller_RealtimeParams" xml:space="preserve"><value>实时参数</value></data>
+  <data name="Controller_Progress" xml:space="preserve"><value>加工进度</value></data>
+  <!--  ControllerPage - 底部控制栏 -->
+  <data name="Controller_Duration" xml:space="preserve"><value>加工时长</value></data>
+  <data name="Controller_Operator" xml:space="preserve"><value>操作人</value></data>
+  <!--  ControllerPage - 控制按钮 -->
+  <data name="Controller_Start" xml:space="preserve"><value>开始</value></data>
+  <data name="Controller_Pause" xml:space="preserve"><value>暂停</value></data>
+  <data name="Controller_EmergencyStop" xml:space="preserve"><value>急停</value></data>
+  <data name="Controller_Reset" xml:space="preserve"><value>复位</value></data>
+  <data name="Controller_RegisterException" xml:space="preserve"><value>异常登记</value></data>
+  <data name="Controller_MarkException" xml:space="preserve"><value>标记异常</value></data>
+  <data name="Controller_Complete" xml:space="preserve"><value>完成</value></data>
+  <!--  ControllerPage - 加工状态 -->
+  <data name="Status_PendingValidation" xml:space="preserve"><value>待校验</value></data>
+  <data name="Status_Queued" xml:space="preserve"><value>待加工</value></data>
+  <data name="Status_Processing" xml:space="preserve"><value>加工中</value></data>
+  <data name="Status_Paused" xml:space="preserve"><value>暂停</value></data>
+  <data name="Status_EmergencyStop" xml:space="preserve"><value>急停</value></data>
+  <data name="Status_Error" xml:space="preserve"><value>异常</value></data>
+  <data name="Status_Aborted" xml:space="preserve"><value>中止</value></data>
+  <data name="Status_PendingQC" xml:space="preserve"><value>待质检</value></data>
+  <data name="Status_Inspected" xml:space="preserve"><value>已质检</value></data>
+  <data name="Status_Completed" xml:space="preserve"><value>已完成</value></data>
+  <!--  ControllerPage - MessageBox -->
+  <data name="Controller_MsgStartFailed" xml:space="preserve"><value>开始加工失败：{0}</value></data>
+  <data name="Controller_MsgEmergencyStopFailed" xml:space="preserve"><value>急停失败：{0}</value></data>
+  <data name="Controller_MsgCompleteFailed" xml:space="preserve"><value>完成加工失败：{0}</value></data>
+  <data name="Controller_MsgOpenWindowFailed" xml:space="preserve"><value>打开窗口失败：{0}</value></data>
+  <data name="Controller_MsgSelectWallFirst" xml:space="preserve"><value>请先在左侧加工队列中选择墙体</value></data>
+  <data name="Controller_MsgConfirmComplete" xml:space="preserve"><value>确认完成加工？
+墙体：{0}
+操作人：{1}</value></data>
+  <data name="Controller_MsgConfirmCompleteTitle" xml:space="preserve"><value>确认完成</value></data>
+
   <!-- ══════════════════════════════════════════ -->
   <!--  JsonEditPage                             -->
   <!-- ══════════════════════════════════════════ -->
@@ -262,6 +305,9 @@
   <data name="Label_ActualLength" xml:space="preserve"><value>长:</value></data>
   <data name="Label_ActualWidth" xml:space="preserve"><value>宽:</value></data>
   <data name="Label_ActualHeight" xml:space="preserve"><value>高:</value></data>
+  <data name="Label_MachiningSide" xml:space="preserve"><value>加工面：</value></data>
+  <data name="Label_FrontSide" xml:space="preserve"><value>正面</value></data>
+  <data name="Label_BackSide" xml:space="preserve"><value>反面</value></data>
   <data name="Placeholder_PlcSearch" xml:space="preserve"><value>输入墙体 ID 回车搜索</value></data>
   <data name="Button_UnauditPlc" xml:space="preserve"><value>反审核</value></data>
   <data name="Button_SendCommand" xml:space="preserve"><value>下发指令</value></data>
