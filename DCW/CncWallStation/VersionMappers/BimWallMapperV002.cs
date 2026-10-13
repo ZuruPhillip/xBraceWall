@@ -473,7 +473,7 @@ namespace CncWallStation.VersionMappers
 
                 var center = new Vec2(
                     (float)device.Position.X,
-                    (float)device.Position.Y);
+                    (float)device.Position.Z);
 
                 var pocket = new Pocket(
                     id: id,
