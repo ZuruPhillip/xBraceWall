@@ -494,7 +494,12 @@ const GROOVE_COLORS = {
   baseBracket : { hex: 0x66bb6a, cn:'底部托架', en:'Base Bracket', css: '#66bb6a' },
   topPlate    : { hex: 0xffa726, cn:'顶板槽',   en:'Top Plate',   css: '#ffa726' },
   glueSeal    : { hex: 0xf06292, cn:'密封胶槽', en:'Glue Seal',   css: '#f06292' },
-  pocket      : { hex: 0xAB47BC, cn:'开关盒坑', en:'Switch Box Pocket', css: '#AB47BC' },
+  // ── Pocket 按 PocketType 细分着色 ──
+  pocket                  : { hex: 0xAB47BC, cn:'开关盒坑', en:'Switch Box Pocket', css: '#AB47BC' }, // 兼容旧数据
+  pocketSwitchBox         : { hex: 0xAB47BC, cn:'开关盒坑',       en:'Switch Box Pocket',      css: '#AB47BC' },
+  pocketPropping          : { hex: 0x26a69a, cn:'斜撑固定坑',     en:'Propping Pocket',        css: '#26a69a' },
+  pocketSteelColumnSidePocket : { hex: 0xffd54f, cn:'钢柱侧板坑', en:'Steel Column Side Pocket', css: '#ffd54f' },
+  pocketGeneral           : { hex: 0xb39ddb, cn:'通用挖坑',       en:'General Pocket',         css: '#b39ddb' },
   xBraceSteel : { hex: 0xff7043, cn:'斜撑钢槽', en:'X-Brace Steel', css: '#ff7043' },
   default     : { hex: 0xce93d8, cn:'其他凹槽', en:'Other Groove', css: '#ce93d8' },
 };
@@ -1127,7 +1132,8 @@ function showMomTooltip(mesh, mouseX, mouseY) {
 
   if (featureType === 'Groove') {
     const box = extra.box;
-    const isPocket = (feature.grooveType === 'pocket');
+    const isPocket = typeof feature.grooveType === 'string'
+                  && feature.grooveType.toLowerCase().startsWith('pocket');
     document.getElementById('mtt-ftype').textContent = window.t('ftype_groove');
     document.getElementById('mtt-len').textContent  = feature.length != null ? (+feature.length).toFixed(1) : (+box.gx / S).toFixed(1);
     document.getElementById('mtt-wid').textContent  = feature.width  != null ? (+feature.width).toFixed(1)  : (+box.gy / S).toFixed(1);
@@ -1537,6 +1543,77 @@ function unhighlightAll() {
 }
 
 // ══════════════════════════════════════════════════
+//  重叠凹槽 / Pocket 拾取：优先最内层特征
+// ══════════════════════════════════════════════════
+// 腔体在加工面内的占地尺寸（用于判断嵌套层级，越小越内层）
+function grooveFootprintArea(mesh) {
+  const info = meshFeatureMap.get(mesh);
+  const box  = info && info.box;
+  if (!box) return Number.POSITIVE_INFINITY;
+  const n = box.floorNormal ?? { x: 0, y: 0, z: 1 };
+  if (Math.abs(n.z) > 0.5) return box.gx * box.gy;   // 顶/底面（XY）
+  if (Math.abs(n.y) > 0.5) return box.gx * box.gz;   // 前/后面（XZ）
+  return box.gy * box.gz;                            // 左/右面（YZ）
+}
+
+// 在 [baseDist, baseDist + pickRange] 命中范围内挑选最内层的凹槽/Pocket：
+//   • 面内占地更小 → 更内层（嵌套 Pocket 的规律）
+//   • 占地相同 → 取更深者
+//   否则射线总停在最先加入的、尺寸最大的外层腔体上，内层 Pocket 无法被选中。
+function pickInnermostGrooveHit(hits, baseDist, pickRange, fallback) {
+  let best      = fallback;
+  let bestArea  = grooveFootprintArea(best);
+  let bestDepth = (meshFeatureMap.get(best)?.f?.depth) ?? 0;
+
+  for (let i = 1; i < hits.length; i++) {
+    if (hits[i].distance - baseDist > pickRange) break; // 已按距离升序，超出范围即可终止
+    const o = hits[i].object;
+    if (!meshFeatureMap.has(o)) continue;
+
+    const area  = grooveFootprintArea(o);
+    const depth = (meshFeatureMap.get(o)?.f?.depth) ?? 0;
+    const smaller        = area < bestArea - 1e-9;
+    const equalButDeeper = Math.abs(area - bestArea) <= 1e-9 && depth > bestDepth;
+    if (smaller || equalButDeeper) {
+      best = o; bestArea = area; bestDepth = depth;
+    }
+  }
+  return best;
+}
+
+// ══════════════════════════════════════════════════
+//  正 / 背面拾取过滤：只允许选中朝向相机那一面的特征
+// ══════════════════════════════════════════════════
+// 取拾取对象所属特征的面法向量
+function pickFeatureNormal(mesh) {
+  if (meshFeatureMap.has(mesh)) return meshFeatureMap.get(mesh)?.f?.currentNormal ?? null;
+  if (meshHoleMap.has(mesh))    return meshHoleMap.get(mesh)?.holeFeature?.currentNormal ?? null;
+  if (meshMepMap.has(mesh))     return meshMepMap.get(mesh)?.mepFeature?.currentNormal ?? null;
+  if (meshRebarMap.has(mesh))   return meshRebarMap.get(mesh)?.rebarFeature?.currentNormal ?? null;
+  return null;
+}
+
+// 相机位于墙体哪一侧：+1 = 正面(+Z)，-1 = 背面(-Z)，0 = 侧视（不做限制）
+function viewerSideZ() {
+  const mid = _WT * 0.5;
+  const eps = Math.max(_WT * 0.08, 0.004);
+  if (camera.position.z > mid + eps) return  1;
+  if (camera.position.z < mid - eps) return -1;
+  return 0;
+}
+
+// +Z 面特征只能在正面选中，-Z 面特征只能在背面选中；
+// 窄面（±X / ±Y，如 Front/Back/Left/Right）特征两面都可见，不做限制。
+function isOnViewerSide(mesh, sideZ) {
+  if (sideZ === 0) return true;
+  const n = pickFeatureNormal(mesh);
+  if (!n) return true;
+  const nz = Math.round(n.z ?? 0);
+  if (nz === 0) return true;
+  return nz === sideZ;
+}
+
+// ══════════════════════════════════════════════════
 //  ★★★ mousemove：使用 mom-tooltip 悬浮面板 ★★★
 // ══════════════════════════════════════════════════
 canvas.addEventListener('mousemove', e => {
@@ -1546,12 +1623,15 @@ canvas.addEventListener('mousemove', e => {
 
   raycaster.setFromCamera(mouse, camera);
 
+  // ★ 正/背面过滤：正面视角只允许选中 +Z 面特征，背面视角只允许选中 -Z 面特征，
+  //   避免射线穿过墙体后命中的另一面特征抢占悬浮面板。
+  const sideZ = viewerSideZ();
   const allPickable = [
     ...(layerState.groove ? grooveMeshes : []),
     ...(layerState.mep    ? mepSegMeshes : []),
     ...(layerState.holeRound || layerState.holeSlotted ? holeMeshes : []),
     ...(layerState.rebar  ? rebarHitMeshes : []),
-  ];
+  ].filter(o => isOnViewerSide(o, sideZ));
   if (!allPickable.length) {
     unhighlightAll();
     hideMomTooltip();
@@ -1568,14 +1648,20 @@ canvas.addEventListener('mousemove', e => {
     if (meshFeatureMap.has(hit)) {
       const baseDist = hits[0].distance;
       const pickRange = (_WT || 0.3) * 0.5;
+
+      // ① 凹槽腔体内的小特征（孔 / MEP / 钢筋槽）优先
+      let inner = null;
       for (let i = 1; i < hits.length; i++) {
         if (hits[i].distance - baseDist > pickRange) break; // 已按距离升序，超出范围即可终止
         const o = hits[i].object;
         if (meshHoleMap.has(o) || meshMepMap.has(o) || meshRebarMap.has(o)) {
-          hit = o;
+          inner = o;
           break;
         }
       }
+
+      // ② 多个凹槽/Pocket 相互重叠（嵌套挖坑）时，取最内层（占地最小）的那个
+      hit = inner ?? pickInnermostGrooveHit(hits, baseDist, pickRange, hit);
     }
     if (meshFeatureMap.has(hit)) {
       if (hoveredMepMesh || hoveredHoleMesh || hoveredRebarMesh) { unhighlightAll(); }
@@ -2408,6 +2494,10 @@ window.resetAllLayers = function() {
     groove_top_plate: { zh: '顶板槽', en: 'Top Plate' },
     groove_glue_seal: { zh: '密封胶槽', en: 'Glue Seal' },
     groove_pocket: { zh: '开关盒坑', en: 'Pocket' },
+    groove_pocket_switch_box: { zh: '开关盒坑', en: 'Switch Box Pocket' },
+    groove_pocket_propping: { zh: '斜撑固定坑', en: 'Propping Pocket' },
+    groove_pocket_steel_column_side_pocket: { zh: '钢柱侧板坑', en: 'Steel Column Side Pocket' },
+    groove_pocket_general: { zh: '通用挖坑', en: 'General Pocket' },
     groove_x_brace_steel: { zh: '斜撑钢槽', en: 'X-Brace Steel' },
     groove_default: { zh: '其他凹槽', en: 'Other Groove' },
     ftype_groove: { zh: '凹槽 (Groove)', en: 'Groove' },

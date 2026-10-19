@@ -742,7 +742,8 @@ namespace CncWallStation.ViewModels
 
         /// <summary>
         /// 将 Pocket 特征序列化为 Groove 格式（与 HTML Groove 渲染引擎兼容）
-        /// Pocket 矩形区域沿 Length 方向映射为 Groove 的起终点，Width 作为槽宽
+        /// Pocket 矩形区域沿 Length 方向映射为 Groove 的起终点，Width 作为槽宽；
+        /// grooveType 按 <see cref="PocketType"/> 细分，HTML 端据此使用不同颜色渲染。
         /// </summary>
         private static object SerializePocket(Pocket pocket)
         {
@@ -753,11 +754,20 @@ namespace CncWallStation.ViewModels
             var startPt = new { x = pocket.LocalPos.X - halfLen, y = pocket.LocalPos.Y };
             var endPt = new { x = pocket.LocalPos.X + halfLen, y = pocket.LocalPos.Y };
 
+            // ── Pocket 类型 → HTML 颜色 key ──
+            string pocketTypeKey = pocket.PocketType switch
+            {
+                PocketType.Propping => "pocketPropping",
+                PocketType.SwitchBox => "pocketSwitchBox",
+                PocketType.SteelColumnSidePocket => "pocketSteelColumnSidePocket",
+                _ => "pocketGeneral",
+            };
+
             return new
             {
                 id = pocket.Id,
                 featureType = "Groove",           // 复用 Groove 渲染管线
-                grooveType = "pocket",            // 图例颜色 key
+                grooveType = pocketTypeKey,       // 图例颜色 key（按 PocketType 细分）
                 startPt,
                 endPt,
                 width = pocket.Width,

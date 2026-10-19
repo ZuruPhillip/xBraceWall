@@ -399,7 +399,8 @@ namespace CncWallStation.VersionMappers
                 length: WallConstants.DevicePocketLength,
                 width: WallConstants.DevicePocketWidth,
                 depth: WallConstants.DevicePocketDepth,
-                cornerRadius: WallConstants.DevicePocketCornerRadius);
+                cornerRadius: WallConstants.DevicePocketCornerRadius,
+                pocketType: PocketType.SwitchBox);
 
             momWallData.Features.Add(pocket);
         }
@@ -613,6 +614,7 @@ namespace CncWallStation.VersionMappers
                 ConvertOpeningToFeature(opening, momWallData);
         }
 
+        #region Propping 斜撑
 
         /// <summary>
         /// 以斜撑中心 X 为定位，生成斜撑 Pocket、顶部螺栓孔与正面螺栓孔并添加到 MomWall
@@ -640,7 +642,6 @@ namespace CncWallStation.VersionMappers
             //    id: "Propping-01");
         }
 
-        #region 斜撑 Pocket
         /// <summary>
         /// 读取各中心点的 X 坐标，在墙体顶端（Top 面）贴顶板槽槽底生成 3 个嵌套 Pocket：
         ///   • Pocket 01：长 106 × 宽 310 × 深 4 ，
@@ -676,7 +677,8 @@ namespace CncWallStation.VersionMappers
                         grooveBottomY - WallConstants.TopPlatePocket0Width / 2f),
                     length: WallConstants.TopPlatePocket0Length,
                     width: WallConstants.TopPlatePocket0Width,
-                    depth: WallConstants.TopPlatePocket0Depth));
+                    depth: WallConstants.TopPlatePocket0Depth,
+                    pocketType: PocketType.Propping));
 
                 // ── Pocket 02：长 106 × 宽 18 × 深 36 ────────────
                 momWallData.Features.Add(new Pocket(
@@ -686,7 +688,8 @@ namespace CncWallStation.VersionMappers
                         grooveBottomY - WallConstants.TopPlatePocket1Width / 2f),
                     length: WallConstants.TopPlatePocket1Length,
                     width: WallConstants.TopPlatePocket1Width,
-                    depth: WallConstants.TopPlatePocket1Depth));
+                    depth: WallConstants.TopPlatePocket1Depth,
+                    pocketType: PocketType.Propping));
 
                 // ── Pocket 03：长 252 × 宽 4 × 深 100 ────────────
                 momWallData.Features.Add(new Pocket(
@@ -696,7 +699,8 @@ namespace CncWallStation.VersionMappers
                         grooveBottomY - WallConstants.TopPlatePocket2Width / 2f),
                     length: WallConstants.TopPlatePocket2Length,
                     width: WallConstants.TopPlatePocket2Width,
-                    depth: WallConstants.TopPlatePocket2Depth));
+                    depth: WallConstants.TopPlatePocket2Depth,
+                    pocketType: PocketType.Propping));
             }
         }
         #endregion
@@ -923,7 +927,8 @@ namespace CncWallStation.VersionMappers
                 center: center1,
                 length: WallConstants.SidePlateSmallGrooveLength,
                 width: WallConstants.SidePlateSmallGrooveWidth,
-                depth: WallConstants.SidePlateSmallGrooveDepth));
+                depth: WallConstants.SidePlateSmallGrooveDepth,
+                pocketType: PocketType.SteelColumnSidePocket));
 
             // ── 中心点 2：X 偏移两槽长度差 / 2（左柱向左、右柱向右）──
             float offsetX = (WallConstants.SidePlateSmallGrooveLength
@@ -940,7 +945,8 @@ namespace CncWallStation.VersionMappers
                 center: center2,
                 length: WallConstants.SidePlateNarrowGrooveLength,
                 width: WallConstants.SidePlateNarrowGrooveWidth,
-                depth: WallConstants.SidePlateNarrowGrooveDepth));
+                depth: WallConstants.SidePlateNarrowGrooveDepth,
+                pocketType: PocketType.SteelColumnSidePocket));
 
             // ── 对应的 4 孔螺栓孔（以中心点 1 为中心）────────────
             AddSteelColumnSidePlateScrewHoles(
@@ -1017,7 +1023,8 @@ namespace CncWallStation.VersionMappers
                 center: center,
                 length: WallConstants.SidePlateGrooveLength,
                 width: WallConstants.SidePlateGrooveOuterWidth,
-                depth: WallConstants.SidePlateGrooveOuterDepth));
+                depth: WallConstants.SidePlateGrooveOuterDepth,
+                pocketType: PocketType.SteelColumnSidePocket));
 
             // 内槽（长 180，宽 120，深 40）
             momWallData.Features.Add(new Pocket(
@@ -1026,7 +1033,8 @@ namespace CncWallStation.VersionMappers
                 center: center,
                 length: WallConstants.SidePlateGrooveLength,
                 width: WallConstants.SidePlateGrooveInnerWidth,
-                depth: WallConstants.SidePlateGrooveInnerDepth));
+                depth: WallConstants.SidePlateGrooveInnerDepth,
+                pocketType: PocketType.SteelColumnSidePocket));
 
             // ── 对应的 6 孔螺栓孔 ───────────────────────────────
             AddSteelColumnSidePlateScrewHoles(

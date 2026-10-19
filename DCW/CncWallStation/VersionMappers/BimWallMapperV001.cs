@@ -367,7 +367,8 @@ namespace CncWallStation.VersionMappers
                 length: WallConstants.DevicePocketLength,
                 width: WallConstants.DevicePocketWidth,
                 depth: WallConstants.DevicePocketDepth,
-                cornerRadius: WallConstants.DevicePocketCornerRadius);
+                cornerRadius: WallConstants.DevicePocketCornerRadius,
+                pocketType: PocketType.SwitchBox);
 
             momWallData.Features.Add(pocket);
         }

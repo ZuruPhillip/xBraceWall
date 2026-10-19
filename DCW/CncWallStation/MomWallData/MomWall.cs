@@ -769,10 +769,11 @@ namespace CncWallStation.MomWallData
 
         public MomWall AddPocket(string id, MachineSide side,
                                  Vec2 center, float width, float height,
-                                 float depth, float cornerRadius = 0f)
+                                 float depth, float cornerRadius = 0f,
+                                 PocketType pocketType = PocketType.General)
         {
             Features.Add(new Pocket(id, side, center, width, height,
-                                    depth, cornerRadius));
+                                    depth, cornerRadius, pocketType));
             return this;
         }
 

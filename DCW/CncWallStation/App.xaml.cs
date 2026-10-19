@@ -141,7 +141,9 @@ namespace CncWallStation
             {
                 Log.Fatal(ex, "应用启动失败");
                 MessageBox.Show(
-                    $"应用启动失败，请检查数据库连接与配置。\n\n{ex.Message}",
+                    "应用启动失败：无法连接数据库或初始化数据表。\n\n" +
+                    $"{ex.GetBaseException().Message}\n\n" +
+                    "请确认数据库服务可访问后重新启动应用，详细日志见程序目录下的 logs 文件夹。",
                     "启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
