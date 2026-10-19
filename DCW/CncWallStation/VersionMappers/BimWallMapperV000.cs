@@ -39,7 +39,7 @@ namespace CncWallStation.VersionMappers
             ConvertCrossBraceToFeature(dto, momWallData);
 
             //生成胶水密封槽数据TopPlateGroove
-            GenerateGlueSealFeature(momWallData);
+            //GenerateGlueSealFeature(momWallData);
 
             //生成钢筋槽数据
             ConvertRebarSlotToFeature(dto.Rebars, momWallData);
@@ -62,6 +62,7 @@ namespace CncWallStation.VersionMappers
             return momWallData;
         }
 
+        #region 钢柱槽
         /// <summary>
         /// 将 SteelFrameColumns DTO 列表转换为 Groove Feature 列表
         /// </summary>
@@ -90,35 +91,36 @@ namespace CncWallStation.VersionMappers
                 switch (ColumnSide)
                 {
                     case PropertyConverter.ColumnSide.Left:
-                    // ──添加左侧钢柱槽
-                    var leftColumnGrooveStartPt = new Vec2(WallConstants.ColumnSteelGrooveSideOffset, momWallData.Width);
-                    var leftColumnGrooveEndPt = new Vec2(WallConstants.ColumnSteelGrooveSideOffset, WallConstants.ColumnSteelGrooveBaseOffset);
-                    var leftColumnGroove = new Groove(
-                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}",
+                    // ──左侧钢柱槽：贴墙左边，分下/上两段
+                    // 下段：墙底 → 高度 1000mm，槽宽 103，槽深 103
+                    var leftLowerGrooveCenterX = WallConstants.ColumnSteelGrooveLowerWidth / 2f;
+                    var leftLowerStartPt = new Vec2(leftLowerGrooveCenterX, 0f);
+                    var leftLowerEndPt = new Vec2(leftLowerGrooveCenterX, WallConstants.ColumnSteelGrooveBaseOffset);
+                    var leftColumnGrooveLower = new Groove(
+                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}-Lower",
                     side: MachineSide.Top,
-                    startPt: leftColumnGrooveStartPt,
-                    endPt: leftColumnGrooveEndPt,
-                    width: WallConstants.ColumnSteelGrooveWidth,
+                    startPt: leftLowerStartPt,
+                    endPt: leftLowerEndPt,
+                    width: WallConstants.ColumnSteelGrooveLowerWidth,
                     depth: WallConstants.ColumnSteelGrooveDepth,
                     grooveType: GrooveType.SteelColumn);
 
-                    momWallData.Features.Add(leftColumnGroove);
+                    momWallData.Features.Add(leftColumnGrooveLower);
 
-                    // ──顶板槽局部坐标
-                    var columnGrooveLeftTopStartPtY = momWallData.Width - WallConstants.TopBracketGrooveWidth / 2;
-                    var columnGrooveLeftTopStartPt = new Vec2(0, columnGrooveLeftTopStartPtY);
-                    var columnGrooveLeftTopEndPt = new Vec2(WallConstants.TopBracketGrooveLength, columnGrooveLeftTopStartPtY);
+                    // 上段：高度 1000mm → 墙顶，槽宽 178，槽深 103
+                    var leftUpperGrooveCenterX = WallConstants.ColumnSteelGrooveUpperWidth / 2f;
+                    var leftUpperStartPt = new Vec2(leftUpperGrooveCenterX, WallConstants.ColumnSteelGrooveBaseOffset);
+                    var leftUpperEndPt = new Vec2(leftUpperGrooveCenterX, momWallData.Width);
+                    var leftColumnGrooveUpper = new Groove(
+                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}-Upper",
+                    side: MachineSide.Top,
+                    startPt: leftUpperStartPt,
+                    endPt: leftUpperEndPt,
+                    width: WallConstants.ColumnSteelGrooveUpperWidth,
+                    depth: WallConstants.ColumnSteelGrooveDepth,
+                    grooveType: GrooveType.SteelColumn);
 
-                    // 添加左侧顶板槽
-                    var leftTopPlateGroove = new Groove(
-                            id: $"TopPlate-Left-{i:D1}",
-                            side: MachineSide.Top,
-                            startPt: columnGrooveLeftTopStartPt,
-                            endPt: columnGrooveLeftTopEndPt,
-                            width: WallConstants.TopBracketGrooveWidth,
-                            depth: WallConstants.TopBracketGrooveDepth,
-                            grooveType: GrooveType.TopBracket);
-                    momWallData.Features.Add(leftTopPlateGroove);
+                    momWallData.Features.Add(leftColumnGrooveUpper);
 
                     // ──底板槽局部坐标
                     var columnGrooveLeftBaseStartPtY = WallConstants.BaseBracketGrooveWidth / 2;
@@ -139,35 +141,36 @@ namespace CncWallStation.VersionMappers
 
                     case PropertyConverter.ColumnSide.Right:
 
-                    // ──添加右侧钢柱槽
-                    var rightColumnGrooveStartPt = new Vec2(momWallData.Length - WallConstants.ColumnSteelGrooveSideOffset, momWallData.Width);
-                    var rightColumnGrooveEndPt = new Vec2(momWallData.Length - WallConstants.ColumnSteelGrooveSideOffset, WallConstants.ColumnSteelGrooveBaseOffset);
-                    var rightColumnGroove = new Groove(
-                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}",
+                    // ──右侧钢柱槽：贴墙右边，分下/上两段
+                    // 下段：墙底 → 高度 1000mm，槽宽 103，槽深 103
+                    var rightLowerGrooveCenterX = momWallData.Length - WallConstants.ColumnSteelGrooveLowerWidth / 2f;
+                    var rightLowerStartPt = new Vec2(rightLowerGrooveCenterX, 0f);
+                    var rightLowerEndPt = new Vec2(rightLowerGrooveCenterX, WallConstants.ColumnSteelGrooveBaseOffset);
+                    var rightColumnGrooveLower = new Groove(
+                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}-Lower",
                     side: MachineSide.Top,
-                    startPt: rightColumnGrooveStartPt,
-                    endPt: rightColumnGrooveEndPt,
-                    width: WallConstants.ColumnSteelGrooveWidth,
+                    startPt: rightLowerStartPt,
+                    endPt: rightLowerEndPt,
+                    width: WallConstants.ColumnSteelGrooveLowerWidth,
                     depth: WallConstants.ColumnSteelGrooveDepth,
                     grooveType: GrooveType.SteelColumn);
 
-                    momWallData.Features.Add(rightColumnGroove);
+                    momWallData.Features.Add(rightColumnGrooveLower);
 
-                    // ──顶板槽局部坐标
-                    var columnGrooveRightTopStartPtY = momWallData.Width - WallConstants.TopBracketGrooveWidth / 2;
-                    var columnGrooveTopRightStartPt = new Vec2(momWallData.Length - WallConstants.TopBracketGrooveLength, columnGrooveRightTopStartPtY);
-                    var columnGrooveTopRightEndPt = new Vec2(momWallData.Length, columnGrooveRightTopStartPtY);
+                    // 上段：高度 1000mm → 墙顶，槽宽 178，槽深 103
+                    var rightUpperGrooveCenterX = momWallData.Length - WallConstants.ColumnSteelGrooveUpperWidth / 2f;
+                    var rightUpperStartPt = new Vec2(rightUpperGrooveCenterX, WallConstants.ColumnSteelGrooveBaseOffset);
+                    var rightUpperEndPt = new Vec2(rightUpperGrooveCenterX, momWallData.Width);
+                    var rightColumnGrooveUpper = new Groove(
+                    id: $"SteelCol-{i:D1}-{col.Pn ?? "noPn"}-Upper",
+                    side: MachineSide.Top,
+                    startPt: rightUpperStartPt,
+                    endPt: rightUpperEndPt,
+                    width: WallConstants.ColumnSteelGrooveUpperWidth,
+                    depth: WallConstants.ColumnSteelGrooveDepth,
+                    grooveType: GrooveType.SteelColumn);
 
-                    // 添加右侧顶板槽
-                    var rightTopPlateGroove = new Groove(
-                            id: $"TopPlate-Right-{i:D1}",
-                            side: MachineSide.Top,
-                            startPt: columnGrooveTopRightStartPt,
-                            endPt: columnGrooveTopRightEndPt,
-                            width: WallConstants.TopBracketGrooveWidth,
-                            depth: WallConstants.TopBracketGrooveDepth,
-                            grooveType: GrooveType.TopBracket);
-                    momWallData.Features.Add(rightTopPlateGroove);
+                    momWallData.Features.Add(rightColumnGrooveUpper);
 
                     // ──底板槽局部坐标
                     var columnGrooveRightBaseStartPtY = WallConstants.BaseBracketGrooveWidth / 2;
@@ -189,9 +192,19 @@ namespace CncWallStation.VersionMappers
                     default:
                     break;
                 }
+
+                // ──生成钢柱侧板槽（按柱子 X 坐标定位左/右中心点）──────
+                if (ColumnSide != PropertyConverter.ColumnSide.Middle)
+                {
+                    AddSidePlateGroovesByColumnX(col.StartPoint.X, momWallData);
+
+                    // ──生成钢柱侧板小槽（Y = 285 单个中心点）──────────
+                    AddSidePlateSmallGroovesByColumnX(col.StartPoint.X, momWallData);
+                }
             }
         }
 
+        #endregion
 
         /// <summary>
         /// 将 BimTopPlate DTO 列表转换为 Groove Feature 列表
@@ -235,7 +248,9 @@ namespace CncWallStation.VersionMappers
 
 
         /// <summary>
-        /// 将 TopPlate 中 Studs.Points 转换为圆孔 Hole Feature
+        /// 将 TopPlate 中 Studs.Points 转换为腰形孔 Hole Feature
+        ///   半径 StudSlotHoleRadius（12.5）、总长 StudSlotHoleTotalLength（200）、
+        ///   孔深 StudSlotHoleDepth（114）；腰孔沿墙长方向（0° 沿 X 轴）。
         /// </summary>
         private static void ConvertStudsToFeature(
             List<BimTopPlateDtoV000>? topPlates, MomWall momWallData)
@@ -251,7 +266,6 @@ namespace CncWallStation.VersionMappers
 
                 var studs = topPlate.Studs;
                 string pn = string.IsNullOrWhiteSpace(studs.Pn) ? "noPn" : studs.Pn!;
-                float radius = WallConstants.StudDiameter / 2f;
 
                 for (int j = 0; j < studs.Points.Count; j++)
                 {
@@ -266,13 +280,16 @@ namespace CncWallStation.VersionMappers
                     // ── 中心点（Front 面：X=墙长，Z=墙高）────
                     var center = new Vec2((float)point.X, WallConstants.StudEdgeDistance);
 
-                    // ── 构造圆孔 Feature ──────────────────────
-                    var hole = Hole.CreateRound(
+                    // ── 构造腰形孔 Feature ────────────────────
+                    //    总长 200 = 两圆心距(175) + 2 × 半径(12.5)
+                    var hole = Hole.CreateSlotted(
                         id: id,
                         side: MachineSide.Front,
                         center: center,
-                        radius: radius,
-                        depth: WallConstants.StudHoleDepth,
+                        radius: WallConstants.StudSlotHoleRadius,
+                        depth: WallConstants.StudSlotHoleDepth,
+                        slotLength: WallConstants.StudSlotHoleTotalLength
+                                    - WallConstants.StudSlotHoleRadius * 2f,
                         throughHole: false);
 
                     momWallData.Features.Add(hole);
@@ -609,18 +626,22 @@ namespace CncWallStation.VersionMappers
                 id: "Propping-01");
         }
 
+        #region X 形槽
         /// <summary>
         /// 当墙类型为 CrossBraceWall 时，生成 X 形斜撑钢槽
         /// 
         /// 端点规则（基于钢柱中心线与墙顶/底边的交点）：
-        ///   • 左上：左侧钢柱中心 X，墙顶 Y + 4mm（向外）
-        ///   • 左下：左侧钢柱中心 X，墙底 Y - 6mm（向外）
-        ///   • 右上：右侧钢柱中心 X，墙顶 Y + 4mm
-        ///   • 右下：右侧钢柱中心 X，墙底 Y - 6mm
+        ///   • 左上：左侧钢柱中心 X，墙顶 Y + XBraceTopOffset（向外）
+        ///   • 左下：左侧钢柱中心 X，墙底 Y - XBraceBottomOffset（向外）
+        ///   • 右上：右侧钢柱中心 X，墙顶 Y + XBraceTopOffset
+        ///   • 右下：右侧钢柱中心 X，墙底 Y - XBraceBottomOffset
         /// 
-        /// 槽路径：
-        ///   ① 左下 → 右上
-        ///   ② 左上 → 右下
+        /// 生成规则：
+        ///   ① 求两条交线（左下→右上、右下→左上）的交点
+        ///   ② 自交点沿交线方向向下偏移 XBraceCenterOffset（450mm）作为分割点，
+        ///      将每条交线分为 2 段：下段（底端 → 分割点）槽宽 80，
+        ///      上段（分割点 → 顶端）槽宽 106，槽深均为 90
+        ///   ③ 交点处再调用 AddXBraceCenterGrooves 沿 4 条交线方向各生成 1 个槽
         /// </summary>
         private static void ConvertCrossBraceToFeature(
             BimWallDtoV000? dto, MomWall momWallData)
@@ -665,7 +686,7 @@ namespace CncWallStation.VersionMappers
             float wallTopY = momWallData.Width;
 
 
-            // ── 6. 计算 4 个端点 ────────────────────────────────
+            // ── 5. 计算 4 个端点 ────────────────────────────────
             Vec2 leftTop = new Vec2(leftColumnX, wallTopY + WallConstants.XBraceTopOffset);
             Vec2 leftBottom = new Vec2(leftColumnX, wallBottomY - WallConstants.XBraceBottomOffset);
             Vec2 rightTop = new Vec2(rightColumnX, wallTopY + WallConstants.XBraceTopOffset);
@@ -674,26 +695,357 @@ namespace CncWallStation.VersionMappers
 
             string pnPrefix = string.IsNullOrWhiteSpace(dto.Pn) ? "Wall" : dto.Pn;
 
-            // ── 8. 生成 2 条斜撑槽 ──────────────────────────────
-            // 斜撑 ①：左下 → 右上
-            momWallData.Features.Add(new Groove(
-                id: $"XBrace-{pnPrefix}-01",
-                side: MachineSide.Top,
-                startPt: leftBottom,
-                endPt: rightTop,
-                width: WallConstants.XBraceGrooveWidth,
-                depth: WallConstants.XBraceGrooveDepth,
-                grooveType: GrooveType.XBraceSteel));
+            // ── 6. 求两条交线的交点 ─────────────────────────────
+            if (!TryIntersect(leftBottom, rightTop, leftTop, rightBottom,
+                              out Vec2 center))
+            {
+                Console.WriteLine(
+                    $"[WARN] CrossBraceWall (Pn={dto.Pn ?? "noPn"}) " +
+                    $"两条交线平行，无法求交点，已跳过");
+                return;
+            }
 
-            // 斜撑 ②：左上 → 右下
-            momWallData.Features.Add(new Groove(
-                id: $"XBrace-{pnPrefix}-02",
+            // ── 7. 两条交线（底端 → 顶端）───────────────────────
+            var lines = new (Vec2 Bottom, Vec2 Top)[]
+            {
+                (leftBottom, rightTop),   // ① 左下 → 右上
+                (rightBottom, leftTop),   // ② 右下 → 左上
+            };
+
+            // ── 8. 每条交线自分割点分为下 / 上两段 ──────────────
+            //    分割点 = 交点沿交线方向向下偏移 XBraceCenterOffset
+            //    下段（底端 → 分割点）槽宽 80，上段（分割点 → 顶端）槽宽 106，
+            //    槽深均为 90
+            for (int k = 0; k < lines.Length; k++)
+            {
+                var (bottom, top) = lines[k];
+
+                float downLength = (bottom - center).Length();
+                if (downLength <= WallConstants.XBraceCenterOffset)
+                {
+                    Console.WriteLine(
+                        $"[WARN] XBrace 交线[{k}] 交点向下长度 {downLength:F1}mm 不足分割偏移 " +
+                        $"{WallConstants.XBraceCenterOffset}mm，已跳过");
+                    continue;
+                }
+
+                Vec2 splitPt = center
+                             + (bottom - center).Normalize()
+                             * WallConstants.XBraceCenterOffset;
+
+                // 下段槽（自底端至分割点）
+                momWallData.Features.Add(new Groove(
+                    id: $"XBrace-{pnPrefix}-{2 * k + 1:D2}",
+                    side: MachineSide.Top,
+                    startPt: bottom,
+                    endPt: splitPt,
+                    width: WallConstants.XBraceGrooveWidth,
+                    depth: WallConstants.XBraceGrooveDepth,
+                    grooveType: GrooveType.XBraceSteel));
+
+                // 上段槽（自分割点至顶端）
+                momWallData.Features.Add(new Groove(
+                    id: $"XBrace-{pnPrefix}-{2 * k + 2:D2}",
+                    side: MachineSide.Top,
+                    startPt: splitPt,
+                    endPt: top,
+                    width: WallConstants.XBraceUpperGrooveWidth,
+                    depth: WallConstants.XBraceGrooveDepth,
+                    grooveType: GrooveType.XBraceSteel));
+            }
+
+            // ── 9. 交点处：沿 4 条交线方向各生成 1 个槽 ──────────
+            Vec2[] armEnds = { leftBottom, rightBottom, leftTop, rightTop };
+            AddXBraceCenterGrooves(center, armEnds, pnPrefix, momWallData);
+        }
+
+        /// <summary>
+        /// 在交点对应的 4 条交线方向上生成 4 个槽：
+        /// 槽沿交线方向，长 XBraceCenterGrooveLength（100mm）、
+        /// 宽 XBraceCenterGrooveWidth（150mm）、深 XBraceCenterGrooveDepth（120mm），
+        /// 槽中心点距交点 XBraceCenterGrooveOffset（500mm）。
+        /// </summary>
+        private static void AddXBraceCenterGrooves(
+            Vec2 center,
+            Vec2[] armEnds,
+            string pnPrefix,
+            MomWall momWallData)
+        {
+            for (int k = 0; k < armEnds.Length; k++)
+            {
+                Vec2 dir = (armEnds[k] - center).Normalize();
+
+                // 槽中心距交点 500mm，槽长 100mm ⇒ 起终点距交点 450 / 550mm
+                Vec2 slotCenter = center + dir * WallConstants.XBraceCenterGrooveOffset;
+                Vec2 slotStart = slotCenter - dir * (WallConstants.XBraceCenterGrooveLength / 2f);
+                Vec2 slotEnd = slotCenter + dir * (WallConstants.XBraceCenterGrooveLength / 2f);
+
+                momWallData.Features.Add(new Groove(
+                    id: $"XBraceCenter-{pnPrefix}-{k + 1:D2}",
+                    side: MachineSide.Top,
+                    startPt: slotStart,
+                    endPt: slotEnd,
+                    width: WallConstants.XBraceCenterGrooveWidth,
+                    depth: WallConstants.XBraceCenterGrooveDepth,
+                    grooveType: GrooveType.XBraceSteel));
+            }
+        }
+
+        #endregion
+
+        #region 侧板小槽
+        /// <summary>
+        /// 根据柱子 X 坐标确定钢柱侧板小槽中心点位置，并生成侧板小槽
+        /// 
+        /// 中心点 X：
+        ///   • 左侧柱（X &lt; SidePlateColumnLeftThreshold）：
+        ///     X0 = 柱 X + SidePlateSmallGrooveLength/2 + ColumnSteelGrooveWidth/2
+        ///                + ColumnSteelWidthClearancePerSide
+        ///   • 右侧柱：
+        ///     X0 = 柱 X - SidePlateSmallGrooveLength/2 - ColumnSteelGrooveWidth/2
+        ///                - ColumnSteelWidthClearancePerSide
+        /// 
+        /// 中心点 Y：SidePlateSmallGrooveCenterY（285）
+        /// 
+        /// 生成中心点后调用 <see cref="AddSteelColumnSidePlateSmallGroovesAndScrewHoles"/> 生成侧板小槽。
+        /// </summary>
+        private static void AddSidePlateSmallGroovesByColumnX(
+            float columnX, MomWall momWallData)
+        {
+            // ── 1. 左 / 右柱判定（X < 阈值 → 左侧柱，其余按右侧柱）──
+            bool isLeft = columnX < WallConstants.SidePlateColumnLeftThreshold;
+
+            // ── 2. 中心点 ───────────────────────────────────────
+            float offsetX = WallConstants.SidePlateSmallGrooveLength / 2f
+                          + WallConstants.ColumnSteelGrooveWidth;
+
+            var center = new Vec2(
+                isLeft ? columnX + WallConstants.ColumnSteelGrooveWidth / 2 + offsetX : columnX - WallConstants.ColumnSteelGrooveWidth / 2 - offsetX,
+                WallConstants.SidePlateSmallGrooveCenterY);
+
+            // ── 3. 生成侧板小槽 ─────────────────────────────────
+            AddSteelColumnSidePlateSmallGroovesAndScrewHoles(center, isLeft, momWallData);
+        }
+
+        /// <summary>
+        /// 生成钢柱侧板小槽（Pocket 方式加工）：以给定中心点 1 为中心
+        ///   • 中心点 1：长 SidePlateSmallGrooveLength（160）× 宽 120 × 深 40
+        ///   • 中心点 2：X 由中心点 1 偏移「两槽长度差 / 2」=
+        ///       (160 - 15) / 2 = 72.5 —— 左侧钢柱往左偏移、右侧钢柱往右偏移
+        ///       在中心点 2 生成窄深槽：长 SidePlateNarrowGrooveLength（15）× 宽 120 × 深 55
+        /// 两槽长度沿墙长方向（X），宽度沿墙高方向（Y）。
+        /// 生成侧板小槽后一并生成对应的 4 孔螺栓孔（⌀20 × 深 100，以中心点 1 为中心）。
+        /// </summary>
+        private static void AddSteelColumnSidePlateSmallGroovesAndScrewHoles(
+            Vec2 center1, bool isLeftColumn, MomWall momWallData)
+        {
+            string key = $"{center1.X:F0}-{center1.Y:F0}";
+
+            // ── 中心点 1：长 160 × 宽 120 × 深 40 ───────────────
+            momWallData.Features.Add(new Pocket(
+                id: $"SidePlateSmall-{key}-01",
                 side: MachineSide.Top,
-                startPt: leftTop,
-                endPt: rightBottom,
-                width: WallConstants.XBraceGrooveWidth,
-                depth: WallConstants.XBraceGrooveDepth,
-                grooveType: GrooveType.XBraceSteel));
+                center: center1,
+                length: WallConstants.SidePlateSmallGrooveLength,
+                width: WallConstants.SidePlateSmallGrooveWidth,
+                depth: WallConstants.SidePlateSmallGrooveDepth));
+
+            // ── 中心点 2：X 偏移两槽长度差 / 2（左柱向左、右柱向右）──
+            float offsetX = (WallConstants.SidePlateSmallGrooveLength
+                           - WallConstants.SidePlateNarrowGrooveLength) / 2f;
+
+            var center2 = new Vec2(
+                isLeftColumn ? center1.X - offsetX : center1.X + offsetX,
+                center1.Y);
+
+            // ── 中心点 2：长 15 × 宽 120 × 深 55 ────────────────
+            momWallData.Features.Add(new Pocket(
+                id: $"SidePlateSmall-{key}-02",
+                side: MachineSide.Top,
+                center: center2,
+                length: WallConstants.SidePlateNarrowGrooveLength,
+                width: WallConstants.SidePlateNarrowGrooveWidth,
+                depth: WallConstants.SidePlateNarrowGrooveDepth));
+
+            // ── 对应的 4 孔螺栓孔（以中心点 1 为中心）────────────
+            AddSteelColumnSidePlateScrewHoles(
+                GenerateSidePlateBoltHoleSquarePositions(center1), momWallData);
+        }
+
+
+        #endregion
+
+
+        #region 侧板槽
+        /// <summary>
+        /// 根据柱子 X 坐标确定钢柱侧板槽中心点位置，并在每个中心点生成侧板槽
+        /// 
+        /// 中心点 X：
+        ///   • 左侧柱（X &lt; SidePlateColumnLeftThreshold）：
+        ///     X0 = 柱 X + SidePlateGrooveLength/2 + ColumnSteelGrooveWidth/2
+        ///                + ColumnSteelWidthClearancePerSide
+        ///   • 右侧柱：
+        ///     X0 = 柱 X - SidePlateGrooveLength/2 - ColumnSteelGrooveWidth/2
+        ///                - ColumnSteelWidthClearancePerSide
+        /// 
+        /// 中心点 Y（两个）：
+        ///   • 下：ColumnSteelGrooveBaseOffset + SidePlateGrooveLowerOffset（1000 + 294）
+        ///   • 上：Wall.Width - SidePlateGrooveUpperOffset（墙宽 - 604）
+        /// 
+        /// 每个中心点调用 <see cref="AddSteelColumnSidePlateGroovesAndScrewHoles"/> 生成侧板槽。
+        /// </summary>
+        private static void AddSidePlateGroovesByColumnX(
+            float columnX, MomWall momWallData)
+        {
+            // ── 1. 左 / 右柱判定（X < 阈值 → 左侧柱，其余按右侧柱）──
+            bool isLeft = columnX < WallConstants.SidePlateColumnLeftThreshold;
+
+            // ── 2. 中心点 X ─────────────────────────────────────
+            float offsetX = WallConstants.SidePlateGrooveLength / 2f
+                          + WallConstants.ColumnSteelGrooveUpperWidth;
+
+            float centerX = isLeft ? columnX + WallConstants.ColumnSteelGrooveWidth / 2 + offsetX : columnX - WallConstants.ColumnSteelGrooveWidth / 2 - offsetX;
+
+            // ── 3. 中心点 Y（下 / 上两个位置）───────────────────
+            float[] centerYs =
+            {
+                WallConstants.ColumnSteelGrooveBaseOffset
+                    + WallConstants.SidePlateGrooveLowerOffset,
+                momWallData.Width - WallConstants.SidePlateGrooveUpperOffset,
+            };
+
+            // ── 4. 生成侧板槽 ───────────────────────────────────
+            foreach (float centerY in centerYs)
+            {
+                AddSteelColumnSidePlateGroovesAndScrewHoles(
+                    new Vec2(centerX, centerY), momWallData);
+            }
+        }
+
+        /// <summary>
+        /// 生成钢柱侧板槽（Pocket 方式加工）：以给定中心点为中心，同一中心点开 2 个槽
+        ///   • 外槽：长 SidePlateGrooveLength（180）× 宽 SidePlateGrooveOuterWidth（200）× 深 15
+        ///   • 内槽：长 180 × 宽 SidePlateGrooveInnerWidth（120）× 深 40
+        /// 槽长沿墙长方向（X），槽宽沿墙高方向（Y），两槽同心；
+        /// 均由 BoxHandler 按 Pocket 生成 T8 铣槽指令。
+        /// 生成侧板槽后一并生成对应的 6 孔螺栓孔（⌀20 × 深 100）。
+        /// </summary>
+        private static void AddSteelColumnSidePlateGroovesAndScrewHoles(
+            Vec2 center, MomWall momWallData)
+        {
+            string key = $"{center.X:F0}-{center.Y:F0}";
+
+            // 外槽（长 180，宽 200，深 15）
+            momWallData.Features.Add(new Pocket(
+                id: $"SidePlate-{key}-01",
+                side: MachineSide.Top,
+                center: center,
+                length: WallConstants.SidePlateGrooveLength,
+                width: WallConstants.SidePlateGrooveOuterWidth,
+                depth: WallConstants.SidePlateGrooveOuterDepth));
+
+            // 内槽（长 180，宽 120，深 40）
+            momWallData.Features.Add(new Pocket(
+                id: $"SidePlate-{key}-02",
+                side: MachineSide.Top,
+                center: center,
+                length: WallConstants.SidePlateGrooveLength,
+                width: WallConstants.SidePlateGrooveInnerWidth,
+                depth: WallConstants.SidePlateGrooveInnerDepth));
+
+            // ── 对应的 6 孔螺栓孔 ───────────────────────────────
+            AddSteelColumnSidePlateScrewHoles(
+                GenerateSidePlateBoltHolePositions(center), momWallData);
+        }
+
+        #endregion
+
+
+        #region 螺栓孔
+        /// <summary>
+        /// 依据中心点坐标（X0, Y0）生成 6 个螺栓孔位置坐标：
+        ///   (X0-60, Y0-80)、(X0-60, Y0+80)、(X0, Y0-80)、
+        ///   (X0+60, Y0+80)、(X0+60, Y0-80)、(X0, Y0+80)
+        /// 偏移量取自 WallConstants.SidePlateBoltHoleOffsetX / Y。
+        /// </summary>
+        private static List<Vec2> GenerateSidePlateBoltHolePositions(Vec2 center)
+        {
+            float dx = WallConstants.SidePlateBoltHoleOffsetX;   // 60
+            float dy = WallConstants.SidePlateBoltHoleOffsetY;   // 80
+
+            return new List<Vec2>
+            {
+                new Vec2(center.X - dx, center.Y - dy),
+                new Vec2(center.X - dx, center.Y + dy),
+                new Vec2(center.X,      center.Y - dy),
+                new Vec2(center.X,      center.Y + dy),
+                new Vec2(center.X + dx, center.Y - dy),
+                new Vec2(center.X + dx, center.Y + dy),
+            };
+        }
+
+        /// <summary>
+        /// 依据中心点坐标（X0, Y0）生成 4 个螺栓孔位置坐标（方阵）：
+        ///   (X0-30, Y0-30)、(X0-30, Y0+30)、(X0+30, Y0+30)、(X0+30, Y0-30)
+        /// 偏移量取自 WallConstants.SidePlateBoltHoleSquareOffset。
+        /// </summary>
+        private static List<Vec2> GenerateSidePlateBoltHoleSquarePositions(Vec2 center)
+        {
+            float d = WallConstants.SidePlateBoltHoleSquareOffset;   // 30
+
+            return new List<Vec2>
+            {
+                new Vec2(center.X - d, center.Y - d),
+                new Vec2(center.X - d, center.Y + d),
+                new Vec2(center.X + d, center.Y + d),
+                new Vec2(center.X + d, center.Y - d),
+            };
+        }
+
+        /// <summary>
+        /// 依据螺栓孔中心点坐标列表生成钢柱侧板螺栓孔（圆孔）：
+        ///   孔径 WallConstants.SidePlateScrewHoleDiameter（20mm），
+        ///   孔深 WallConstants.SidePlateScrewHoleDepth（100mm），
+        ///   加工面为墙正面（Top），非通孔。
+        /// 特征 ID 由孔中心坐标生成，多个柱子/多个中心点调用不会重名。
+        /// </summary>
+        private static void AddSteelColumnSidePlateScrewHoles(
+            List<Vec2> centerPoints, MomWall momWallData)
+        {
+            if (centerPoints == null || centerPoints.Count == 0) return;
+
+            foreach (var center in centerPoints)
+            {
+                momWallData.Features.Add(Hole.CreateRound(
+                    id: $"SidePlateScrew-{center.X:F0}-{center.Y:F0}",
+                    side: MachineSide.Top,
+                    center: center,
+                    radius: WallConstants.SidePlateScrewHoleDiameter / 2f,
+                    depth: WallConstants.SidePlateScrewHoleDepth,
+                    throughHole: false));
+            }
+        }
+        #endregion
+
+
+        /// <summary>
+        /// 求两条直线（各由两点确定）的交点；两线平行（含重合）时返回 false
+        /// </summary>
+        private static bool TryIntersect(
+            Vec2 a1, Vec2 a2, Vec2 b1, Vec2 b2, out Vec2 intersection)
+        {
+            intersection = Vec2.Zero;
+
+            Vec2 da = a2 - a1;
+            Vec2 db = b2 - b1;
+
+            float denom = da.Cross(db);
+            if (MathF.Abs(denom) <= WallConstants.DirectionTolerance)
+                return false;
+
+            float t = (b1 - a1).Cross(db) / denom;
+            intersection = a1 + da * t;
+            return true;
         }
 
     }
