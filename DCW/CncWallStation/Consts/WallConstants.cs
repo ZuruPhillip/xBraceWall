@@ -121,6 +121,55 @@
         public const float StudSlotHoleDepth = 114f;
 
         // ══════════════════════════════════════════════════════════
+        // 顶板槽底部 Pocket 尺寸（贴顶板槽槽底，Y = wallWidth - TopPlateGrooveDepth - 宽度/2）
+        // ══════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 0（最外层）长度（mm）——沿墙长方向（X）
+        /// </summary>
+        public const float TopPlatePocket0Length = 106f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 0（最外层）宽度（mm）——沿墙高方向（Y）
+        /// </summary>
+        public const float TopPlatePocket0Width = 310f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 0（最外层）深度（mm）
+        /// </summary>
+        public const float TopPlatePocket0Depth = 4f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 1 长度（mm）——沿墙长方向（X）
+        /// </summary>
+        public const float TopPlatePocket1Length = 106f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 1 宽度（mm）——沿墙高方向（Y）
+        /// </summary>
+        public const float TopPlatePocket1Width = 18f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 1 深度（mm）
+        /// </summary>
+        public const float TopPlatePocket1Depth = 36f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 2 长度（mm）——沿墙长方向（X）
+        /// </summary>
+        public const float TopPlatePocket2Length = 252f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 2 宽度（mm）——沿墙高方向（Y）
+        /// </summary>
+        public const float TopPlatePocket2Width = 4f;
+
+        /// <summary>
+        /// 顶板槽底部 Pocket 2 深度（mm）
+        /// </summary>
+        public const float TopPlatePocket2Depth = 100f;
+
+        // ══════════════════════════════════════════════════════════
         // 胶水密封槽基础尺寸
         // ══════════════════════════════════════════════════════════
 
@@ -440,6 +489,36 @@
         /// 斜撑槽侧面深度（mm）
         /// </summary>
         public const float ProppingSideSlotDepth = 30f;// 沿 Y 轴
+
+        /// <summary>
+        /// 斜撑顶部螺栓孔 X 向偏移（mm）——孔位 X = 中心 X ± 该值
+        /// </summary>
+        public const float ProppingTopBoltHoleOffsetX = 30f;
+
+        /// <summary>
+        /// 斜撑顶部螺栓孔距墙顶距离（mm）——孔位 Y = wallWidth - 该值
+        /// </summary>
+        public const float ProppingTopBoltHoleOffsetY = 299f;
+
+        /// <summary>
+        /// 斜撑正面螺栓孔 X 向偏移（mm）——孔位 X = 中心 X ± 该值
+        /// </summary>
+        public const float ProppingFrontBoltHoleOffsetX = 70f;
+
+        /// <summary>
+        /// 斜撑正面螺栓孔距墙顶距离（mm）——孔位 Z = wallHeight - 该值
+        /// </summary>
+        public const float ProppingFrontBoltHoleOffsetY = 75f;
+
+        /// <summary>
+        /// 斜撑螺栓孔直径（mm）
+        /// </summary>
+        public const float ProppingScrewHoleDiameter = 20f;
+
+        /// <summary>
+        /// 斜撑螺栓孔孔深（mm）
+        /// </summary>
+        public const float ProppingScrewHoleDepth = 100f;
 
         /// <summary>横向钢筋槽切割深度（mm）</summary>
         public const float HorizontalRebarSlotDepth = 28f;

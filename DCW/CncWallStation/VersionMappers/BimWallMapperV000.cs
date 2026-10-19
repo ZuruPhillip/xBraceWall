@@ -615,16 +615,91 @@ namespace CncWallStation.VersionMappers
 
 
         /// <summary>
-        /// 将多个斜撑 DTO 批量转换为 Propping Feature 并添加到 MomWall
-        /// 
+        /// 以斜撑中心 X 为定位，生成斜撑 Pocket、顶部螺栓孔与正面螺栓孔并添加到 MomWall
+        /// （斜撑槽 Propping Feature 的生成逻辑暂时注释，需要时取消注释即可）
+        /// </summary>
         private static void ConvertProppingToFeature(float centerX,
             MomWall momWallData)
         {
-            ProppingConverter.Convert(
-                centerX: centerX,
-                momWallData: momWallData,
-                id: "Propping-01");
+            // ── 斜撑中心点（Y 取墙顶，供 Pocket / 螺栓孔定位）──
+            var centerPoints = new List<Vec2>
+            {
+                new Vec2(centerX, momWallData.Width),
+            };
+
+            // ── 斜撑 Pocket（墙顶面，贴顶板槽槽底）─────────────
+            AddProppingPocket(centerPoints, momWallData);
+
+            // ── 斜撑螺栓孔（顶部 2 个 + 正面 2 个）─────────────
+            AddProppingTopScrewHoles(centerPoints, momWallData);
+            AddProppingFrontScrewHoles(centerPoints, momWallData);
+
+            //ProppingConverter.Convert(
+            //    centerX: centerX,
+            //    momWallData: momWallData,
+            //    id: "Propping-01");
         }
+
+        #region 斜撑 Pocket
+        /// <summary>
+        /// 读取各中心点的 X 坐标，在墙体顶端（Top 面）贴顶板槽槽底生成 3 个嵌套 Pocket：
+        ///   • Pocket 01：长 106 × 宽 310 × 深 4 ，
+        ///       中心 Y = wallWidth - TopPlateGrooveDepth - 310/2
+        ///   • Pocket 02：长 106 × 宽 18  × 深 36 ，
+        ///       中心 Y = wallWidth - TopPlateGrooveDepth - 18/2
+        ///   • Pocket 03：长 252 × 宽 4   × 深 100，
+        ///       中心 Y = wallWidth - TopPlateGrooveDepth - 4/2
+        /// 仅使用输入点的 X 参与定位，Y 由墙宽（<see cref="MomWall.Width"/>）推算。
+        /// 槽长沿墙长方向（X），槽宽沿墙高方向（Y），加工面为墙顶面（Top）。
+        /// </summary>
+        /// <param name="centerPoints">斜撑中心点列表（仅使用 X 值）</param>
+        /// <param name="momWallData">目标墙体</param>
+        public static void AddProppingPocket(
+            List<Vec2> centerPoints, MomWall momWallData)
+        {
+            if (centerPoints == null || centerPoints.Count == 0) return;
+            if (momWallData == null) return;
+
+            // ── 顶板槽槽底 Y（所有 Pocket 的定位基准）────────────
+            float grooveBottomY = momWallData.Width - WallConstants.TopPlateGrooveDepth;
+
+            for (int i = 0; i < centerPoints.Count; i++)
+            {
+                float centerX = centerPoints[i].X;
+                string key = $"{centerX:F0}-{i:D2}";
+
+                // ── Pocket 01：长 106 × 宽 310 × 深 4 ────────────
+                momWallData.Features.Add(new Pocket(
+                    id: $"ProppingPocket-{key}-01",
+                    side: MachineSide.Top,
+                    center: new Vec2(centerX,
+                        grooveBottomY - WallConstants.TopPlatePocket0Width / 2f),
+                    length: WallConstants.TopPlatePocket0Length,
+                    width: WallConstants.TopPlatePocket0Width,
+                    depth: WallConstants.TopPlatePocket0Depth));
+
+                // ── Pocket 02：长 106 × 宽 18 × 深 36 ────────────
+                momWallData.Features.Add(new Pocket(
+                    id: $"ProppingPocket-{key}-02",
+                    side: MachineSide.Top,
+                    center: new Vec2(centerX,
+                        grooveBottomY - WallConstants.TopPlatePocket1Width / 2f),
+                    length: WallConstants.TopPlatePocket1Length,
+                    width: WallConstants.TopPlatePocket1Width,
+                    depth: WallConstants.TopPlatePocket1Depth));
+
+                // ── Pocket 03：长 252 × 宽 4 × 深 100 ────────────
+                momWallData.Features.Add(new Pocket(
+                    id: $"ProppingPocket-{key}-03",
+                    side: MachineSide.Top,
+                    center: new Vec2(centerX,
+                        grooveBottomY - WallConstants.TopPlatePocket2Width / 2f),
+                    length: WallConstants.TopPlatePocket2Length,
+                    width: WallConstants.TopPlatePocket2Width,
+                    depth: WallConstants.TopPlatePocket2Depth));
+            }
+        }
+        #endregion
 
         #region X 形槽
         /// <summary>
@@ -1000,6 +1075,112 @@ namespace CncWallStation.VersionMappers
                 new Vec2(center.X + d, center.Y + d),
                 new Vec2(center.X + d, center.Y - d),
             };
+        }
+
+        /// <summary>
+        /// 依据中心点坐标（X0, Y0）生成 2 个斜撑顶部螺栓孔位置坐标：
+        ///   (X0-30, wallWidth-299)、(X0+30, wallWidth-299)
+        /// 其中 wallWidth 取 center.Y，调用方需传入墙顶中心点
+        /// （即 Y = <see cref="MomWall.Width"/>）。
+        /// 偏移量取自 WallConstants.ProppingTopBoltHoleOffsetX / OffsetY。
+        /// </summary>
+        private static List<Vec2> GenerateProppingTopBoltHolePositions(Vec2 center)
+        {
+            float dx = WallConstants.ProppingTopBoltHoleOffsetX;   // 30
+            float y = center.Y - WallConstants.ProppingTopBoltHoleOffsetY;   // wallWidth - 299
+
+            return new List<Vec2>
+            {
+                new Vec2(center.X - dx, y),
+                new Vec2(center.X + dx, y),
+            };
+        }
+
+        /// <summary>
+        /// 依据中心点坐标（X0, Y0）生成 2 个斜撑正面螺栓孔位置坐标：
+        ///   (X0-70, wallHeight-75)、(X0+70, wallHeight-75)
+        /// 其中 wallHeight 取 center.Y，调用方需传入墙顶中心点
+        /// （即 Y = <see cref="MomWall.Width"/>）。
+        /// 偏移量取自 WallConstants.ProppingFrontBoltHoleOffsetX / OffsetY。
+        /// </summary>
+        private static List<Vec2> GenerateProppingFrontBoltHolePositions(Vec2 center, MomWall momWallData)
+        {
+            float dx = WallConstants.ProppingFrontBoltHoleOffsetX;   // 70
+            float y = momWallData.ActualThickness - WallConstants.ProppingFrontBoltHoleOffsetY;   // wallHeight - 75
+
+            return new List<Vec2>
+            {
+                new Vec2(center.X - dx, y),
+                new Vec2(center.X + dx, y),
+            };
+        }
+
+        /// <summary>
+        /// 依据斜撑中心点列表生成顶部螺栓孔（圆孔）：
+        ///   孔径 WallConstants.ProppingScrewHoleDiameter（20mm），
+        ///   孔深 WallConstants.ProppingScrewHoleDepth（100mm），
+        ///   加工面为墙顶面（Top），非通孔。
+        /// 每个中心点生成 2 个孔，位置由 <see cref="GenerateProppingTopBoltHolePositions"/> 计算。
+        /// </summary>
+        public static void AddProppingTopScrewHoles(
+            List<Vec2> centerPoints, MomWall momWallData)
+        {
+            if (centerPoints == null || centerPoints.Count == 0) return;
+            if (momWallData == null) return;
+
+            foreach (var center in centerPoints)
+            {
+                AddProppingScrewHoles(
+                    GenerateProppingTopBoltHolePositions(center),
+                    momWallData,
+                    MachineSide.Top,
+                    idPrefix: "ProppingTopScrew");
+            }
+        }
+
+        /// <summary>
+        /// 依据斜撑中心点列表生成正面螺栓孔（圆孔）：
+        ///   孔径 WallConstants.ProppingScrewHoleDiameter（20mm），
+        ///   孔深 WallConstants.ProppingScrewHoleDepth（100mm），
+        ///   加工面为墙正面（Front），非通孔。
+        /// 每个中心点生成 2 个孔，位置由 <see cref="GenerateProppingFrontBoltHolePositions"/> 计算。
+        /// </summary>
+        public static void AddProppingFrontScrewHoles(
+            List<Vec2> centerPoints, MomWall momWallData)
+        {
+            if (centerPoints == null || centerPoints.Count == 0) return;
+            if (momWallData == null) return;
+
+            foreach (var center in centerPoints)
+            {
+                AddProppingScrewHoles(
+                    GenerateProppingFrontBoltHolePositions(center, momWallData),
+                    momWallData,
+                    MachineSide.Front,
+                    idPrefix: "ProppingFrontScrew");
+            }
+        }
+
+        /// <summary>
+        /// 依据孔位坐标列表批量生成斜撑螺栓孔（圆孔），孔径 20、孔深 100、非通孔。
+        /// 特征 ID 由「前缀 + 孔中心坐标」生成，多个中心点调用不会重名。
+        /// </summary>
+        private static void AddProppingScrewHoles(
+            List<Vec2> positions, MomWall momWallData,
+            MachineSide side, string idPrefix)
+        {
+            if (positions == null || positions.Count == 0) return;
+
+            foreach (var pos in positions)
+            {
+                momWallData.Features.Add(Hole.CreateRound(
+                    id: $"{idPrefix}-{pos.X:F0}-{pos.Y:F0}",
+                    side: side,
+                    center: pos,
+                    radius: WallConstants.ProppingScrewHoleDiameter / 2f,
+                    depth: WallConstants.ProppingScrewHoleDepth,
+                    throughHole: false));
+            }
         }
 
         /// <summary>
