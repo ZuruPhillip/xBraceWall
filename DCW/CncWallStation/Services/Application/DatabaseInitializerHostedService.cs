@@ -1,5 +1,6 @@
 ﻿using CncWallStation.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
@@ -10,9 +11,19 @@ namespace CncWallStation.Services.Application
     /// 数据库初始化：EnsureCreated + 手动补建/升级表结构。
     /// 说明：当前沿用 EnsureCreated + 手动 DDL 方案。建议后续迁移至 EF Core Migrations
     /// （用 db.Database.Migrate() 替代本类的全部手动 SQL）。
+    /// 开关：appsettings.json → Database:AutoInitialize。
+    ///   生产环境置为 false，跳过全部自动建表逻辑，库结构由 documents/sql 下的脚本负责；
+    ///   缺省或值非法时按 true 处理，保持既有行为不变。
     /// </summary>
     public class DatabaseInitializerHostedService : IHostedService
     {
+        /// <summary>控制是否在启动时自动建库建表的配置键。</summary>
+        public const string AutoInitializeConfigKey = "Database:AutoInitialize";
+
+        private readonly IDbContextFactory<AppDbContext> _dbFactory;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<DatabaseInitializerHostedService> _logger;
+
         /// <summary>
         /// 第 N 次失败后的等待时间（数组长度 + 1 即最大尝试次数）。
         /// 用途：MySQL 服务器若未开启 skip_name_resolve，会反查客户端 IP 的主机名；
@@ -26,19 +37,27 @@ namespace CncWallStation.Services.Application
             TimeSpan.FromSeconds(5),
         };
 
-        private readonly IDbContextFactory<AppDbContext> _dbFactory;
-        private readonly ILogger<DatabaseInitializerHostedService> _logger;
-
         public DatabaseInitializerHostedService(
             IDbContextFactory<AppDbContext> dbFactory,
+            IConfiguration configuration,
             ILogger<DatabaseInitializerHostedService> logger)
         {
             _dbFactory = dbFactory;
+            _configuration = configuration;
             _logger = logger;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            if (!IsAutoInitializeEnabled())
+            {
+                _logger.LogInformation(
+                    "数据库自动初始化已禁用（{ConfigKey} = false），跳过建库/建表与升级脚本；" +
+                    "库结构应由 documents/sql 下的脚本手工维护。",
+                    AutoInitializeConfigKey);
+                return;
+            }
+
             _logger.LogInformation("开始初始化数据库...");
 
             await ExecuteWithRetryAsync(InitializeSchemaAsync, cancellationToken);
@@ -47,6 +66,29 @@ namespace CncWallStation.Services.Application
         }
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+        /// <summary>
+        /// 读取 <see cref="AutoInitializeConfigKey"/> 开关。
+        /// 未配置或无法解析为布尔值时按 true 处理，避免历史部署因缺少配置项而行为突变。
+        /// </summary>
+        private bool IsAutoInitializeEnabled()
+        {
+            var raw = _configuration[AutoInitializeConfigKey];
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return true;
+            }
+
+            if (bool.TryParse(raw.Trim(), out var enabled))
+            {
+                return enabled;
+            }
+
+            _logger.LogWarning(
+                "配置项 {ConfigKey} 的值 \"{Value}\" 无法解析为布尔值，按 true 处理。",
+                AutoInitializeConfigKey, raw);
+            return true;
+        }
 
         /// <summary>
         /// 仅在“可恢复的连接类错误”上重试；一旦重试次数用尽，异常照常抛出，由上层提示启动失败。

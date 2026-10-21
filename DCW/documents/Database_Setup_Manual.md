@@ -7,7 +7,7 @@
 | Database | MySQL 8.0 (target version 8.0.46) |
 | Database name | `DcwCncStation` |
 | Target server | `10.33.120.30:3306` |
-| Document version | V1.0 (EN) |
+| Document version | V1.1 (EN) |
 | Date | 2026-10-21 |
 | Audience | Field implementation engineers, IT operations, backend developers |
 
@@ -45,7 +45,7 @@ The schema is not hand-written. It is derived from the application code so that 
 | `CncWallStation/Migrations/AppDbContextModelSnapshot.cs` | Final state of the EF Core model; basis for the full DDL |
 | `CncWallStation/EntityFrameworkCore/AppDbContext.cs` | Index names, default values, cascade deletes, `MEDIUMTEXT` column types |
 | `CncWallStation/Migrations/2026*_*.cs` | Three existing incremental migrations, used to create the migration baseline |
-| `CncWallStation/Services/Application/DatabaseInitializerHostedService.cs` | Fallback table creation performed at application startup (see Chapter 7) |
+| `CncWallStation/Services/Application/DatabaseInitializerHostedService.cs` | Fallback table creation at startup, controlled by the `Database:AutoInitialize` switch (see Chapter 7) |
 
 ### 1.3 Scope and Limitations
 
@@ -132,6 +132,8 @@ FLUSH PRIVILEGES;
 ```
 
 After switching accounts, update `ConnectionStrings:Default` in `CncWallStation/appsettings.json` accordingly.
+
+> Note the difference between two privilege sets: the table above is the minimum for the **setup account** that runs this manual's SQL. The **runtime account** does **not** need `CREATE` / `ALTER` / `INDEX` / `REFERENCES` when `Database:AutoInitialize=false` (the shipped value); `SELECT` / `INSERT` / `UPDATE` / `DELETE` are sufficient (see 7.3).
 
 ---
 
@@ -309,17 +311,46 @@ The site executes the reviewed upgrade SQL and updates `__EFMigrationsHistory` a
 
 Understanding this mechanism avoids duplicate setup work and misdiagnosis of "the application created the database by itself".
 
+### 7.1 Switch: `Database:AutoInitialize`
+
+`Database:AutoInitialize` in `appsettings.json` decides whether the application creates tables at startup:
+
+```json
+{
+  "ConnectionStrings": {
+    "Default": "Server=10.33.120.30;Port=3306;Database=DcwCncStation;User ID=root;Password=<password>;Charset=utf8mb4;Connection Timeout=30;"
+  },
+  "Database": {
+    "AutoInitialize": false
+  }
+}
+```
+
+| Value | Startup behaviour | Intended use |
+| --- | --- | --- |
+| `false` (shipped default) | **Skips everything**: no database creation, no table creation, no upgrade DDL | Production stations; schema is owned by the SQL scripts in this manual |
+| `true` | Runs the `EnsureCreated` + hand-written DDL flow described in 7.2 | Development and first-time environment bring-up |
+| Missing or unparsable | Treated as `true`, with a warning log entry | Backward compatibility with older configuration files |
+
+> The switch is read from `appsettings.json` and can be overridden by an environment variable (e.g. `Database__AutoInitialize=true`). Restart the client after changing it.
+
+### 7.2 Behaviour When the Switch Is `true`
+
 `CncWallStation/Services/Application/DatabaseInitializerHostedService.cs` runs during startup (`IHostedService.StartAsync`):
 
 1. `db.Database.EnsureCreatedAsync()` — if the database does not exist, it **creates the database and tables**; if it already exists, it **does nothing** (no schema comparison, no schema change).
 2. It then runs a set of hand-written `CREATE TABLE IF NOT EXISTS` statements (`PlcInstruction`, `Opc`, `MachiningException`, `MachiningRecord`) and several `ALTER TABLE` statements (adding the `Side` column, renaming `Operator` to `Registrant`, adding new columns to the exception table, etc.).
 3. Connection-class errors (timeouts, network hiccups) are retried after 2 s and 5 s (3 attempts total); privilege errors (`AccessDenied` / `UnknownDatabase`) are not retried and surface immediately.
 
-Consequences:
+### 7.3 Consequences and Log Interpretation
 
-- **A database created with this manual is never modified at startup**; the application can be started repeatedly.
-- Letting the application create the database directly also works, but that path **requires the runtime account to hold `CREATE DATABASE`**, and the structure is buried in code — not reviewable, not auditable, and therefore not recommended for production hand-over.
-- Log lines `开始初始化数据库...` / `数据库初始化完成` indicate a healthy initialization; `数据库初始化第 x/3 次尝试失败` indicates network latency or slow reverse DNS resolution.
+- With the shipped configuration (`false`) the application **executes no DDL at startup**; the schema is fully owned by this manual's scripts, and the application can be started repeatedly.
+- In that mode the runtime account **does not need `CREATE DATABASE` / `ALTER` privileges**; `SELECT` / `INSERT` / `UPDATE` / `DELETE` are sufficient (index-related privileges are only needed by the setup account).
+- With auto-initialization disabled, a missing database or table does not block startup; the main window opens and business queries fail instead (`Table 'dcwc...' doesn't exist`). Run the setup scripts first.
+- Log interpretation (`logs/log-YYYYMMDD.txt`):
+  - `数据库自动初始化已禁用（Database:AutoInitialize = false）...` — switch is effective, as expected in production;
+  - `开始初始化数据库...` / `数据库初始化完成` — the auto-creation flow ran (`true`);
+  - `数据库初始化第 x/3 次尝试失败` — network latency or slow reverse DNS resolution.
 
 ---
 
@@ -363,7 +394,7 @@ SELECT * FROM `__EFMigrationsHistory`; -- expect 3 rows
 ### 8.3 Application-Level Verification
 
 1. Confirm `ConnectionStrings:Default` in `CncWallStation/appsettings.json` points to the new database;
-2. Start `CncWallStation.exe` and look for `数据库初始化完成` in `logs/log-YYYYMMDD.txt`;
+2. Start `CncWallStation.exe` and look for `数据库自动初始化已禁用（Database:AutoInitialize = false）` in `logs/log-YYYYMMDD.txt` (or `数据库初始化完成` when the switch is `true`);
 3. Import a BIM data set in the application, then query:
 
 ```sql
@@ -505,6 +536,9 @@ Other tables:
 {
   "ConnectionStrings": {
     "Default": "Server=10.33.120.30;Port=3306;Database=DcwCncStation;User ID=root;Password=<password>;Charset=utf8mb4;Connection Timeout=30;"
+  },
+  "Database": {
+    "AutoInitialize": false
   }
 }
 ```
@@ -514,6 +548,7 @@ Requirements:
 - `Charset=utf8mb4` is mandatory;
 - `Server`, `Port` and `Database` must match section 2.1;
 - Replace `User ID` / `Password` with the dedicated account in production;
+- Set `Database:AutoInitialize` to `false` in production so that this manual's scripts own the schema (see Chapter 7);
 - Restart the client application after changing the file.
 
 ### Appendix E Version History
@@ -521,3 +556,4 @@ Requirements:
 | Version | Date | Change |
 | --- | --- | --- |
 | V1.0 (EN) | 2026-10-21 | English edition: 5 SQL scripts; `DcwCncStation` created on `10.33.120.30` (8 business tables + migration baseline); `AppDbContextFactory` switched to `appsettings.json` with a fixed `MySqlServerVersion(8,0,32)` |
+| V1.1 (EN) | 2026-10-21 | Added the `Database:AutoInitialize` switch (shipped as `false`) so production skips startup-time table creation/upgrade; added the 7.1 switch reference, 7.3 log interpretation, and the reduced runtime-account privilege note |
