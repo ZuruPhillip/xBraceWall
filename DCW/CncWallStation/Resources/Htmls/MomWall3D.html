@@ -495,11 +495,11 @@ const GROOVE_COLORS = {
   topPlate    : { hex: 0xffa726, cn:'顶板槽',   en:'Top Plate',   css: '#ffa726' },
   glueSeal    : { hex: 0xf06292, cn:'密封胶槽', en:'Glue Seal',   css: '#f06292' },
   // ── Pocket 按 PocketType 细分着色 ──
-  pocket                  : { hex: 0xAB47BC, cn:'开关盒坑', en:'Switch Box Pocket', css: '#AB47BC' }, // 兼容旧数据
-  pocketSwitchBox         : { hex: 0xAB47BC, cn:'开关盒坑',       en:'Switch Box Pocket',      css: '#AB47BC' },
-  pocketPropping          : { hex: 0x26a69a, cn:'斜撑固定坑',     en:'Propping Pocket',        css: '#26a69a' },
-  pocketSteelColumnSidePocket : { hex: 0xffd54f, cn:'钢柱侧板坑', en:'Steel Column Side Pocket', css: '#ffd54f' },
-  pocketGeneral           : { hex: 0xb39ddb, cn:'通用挖坑',       en:'General Pocket',         css: '#b39ddb' },
+  pocket                  : { hex: 0xAB47BC, cn:'开关盒槽', en:'Switch Box Pocket', css: '#AB47BC' }, // 兼容旧数据
+  pocketSwitchBox         : { hex: 0xAB47BC, cn:'开关盒槽',       en:'Switch Box Pocket',      css: '#AB47BC' },
+  pocketPropping          : { hex: 0x26a69a, cn:'斜撑固定槽',     en:'Propping Pocket',        css: '#26a69a' },
+  pocketSteelColumnSidePocket : { hex: 0xffd54f, cn:'钢柱侧板槽', en:'Steel Column Side Pocket', css: '#ffd54f' },
+  pocketGeneral           : { hex: 0xb39ddb, cn:'通用挖槽',       en:'General Pocket',         css: '#b39ddb' },
   xBraceSteel : { hex: 0xff7043, cn:'斜撑钢槽', en:'X-Brace Steel', css: '#ff7043' },
   default     : { hex: 0xce93d8, cn:'其他凹槽', en:'Other Groove', css: '#ce93d8' },
 };
@@ -1660,7 +1660,7 @@ canvas.addEventListener('mousemove', e => {
         }
       }
 
-      // ② 多个凹槽/Pocket 相互重叠（嵌套挖坑）时，取最内层（占地最小）的那个
+      // ② 多个凹槽/Pocket 相互重叠（嵌套挖槽）时，取最内层（占地最小）的那个
       hit = inner ?? pickInnermostGrooveHit(hits, baseDist, pickRange, hit);
     }
     if (meshFeatureMap.has(hit)) {
@@ -2493,11 +2493,11 @@ window.resetAllLayers = function() {
     groove_base_bracket: { zh: '底部托架', en: 'Base Bracket' },
     groove_top_plate: { zh: '顶板槽', en: 'Top Plate' },
     groove_glue_seal: { zh: '密封胶槽', en: 'Glue Seal' },
-    groove_pocket: { zh: '开关盒坑', en: 'Pocket' },
-    groove_pocket_switch_box: { zh: '开关盒坑', en: 'Switch Box Pocket' },
-    groove_pocket_propping: { zh: '斜撑固定坑', en: 'Propping Pocket' },
-    groove_pocket_steel_column_side_pocket: { zh: '钢柱侧板坑', en: 'Steel Column Side Pocket' },
-    groove_pocket_general: { zh: '通用挖坑', en: 'General Pocket' },
+    groove_pocket: { zh: '开关盒槽', en: 'Pocket' },
+    groove_pocket_switch_box: { zh: '开关盒槽', en: 'Switch Box Pocket' },
+    groove_pocket_propping: { zh: '斜撑固定槽', en: 'Propping Pocket' },
+    groove_pocket_steel_column_side_pocket: { zh: '钢柱侧板槽', en: 'Steel Column Side Pocket' },
+    groove_pocket_general: { zh: '通用挖槽', en: 'General Pocket' },
     groove_x_brace_steel: { zh: '斜撑钢槽', en: 'X-Brace Steel' },
     groove_default: { zh: '其他凹槽', en: 'Other Groove' },
     ftype_groove: { zh: '凹槽 (Groove)', en: 'Groove' },

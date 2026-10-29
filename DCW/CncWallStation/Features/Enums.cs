@@ -5,7 +5,7 @@
     {
         Groove,      // 矩形切槽
         Hole,        // 开孔(圆孔/腰孔)
-        Pocket,      // 矩形挖坑
+        Pocket,      // 矩形挖槽
         MepSlot,     // 电线管道线槽
         RebarSlot,   // 钢筋槽
         Propping,    // 斜撑
@@ -70,21 +70,21 @@
     }
 
     /// <summary>
-    /// 挖坑（Pocket）类型枚举
+    /// 挖槽（Pocket）类型枚举
     /// 描述 Pocket 的业务用途，便于后续加工路径分类处理
     /// </summary>
     public enum PocketType
     {
-        /// <summary>通用挖坑（未分类）</summary>
+        /// <summary>通用挖槽（未分类）</summary>
         General,
 
-        /// <summary>斜撑固定坑（proppingPocket）</summary>
+        /// <summary>斜撑固定槽（proppingPocket）</summary>
         Propping,
 
-        /// <summary>开关盒坑（switchBoxPocket）</summary>
+        /// <summary>开关盒槽（switchBoxPocket）</summary>
         SwitchBox,
 
-        /// <summary>钢柱侧板坑（steelColumnSidePocket）</summary>
+        /// <summary>钢柱侧板槽（steelColumnSidePocket）</summary>
         SteelColumnSidePocket,
     }
 
@@ -105,7 +105,7 @@
         {
             FeatureType.Groove => "矩形切槽",
             FeatureType.Hole => "开孔",
-            FeatureType.Pocket => "矩形挖坑",
+            FeatureType.Pocket => "矩形挖槽",
             FeatureType.MepSlot => "电线管道线槽",
             FeatureType.RebarSlot => "钢筋槽",
             FeatureType.Propping => "斜撑",
@@ -191,10 +191,10 @@
     {
         public static string ToDisplayText(this PocketType pt) => pt switch
         {
-            PocketType.General => "通用挖坑",
-            PocketType.Propping => "斜撑固定坑",
-            PocketType.SwitchBox => "开关盒坑",
-            PocketType.SteelColumnSidePocket => "钢柱侧板坑",
+            PocketType.General => "通用挖槽",
+            PocketType.Propping => "斜撑固定槽",
+            PocketType.SwitchBox => "开关盒槽",
+            PocketType.SteelColumnSidePocket => "钢柱侧板槽",
             _ => pt.ToString()
         };
 

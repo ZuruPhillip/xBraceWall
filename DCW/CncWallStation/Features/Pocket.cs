@@ -3,11 +3,11 @@
 namespace CncWallStation.Features
 {
     /// <summary>
-    /// 矩形挖坑 / 开槽特征
+    /// 矩形挖槽 / 开槽特征
     /// </summary>
     public class Pocket : Feature
     {
-        /// <summary>挖坑类型（业务分类）</summary>
+        /// <summary>挖槽类型（业务分类）</summary>
         public PocketType PocketType { get; set; }
 
         /// <summary>口袋长度（mm）</summary>

@@ -54,7 +54,7 @@ namespace CncWallStation.VersionMappers
             ConvertDeviceToFeature(dto.MepDevices,momWallData);
 
             //生成斜撑数据
-            ConvertProppingToFeature(1000f,momWallData);
+            ConvertProppingToFeature(2000f,momWallData);
 
             //生成窗户数据
             ConvertOpeningToFeature(dto.OpeningHoles,momWallData);
