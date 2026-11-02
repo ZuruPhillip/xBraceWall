@@ -7,6 +7,9 @@ namespace BimWallData.V001
         [JsonProperty("pn")]
         public string? Pn { get; set; }
 
+        [JsonProperty("wallType")]
+        public string? WallType { get; set; }
+
         [JsonProperty("aacDensity")]
         public float AacDensity { get; set; }
         [JsonProperty("coreHeight")]

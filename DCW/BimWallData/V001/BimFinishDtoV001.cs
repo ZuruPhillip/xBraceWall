@@ -16,6 +16,6 @@ namespace BimWallData.V001
         [JsonProperty("contour")]
         public List<PointXyzDto>? Contour { get; set; }
         [JsonProperty("cutouts")]
-        public string? Cutouts { get; set; }
+        public List<PointXyzDto>? Cutouts { get; set; }
     }
 }
