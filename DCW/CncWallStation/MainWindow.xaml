@@ -106,11 +106,18 @@
                 Command="{Binding NavigateCommand}"
                 CommandParameter="ReportPage"/>
 
-                <!-- 系统设置 -->
+                    <!-- OPC节点配置 -->
+                    <hc:SideMenuItem 
+                Header="{l:Loc Menu_OpcNodeConfig}" 
+                Command="{Binding NavigateCommand}"
+                CommandParameter="OpcNodeConfigPage"/>
+                
+                    <!-- 系统设置 -->
                 <hc:SideMenuItem 
                 Header="{l:Loc Menu_Settings}" 
                 Command="{Binding NavigateCommand}"
                 CommandParameter="SettingPage"/>
+
             </hc:SideMenu.Items>
         </hc:SideMenu>
         </Grid>

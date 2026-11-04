@@ -153,6 +153,9 @@
   <data name="Menu_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="Menu_OpcNodeConfig" xml:space="preserve">
+    <value>OPC Nodes</value>
+  </data>
   <data name="TabHeader_WallList" xml:space="preserve">
     <value>Wall List</value>
   </data>
@@ -179,6 +182,9 @@
   </data>
   <data name="TabHeader_Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="TabHeader_OpcNodeConfig" xml:space="preserve">
+    <value>OPC Nodes</value>
   </data>
   <data name="Common_Search" xml:space="preserve">
     <value>Search</value>
@@ -1109,50 +1115,289 @@ Please enter new wall name:</value>
   <data name="Settings_DisconnectOpc" xml:space="preserve">
     <value>Disconnect</value>
   </data>
-  <data name="Settings_OpcNodeManagement" xml:space="preserve">
-    <value>OPC Node Management</value>
+  <!-- ══════════════════════════════════════════ -->
+  <!--  OpcNodeConfigPage                        -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_OpcNodeConfig" xml:space="preserve">
+    <value>OPC Node Configuration</value>
   </data>
-  <data name="Settings_OpcNodeManagementDesc" xml:space="preserve">
-    <value>Configure OPC UA node addresses for read/write and monitoring</value>
+  <data name="OpcNode_PageDesc" xml:space="preserve">
+    <value>Group and maintain OPC UA nodes with search, paging and Excel batch editing</value>
   </data>
-  <data name="Settings_AddNode" xml:space="preserve">
-    <value>Add New Node</value>
+  <data name="OpcNode_Refresh" xml:space="preserve">
+    <value>Refresh</value>
   </data>
-  <data name="Settings_NodeIdPlaceholder" xml:space="preserve">
-    <value>NodeId, e.g. ns=3;s="VarName"</value>
+  <data name="OpcNode_NewNode" xml:space="preserve">
+    <value>+ New Node</value>
   </data>
-  <data name="Settings_NodeDescriptionPlaceholder" xml:space="preserve">
-    <value>Node description/alias</value>
+  <data name="OpcNode_NewNodeTitle" xml:space="preserve">
+    <value>New OPC Node</value>
   </data>
-  <data name="Settings_NodeWritable" xml:space="preserve">
-    <value>Writable</value>
+  <data name="OpcNode_EditNodeTitle" xml:space="preserve">
+    <value>Edit OPC Node</value>
   </data>
-  <data name="Settings_AddNodeBtn" xml:space="preserve">
-    <value>Add Node</value>
+
+  <!-- Groups -->
+  <data name="OpcNode_GroupPanel" xml:space="preserve">
+    <value>Node Groups</value>
   </data>
-  <data name="Settings_DeleteNode" xml:space="preserve">
-    <value>Delete Selected</value>
+  <data name="OpcNode_GroupAll" xml:space="preserve">
+    <value>All Nodes</value>
   </data>
-  <data name="Settings_ClearAllNodes" xml:space="preserve">
-    <value>Clear All</value>
+  <data name="OpcNode_Ungrouped" xml:space="preserve">
+    <value>Ungrouped</value>
   </data>
-  <data name="Settings_GridNodeId" xml:space="preserve">
+  <data name="OpcNode_NewGroup" xml:space="preserve">
+    <value>New Group</value>
+  </data>
+  <data name="OpcNode_NewGroupTitle" xml:space="preserve">
+    <value>New Group</value>
+  </data>
+  <data name="OpcNode_RenameGroup" xml:space="preserve">
+    <value>Rename Group</value>
+  </data>
+  <data name="OpcNode_RenameGroupTitle" xml:space="preserve">
+    <value>Rename Group</value>
+  </data>
+  <data name="OpcNode_DeleteGroup" xml:space="preserve">
+    <value>Delete Group</value>
+  </data>
+  <data name="OpcNode_GroupName" xml:space="preserve">
+    <value>Group Name</value>
+  </data>
+  <data name="OpcNode_GroupNameHint" xml:space="preserve">
+    <value>Up to 64 characters</value>
+  </data>
+  <data name="OpcNode_GroupDesc" xml:space="preserve">
+    <value>Description (optional)</value>
+  </data>
+  <data name="OpcNode_GroupNameRequired" xml:space="preserve">
+    <value>Group name is required</value>
+  </data>
+  <data name="OpcNode_GroupNameTooLong" xml:space="preserve">
+    <value>Group name cannot exceed {0} characters</value>
+  </data>
+  <data name="OpcNode_GroupNameExists" xml:space="preserve">
+    <value>This group name already exists</value>
+  </data>
+  <data name="OpcNode_Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="OpcNode_GroupSaveFailed" xml:space="preserve">
+    <value>Group operation failed: {0}</value>
+  </data>
+
+  <!-- Node fields -->
+  <data name="OpcNode_NodeId" xml:space="preserve">
     <value>NodeId</value>
   </data>
-  <data name="Settings_GridDescription" xml:space="preserve">
+  <data name="OpcNode_NodeIdPlaceholder" xml:space="preserve">
+    <value>e.g. ns=3;s="VarName"</value>
+  </data>
+  <data name="OpcNode_NodeIdEditHint" xml:space="preserve">
+    <value>NodeId is the subscription key and cannot be changed after creation</value>
+  </data>
+  <data name="OpcNode_NodeIdRequired" xml:space="preserve">
+    <value>NodeId is required</value>
+  </data>
+  <data name="OpcNode_NodeIdTooLong" xml:space="preserve">
+    <value>NodeId cannot exceed {0} characters</value>
+  </data>
+  <data name="OpcNode_NodeIdExists" xml:space="preserve">
+    <value>This NodeId already exists</value>
+  </data>
+  <data name="OpcNode_Description" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="Settings_GridWritable" xml:space="preserve">
+  <data name="OpcNode_DescriptionPlaceholder" xml:space="preserve">
+    <value>Node description / alias</value>
+  </data>
+  <data name="OpcNode_Writable" xml:space="preserve">
     <value>Writable</value>
   </data>
-  <data name="Settings_GridShowInRealtime" xml:space="preserve">
-    <value>Show in Realtime</value>
+  <data name="OpcNode_ShowInRealtime" xml:space="preserve">
+    <value>Show in realtime panel on control page</value>
   </data>
-  <data name="Settings_GridValue" xml:space="preserve">
+
+  <!-- Search & filters -->
+  <data name="OpcNode_KeywordPlaceholder" xml:space="preserve">
+    <value>Search NodeId or description</value>
+  </data>
+  <data name="OpcNode_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="OpcNode_Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="OpcNode_FilterAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="OpcNode_FilterWritable" xml:space="preserve">
+    <value>Writable</value>
+  </data>
+  <data name="OpcNode_FilterReadOnly" xml:space="preserve">
+    <value>Read-only</value>
+  </data>
+  <data name="OpcNode_FilterRealtimeYes" xml:space="preserve">
+    <value>Shown</value>
+  </data>
+  <data name="OpcNode_FilterRealtimeNo" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="OpcNode_FilterKeywordLabel" xml:space="preserve">
+    <value>Keyword: {0}</value>
+  </data>
+  <data name="OpcNode_FilterGroupLabel" xml:space="preserve">
+    <value>Group: {0}</value>
+  </data>
+  <data name="OpcNode_FilterWritableLabel" xml:space="preserve">
+    <value>Writable: {0}</value>
+  </data>
+  <data name="OpcNode_FilterRealtimeLabel" xml:space="preserve">
+    <value>Realtime: {0}</value>
+  </data>
+  <data name="OpcNode_NoResult" xml:space="preserve">
+    <value>No matching nodes</value>
+  </data>
+  <data name="OpcNode_NoResultHint" xml:space="preserve">
+    <value>Adjust the search criteria or create a new node</value>
+  </data>
+
+  <!-- Grid -->
+  <data name="OpcNode_ColNodeId" xml:space="preserve">
+    <value>NodeId</value>
+  </data>
+  <data name="OpcNode_ColDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="OpcNode_ColGroup" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="OpcNode_ColWritable" xml:space="preserve">
+    <value>Writable</value>
+  </data>
+  <data name="OpcNode_ColRealtime" xml:space="preserve">
+    <value>Realtime</value>
+  </data>
+  <data name="OpcNode_ColValue" xml:space="preserve">
     <value>Current Value</value>
   </data>
-  <data name="Settings_GridUpdated" xml:space="preserve">
+  <data name="OpcNode_ColUpdated" xml:space="preserve">
     <value>Last Updated</value>
+  </data>
+  <data name="OpcNode_ColActions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="OpcNode_ActionEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="OpcNode_ActionDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- Paging -->
+  <data name="OpcNode_TotalFormat" xml:space="preserve">
+    <value>{0} in total</value>
+  </data>
+  <data name="OpcNode_RangeFormat" xml:space="preserve">
+    <value>showing {0}-{1}</value>
+  </data>
+  <data name="OpcNode_PageSize" xml:space="preserve">
+    <value>Rows</value>
+  </data>
+  <data name="OpcNode_PrevPage" xml:space="preserve">
+    <value>Prev</value>
+  </data>
+  <data name="OpcNode_NextPage" xml:space="preserve">
+    <value>Next</value>
+  </data>
+
+  <!-- Delete confirmation -->
+  <data name="OpcNode_DeleteTitle" xml:space="preserve">
+    <value>Confirm Deletion</value>
+  </data>
+  <data name="OpcNode_DeleteConfirm" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="OpcNode_DeleteNodeMessage" xml:space="preserve">
+    <value>Delete node "{0}"? This action cannot be undone.</value>
+  </data>
+  <data name="OpcNode_DeleteNodeBatchMessage" xml:space="preserve">
+    <value>Delete the {0} selected nodes? This action cannot be undone.</value>
+  </data>
+  <data name="OpcNode_DeleteGroupTitle" xml:space="preserve">
+    <value>Confirm Group Deletion</value>
+  </data>
+  <data name="OpcNode_DeleteGroupMessage" xml:space="preserve">
+    <value>Delete group "{0}"? Its {1} node(s) will be moved to "Ungrouped".</value>
+  </data>
+  <data name="OpcNode_SelectNodeFirst" xml:space="preserve">
+    <value>Please select the nodes to delete in the grid first</value>
+  </data>
+  <data name="OpcNode_DeleteFailed" xml:space="preserve">
+    <value>Failed to delete nodes: {0}</value>
+  </data>
+  <data name="OpcNode_LoadFailed" xml:space="preserve">
+    <value>Failed to load OPC nodes: {0}</value>
+  </data>
+  <data name="OpcNode_CreateNodeFailed" xml:space="preserve">
+    <value>Failed to create node: {0}</value>
+  </data>
+  <data name="OpcNode_UpdateNodeFailed" xml:space="preserve">
+    <value>Failed to update node: {0}</value>
+  </data>
+
+  <!-- Excel import/export -->
+  <data name="OpcNode_Import" xml:space="preserve">
+    <value>Import Excel</value>
+  </data>
+  <data name="OpcNode_Export" xml:space="preserve">
+    <value>Export Excel</value>
+  </data>
+  <data name="OpcNode_BatchDelete" xml:space="preserve">
+    <value>Delete Selected</value>
+  </data>
+  <data name="OpcNode_ExportEmpty" xml:space="preserve">
+    <value>No data to export under the current search criteria</value>
+  </data>
+  <data name="OpcNode_ExportSuccess" xml:space="preserve">
+    <value>Exported {0} node(s) to: {1}</value>
+  </data>
+  <data name="OpcNode_ExportFailed" xml:space="preserve">
+    <value>Export failed: {0}</value>
+  </data>
+  <data name="OpcNode_ImportEmpty" xml:space="preserve">
+    <value>No importable nodes found in the file</value>
+  </data>
+  <data name="OpcNode_ImportPreviewTitle" xml:space="preserve">
+    <value>Import Preview</value>
+  </data>
+  <data name="OpcNode_ImportFilePath" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="OpcNode_ImportAdded" xml:space="preserve">
+    <value>Added</value>
+  </data>
+  <data name="OpcNode_ImportUpdated" xml:space="preserve">
+    <value>Updated</value>
+  </data>
+  <data name="OpcNode_ImportSkipped" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="OpcNode_ImportErrorsFormat" xml:space="preserve">
+    <value>Skipped rows ({0} in total, first 20 shown)</value>
+  </data>
+  <data name="OpcNode_ImportErrorsMore" xml:space="preserve">
+    <value>{0} more not shown</value>
+  </data>
+  <data name="OpcNode_ImportConfirm" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="OpcNode_ImportResultFormat" xml:space="preserve">
+    <value>Import finished: {0} added, {1} updated, {2} skipped</value>
+  </data>
+  <data name="OpcNode_ImportFailed" xml:space="preserve">
+    <value>Import failed: {0}</value>
   </data>
 
   <!-- ══════════════════════════════════════════ -->

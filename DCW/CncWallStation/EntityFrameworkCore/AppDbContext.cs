@@ -18,6 +18,8 @@ namespace CncWallStation.EntityFrameworkCore
         public DbSet<DataCheckRecordEntity> DataCheckRecords => Set<DataCheckRecordEntity>();
         public DbSet<PlcInstructionEntity> PlcInstructions => Set<PlcInstructionEntity>();
         public DbSet<OpcWriteRecordEntity> OpcWriteRecords => Set<OpcWriteRecordEntity>();
+        public DbSet<OpcNodeGroupEntity> OpcNodeGroups => Set<OpcNodeGroupEntity>();
+        public DbSet<OpcNodeEntity> OpcNodes => Set<OpcNodeEntity>();
         public DbSet<MachiningExceptionEntity> MachiningExceptions => Set<MachiningExceptionEntity>();
         public DbSet<MachiningRecordEntity> MachiningRecords => Set<MachiningRecordEntity>();
 
@@ -73,6 +75,60 @@ namespace CncWallStation.EntityFrameworkCore
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("timestamp")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // ==================== OpcNodeGroup 表配置 ====================
+            modelBuilder.Entity<OpcNodeGroupEntity>(entity =>
+            {
+                entity.ToTable("OpcNodeGroup");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                // 分组名称唯一，避免出现同名分组
+                entity.HasIndex(e => e.Name)
+                    .IsUnique()
+                    .HasDatabaseName("UX_OpcNodeGroup_Name");
+
+                entity.Property(e => e.Name).HasMaxLength(64).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+
+            // ==================== OpcNode 表配置 ====================
+            modelBuilder.Entity<OpcNodeEntity>(entity =>
+            {
+                entity.ToTable("OpcNode");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd();
+
+                // NodeId 为订阅唯一键
+                entity.HasIndex(e => e.NodeId)
+                    .IsUnique()
+                    .HasDatabaseName("UX_OpcNode_NodeId");
+                entity.HasIndex(e => e.GroupId).HasDatabaseName("IX_OpcNode_GroupId");
+
+                entity.Property(e => e.NodeId).HasMaxLength(256).IsRequired();
+                entity.Property(e => e.Description).HasMaxLength(256);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                // 分组删除时由应用层先把 GroupId 置空，这里仅做 SetNull 兜底
+                entity.HasOne<OpcNodeGroupEntity>()
+                    .WithMany()
+                    .HasForeignKey(e => e.GroupId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // ==================== Project 表配置 ====================

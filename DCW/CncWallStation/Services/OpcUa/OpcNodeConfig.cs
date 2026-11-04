@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CncWallStation.Localization;
 
 namespace CncWallStation.Services.OpcUa;
 
@@ -7,6 +8,23 @@ namespace CncWallStation.Services.OpcUa;
 /// </summary>
 public partial class OpcNodeConfig : ObservableObject
 {
+    /// <summary>数据库主键（0 表示尚未持久化）</summary>
+    public long Id { get; set; }
+
+    /// <summary>所属分组 Id（null 表示未分组）</summary>
+    public int? GroupId { get; set; }
+
+    /// <summary>所属分组名称（仅用于界面展示）</summary>
+    [ObservableProperty]
+    private string? _groupName;
+
+    /// <summary>分组显示名：未分组时回退为本地化文案</summary>
+    public string GroupDisplayName => string.IsNullOrWhiteSpace(GroupName)
+        ? LocalizationService.Instance["OpcNode_Ungrouped"]
+        : GroupName;
+
+    partial void OnGroupNameChanged(string? value) => OnPropertyChanged(nameof(GroupDisplayName));
+
     /// <summary>节点唯一标识符，如 ns=3;s="MyVariable"</summary>
     public string NodeId { get; set; } = string.Empty;
 

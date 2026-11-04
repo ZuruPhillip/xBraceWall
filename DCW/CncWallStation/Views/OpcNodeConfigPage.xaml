@@ -1,0 +1,649 @@
+<Page x:Class="CncWallStation.Views.OpcNodeConfigPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:l="clr-namespace:CncWallStation.Localization"
+      xmlns:views="clr-namespace:CncWallStation.Views"
+      mc:Ignorable="d"
+      d:DesignHeight="900" d:DesignWidth="1100"
+      FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <views:OpcQualityColorConverter x:Key="OpcQualityColor"/>
+
+        <!-- 卡片 -->
+        <Style x:Key="PanelCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="#E8E8E8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- 小号幽灵按钮（分组操作） -->
+        <Style x:Key="GhostIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#8C8C8C"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E6F4FF"/>
+                                <Setter Property="Foreground" Value="#1677FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 分组列表项 -->
+        <Style x:Key="GroupListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="6,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="4" Padding="8,0" Height="34">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#F5F5F5"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E6F4FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 查询条件标签 -->
+        <Style x:Key="ChipBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="#E6F4FF"/>
+            <Setter Property="CornerRadius" Value="11"/>
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+        </Style>
+
+        <Style x:Key="ChipCloseButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#1677FF"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="2,0">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 分页按钮 -->
+        <Style x:Key="PagerButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#262626"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E8E8E8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#1677FF"/>
+                                <Setter Property="Foreground" Value="#1677FF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#BFBFBF"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#F0F0F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 行内文字按钮（编辑/删除） -->
+        <Style x:Key="RowLinkButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#1677FF"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#4096FF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════ 标题栏 ═══════════ -->
+        <Border Grid.Row="0" Margin="16,16,16,8" Padding="16,12"
+                Background="White" CornerRadius="4"
+                BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="4" Height="34" Background="#1677FF" CornerRadius="2" Margin="0,0,10,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{l:Loc PageTitle_OpcNodeConfig}"
+                                   FontSize="18" FontWeight="Bold" Foreground="#262626"/>
+                        <TextBlock Text="{l:Loc OpcNode_PageDesc}"
+                                   FontSize="12" Foreground="#8C8C8C" Margin="0,3,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Content="{l:Loc OpcNode_Refresh}"
+                            Command="{Binding RefreshCommand}"
+                            Style="{StaticResource BaseButtonStyle}"
+                            MinWidth="88" Margin="0,0,8,0"/>
+                    <Button Content="{l:Loc OpcNode_NewNode}"
+                            Command="{Binding CreateNodeCommand}"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            MinWidth="104"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ 主体：左分组 + 右节点 ═══════════ -->
+        <Grid Grid.Row="1" Margin="16,0,16,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="232"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左栏：分组管理 -->
+            <Border Grid.Column="0" Style="{StaticResource PanelCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="14,12,10,8">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{l:Loc OpcNode_GroupPanel}"
+                                       FontSize="13" FontWeight="SemiBold" Foreground="#262626"/>
+                        </StackPanel>
+                        <Button Content="+"
+                                HorizontalAlignment="Right"
+                                Style="{StaticResource GhostIconButtonStyle}"
+                                FontSize="16"
+                                Command="{Binding CreateGroupCommand}"
+                                ToolTip="{l:Loc OpcNode_NewGroup}"/>
+                    </Grid>
+
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding Groups}"
+                             SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ItemContainerStyle="{StaticResource GroupListItemStyle}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border x:Name="AccentBar" Grid.Column="0"
+                                            Width="3" Height="16" CornerRadius="2"
+                                            Background="Transparent" Margin="0,0,8,0"/>
+
+                                    <TextBlock x:Name="NameText" Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               FontSize="13" Foreground="#262626"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
+
+                                    <Border Grid.Column="2" Background="#F0F0F0" CornerRadius="8"
+                                            Padding="7,1" Margin="6,0,0,0" VerticalAlignment="Center">
+                                        <TextBlock x:Name="CountText" Text="{Binding NodeCount}"
+                                                   FontSize="11" Foreground="#8C8C8C"/>
+                                    </Border>
+
+                                    <StackPanel x:Name="Actions" Grid.Column="3"
+                                                Orientation="Horizontal" Margin="4,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Visibility="Collapsed">
+                                        <Button Content="✎"
+                                                Style="{StaticResource GhostIconButtonStyle}"
+                                                Command="{Binding DataContext.RenameGroupCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{l:Loc OpcNode_RenameGroup}"
+                                                Visibility="{Binding IsManageable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                        <Button Content="✕"
+                                                Style="{StaticResource GhostIconButtonStyle}"
+                                                Command="{Binding DataContext.DeleteGroupCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{l:Loc OpcNode_DeleteGroup}"
+                                                Visibility="{Binding IsManageable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter TargetName="Actions" Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                        <Setter TargetName="AccentBar" Property="Background" Value="#1677FF"/>
+                                        <Setter TargetName="NameText" Property="Foreground" Value="#1677FF"/>
+                                        <Setter TargetName="NameText" Property="FontWeight" Value="SemiBold"/>
+                                        <Setter TargetName="CountText" Property="Foreground" Value="#1677FF"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- 右栏：查询 + 表格 + 分页 -->
+            <Border Grid.Column="2" Style="{StaticResource PanelCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 查询区 -->
+                    <StackPanel Grid.Row="0" Margin="14,12,14,8">
+                        <!-- 关键字 + 查询/重置 -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Margin="0,0,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid Grid.Column="0">
+                                    <TextBox x:Name="KeywordBox"
+                                             Text="{Binding Keyword, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource BaseTextBoxStyle}"
+                                             KeyDown="OnKeywordKeyDown"/>
+                                    <TextBlock Text="{l:Loc OpcNode_KeywordPlaceholder}"
+                                               IsHitTestVisible="False"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0"
+                                               FontSize="13" Foreground="#BFBFBF">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Keyword}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+
+                                <Button Grid.Column="1" Content="✕"
+                                        VerticalAlignment="Center"
+                                        Margin="6,0,0,0"
+                                        Style="{StaticResource GhostIconButtonStyle}"
+                                        Command="{Binding ClearKeywordChipCommand}"
+                                        ToolTip="{l:Loc Common_Clear}"
+                                        Visibility="{Binding HasKeywordChip, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </Grid>
+
+                            <Button Grid.Column="1" Content="{l:Loc OpcNode_Search}"
+                                    Command="{Binding SearchCommand}"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    MinWidth="76" Margin="0,0,8,0"/>
+                            <Button Grid.Column="2" Content="{l:Loc OpcNode_Reset}"
+                                    Command="{Binding ResetSearchCommand}"
+                                    Style="{StaticResource BaseButtonStyle}"
+                                    MinWidth="76"/>
+                        </Grid>
+
+                        <!-- 筛选 + 批量操作 -->
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox Grid.Column="0" Width="150" Margin="0,0,8,0"
+                                      ItemsSource="{Binding Groups}"
+                                      SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
+                                      DisplayMemberPath="Name"
+                                      Style="{StaticResource BaseComboBoxStyle}"
+                                      ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"/>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,8,0">
+                                <TextBlock Text="{l:Loc OpcNode_Writable}"
+                                           FontSize="12" Foreground="#8C8C8C"
+                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <ComboBox Width="100"
+                                          ItemsSource="{Binding WritableFilterOptions}"
+                                          SelectedIndex="{Binding WritableFilterIndex, Mode=TwoWay}"
+                                          Style="{StaticResource BaseComboBoxStyle}"
+                                          ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <TextBlock Text="{l:Loc OpcNode_ColRealtime}"
+                                           FontSize="12" Foreground="#8C8C8C"
+                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <ComboBox Width="100"
+                                          ItemsSource="{Binding RealtimeFilterOptions}"
+                                          SelectedIndex="{Binding RealtimeFilterIndex, Mode=TwoWay}"
+                                          Style="{StaticResource BaseComboBoxStyle}"
+                                          ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4" Orientation="Horizontal">
+                                <Button Content="{l:Loc OpcNode_Import}"
+                                        Command="{Binding ImportExcelCommand}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        MinWidth="96" Margin="0,0,8,0"/>
+                                <Button Content="{l:Loc OpcNode_Export}"
+                                        Command="{Binding ExportExcelCommand}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        MinWidth="96" Margin="0,0,8,0"/>
+                                <Button Content="{l:Loc OpcNode_BatchDelete}"
+                                        Command="{Binding DeleteSelectedNodesCommand}"
+                                        CommandParameter="{Binding SelectedItems, ElementName=NodeGrid}"
+                                        Style="{StaticResource BaseButtonStyle}"
+                                        MinWidth="96"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 生效条件标签 -->
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0"
+                                    Visibility="{Binding HasActiveFilter, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Border Style="{StaticResource ChipBorderStyle}"
+                                    Visibility="{Binding HasKeywordChip, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding KeywordChipText}" FontSize="12" Foreground="#1677FF"/>
+                                    <Button Content="✕" Style="{StaticResource ChipCloseButtonStyle}"
+                                            Command="{Binding ClearKeywordChipCommand}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource ChipBorderStyle}"
+                                    Visibility="{Binding HasGroupChip, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding GroupChipText}" FontSize="12" Foreground="#1677FF"/>
+                                    <Button Content="✕" Style="{StaticResource ChipCloseButtonStyle}"
+                                            Command="{Binding ClearGroupChipCommand}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource ChipBorderStyle}"
+                                    Visibility="{Binding HasWritableChip, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding WritableChipText}" FontSize="12" Foreground="#1677FF"/>
+                                    <Button Content="✕" Style="{StaticResource ChipCloseButtonStyle}"
+                                            Command="{Binding ClearWritableChipCommand}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource ChipBorderStyle}"
+                                    Visibility="{Binding HasRealtimeChip, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding RealtimeChipText}" FontSize="12" Foreground="#1677FF"/>
+                                    <Button Content="✕" Style="{StaticResource ChipCloseButtonStyle}"
+                                            Command="{Binding ClearRealtimeChipCommand}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 表格 -->
+                    <Grid Grid.Row="2">
+                        <DataGrid x:Name="NodeGrid"
+                                  ItemsSource="{Binding PageNodes}"
+                                  Style="{StaticResource LightDataGridStyle}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Extended"
+                                  SelectionUnit="FullRow"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{l:Loc OpcNode_ColNodeId}"
+                                                    Binding="{Binding NodeId}"
+                                                    Width="300">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontFamily" Value="Consolas, Segoe UI"/>
+                                            <Setter Property="FontSize" Value="12"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="ToolTip" Value="{Binding NodeId}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="{l:Loc OpcNode_ColDescription}"
+                                                    Binding="{Binding Description}"
+                                                    Width="240">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="ToolTip" Value="{Binding Description}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn Header="{l:Loc OpcNode_ColGroup}"
+                                                    Binding="{Binding GroupDisplayName}"
+                                                    Width="140"/>
+
+                                <DataGridTemplateColumn Header="{l:Loc OpcNode_ColWritable}" Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsWritable, Mode=OneWay}"
+                                                      IsHitTestVisible="False"
+                                                      Focusable="False"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="{l:Loc OpcNode_ColRealtime}" Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsShowInRealtime, Mode=OneWay}"
+                                                      IsHitTestVisible="False"
+                                                      Focusable="False"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="{l:Loc OpcNode_ColValue}" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding CurrentValue}"
+                                                       FontSize="12"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Foreground="{Binding Quality, Converter={StaticResource OpcQualityColor}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="{l:Loc OpcNode_ColUpdated}"
+                                                    Binding="{Binding LastUpdated, StringFormat='yyyy-MM-dd HH:mm:ss'}"
+                                                    Width="150"/>
+
+                                <DataGridTemplateColumn Header="{l:Loc OpcNode_ColActions}" Width="110">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Content="{l:Loc OpcNode_ActionEdit}"
+                                                        Style="{StaticResource RowLinkButtonStyle}"
+                                                        Command="{Binding DataContext.EditNodeCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                        CommandParameter="{Binding}"/>
+                                                <TextBlock Text="|" Foreground="#E8E8E8" FontSize="11"
+                                                           VerticalAlignment="Center"/>
+                                                <Button Content="{l:Loc OpcNode_ActionDelete}"
+                                                        Style="{StaticResource RowLinkButtonStyle}"
+                                                        Foreground="#E60012"
+                                                        Command="{Binding DataContext.DeleteNodeCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                        CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- 空状态 -->
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                    Visibility="{Binding HasNoResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="{l:Loc OpcNode_NoResult}"
+                                       FontSize="14" Foreground="#8C8C8C"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="{l:Loc OpcNode_NoResultHint}"
+                                       FontSize="12" Foreground="#BFBFBF"
+                                       Margin="0,6,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- 加载遮罩 -->
+                        <Border Background="#B3FFFFFF"
+                                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="{l:Loc Common_LoadingText}"
+                                       FontSize="13" Foreground="#1677FF"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- 分页条 -->
+                    <Border Grid.Row="3" BorderBrush="#F0F0F0" BorderThickness="0,1,0,0" Padding="14,8">
+                        <Grid>
+                            <TextBlock Text="{Binding PageInfoText}"
+                                       FontSize="12" Foreground="#8C8C8C"
+                                       VerticalAlignment="Center"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="{l:Loc OpcNode_PageSize}"
+                                           FontSize="12" Foreground="#8C8C8C"
+                                           VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <ComboBox Width="72" Height="28" Margin="0,0,14,0"
+                                          ItemsSource="{Binding PageSizeOptions}"
+                                          SelectedItem="{Binding PageSize}"
+                                          Style="{StaticResource BaseComboBoxStyle}"
+                                          ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"/>
+
+                                <Button Content="{l:Loc OpcNode_PrevPage}"
+                                        Style="{StaticResource PagerButtonStyle}"
+                                        Command="{Binding PreviousPageCommand}"
+                                        IsEnabled="{Binding CanGoPrevious}"/>
+
+                                <ItemsControl ItemsSource="{Binding PageNumbers}" VerticalAlignment="Center">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Button x:Name="PageBtn"
+                                                        Content="{Binding Text}"
+                                                        Style="{StaticResource PagerButtonStyle}"
+                                                        Command="{Binding DataContext.GoToPageCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                        CommandParameter="{Binding PageIndex}"/>
+                                                <TextBlock x:Name="Ellipsis" Text="…"
+                                                           FontSize="12" Foreground="#8C8C8C"
+                                                           VerticalAlignment="Center" Margin="4,0"
+                                                           Visibility="Collapsed"/>
+                                            </Grid>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsEllipsis}" Value="True">
+                                                    <Setter TargetName="PageBtn" Property="Visibility" Value="Collapsed"/>
+                                                    <Setter TargetName="Ellipsis" Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                    <Setter TargetName="PageBtn" Property="Background" Value="#1677FF"/>
+                                                    <Setter TargetName="PageBtn" Property="Foreground" Value="White"/>
+                                                    <Setter TargetName="PageBtn" Property="BorderBrush" Value="#1677FF"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Button Content="{l:Loc OpcNode_NextPage}"
+                                        Style="{StaticResource PagerButtonStyle}"
+                                        Command="{Binding NextPageCommand}"
+                                        IsEnabled="{Binding CanGoNext}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

@@ -24,7 +24,8 @@ namespace CncWallStation.ViewModels
             { "JsonEditPage", ("TabHeader_JsonEditor", typeof(Views.JsonEditPage)) },
             { "DataCheckPage", ("TabHeader_DataCheck", typeof(Views.DataCheckPage)) },
             { "PlcDataPage", ("TabHeader_PlcData", typeof(Views.PlcDataPage)) },
-            { "SettingPage", ("TabHeader_Settings", typeof(Views.SettingPage)) }
+            { "SettingPage", ("TabHeader_Settings", typeof(Views.SettingPage)) },
+            { "OpcNodeConfigPage", ("TabHeader_OpcNodeConfig", typeof(Views.OpcNodeConfigPage)) }
         };
 
         public ObservableCollection<TabItemViewModel> Tabs { get; } = new();

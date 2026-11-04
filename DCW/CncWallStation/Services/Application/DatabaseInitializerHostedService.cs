@@ -275,6 +275,33 @@ namespace CncWallStation.Services.Application
                     INDEX IX_MachiningRecord_WallId (WallId),
                     CONSTRAINT FK_MachiningRecord_Wall FOREIGN KEY (WallId) REFERENCES Wall(Id) ON DELETE CASCADE
                 );", cancellationToken);
+            // ===== OpcNodeGroup / OpcNode（OPC 节点配置页）=====
+            await db.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS OpcNodeGroup (
+                    Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    Name VARCHAR(64) NOT NULL,
+                    Description VARCHAR(256) NULL,
+                    SortOrder INT NOT NULL DEFAULT 0,
+                    CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY UX_OpcNodeGroup_Name (Name)
+                );", cancellationToken);
+
+            await db.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE IF NOT EXISTS OpcNode (
+                    Id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    GroupId INT NULL,
+                    NodeId VARCHAR(256) NOT NULL,
+                    Description VARCHAR(256) NULL,
+                    IsWritable TINYINT(1) NOT NULL DEFAULT 0,
+                    IsShowInRealtime TINYINT(1) NOT NULL DEFAULT 0,
+                    SortOrder INT NOT NULL DEFAULT 0,
+                    CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UpdatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE KEY UX_OpcNode_NodeId (NodeId),
+                    KEY IX_OpcNode_GroupId (GroupId),
+                    CONSTRAINT FK_OpcNode_OpcNodeGroup_GroupId
+                        FOREIGN KEY (GroupId) REFERENCES OpcNodeGroup (Id) ON DELETE SET NULL
+                );", cancellationToken);
         }
     }
 }

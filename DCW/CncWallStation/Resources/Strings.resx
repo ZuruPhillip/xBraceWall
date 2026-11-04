@@ -20,6 +20,7 @@
   <data name="Menu_Quality" xml:space="preserve"><value>质量控制</value></data>
   <data name="Menu_Report" xml:space="preserve"><value>报表分析</value></data>
   <data name="Menu_Settings" xml:space="preserve"><value>系统设置</value></data>
+  <data name="Menu_OpcNodeConfig" xml:space="preserve"><value>OPC节点配置</value></data>
 
   <!--  Tab 标题                                 -->
   <data name="TabHeader_WallList" xml:space="preserve"><value>墙体清单</value></data>
@@ -31,6 +32,7 @@
   <data name="TabHeader_DataCheck" xml:space="preserve"><value>数据预检</value></data>
   <data name="TabHeader_PlcData" xml:space="preserve"><value>PLC指令单元</value></data>
   <data name="TabHeader_Settings" xml:space="preserve"><value>系统设置</value></data>
+  <data name="TabHeader_OpcNodeConfig" xml:space="preserve"><value>OPC节点配置</value></data>
 
   <!-- ══════════════════════════════════════════ -->
   <!--  通用                                      -->
@@ -392,21 +394,112 @@
   <data name="Settings_SaveOpcConfig" xml:space="preserve"><value>保存配置</value></data>
   <data name="Settings_ConnectOpc" xml:space="preserve"><value>连接 OPC</value></data>
   <data name="Settings_DisconnectOpc" xml:space="preserve"><value>断开连接</value></data>
-  <data name="Settings_OpcNodeManagement" xml:space="preserve"><value>OPC 节点管理</value></data>
-  <data name="Settings_OpcNodeManagementDesc" xml:space="preserve"><value>配置需要读写和监控的 OPC UA 节点地址</value></data>
-  <data name="Settings_AddNode" xml:space="preserve"><value>添加新节点</value></data>
-  <data name="Settings_NodeIdPlaceholder" xml:space="preserve"><value>NodeId，如 ns=3;s=&quot;VarName&quot;</value></data>
-  <data name="Settings_NodeDescriptionPlaceholder" xml:space="preserve"><value>节点描述/别名</value></data>
-  <data name="Settings_NodeWritable" xml:space="preserve"><value>可写</value></data>
-  <data name="Settings_AddNodeBtn" xml:space="preserve"><value>添加节点</value></data>
-  <data name="Settings_DeleteNode" xml:space="preserve"><value>删除选中</value></data>
-  <data name="Settings_ClearAllNodes" xml:space="preserve"><value>清空全部</value></data>
-  <data name="Settings_GridNodeId" xml:space="preserve"><value>NodeId</value></data>
-  <data name="Settings_GridDescription" xml:space="preserve"><value>描述</value></data>
-  <data name="Settings_GridWritable" xml:space="preserve"><value>可写</value></data>
-  <data name="Settings_GridShowInRealtime" xml:space="preserve"><value>实时显示</value></data>
-  <data name="Settings_GridValue" xml:space="preserve"><value>当前值</value></data>
-  <data name="Settings_GridUpdated" xml:space="preserve"><value>更新时间</value></data>
+  <!-- ══════════════════════════════════════════ -->
+  <!--  OpcNodeConfigPage（OPC 节点配置）          -->
+  <!-- ══════════════════════════════════════════ -->
+  <data name="PageTitle_OpcNodeConfig" xml:space="preserve"><value>OPC 节点配置</value></data>
+  <data name="OpcNode_PageDesc" xml:space="preserve"><value>分组管理 OPC UA 节点，支持查询、分页与 Excel 批量维护</value></data>
+  <data name="OpcNode_Refresh" xml:space="preserve"><value>刷新</value></data>
+  <data name="OpcNode_NewNode" xml:space="preserve"><value>+ 新建节点</value></data>
+  <data name="OpcNode_NewNodeTitle" xml:space="preserve"><value>新建 OPC 节点</value></data>
+  <data name="OpcNode_EditNodeTitle" xml:space="preserve"><value>编辑 OPC 节点</value></data>
+
+  <!-- 分组 -->
+  <data name="OpcNode_GroupPanel" xml:space="preserve"><value>节点分组</value></data>
+  <data name="OpcNode_GroupAll" xml:space="preserve"><value>全部节点</value></data>
+  <data name="OpcNode_Ungrouped" xml:space="preserve"><value>未分组</value></data>
+  <data name="OpcNode_NewGroup" xml:space="preserve"><value>新建分组</value></data>
+  <data name="OpcNode_NewGroupTitle" xml:space="preserve"><value>新建分组</value></data>
+  <data name="OpcNode_RenameGroup" xml:space="preserve"><value>重命名分组</value></data>
+  <data name="OpcNode_RenameGroupTitle" xml:space="preserve"><value>重命名分组</value></data>
+  <data name="OpcNode_DeleteGroup" xml:space="preserve"><value>删除分组</value></data>
+  <data name="OpcNode_GroupName" xml:space="preserve"><value>分组名称</value></data>
+  <data name="OpcNode_GroupNameHint" xml:space="preserve"><value>最多 64 个字符</value></data>
+  <data name="OpcNode_GroupDesc" xml:space="preserve"><value>分组描述（可选）</value></data>
+  <data name="OpcNode_GroupNameRequired" xml:space="preserve"><value>请输入分组名称</value></data>
+  <data name="OpcNode_GroupNameTooLong" xml:space="preserve"><value>分组名称不能超过 {0} 个字符</value></data>
+  <data name="OpcNode_GroupNameExists" xml:space="preserve"><value>该分组名称已存在</value></data>
+  <data name="OpcNode_Group" xml:space="preserve"><value>所属分组</value></data>
+  <data name="OpcNode_GroupSaveFailed" xml:space="preserve"><value>分组操作失败：{0}</value></data>
+
+  <!-- 节点字段 -->
+  <data name="OpcNode_NodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="OpcNode_NodeIdPlaceholder" xml:space="preserve"><value>如 ns=3;s=&quot;VarName&quot;</value></data>
+  <data name="OpcNode_NodeIdEditHint" xml:space="preserve"><value>NodeId 是订阅标识，创建后不可修改</value></data>
+  <data name="OpcNode_NodeIdRequired" xml:space="preserve"><value>请输入 NodeId</value></data>
+  <data name="OpcNode_NodeIdTooLong" xml:space="preserve"><value>NodeId 长度不能超过 {0} 个字符</value></data>
+  <data name="OpcNode_NodeIdExists" xml:space="preserve"><value>该 NodeId 已存在</value></data>
+  <data name="OpcNode_Description" xml:space="preserve"><value>描述</value></data>
+  <data name="OpcNode_DescriptionPlaceholder" xml:space="preserve"><value>节点描述/别名</value></data>
+  <data name="OpcNode_Writable" xml:space="preserve"><value>可写</value></data>
+  <data name="OpcNode_ShowInRealtime" xml:space="preserve"><value>实时显示（控制页实时参数面板）</value></data>
+
+  <!-- 查询与筛选 -->
+  <data name="OpcNode_KeywordPlaceholder" xml:space="preserve"><value>搜索 NodeId 或描述</value></data>
+  <data name="OpcNode_Search" xml:space="preserve"><value>查询</value></data>
+  <data name="OpcNode_Reset" xml:space="preserve"><value>重置</value></data>
+  <data name="OpcNode_FilterAll" xml:space="preserve"><value>全部</value></data>
+  <data name="OpcNode_FilterWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="OpcNode_FilterReadOnly" xml:space="preserve"><value>只读</value></data>
+  <data name="OpcNode_FilterRealtimeYes" xml:space="preserve"><value>显示</value></data>
+  <data name="OpcNode_FilterRealtimeNo" xml:space="preserve"><value>不显示</value></data>
+  <data name="OpcNode_FilterKeywordLabel" xml:space="preserve"><value>关键字：{0}</value></data>
+  <data name="OpcNode_FilterGroupLabel" xml:space="preserve"><value>分组：{0}</value></data>
+  <data name="OpcNode_FilterWritableLabel" xml:space="preserve"><value>可写：{0}</value></data>
+  <data name="OpcNode_FilterRealtimeLabel" xml:space="preserve"><value>实时：{0}</value></data>
+  <data name="OpcNode_NoResult" xml:space="preserve"><value>未找到匹配节点</value></data>
+  <data name="OpcNode_NoResultHint" xml:space="preserve"><value>请调整查询条件后重试，或新建节点</value></data>
+
+  <!-- 表格 -->
+  <data name="OpcNode_ColNodeId" xml:space="preserve"><value>NodeId</value></data>
+  <data name="OpcNode_ColDescription" xml:space="preserve"><value>描述</value></data>
+  <data name="OpcNode_ColGroup" xml:space="preserve"><value>分组</value></data>
+  <data name="OpcNode_ColWritable" xml:space="preserve"><value>可写</value></data>
+  <data name="OpcNode_ColRealtime" xml:space="preserve"><value>实时显示</value></data>
+  <data name="OpcNode_ColValue" xml:space="preserve"><value>当前值</value></data>
+  <data name="OpcNode_ColUpdated" xml:space="preserve"><value>更新时间</value></data>
+  <data name="OpcNode_ColActions" xml:space="preserve"><value>操作</value></data>
+  <data name="OpcNode_ActionEdit" xml:space="preserve"><value>编辑</value></data>
+  <data name="OpcNode_ActionDelete" xml:space="preserve"><value>删除</value></data>
+
+  <!-- 分页 -->
+  <data name="OpcNode_TotalFormat" xml:space="preserve"><value>共 {0} 条</value></data>
+  <data name="OpcNode_RangeFormat" xml:space="preserve"><value>当前 {0}-{1} 条</value></data>
+  <data name="OpcNode_PageSize" xml:space="preserve"><value>每页</value></data>
+  <data name="OpcNode_PrevPage" xml:space="preserve"><value>上一页</value></data>
+  <data name="OpcNode_NextPage" xml:space="preserve"><value>下一页</value></data>
+
+  <!-- 删除确认 -->
+  <data name="OpcNode_DeleteTitle" xml:space="preserve"><value>确认删除</value></data>
+  <data name="OpcNode_DeleteConfirm" xml:space="preserve"><value>删除</value></data>
+  <data name="OpcNode_DeleteNodeMessage" xml:space="preserve"><value>确定要删除节点 &quot;{0}&quot; 吗？此操作不可撤销。</value></data>
+  <data name="OpcNode_DeleteNodeBatchMessage" xml:space="preserve"><value>确定要删除选中的 {0} 个节点吗？此操作不可撤销。</value></data>
+  <data name="OpcNode_DeleteGroupTitle" xml:space="preserve"><value>确认删除分组</value></data>
+  <data name="OpcNode_DeleteGroupMessage" xml:space="preserve"><value>确定要删除分组 &quot;{0}&quot; 吗？该分组下的 {1} 个节点将移至“未分组”。</value></data>
+  <data name="OpcNode_SelectNodeFirst" xml:space="preserve"><value>请先在表格中选择要删除的节点</value></data>
+  <data name="OpcNode_DeleteFailed" xml:space="preserve"><value>删除节点失败：{0}</value></data>
+  <data name="OpcNode_LoadFailed" xml:space="preserve"><value>加载 OPC 节点失败：{0}</value></data>
+  <data name="OpcNode_CreateNodeFailed" xml:space="preserve"><value>创建节点失败：{0}</value></data>
+  <data name="OpcNode_UpdateNodeFailed" xml:space="preserve"><value>更新节点失败：{0}</value></data>
+
+  <!-- Excel 导入导出 -->
+  <data name="OpcNode_Import" xml:space="preserve"><value>导入 Excel</value></data>
+  <data name="OpcNode_Export" xml:space="preserve"><value>导出 Excel</value></data>
+  <data name="OpcNode_BatchDelete" xml:space="preserve"><value>批量删除</value></data>
+  <data name="OpcNode_ExportEmpty" xml:space="preserve"><value>当前查询条件下无数据可导出</value></data>
+  <data name="OpcNode_ExportSuccess" xml:space="preserve"><value>已导出 {0} 个节点到：{1}</value></data>
+  <data name="OpcNode_ExportFailed" xml:space="preserve"><value>导出失败：{0}</value></data>
+  <data name="OpcNode_ImportEmpty" xml:space="preserve"><value>文件中没有可导入的节点</value></data>
+  <data name="OpcNode_ImportPreviewTitle" xml:space="preserve"><value>导入预览</value></data>
+  <data name="OpcNode_ImportFilePath" xml:space="preserve"><value>待导入文件</value></data>
+  <data name="OpcNode_ImportAdded" xml:space="preserve"><value>新增</value></data>
+  <data name="OpcNode_ImportUpdated" xml:space="preserve"><value>更新</value></data>
+  <data name="OpcNode_ImportSkipped" xml:space="preserve"><value>跳过</value></data>
+  <data name="OpcNode_ImportErrorsFormat" xml:space="preserve"><value>跳过明细（共 {0} 条，最多显示前 20 条）</value></data>
+  <data name="OpcNode_ImportErrorsMore" xml:space="preserve"><value>另有 {0} 条未显示</value></data>
+  <data name="OpcNode_ImportConfirm" xml:space="preserve"><value>确认导入</value></data>
+  <data name="OpcNode_ImportResultFormat" xml:space="preserve"><value>导入完成：新增 {0} 条，更新 {1} 条，跳过 {2} 条</value></data>
+  <data name="OpcNode_ImportFailed" xml:space="preserve"><value>导入失败：{0}</value></data>
 
   <!-- ══════════════════════════════════════════ -->
   <!--  ControllerPage - OPC 监控                -->

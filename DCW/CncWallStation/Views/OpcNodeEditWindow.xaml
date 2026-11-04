@@ -1,0 +1,146 @@
+<Window x:Class="CncWallStation.Views.OpcNodeEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:CncWallStation.Localization"
+        Title="{Binding Title}"
+        Width="520"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="#E8E8E8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#8C8C8C"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width" Value="76"/>
+        </Style>
+
+        <Style x:Key="FieldHintStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#BFBFBF"/>
+            <Setter Property="Margin" Value="0,6,0,0"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="16,16,16,4">
+
+            <!-- NodeId -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="76"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{l:Loc OpcNode_NodeId}"
+                                   Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding NodeId, UpdateSourceTrigger=PropertyChanged}"
+                                 IsReadOnly="{Binding IsEditMode}"
+                                 Style="{StaticResource BaseTextBoxStyle}"
+                                 MaxLength="256"/>
+                    </Grid>
+                    <TextBlock Text="{l:Loc OpcNode_NodeIdPlaceholder}"
+                               Style="{StaticResource FieldHintStyle}"
+                               Margin="76,6,0,0"
+                               Visibility="{Binding IsCreateMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding NodeIdHint}"
+                               Style="{StaticResource FieldHintStyle}"
+                               Margin="76,6,0,0"
+                               Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 描述 -->
+            <Border Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="76"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{l:Loc OpcNode_Description}"
+                               Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Grid.Column="1"
+                             Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource BaseTextBoxStyle}"
+                             MaxLength="256"
+                             ToolTip="{l:Loc OpcNode_DescriptionPlaceholder}"/>
+                </Grid>
+            </Border>
+
+            <!-- 所属分组 -->
+            <Border Style="{StaticResource CardStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="76"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{l:Loc OpcNode_Group}"
+                               Style="{StaticResource FieldLabelStyle}"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding GroupOptions}"
+                              SelectedItem="{Binding SelectedGroupOption}"
+                              DisplayMemberPath="Name"
+                              Style="{StaticResource BaseComboBoxStyle}"
+                              ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"/>
+                </Grid>
+            </Border>
+
+            <!-- 开关区 -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <CheckBox Content="{l:Loc OpcNode_Writable}"
+                              IsChecked="{Binding IsWritable}"
+                              FontSize="13" Foreground="#262626"
+                              Margin="0,2,0,10"/>
+                    <CheckBox Content="{l:Loc OpcNode_ShowInRealtime}"
+                              IsChecked="{Binding IsShowInRealtime}"
+                              FontSize="13" Foreground="#262626"
+                              Margin="0,2"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 校验错误 -->
+            <TextBlock Text="{Binding ErrorMessage}"
+                       FontSize="12" Foreground="#E60012"
+                       TextWrapping="Wrap" Margin="4,2,4,0"
+                       Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </StackPanel>
+
+        <!-- 底部按钮 -->
+        <Border Grid.Row="1" Background="White" BorderBrush="#E8E8E8" BorderThickness="0,1,0,0"
+                Padding="16,12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{l:Loc Common_Cancel}"
+                        Command="{Binding CancelCommand}"
+                        Style="{StaticResource BaseButtonStyle}"
+                        MinWidth="88" Margin="0,0,10,0"/>
+                <Button Content="{l:Loc Common_Save}"
+                        Command="{Binding SaveCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        MinWidth="88" IsDefault="True"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

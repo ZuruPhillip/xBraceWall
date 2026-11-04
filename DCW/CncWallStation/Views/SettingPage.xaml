@@ -4,7 +4,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:l="clr-namespace:CncWallStation.Localization"
-      xmlns:opc="clr-namespace:CncWallStation.Services.OpcUa"
       mc:Ignorable="d"
       d:DesignHeight="900" d:DesignWidth="1000"
       FontFamily="Segoe UI, PingFang SC, Microsoft YaHei">
@@ -90,15 +89,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-
-        <Style x:Key="WarnButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#EF4444"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#DC2626"/>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
@@ -238,119 +228,6 @@
                             <Button Content="{l:Loc Settings_DisconnectOpc}"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Command="{Binding DisconnectOpcCommand}"/>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- ==================== OPC 节点管理卡片 ==================== -->
-                <Border Background="White" CornerRadius="8"
-                        BorderBrush="#E8E8E8" BorderThickness="1"
-                        Padding="24,20" Margin="0,0,0,12">
-                    <StackPanel>
-                        <TextBlock Text="{l:Loc Settings_OpcNodeManagement}"
-                                   FontSize="16" FontWeight="Bold"
-                                   Foreground="#1A1A1A" Margin="0,0,0,4"/>
-                        <TextBlock Text="{l:Loc Settings_OpcNodeManagementDesc}"
-                                   FontSize="13" Foreground="#8C8C8C"
-                                   Margin="0,0,0,16"/>
-
-                        <!-- 添加节点区域 -->
-                        <Border Background="#F8FAFC" CornerRadius="4"
-                                BorderBrush="#E2E8F0" BorderThickness="1"
-                                Padding="12" Margin="0,0,0,12">
-                            <StackPanel>
-                                <TextBlock Text="{l:Loc Settings_AddNode}" FontSize="14"
-                                           FontWeight="SemiBold" Foreground="#333"
-                                           Margin="0,0,0,8"/>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="220"/>
-                                        <ColumnDefinition Width="180"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <TextBox Grid.Column="0" Text="{Binding NewNodeId, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBoxStyle}"
-                                             Margin="0,0,8,0"
-                                             Tag="{l:Loc Settings_NodeIdPlaceholder}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding NewNodeDescription, UpdateSourceTrigger=PropertyChanged}"
-                                             Style="{StaticResource FormTextBoxStyle}"
-                                             Margin="0,0,8,0"
-                                             Tag="{l:Loc Settings_NodeDescriptionPlaceholder}"/>
-                                    <CheckBox Grid.Column="2" IsChecked="{Binding NewNodeIsWritable}"
-                                              Content="{l:Loc Settings_NodeWritable}"
-                                              VerticalAlignment="Center" Margin="0,0,12,0"/>
-                                    <Button Grid.Column="3" Content="{l:Loc Settings_AddNodeBtn}"
-                                            Style="{StaticResource ActionButtonStyle}"
-                                            Command="{Binding AddOpcNodeCommand}"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- 节点列表 DataGrid -->
-                        <DataGrid ItemsSource="{Binding OpcNodes}"
-                                  SelectedItem="{Binding SelectedOpcNode}"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  CanUserDeleteRows="False"
-                                  IsReadOnly="False"
-                                  MinHeight="150"
-                                  MaxHeight="300"
-                                  GridLinesVisibility="Horizontal"
-                                  HeadersVisibility="Column"
-                                  BorderBrush="#E2E8F0">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="{l:Loc Settings_GridNodeId}"
-                                                    Binding="{Binding NodeId}"
-                                                    Width="200"
-                                                    IsReadOnly="True"/>
-                                <DataGridTextColumn Header="{l:Loc Settings_GridDescription}"
-                                                    Binding="{Binding Description}"
-                                                    Width="160"
-                                                    IsReadOnly="True"/>
-                                <DataGridTemplateColumn Header="{l:Loc Settings_GridWritable}"
-                                                        Width="60">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding IsWritable, UpdateSourceTrigger=PropertyChanged}"
-                                                      HorizontalAlignment="Center"
-                                                      IsHitTestVisible="True"
-                                                      ClickMode="Press"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="{l:Loc Settings_GridShowInRealtime}"
-                                                        Width="80">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding IsShowInRealtime, UpdateSourceTrigger=PropertyChanged}"
-                                                      HorizontalAlignment="Center"
-                                                      IsHitTestVisible="True"
-                                                      ClickMode="Press"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{l:Loc Settings_GridValue}"
-                                                    Binding="{Binding CurrentValue}"
-                                                    Width="120"
-                                                    IsReadOnly="True"/>
-                                <DataGridTextColumn Header="{l:Loc Settings_GridUpdated}"
-                                                    Binding="{Binding LastUpdated, StringFormat='yyyy-MM-dd HH:mm:ss'}"
-                                                    Width="160"
-                                                    IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-
-                        <!-- 操作按钮 -->
-                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                            <Button Content="{l:Loc Settings_DeleteNode}"
-                                    Style="{StaticResource WarnButtonStyle}"
-                                    Command="{Binding DeleteOpcNodeCommand}"/>
-                            <Button Content="{l:Loc Settings_ClearAllNodes}"
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding ClearAllOpcNodesCommand}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

@@ -12,9 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -26,6 +24,7 @@ namespace CncWallStation.ViewModels
         private readonly ILogger<ControllerPageViewModel> _logger;
         private readonly IOpcUaService _opcUaService;
         private readonly IMachiningAppService _machiningAppService;
+        private readonly IOpcNodeAppService _opcNodeAppService;
         private readonly IServiceProvider _serviceProvider;
 
         // 计时器
@@ -35,11 +34,6 @@ namespace CncWallStation.ViewModels
 
         // 释放标志
         private bool _disposed;
-
-        // OPC 节点配置文件路径（与 SettingPageViewModel 共用同一文件）
-        private static readonly string NodesFilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CncWallStation", "opc_nodes.json");
 
         // 当前墙体数据
         [ObservableProperty] private WallInfoDto? _currentWall;
@@ -93,11 +87,13 @@ namespace CncWallStation.ViewModels
             ILogger<ControllerPageViewModel> logger,
             IOpcUaService opcUaService,
             IMachiningAppService machiningAppService,
+            IOpcNodeAppService opcNodeAppService,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
             _opcUaService = opcUaService;
             _machiningAppService = machiningAppService;
+            _opcNodeAppService = opcNodeAppService;
             _serviceProvider = serviceProvider;
 
             _machiningTimer = new DispatcherTimer
@@ -119,8 +115,8 @@ namespace CncWallStation.ViewModels
         {
             try
             {
-                // 加载用户在系统设置中勾选的实时参数节点
-                LoadRealtimeNodesFromFile();
+                // 加载用户在【OPC节点配置】页勾选“实时显示”的节点
+                await LoadRealtimeNodesAsync();
 
                 // 若 OPC 已连接，立即订阅实时参数节点（覆盖"先连接后打开控制页"的场景）
                 if (_opcUaService.IsConnected)
@@ -351,31 +347,27 @@ namespace CncWallStation.ViewModels
             }
         }
 
-        /// <summary>从 opc_nodes.json 加载用户勾选了"实时显示"的节点到面板</summary>
         /// <summary>
-        /// 重新从配置文件加载实时参数节点并订阅。
-        /// 供页面切换到控制页签时调用，确保用户在系统设置中的最新勾选同步生效。
+        /// 重新从数据库加载实时参数节点并订阅。
+        /// 供页面切换到控制页签时调用，确保用户在【OPC节点配置】页的最新勾选同步生效。
         /// </summary>
         public async Task ReloadRealtimeNodesAsync()
         {
-            LoadRealtimeNodesFromFile();
+            await LoadRealtimeNodesAsync();
             await SubscribeRealtimeNodesAsync();
         }
 
-        private void LoadRealtimeNodesFromFile()
+        /// <summary>从数据库加载勾选了“实时显示”的节点到控制页面板</summary>
+        private async Task LoadRealtimeNodesAsync()
         {
             RealtimeNodes.Clear();
             _realtimeNodeMap.Clear();
 
             try
             {
-                if (!File.Exists(NodesFilePath)) return;
+                var nodes = await _opcNodeAppService.GetRealtimeNodesAsync();
 
-                var json = File.ReadAllText(NodesFilePath);
-                var nodes = JsonSerializer.Deserialize<List<OpcNodeConfig>>(json);
-                if (nodes == null) return;
-
-                foreach (var node in nodes.Where(n => n.IsShowInRealtime))
+                foreach (var node in nodes)
                 {
                     var dto = new RealtimeNodeItemDto
                     {
