@@ -20,6 +20,11 @@ namespace CncWallStation.Features.MepSlots
     /// │ waffleBox   │ 只能是端点，从端点向内 100mm 段宽度变为 100mm          │
     /// │ device      │ 只能是端点，从端点向内 60mm 段深度渐变 60mm→18mm      │
     /// └─────────────┴──────────────────────────────────────────────────────┘
+    ///
+    /// 关于 corner 圆弧的方向：此处按真实拐弯几何生成（左转 = 逆时针，右转 = 顺时针），
+    /// 以保持 MOM 几何与 3D 渲染正确；PLC 指令发射前由
+    /// <see cref="MepSlotPartitioner"/> 统一归一化为逆时针表示（顺时针弧交换起止角，
+    /// 并反向组织 arc 分区的相邻直线截断点），因此本层无需关心指令方位。
     /// </summary>
     internal static class MepCableConverter
     {
@@ -244,6 +249,8 @@ namespace CncWallStation.Features.MepSlots
                         arcEnd.X - center.X) * (180f / MathF.PI);
 
                     // ── 叉积改为实例方法调用 ─────────────────────────────────
+                    // 圆弧方向 = 真实拐弯方向（左转逆时针 / 右转顺时针），保持几何与渲染正确；
+                    // PLC 发射前的逆时针归一化由 MepSlotPartitioner 负责，此处不要改成恒 false。
                     float cross = d1Norm.Cross(d2Norm);
                     bool isCw = cross > 0;
 
@@ -369,7 +376,10 @@ namespace CncWallStation.Features.MepSlots
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Step5 辅助：渐变深度段拆分（10 步模拟）
+        // Step5 辅助：渐变深度段拆分
+        // 注意：默认 steps = 1，最终只生成 1 段、深度取起止深度中值
+        //       （(60+18)/2 = 39mm），并非多段阶梯渐变；
+        //       如需阶梯近似，调用处需显式传入更大的步数。
         // ═══════════════════════════════════════════════════════════════════════
 
         private static void BuildTaperLines(
@@ -547,7 +557,7 @@ namespace CncWallStation.Features.MepSlots
             │
             ▼
       遍历 buildCmds → MepSlot.AddLine / AddArc / LineTo
-      • CmdTaperLine → 拆成10小段模拟渐变
+      • CmdTaperLine → 按 steps 拆分（默认 1 段，深度取中值）
          */
 
         // ═══════════════════════════════════════════════════════════════════════

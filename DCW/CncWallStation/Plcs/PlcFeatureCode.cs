@@ -37,10 +37,13 @@
 
         // T8 线槽/盒  & 斜槽
         public const int CableBox = 10;   // 线盒
-        public const int CableSlotL5 = 5;    // L 型 5
-        public const int CableSlotL6 = 6;    // L 型 6
-        public const int CableSlotL7 = 7;    // L 型 7
-        public const int CableSlotL8 = 8;    // L 型 8
+
+        // ── 圆弧线槽（圆弧指令一律按逆时针解释，F 值仅区分方位）──
+        // 方位以「分区起点 → 分区终点」的增量 (dx, dy) 判定，墙局部坐标 Y 增大 = 上
+        public const int CableSlotL5 = 5;    // L 型 5：dx>0, dy<0（左上→右下）
+        public const int CableSlotL6 = 6;    // L 型 6：dx>0, dy>0（左下→右上）；亦为方位退化时的回退值
+        public const int CableSlotL7 = 7;    // L 型 7：dx<0, dy>0（右下→左上）
+        public const int CableSlotL8 = 8;    // L 型 8：dx<0, dy<0（右上→左下）
         public const int DiagLU_RD = 31;   // 左上→右下
         public const int DiagLD_RU = 30;   // 左下→右上
         public const int DiagWideLD_RU = 32;   // 左下→右上 宽槽

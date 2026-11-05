@@ -77,10 +77,14 @@ namespace CncWallStation.Plcs.Handlers
             bool ok =
                 // ① 侧面 Φ25 → T3
                 (side == MachineSide.Front && Match(d, DIAMETER_25)) ||
+                // ① 侧面 Φ25 → T3 TODO
+                (side == MachineSide.Front && Match(d, DIAMETER_20)) ||
                 // ② 侧面 Φ12 → T9
                 (side == MachineSide.Front && Match(d, DIAMETER_12)) ||
                 // ① 侧面 Φ25 → T3
                 (side == MachineSide.Back && Match(d, DIAMETER_25)) ||
+                // ① 侧面 Φ25 → T3 TODO
+                (side == MachineSide.Back && Match(d, DIAMETER_20)) ||
                 // ② 侧面 Φ12 → T9
                 (side == MachineSide.Back && Match(d, DIAMETER_12)) ||
                 // ③ 顶面 Φ20 → T8
@@ -147,6 +151,8 @@ namespace CncWallStation.Plcs.Handlers
         {
             if (side == MachineSide.Front)
             {
+                if (Match(diameter, DIAMETER_20))
+                    return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9 TODO
                 if (Match(diameter, DIAMETER_25))
                     return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9
                 if (Match(diameter, DIAMETER_12))
@@ -156,6 +162,8 @@ namespace CncWallStation.Plcs.Handlers
             {
                 if (Match(diameter, DIAMETER_25))
                     return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9
+                if (Match(diameter, DIAMETER_20))
+                    return (PlcTool.LargeDrill, PlcFeatureCode.BottomHole);   // T3 F9 TODO
                 if (Match(diameter, DIAMETER_12))
                     return (PlcTool.SmallDrill, PlcFeatureCode.BottomHole);   // T9 F9
             }

@@ -13,13 +13,17 @@ namespace CncWallStation.Features.MepSlots
     /// ┌───────────────────────────────────────────────────────────────────────┐
     /// │ 1. 直线分段：仅将路径上连续、且宽度(OverrideWidth ?? Width)与深度都相同  │
     /// │    的相邻直线段合并为同一分段；圆弧段(arc)作为强制断点。                 │
-    /// │ 2. arc 分段：取上一段直线中点 prevMid 与下一段直线中点 nextMid 作为切割点，│
-    /// │    构造一个独立 MepSlot，内容 = [prevMid→prevEnd] + Arc + [nextStart→nextMid]，│
-    /// │    起点为 prevMid，终点为 nextMid。                                    │
-    /// │ 3. 切割点连续性：prevMid 成为前一直线分段的终点、当前 arc 分段的起点；   │
+    /// │ 2. 圆弧逆时针归一化：所有圆弧一律以逆时针表示（顺时针弧交换起止角，      │
+    /// │    几何等价，但起点变为原终点），因为 PLC 侧圆弧指令恒按逆时针解释。      │
+    /// │ 3. arc 分段：取上一段直线中点 prevMid 与下一段直线中点 nextMid 作为切割点，│
+    /// │    依据归一化后圆弧的起点落在哪一端决定分区的行进方向：                 │
+    /// │    • 起点 = 前段终点 → 正向 [prevMid→prevEnd] + Arc + [nextStart→nextMid]；│
+    /// │    • 起点 = 后段起点 → 反向 [nextMid→nextStart] + Arc + [prevEnd→prevMid] │
+    /// │      （即“相邻直线截断点对调”，分区首尾仍严格连续，但 X0/Y0 变为出刀侧）。│
+    /// │ 4. 切割点连续性：prevMid 成为前一直线分段的终点、当前 arc 分段的起点；   │
     /// │    nextMid 成为当前 arc 分段的终点、后一分段的起点，保证首尾严格连续。   │
-    /// │ 4. 异常处理：若 arc 上一段或下一段不是直线段，则记录异常到日志，          │
-    /// │    且不创建该 arc 对应的分段。                                          │
+    /// │ 5. 异常处理：若 arc 上一段或下一段不是直线段，或归一化后起点与前后直线    │
+    /// │    端点均不重合，则记录异常到日志，且不创建该 arc 对应的分段。           │
     /// └───────────────────────────────────────────────────────────────────────┘
     /// </summary>
     public static class MepSlotPartitioner
@@ -86,20 +90,47 @@ namespace CncWallStation.Features.MepSlots
                     Vec2 prevMid = Mid(prevLine.StartPoint, prevLine.EndPoint);
                     Vec2 nextMid = Mid(nextLine.StartPoint, nextLine.EndPoint);
 
-                    // 构造 arc 分段：[prevMid→prevEnd] + Arc + [nextStart→nextMid]
-                    var arcPart = new MepSlot($"{slot.Id}-arc{i}", slot.InitialSide, slot.Width);
+                    // 归一化为逆时针表示（顺时针弧交换起止角，几何等价但起点=原终点）
+                    var ccw = arc.ToCounterClockwise();
 
-                    arcPart.AddSegment(new LineSegment(prevMid, prevLine.EndPoint, prevLine.Depth)
-                    { OverrideWidth = prevLine.OverrideWidth });
+                    // 按归一化后圆弧的真实起点决定分区行进方向，保证首尾严格连续
+                    MepSlot? arcPart = null;
 
-                    arcPart.AddArc(arc.Center, arc.Radius,
-                                   arc.StartAngleDeg, arc.EndAngleDeg,
-                                   arc.Depth, arc.IsClockwise);
-                    if (arc.OverrideWidth.HasValue)
-                        arcPart.Segments[^1].OverrideWidth = arc.OverrideWidth;
+                    if (IsSamePoint(ccw.StartPoint, prevLine.EndPoint))
+                    {
+                        // 正向：[prevMid→prevEnd] + Arc(逆时针) + [nextStart→nextMid]
+                        arcPart = new MepSlot($"{slot.Id}-arc{i}", slot.InitialSide, slot.Width);
 
-                    arcPart.AddSegment(new LineSegment(nextLine.StartPoint, nextMid, nextLine.Depth)
-                    { OverrideWidth = nextLine.OverrideWidth });
+                        arcPart.AddSegment(
+                            new LineSegment(prevMid, prevLine.EndPoint, prevLine.Depth)
+                            { OverrideWidth = prevLine.OverrideWidth });
+                        arcPart.AddSegment(ccw);
+                        arcPart.AddSegment(
+                            new LineSegment(nextLine.StartPoint, nextMid, nextLine.Depth)
+                            { OverrideWidth = nextLine.OverrideWidth });
+                    }
+                    else if (IsSamePoint(ccw.StartPoint, nextLine.StartPoint))
+                    {
+                        // 反向（原顺时针弧）：[nextMid→nextStart] + Arc(逆时针) + [prevEnd→prevMid]
+                        arcPart = new MepSlot($"{slot.Id}-arc{i}", slot.InitialSide, slot.Width);
+
+                        arcPart.AddSegment(
+                            new LineSegment(nextMid, nextLine.StartPoint, nextLine.Depth)
+                            { OverrideWidth = nextLine.OverrideWidth });
+                        arcPart.AddSegment(ccw);
+                        arcPart.AddSegment(
+                            new LineSegment(prevLine.EndPoint, prevMid, prevLine.Depth)
+                            { OverrideWidth = prevLine.OverrideWidth });
+                    }
+                    else
+                    {
+                        // 异常：归一化后圆弧起点与前后直线端点均不重合，无法保证连续性
+                        logger?.LogError(
+                            "[MepSlot {MepSlotId}] 圆弧段(index={ArcIndex})逆时针归一化后起点({ArcStart})" +
+                            "与前段终点({PrevEnd})、后段起点({NextStart})均不重合，跳过该圆弧分段。",
+                            slot.Id, i, ccw.StartPoint, prevLine.EndPoint, nextLine.StartPoint);
+                        continue;
+                    }
 
                     result.Add(arcPart);
                 }
@@ -163,6 +194,13 @@ namespace CncWallStation.Features.MepSlots
 
         /// <summary>直线中点</summary>
         private static Vec2 Mid(Vec2 a, Vec2 b) => (a + b) * 0.5f;
+
+        /// <summary>端点重合判定容差（mm）：仅用于判断圆弧起点落在哪一端，比几何容差略宽以吸收三角函数误差</summary>
+        private const float EndpointTol = 0.01f;
+
+        /// <summary>判断两端点是否重合（用于决定 arc 分区的行进方向）</summary>
+        private static bool IsSamePoint(Vec2 a, Vec2 b)
+            => (a - b).Length() <= EndpointTol;
 
         /// <summary>判断 idx 处是否为"前后均为直线段"的有效圆弧</summary>
         private static bool IsValidArc(List<ISegment> segs, int idx)

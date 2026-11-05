@@ -108,7 +108,7 @@ namespace CncWallStation.Plcs
                 foreach (var slot in cableSlots)
                     cablePartitions.AddRange(MepSlotPartitioner.Partition(slot, logger));
 
-                CableHandler.HandleBatch(cablePartitions, ctx);
+                CableHandler.HandleBatch(cablePartitions, ctx, logger);
                 AddGroupIfNotEmpty(groups, "CableHandler", "电缆槽", ctx.Output, before);
             }
 

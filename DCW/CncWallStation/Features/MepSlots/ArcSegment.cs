@@ -191,6 +191,30 @@ namespace CncWallStation.Features.MepSlots
             return new ArcSegment(center, radius, sa, ea, depth, cw, true);
         }
 
+        // ── 方向归一化 ───────────────────────────────────────
+
+        /// <summary>
+        /// 几何等价地转换为逆时针表示（PLC 侧圆弧指令一律按逆时针解释）。
+        ///
+        /// 规则：
+        ///   • 已是逆时针（<see cref="IsClockwise"/> = false）：直接克隆，扫掠与起止点不变；
+        ///   • 顺时针（CW）：交换起止角并置 <see cref="IsClockwise"/> = false，
+        ///     得到的是「同一段圆弧」的逆时针走法——起点 = 原终点、终点 = 原起点，
+        ///     因此调用方必须相应调整相邻段的截断点，否则路径首尾不再相接。
+        ///
+        /// 始终返回新实例，避免分区与原特征共享可变段对象（变换会原地修改圆弧）。
+        /// </summary>
+        public ArcSegment ToCounterClockwise()
+        {
+            // 内部构造（弧度），避免 度→弧度 往返误差
+            var normalized = IsClockwise
+                ? new ArcSegment(Center, Radius, EndAngle, StartAngle, Depth, false, true)
+                : new ArcSegment(Center, Radius, StartAngle, EndAngle, Depth, false, true);
+
+            normalized.OverrideWidth = OverrideWidth;
+            return normalized;
+        }
+
         // ── 实现接口 ─────────────────────────────────────────
 
         public ISegment Remap(

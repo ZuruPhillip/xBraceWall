@@ -49,7 +49,7 @@ namespace CncWallStation.VersionMappers
             ConvertShearKeysToFeature(dto.ShearKeys, momWallData);
 
             // 生成 MepCableSlot 数据（V002 加工面/类型从 mepCableCutouts 关联）
-            ConvertMepCableToFeature(dto.MepCables, dto.MepCableCutouts, momWallData);
+            //ConvertMepCableToFeature(dto.MepCables, dto.MepCableCutouts, momWallData);
 
             // 生成 MepCableCutout 线槽数据（V002 新增）
             ConvertMepCableCutoutsToFeature(dto.MepCableCutouts, momWallData);
